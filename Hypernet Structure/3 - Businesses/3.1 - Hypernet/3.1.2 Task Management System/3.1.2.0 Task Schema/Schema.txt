@@ -1,0 +1,32 @@
+ach task is an Object with this structure (super basic, will be expanded):
+Task Object:
+├── General Metadata
+│   ├── Hypernet Address (3.1.2.1.XXX)
+│   ├── Task ID (unique identifier)
+│   ├── Created Date/Time
+│   ├── Created By (Person Object link)
+│   ├── Status (Open/Assigned/In Progress/Blocked/Complete)
+│   ├── Priority (Critical/High/Medium/Low)
+│   └── Tags/Keywords
+├── Task-Specific Metadata
+│   ├── Title
+│   ├── Description
+│   ├── Estimated Hours
+│   ├── Actual Hours (tracking)
+│   ├── Skills Required (array)
+│   ├── Deliverables (array)
+│   ├── Acceptance Criteria
+│   ├── Due Date (if applicable)
+│   └── Budget (if applicable)
+├── Relationship Links
+│   ├── Assigned To (Person Objects)
+│   ├── Upstream Dependencies (Task Objects)
+│   ├── Downstream Dependents (Task Objects)
+│   ├── Related Documents (Document Objects)
+│   ├── Related Discussions (Discussion Objects)
+│   └── Parent Task (for subtasks)
+└── Tracking Data
+    ├── Activity Log
+    ├── Comments/Updates
+    ├── File Attachments
+    └── Status Change History

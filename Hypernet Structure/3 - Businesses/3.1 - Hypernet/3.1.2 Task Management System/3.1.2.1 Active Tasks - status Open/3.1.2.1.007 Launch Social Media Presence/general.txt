@@ -1,0 +1,14 @@
+Location: 3.1.6.2
+Priority: HIGH
+Estimated Hours: 30 (setup) + 10/week (ongoing)
+Skills Required: Social media management, content creation, community management
+Deliverables:
+Twitter/X account + strategy
+LinkedIn company page + strategy
+YouTube channel (for videos)
+Reddit presence strategy
+Content calendar (30 days)
+Viral campaign concepts
+Why: Build awareness, community, momentum
+Upstream: Task 004
+Downstream: Community growth, Kickstarter success

@@ -1,0 +1,14 @@
+Location: 3.1.6.4
+Priority: HIGH
+Estimated Hours: 80
+Skills Required: Marketing, video production, copywriting, campaign management
+Deliverables:
+Campaign video (using AI video tools mentioned)
+Campaign page copy
+Reward tier structure (sequential numbering emphasis)
+@alias auction mechanics
+Funding goal justification
+Fulfillment plan
+Why: Primary initial funding mechanism
+Upstream: Task 004 (website for credibility)
+Downstream: Revenue, community building

@@ -1,0 +1,12 @@
+Location: 3.1.3.2
+Priority: CRITICAL
+Estimated Hours: 20
+Skills Required: HR, organizational design
+Deliverables:
+Complete skills taxonomy
+Role definitions
+Skill assessment framework
+Team member profile templates
+Why: Match people to tasks effectively
+Upstream: Task 001
+Downstream: All task assignments

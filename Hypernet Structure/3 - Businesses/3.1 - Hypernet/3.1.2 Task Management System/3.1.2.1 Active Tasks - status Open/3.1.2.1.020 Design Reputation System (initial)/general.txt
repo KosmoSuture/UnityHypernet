@@ -1,0 +1,14 @@
+Location: 3.1.5.1
+Priority: MEDIUM
+Estimated Hours: 80
+Skills Required: Algorithm design, game theory, social systems design
+Deliverables:
+Reputation schema design
+Knowledge reputation algorithm
+Character reputation algorithm
+Gaming/manipulation prevention
+Visualization approach
+Testing framework
+Why: Core to discussion/voting/truth systems
+Upstream: Task 009
+Downstream: All community features
