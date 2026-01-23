@@ -1,0 +1,20 @@
+
+
+# 1. Synopsis.
+This is a template for people to record their contributions to the Hypernet.  This is a rough draft and will be modified in the future to provide additional details, but I'm starting it simple
+
+
+# 2.  Paid Hours. 
+These are hours that are paid and will get 1 credit hour to the profit sharing pool
+
+| Date | Time | Total Hours | Project applied to | Description of work done. |
+| ---- | ---- | ----------- | ------------------ | ------------------------- |
+|      |      |             |                    |                           |
+
+
+# 3. Unpaid hours
+These are hours that are unpaid and will get 10 credit hours to the profit sharing pool
+
+| Date | Time | Total Hours | Project applied to | Description of work done. |
+| ---- | ---- | ----------- | ------------------ | ------------------------- |
+|      |      |             |                    |                           |
