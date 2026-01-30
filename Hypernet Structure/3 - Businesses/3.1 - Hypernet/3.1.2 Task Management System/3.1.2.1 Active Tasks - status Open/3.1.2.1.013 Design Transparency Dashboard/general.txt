@@ -1,13 +1,157 @@
-Location: 3.1.4.5
-Priority: MEDIUM
-Estimated Hours: 60
-Skills Required: Data visualization, web development, UX
+================================================================================
+TASK OBJECT: 3.1.2.1.013 - Design Transparency Dashboard
+================================================================================
+
+─────────────────────────────────────────────────────────────────────────────────
+GENERAL METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Hypernet Address:       3.1.2.1.013
+Task ID:                TASK-013
+Created Date/Time:      2025-01-30 00:00:00 UTC
+Created By:             [Person Object: TBD - Founder/Project Lead]
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          transparency, dashboard, data-visualization, trust,
+                        accountability, metrics, public-facing, real-time
+
+─────────────────────────────────────────────────────────────────────────────────
+TASK-SPECIFIC METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Title:                  Design Transparency Dashboard
+
+Description:            Create a public-facing dashboard that demonstrates Hypernet's
+                        commitment to transparency. Display financial tracking,
+                        contribution metrics, decision logs, development progress,
+                        and real-time metrics. Core to the "#1 most trusted company"
+                        mission.
+
+Estimated Hours:        60
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Data Visualization
+  - Web Development
+  - UX Design
+  - Backend Development
+  - Database Integration
+  - Real-time Systems
+
 Deliverables:
-Public financial tracking interface
-Contribution visualization
-Decision log public interface
-Code commit transparency
-Real-time metrics display
-Why: Core to "#1 most trusted" mission
-Upstream: Tasks 002, 004
-Downstream: Trust building, community engagement
+  1. Public financial tracking interface
+     - Income/revenue display
+     - Expense breakdown
+     - Budget vs. actual
+     - Runway calculations
+     - Historical trends
+     - Audit trail links
+
+  2. Contribution visualization
+     - Active contributors count
+     - Hours contributed (aggregate)
+     - Task completion metrics
+     - Skill distribution
+     - Geographic distribution
+     - Growth trends
+
+  3. Decision log public interface
+     - Major decisions recorded
+     - Rationale documented
+     - Voting records (where applicable)
+     - Timeline of decisions
+     - Search and filter capability
+
+  4. Code commit transparency
+     - GitHub activity feed
+     - Commit frequency
+     - Code review metrics
+     - Release history
+     - Issue/PR statistics
+     - Test coverage trends
+
+  5. Real-time metrics display
+     - Live system status
+     - Key performance indicators
+     - Progress toward milestones
+     - Community engagement metrics
+     - Update timestamps
+     - Data freshness indicators
+
+Acceptance Criteria:
+  - [ ] Dashboard is publicly accessible
+  - [ ] Financial data updates at least weekly
+  - [ ] Contribution metrics are accurate
+  - [ ] Decision log is comprehensive
+  - [ ] GitHub integration is functional
+  - [ ] Real-time updates work correctly
+  - [ ] Mobile responsive design
+  - [ ] Load time under 3 seconds
+  - [ ] Data accuracy verified
+  - [ ] Privacy considerations addressed (aggregate vs. individual)
+
+Due Date:               [TBD - After Tasks 002 and 004]
+
+Budget:
+  - Development: Internal team hours
+  - Visualization libraries: Free/open source
+  - Hosting: Included with website
+  - Estimated: $0-100/month additional
+
+─────────────────────────────────────────────────────────────────────────────────
+RELATIONSHIP LINKS
+─────────────────────────────────────────────────────────────────────────────────
+Assigned To:            [Unassigned - Needs Frontend Developer + Designer]
+
+Upstream Dependencies:
+  - 3.1.2.1.002 Create Task Management System (Required)
+  - 3.1.2.1.004 Build Unity Website (Required - integration point)
+
+Downstream Dependents:
+  - [Trust and credibility building]
+  - [Community engagement]
+  - [Investor confidence]
+
+Related Documents:
+  - [Document Object: Dashboard Requirements - TBD]
+  - [Document Object: Data Privacy Policy - TBD]
+  - [Document Object: Metrics Definitions - TBD]
+
+Related Discussions:
+  - [Discussion Object: What to Display Thread - TBD]
+  - [Discussion Object: Privacy Boundaries Thread - TBD]
+
+Parent Task:            None (Top-level task)
+
+─────────────────────────────────────────────────────────────────────────────────
+TRACKING DATA
+─────────────────────────────────────────────────────────────────────────────────
+Activity Log:
+  [2025-01-30] Task created and documented in schema format
+
+Comments/Updates:
+  - Transparency is a core differentiator - this demonstrates it
+  - Balance transparency with privacy (aggregate data where appropriate)
+  - Start simple, add complexity over time
+  - Automation is key - manual updates won't scale
+  - Consider embedding in main website
+
+File Attachments:       None
+
+Status Change History:
+  [2025-01-30] Status: Created -> Open
+
+================================================================================
+NOTES
+================================================================================
+Why: Core to "#1 most trusted" mission. Radical transparency builds trust
+and differentiates Hypernet from traditional tech companies.
+
+Reference Location: 3.1.4.5 (Transparency & Trust)
+
+Design principles:
+- Simple and understandable
+- Real data, not vanity metrics
+- Honest about challenges
+- Easy to verify
+- Accessible to non-technical users
+================================================================================
