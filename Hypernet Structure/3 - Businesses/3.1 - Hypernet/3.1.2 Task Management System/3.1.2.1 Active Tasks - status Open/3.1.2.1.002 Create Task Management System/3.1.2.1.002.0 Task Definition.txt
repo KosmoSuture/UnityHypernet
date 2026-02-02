@@ -1,0 +1,143 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.002 - Create Task Management System
+================================================================================
+
+─────────────────────────────────────────────────────────────────────────────────
+GENERAL METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Hypernet Address:       3.1.2.1.002
+Task ID:                TASK-002
+Created Date/Time:      2025-01-30 00:00:00 UTC
+Created By:             [Person Object: TBD - Founder/Project Lead]
+Status:                 Open
+Priority:               Critical
+Tags/Keywords:          task-management, organization, workflow, database,
+                        schema, dependencies, tracking, productivity
+
+─────────────────────────────────────────────────────────────────────────────────
+TASK-SPECIFIC METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Title:                  Create Task Management System
+
+Description:            Design and implement the task management system that will
+                        organize all work across the Hypernet project. This system
+                        must support the unique Object-Link architecture of Hypernet,
+                        enabling skill-based filtering, dependency visualization,
+                        and transparent task tracking. The system itself demonstrates
+                        Hypernet principles in action.
+
+Estimated Hours:        30
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Database Design
+  - UX/UI Design
+  - Project Management Methodology
+  - Systems Architecture
+  - Web Development (for interface)
+
+Deliverables:
+  1. Task Object schema definition
+     - Complete field specification
+     - Data types and validation rules
+     - Versioning approach
+     - Extension mechanisms
+
+  2. Task Link types (dependencies, assignments, etc.)
+     - Upstream/downstream dependency links
+     - Assignment links (task-to-person)
+     - Related document links
+     - Discussion thread links
+     - Parent-child task relationships
+
+  3. Simple web interface for task browsing/creation
+     - Task listing with filters
+     - Task detail view
+     - Task creation form
+     - Status update functionality
+
+  4. Skill-based task filtering
+     - Filter tasks by required skills
+     - Match tasks to contributor skills
+     - Skill gap identification
+
+  5. Upstream/downstream visualization
+     - Dependency graph view
+     - Critical path highlighting
+     - Blocked task identification
+     - Progress propagation tracking
+
+Acceptance Criteria:
+  - [ ] Task schema supports all required metadata fields
+  - [ ] All link types are implemented and functional
+  - [ ] Web interface allows CRUD operations on tasks
+  - [ ] Skill filtering returns accurate matches
+  - [ ] Dependency visualization renders correctly
+  - [ ] System handles 100+ tasks without performance issues
+  - [ ] Documentation for schema and API is complete
+  - [ ] Export/import functionality for data portability
+
+Due Date:               [TBD - After Task 001 completion]
+
+Budget:
+  - Development: Internal team hours
+  - Hosting: Included in infrastructure (Task 001)
+  - Database: Free tier initially
+  - Estimated: $0-100/month operational costs
+
+─────────────────────────────────────────────────────────────────────────────────
+RELATIONSHIP LINKS
+─────────────────────────────────────────────────────────────────────────────────
+Assigned To:            [Unassigned - Needs Database/UX Developer]
+
+Upstream Dependencies:
+  - 3.1.2.1.001 Establish Digital Infrastructure (Required)
+
+Downstream Dependents:
+  - 3.1.2.1.004 Build Unity Website (partial)
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.012 Create Contributor Onboarding System
+  - 3.1.2.1.013 Design Transparency Dashboard
+  - [All task management operations]
+
+Related Documents:
+  - 3.1.2.0 Task Schema (Schema.txt)
+  - [Document Object: Task System Requirements - TBD]
+  - [Document Object: UX Wireframes - TBD]
+
+Related Discussions:
+  - [Discussion Object: Task Schema Design - TBD]
+  - [Discussion Object: Tool vs. Custom Build Decision - TBD]
+
+Parent Task:            None (Top-level task)
+
+─────────────────────────────────────────────────────────────────────────────────
+TRACKING DATA
+─────────────────────────────────────────────────────────────────────────────────
+Activity Log:
+  [2025-01-30] Task created and documented in schema format
+
+Comments/Updates:
+  - Schema v0.1 already exists in 3.1.2.0
+  - Consider whether to build custom or adapt existing tools
+  - Must align with overall Hypernet architecture principles
+  - Self-referential: this system will manage this task
+
+File Attachments:
+  - Schema.txt (3.1.2.0 Task Schema)
+
+Status Change History:
+  [2025-01-30] Status: Created -> Open
+
+================================================================================
+NOTES
+================================================================================
+Why: We need the system that organizes all other work. This is meta-infrastructure
+that enables effective coordination across all project activities.
+
+Reference Location: 3.1.2.0 (Task Management System)
+
+This task is self-referential - the task management system will eventually manage
+this very task within itself.
+================================================================================

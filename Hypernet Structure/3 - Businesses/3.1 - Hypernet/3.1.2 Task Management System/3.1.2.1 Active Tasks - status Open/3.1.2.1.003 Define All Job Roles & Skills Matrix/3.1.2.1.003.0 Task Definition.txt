@@ -1,0 +1,139 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.003 - Define All Job Roles & Skills Matrix
+================================================================================
+
+─────────────────────────────────────────────────────────────────────────────────
+GENERAL METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Hypernet Address:       3.1.2.1.003
+Task ID:                TASK-003
+Created Date/Time:      2025-01-30 00:00:00 UTC
+Created By:             [Person Object: TBD - Founder/Project Lead]
+Status:                 Open
+Priority:               Critical
+Tags/Keywords:          hr, skills, roles, taxonomy, team-building, assessment,
+                        organizational-design, talent-management, matrix
+
+─────────────────────────────────────────────────────────────────────────────────
+TASK-SPECIFIC METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Title:                  Define All Job Roles & Skills Matrix
+
+Description:            Create a comprehensive taxonomy of skills and role definitions
+                        needed for the Hypernet project. This enables effective
+                        matching of contributors to tasks, identification of skill
+                        gaps, and strategic team building. The matrix will serve as
+                        the foundation for the contributor onboarding system and
+                        task assignment algorithms.
+
+Estimated Hours:        20
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Human Resources
+  - Organizational Design
+  - Technical Knowledge (to understand tech roles)
+  - Documentation
+  - Taxonomy/Classification Systems
+
+Deliverables:
+  1. Complete skills taxonomy
+     - Technical skills (programming, infrastructure, etc.)
+     - Creative skills (design, writing, video, etc.)
+     - Business skills (strategy, finance, legal, etc.)
+     - Soft skills (communication, leadership, etc.)
+     - Domain expertise (VR, security, distributed systems, etc.)
+     - Skill levels (beginner, intermediate, advanced, expert)
+
+  2. Role definitions
+     - Technical roles (developers, architects, DevOps, etc.)
+     - Creative roles (designers, content creators, etc.)
+     - Business roles (project managers, strategists, etc.)
+     - Community roles (moderators, advocates, etc.)
+     - Leadership roles (leads, directors, etc.)
+     - Role responsibilities and expectations
+
+  3. Skill assessment framework
+     - Self-assessment questionnaire
+     - Verification methods (portfolio, tests, etc.)
+     - Skill progression tracking
+     - Certification/badge system design
+
+  4. Team member profile templates
+     - Standard profile structure
+     - Skills inventory section
+     - Availability tracking
+     - Interest/preference capture
+     - Contribution history
+
+Acceptance Criteria:
+  - [ ] Skills taxonomy covers all project needs (50+ skills minimum)
+  - [ ] All current team members can be profiled using the system
+  - [ ] Role definitions are clear and non-overlapping
+  - [ ] Assessment framework produces consistent results
+  - [ ] Profile templates integrate with task management system
+  - [ ] Matrix enables automated task-skill matching
+  - [ ] Documentation is complete and accessible
+  - [ ] Feedback mechanism for taxonomy updates exists
+
+Due Date:               [TBD - After Task 001 completion]
+
+Budget:
+  - Development: Internal team hours
+  - Assessment tools: Free/low-cost options available
+  - Estimated: $0-50/month operational costs
+
+─────────────────────────────────────────────────────────────────────────────────
+RELATIONSHIP LINKS
+─────────────────────────────────────────────────────────────────────────────────
+Assigned To:            [Unassigned - Needs HR/Org Design specialist]
+
+Upstream Dependencies:
+  - 3.1.2.1.001 Establish Digital Infrastructure (Required)
+
+Downstream Dependents:
+  - 3.1.2.1.012 Create Contributor Onboarding System
+  - [All task assignments across the project]
+  - [Future hiring/recruiting activities]
+  - [Team scaling decisions]
+
+Related Documents:
+  - [Document Object: Skills Taxonomy v1 - TBD]
+  - [Document Object: Role Definitions - TBD]
+  - [Document Object: Assessment Guidelines - TBD]
+
+Related Discussions:
+  - [Discussion Object: Skills Categories Thread - TBD]
+  - [Discussion Object: Role Hierarchy Thread - TBD]
+
+Parent Task:            None (Top-level task)
+
+─────────────────────────────────────────────────────────────────────────────────
+TRACKING DATA
+─────────────────────────────────────────────────────────────────────────────────
+Activity Log:
+  [2025-01-30] Task created and documented in schema format
+
+Comments/Updates:
+  - Survey existing ~80 person-hours of team as initial input
+  - Align with industry-standard skill taxonomies where possible
+  - Consider integration with LinkedIn/GitHub skills
+  - Must support both volunteer and paid contributor models
+
+File Attachments:       None
+
+Status Change History:
+  [2025-01-30] Status: Created -> Open
+
+================================================================================
+NOTES
+================================================================================
+Why: Match people to tasks effectively. Without this framework, task assignment
+becomes ad-hoc and potentially inefficient. This enables data-driven team building.
+
+Reference Location: 3.1.3.2 (Team & Skills)
+
+Immediate Action: Survey existing team members to understand current skills
+and interests as the first step.
+================================================================================

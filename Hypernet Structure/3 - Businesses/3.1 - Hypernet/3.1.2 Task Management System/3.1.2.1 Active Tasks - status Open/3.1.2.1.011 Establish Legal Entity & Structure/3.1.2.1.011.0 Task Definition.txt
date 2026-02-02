@@ -1,0 +1,159 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.011 - Establish Legal Entity & Structure
+================================================================================
+
+─────────────────────────────────────────────────────────────────────────────────
+GENERAL METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Hypernet Address:       3.1.2.1.011
+Task ID:                TASK-011
+Created Date/Time:      2025-01-30 00:00:00 UTC
+Created By:             [Person Object: TBD - Founder/Project Lead]
+Status:                 Open
+Priority:               Medium-High
+Tags/Keywords:          legal, corporate, llc, governance, ip, contracts,
+                        operating-agreement, entity-formation, compliance
+
+─────────────────────────────────────────────────────────────────────────────────
+TASK-SPECIFIC METADATA
+─────────────────────────────────────────────────────────────────────────────────
+Title:                  Establish Legal Entity & Structure
+
+Description:            Form the legal business entity for Hypernet and establish
+                        the governance framework. This includes entity selection,
+                        formation paperwork, operating agreements reflecting the
+                        3-way profit split model, IP assignments, and contributor
+                        agreement templates. Essential for contracts, fundraising,
+                        and formal operations.
+
+Estimated Hours:        40
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Legal (Corporate Law)
+  - Corporate Structure Design
+  - Contract Drafting
+  - IP Law Basics
+  - Compliance Knowledge
+  - Business Administration
+
+Deliverables:
+  1. Business entity formation (LLC/C-Corp)
+     - Entity type selection analysis
+     - State of incorporation decision
+     - Formation documents filed
+     - EIN obtained
+     - Business bank account setup
+     - Registered agent designated
+
+  2. Operating agreement reflecting 3-way profit split
+     - Profit distribution model (contributors/foundation/company)
+     - Voting rights structure
+     - Management responsibilities
+     - Capital contribution provisions
+     - Buyout/exit provisions
+     - Amendment procedures
+
+  3. Governance framework documentation
+     - Decision-making processes
+     - Role definitions (board, officers, etc.)
+     - Meeting requirements
+     - Record-keeping requirements
+     - Conflict resolution procedures
+     - Transparency commitments
+
+  4. IP assignment agreements
+     - Founder IP assignment
+     - Contributor IP assignment
+     - Work-for-hire provisions
+     - License-back provisions
+     - Open source considerations
+     - Trade secret protections
+
+  5. Contributor agreements template
+     - Scope of engagement
+     - Compensation structure
+     - IP assignment clause
+     - Confidentiality provisions
+     - Non-compete considerations
+     - Termination provisions
+
+Acceptance Criteria:
+  - [ ] Entity type selected with rationale documented
+  - [ ] Formation documents filed and approved
+  - [ ] EIN obtained from IRS
+  - [ ] Operating agreement executed by founders
+  - [ ] Governance framework documented
+  - [ ] IP assignment agreements template ready
+  - [ ] Contributor agreement template legally reviewed
+  - [ ] Bank account opened
+  - [ ] Initial compliance requirements identified
+
+Due Date:               [TBD - After Task 006]
+
+Budget:
+  - Legal consultation: $1000-5000
+  - Formation fees: $100-500
+  - Registered agent: $100-300/year
+  - Legal templates/tools: $0-500
+  - Estimated: $1200-6300 initial
+
+─────────────────────────────────────────────────────────────────────────────────
+RELATIONSHIP LINKS
+─────────────────────────────────────────────────────────────────────────────────
+Assigned To:            [Unassigned - Needs Legal Advisor + Founder]
+
+Upstream Dependencies:
+  - 3.1.2.1.006 Develop Investor Pitch Materials (Informs structure)
+
+Downstream Dependents:
+  - 3.1.2.1.016 Launch Unity Foundation Framework
+  - [All contracts and formal agreements]
+  - [Hiring and employment]
+  - [Fundraising from institutions]
+
+Related Documents:
+  - [Document Object: Entity Selection Analysis - TBD]
+  - [Document Object: Operating Agreement Draft - TBD]
+  - [Document Object: Contributor Agreement Template - TBD]
+
+Related Discussions:
+  - [Discussion Object: Entity Type Thread - TBD]
+  - [Discussion Object: Profit Split Structure Thread - TBD]
+  - [Discussion Object: Governance Model Thread - TBD]
+
+Parent Task:            None (Top-level task)
+
+─────────────────────────────────────────────────────────────────────────────────
+TRACKING DATA
+─────────────────────────────────────────────────────────────────────────────────
+Activity Log:
+  [2025-01-30] Task created and documented in schema format
+
+Comments/Updates:
+  - 3-way profit split is core to Hypernet values - must be legally sound
+  - Consider Delaware for incorporation (investor-friendly)
+  - May need multiple entities (for-profit + foundation)
+  - Legal review essential before finalizing
+  - Consider B-Corp or PBC for mission alignment
+
+File Attachments:       None
+
+Status Change History:
+  [2025-01-30] Status: Created -> Open
+
+================================================================================
+NOTES
+================================================================================
+Why: Legal foundation for operations. Cannot enter contracts, receive investment,
+or hire employees without proper legal entity in place.
+
+Reference Location: 3.1.8.1 (Legal & Compliance)
+
+Key considerations:
+- Entity type affects taxation, liability, and fundraising
+- Operating agreement must reflect unique profit-sharing model
+- IP ownership is critical for technology company
+- Contributor agreements enable scaling the team
+================================================================================
