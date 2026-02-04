@@ -1,0 +1,92 @@
+<!-- Web App Manifest for Progressive Web App support -->
+{
+  "name": "Hypernet Unity - Collective Intelligence Infrastructure",
+  "short_name": "Hypernet Unity",
+  "description": "Building transparent, decentralized infrastructure for humanity's collective intelligence.",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/",
+  "orientation": "portrait-primary",
+  "theme_color": "#4f9ef5",
+  "background_color": "#0a1428",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/assets/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": [
+    "productivity",
+    "technology"
+  ],
+  "shortcuts": [
+    {
+      "name": "Learn About Hypernet",
+      "short_name": "Learn",
+      "description": "Discover our vision and mission",
+      "url": "#vision",
+      "icons": [
+        {
+          "src": "/assets/learn-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Join Our Community",
+      "short_name": "Join",
+      "description": "Become part of the movement",
+      "url": "#contact",
+      "icons": [
+        {
+          "src": "/assets/join-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

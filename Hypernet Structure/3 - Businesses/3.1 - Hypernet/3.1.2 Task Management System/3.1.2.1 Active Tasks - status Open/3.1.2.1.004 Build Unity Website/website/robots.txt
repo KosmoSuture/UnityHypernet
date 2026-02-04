@@ -1,0 +1,24 @@
+# robots.txt
+# Controls search engine crawler access and sitemap location
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+
+# Specific rules for major crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckGo
+Allow: /
+
+# Sitemap location
+Sitemap: https://hypernet.unity/sitemap.xml
+
+# Crawl delay for respectful crawling (in seconds)
+Crawl-delay: 1
