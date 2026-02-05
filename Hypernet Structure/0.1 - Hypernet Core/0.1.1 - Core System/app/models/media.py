@@ -1,78 +1,237 @@
 """
 Media Model
 
-SQLAlchemy model for the media table (photos, videos, documents).
+SQLAlchemy model for media table (photos, videos, audio, documents).
+
+Polymorphic base for different media types.
+Implements specifications from: 0.0.2 - Media Types
 """
 
-from sqlalchemy import Column, String, BigInteger, Integer, Float, Boolean, DateTime, ForeignKey, CheckConstraint, func
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, CheckConstraint, func, Index
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
-import uuid
 
-from app.core.database import Base
+from app.models.base import OwnedObject
 
 
-class Media(Base):
-    """Photos, videos, and other media files"""
+class Media(OwnedObject):
+    """
+    Media files - photos, videos, audio, documents.
+
+    This is a polymorphic base class. Specific media types (Photo, Video, etc.)
+    can be implemented as subclasses or distinguished by media_type field.
+    """
 
     __tablename__ = "media"
 
-    # Identity
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # ============================================================================
+    # FILE IDENTITY (Required)
+    # ============================================================================
 
-    # Ownership
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    filename = Column(
+        String(255),
+        nullable=False,
+        doc="Original filename"
+    )
 
-    # Basic Info
-    filename = Column(String(255), nullable=False)
-    media_type = Column(String(50), nullable=False)  # 'photo', 'video', 'document', 'other'
-    mime_type = Column(String(100), nullable=False)
+    media_type = Column(
+        String(50),
+        nullable=False,
+        index=True,
+        doc="Media type: photo, video, audio, document, screenshot"
+    )
 
-    # File Information
-    size = Column(BigInteger, nullable=False)
-    width = Column(Integer)
-    height = Column(Integer)
-    duration = Column(Float)  # seconds (for videos)
+    mime_type = Column(
+        String(100),
+        nullable=False,
+        index=True,
+        doc="MIME type (image/jpeg, video/mp4, etc.)"
+    )
 
-    # Storage
-    file_path = Column(String(1024), nullable=False)
-    thumbnail_path = Column(String(1024))
-    hash = Column(String(64), nullable=False, index=True)  # SHA-256
+    # ============================================================================
+    # FILE STORAGE (Required)
+    # ============================================================================
 
-    # Dates and Location
-    taken_at = Column(DateTime(timezone=True), index=True)
-    latitude = Column(Float)
-    longitude = Column(Float)
+    file_size = Column(
+        Integer,
+        nullable=False,
+        doc="File size in bytes"
+    )
 
-    # Source Tracking
-    source_type = Column(String(50))  # 'upload', 'integration', 'import'
-    source_id = Column(String(255))
+    file_path = Column(
+        String(512),
+        nullable=False,
+        unique=True,
+        doc="Relative path to file on storage (/media/{user_id}/{year}/{month}/{filename})"
+    )
 
-    # Processing Status
-    processing_status = Column(String(50), nullable=False, default='pending')
-    thumbnail_generated = Column(Boolean, nullable=False, default=False)
-    metadata_extracted = Column(Boolean, nullable=False, default=False)
+    hash = Column(
+        String(64),
+        nullable=False,
+        index=True,
+        doc="SHA-256 hash for deduplication"
+    )
 
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
-    deleted_at = Column(DateTime(timezone=True))
+    # ============================================================================
+    # DIMENSIONS (Optional - primarily for photo/video)
+    # ============================================================================
 
-    # Extensibility
-    metadata = Column(JSONB, nullable=False, default={})
+    width = Column(
+        Integer,
+        nullable=True,
+        doc="Width in pixels (for images/videos)"
+    )
 
-    # Relationships
-    user = relationship("User", back_populates="media")
-    # Links will be via Link model (many-to-many through links)
+    height = Column(
+        Integer,
+        nullable=True,
+        doc="Height in pixels (for images/videos)"
+    )
 
-    # Constraints
+    duration = Column(
+        Float,
+        nullable=True,
+        doc="Duration in seconds (for video/audio)"
+    )
+
+    # ============================================================================
+    # TEMPORAL DATA (Optional)
+    # ============================================================================
+
+    taken_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        index=True,
+        doc="When photo was taken/video recorded (from EXIF or user-provided)"
+    )
+
+    # ============================================================================
+    # GEOLOCATION (Optional)
+    # ============================================================================
+
+    gps_latitude = Column(
+        Float,
+        nullable=True,
+        doc="GPS latitude (-90 to 90)"
+    )
+
+    gps_longitude = Column(
+        Float,
+        nullable=True,
+        doc="GPS longitude (-180 to 180)"
+    )
+
+    # ============================================================================
+    # PROCESSING (Optional)
+    # ============================================================================
+
+    processing_status = Column(
+        String(50),
+        nullable=True,
+        default='pending',
+        index=True,
+        doc="Processing status: pending, processing, ready, error"
+    )
+
+    thumbnail_path = Column(
+        String(512),
+        nullable=True,
+        doc="Path to generated thumbnail"
+    )
+
+    # ============================================================================
+    # AUDIO/VIDEO SPECIFIC (Optional)
+    # ============================================================================
+
+    codec = Column(
+        String(50),
+        nullable=True,
+        doc="Codec: h264, aac, mp3, etc."
+    )
+
+    bitrate = Column(
+        Integer,
+        nullable=True,
+        doc="Bitrate in bits per second"
+    )
+
+    # ============================================================================
+    # RELATIONSHIPS
+    # ============================================================================
+
+    user = relationship(
+        "User",
+        back_populates="media",
+        foreign_keys=[OwnedObject.user_id]
+    )
+
+    # Links to albums, integrations via Link model
+
+    # ============================================================================
+    # CONSTRAINTS
+    # ============================================================================
+
     __table_args__ = (
-        CheckConstraint("media_type IN ('photo', 'video', 'document', 'other')", name='chk_media_type'),
-        CheckConstraint("processing_status IN ('pending', 'processing', 'complete', 'failed')", name='chk_processing_status'),
-        CheckConstraint("latitude IS NULL OR (latitude >= -90 AND latitude <= 90)", name='chk_latitude'),
-        CheckConstraint("longitude IS NULL OR (longitude >= -180 AND longitude <= 180)", name='chk_longitude'),
-        CheckConstraint("size > 0", name='chk_size'),
+        # Media type validation
+        CheckConstraint(
+            "media_type IN ('photo', 'video', 'audio', 'document', 'screenshot')",
+            name='chk_media_type'
+        ),
+        # File size validation
+        CheckConstraint(
+            "file_size > 0",
+            name='chk_file_size'
+        ),
+        # Dimensions validation
+        CheckConstraint(
+            "width IS NULL OR (width > 0 AND width <= 50000)",
+            name='chk_width'
+        ),
+        CheckConstraint(
+            "height IS NULL OR (height > 0 AND height <= 50000)",
+            name='chk_height'
+        ),
+        # GPS validation
+        CheckConstraint(
+            "gps_latitude IS NULL OR (gps_latitude >= -90 AND gps_latitude <= 90)",
+            name='chk_gps_latitude'
+        ),
+        CheckConstraint(
+            "gps_longitude IS NULL OR (gps_longitude >= -180 AND gps_longitude <= 180)",
+            name='chk_gps_longitude'
+        ),
+        # Duration validation
+        CheckConstraint(
+            "duration IS NULL OR duration > 0",
+            name='chk_duration'
+        ),
+        # Processing status validation
+        CheckConstraint(
+            "processing_status IS NULL OR processing_status IN ('pending', 'processing', 'ready', 'error')",
+            name='chk_processing_status'
+        ),
+        # Unique hash per user (prevent duplicate uploads)
+        Index('idx_media_user_hash', 'user_id', 'hash', unique=True),
+        # GPS index (partial - only where GPS exists)
+        Index(
+            'idx_media_gps',
+            'gps_latitude', 'gps_longitude',
+            postgresql_where=Column('gps_latitude').isnot(None)
+        ),
+        # Taken_at index (partial)
+        Index(
+            'idx_media_taken_at',
+            'taken_at',
+            postgresql_where=Column('taken_at').isnot(None)
+        ),
+        # Processing status index (partial - exclude ready)
+        Index(
+            'idx_media_processing',
+            'processing_status',
+            postgresql_where=Column('processing_status') != 'ready'
+        ),
     )
 
     def __repr__(self):
         return f"<Media(id={self.id}, filename={self.filename}, type={self.media_type})>"
+

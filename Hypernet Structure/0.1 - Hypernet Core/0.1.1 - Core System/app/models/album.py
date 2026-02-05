@@ -2,28 +2,23 @@
 Album Model
 
 SQLAlchemy model for the albums table (collections of media).
+
+Implements: 0.0 - Object Type Registry / [Future: Album type definition]
 """
 
-from sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey, CheckConstraint, func
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, String, Text, Integer, ForeignKey, CheckConstraint
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
 
-from app.core.database import Base
+from app.models.base import OwnedObject
 
 
-class Album(Base):
+class Album(OwnedObject):
     """Collections of media objects"""
 
     __tablename__ = "albums"
 
-    # Identity
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
-    # Ownership
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-
-    # Basic Info
+    # Basic Info (Identity and Ownership inherited from OwnedObject)
     name = Column(String(200), nullable=False, index=True)
     description = Column(Text)
 
@@ -37,21 +32,11 @@ class Album(Base):
     # Privacy (future use)
     visibility = Column(String(50), nullable=False, default='private')
 
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
-    deleted_at = Column(DateTime(timezone=True))
-
-    # Source Tracking
-    source_type = Column(String(50))
-    source_id = Column(String(255))
-
-    # Extensibility
-    metadata = Column(JSONB, nullable=False, default={})
+    # Timestamps, Source Tracking, and Metadata inherited from OwnedObject
 
     # Relationships
-    user = relationship("User", back_populates="albums")
-    cover_media = relationship("Media", foreign_keys=[cover_media_id])
+    user = relationship("User", back_populates="albums", foreign_keys=[OwnedObject.user_id])
+    cover_media = relationship("Media", foreign_keys=[cover_media_id], post_update=True)
     # Media in album will be via Link model (many-to-many through links)
 
     # Constraints

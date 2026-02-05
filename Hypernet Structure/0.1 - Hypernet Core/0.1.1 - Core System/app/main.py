@@ -10,7 +10,11 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.routes import auth, users, media, albums, integrations, links
+from app.routes import (
+    auth, users, media, albums, integrations, links,
+    social_posts, social_accounts, notes, bookmarks,
+    contacts, calendar_events, tasks, emails, web_pages
+)
 
 # Create database tables (in production, use Alembic migrations)
 # Base.metadata.create_all(bind=engine)
@@ -35,12 +39,32 @@ app.add_middleware(
 )
 
 # Include routers
+# Core
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
-app.include_router(media.router, prefix="/api/v1/media", tags=["Media"])
-app.include_router(albums.router, prefix="/api/v1/albums", tags=["Albums"])
 app.include_router(integrations.router, prefix="/api/v1/integrations", tags=["Integrations"])
 app.include_router(links.router, prefix="/api/v1/links", tags=["Links"])
+
+# Media
+app.include_router(media.router, prefix="/api/v1/media", tags=["Media"])
+app.include_router(albums.router, prefix="/api/v1/albums", tags=["Albums"])
+
+# Social
+app.include_router(social_posts.router, prefix="/api/v1/social-posts", tags=["Social Media"])
+app.include_router(social_accounts.router, prefix="/api/v1/social-accounts", tags=["Social Media"])
+
+# Communication
+app.include_router(emails.router, prefix="/api/v1/emails", tags=["Communication"])
+app.include_router(contacts.router, prefix="/api/v1/contacts", tags=["Communication"])
+
+# Web
+app.include_router(web_pages.router, prefix="/api/v1/web-pages", tags=["Web Content"])
+app.include_router(bookmarks.router, prefix="/api/v1/bookmarks", tags=["Web Content"])
+
+# Life
+app.include_router(calendar_events.router, prefix="/api/v1/calendar-events", tags=["Productivity"])
+app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["Productivity"])
+app.include_router(notes.router, prefix="/api/v1/notes", tags=["Productivity"])
 
 
 # Root endpoint
@@ -83,7 +107,28 @@ async def version_info():
     return {
         "version": "0.1.0",
         "api_version": "v1",
-        "capabilities": ["media", "albums", "integrations", "links"],
+        "capabilities": [
+            # Core
+            "users",
+            "integrations",
+            "links",
+            # Media
+            "media",
+            "albums",
+            # Social
+            "social-posts",
+            "social-accounts",
+            # Communication
+            "emails",
+            "contacts",
+            # Web
+            "web-pages",
+            "bookmarks",
+            # Productivity
+            "calendar-events",
+            "tasks",
+            "notes"
+        ],
         "integrations_available": ["google-photos"],  # Start with one
     }
 
