@@ -13,7 +13,9 @@ from app.core.database import engine, Base
 from app.routes import (
     auth, users, media, albums, integrations, links,
     social_posts, social_accounts, notes, bookmarks,
-    contacts, calendar_events, tasks, emails, web_pages
+    contacts, calendar_events, tasks, emails, web_pages,
+    documents, transactions, locations, health_records,
+    profile_attributes, devices, notifications, audit
 )
 
 # Create database tables (in production, use Alembic migrations)
@@ -61,10 +63,34 @@ app.include_router(contacts.router, prefix="/api/v1/contacts", tags=["Communicat
 app.include_router(web_pages.router, prefix="/api/v1/web-pages", tags=["Web Content"])
 app.include_router(bookmarks.router, prefix="/api/v1/bookmarks", tags=["Web Content"])
 
-# Life
+# Productivity
 app.include_router(calendar_events.router, prefix="/api/v1/calendar-events", tags=["Productivity"])
 app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["Productivity"])
 app.include_router(notes.router, prefix="/api/v1/notes", tags=["Productivity"])
+
+# Documents & Files
+app.include_router(documents.router, prefix="/api/v1/documents", tags=["Documents"])
+
+# Financial
+app.include_router(transactions.router, prefix="/api/v1/transactions", tags=["Financial"])
+
+# Location
+app.include_router(locations.router, prefix="/api/v1/locations", tags=["Location"])
+
+# Health
+app.include_router(health_records.router, prefix="/api/v1/health-records", tags=["Health"])
+
+# Profile
+app.include_router(profile_attributes.router, prefix="/api/v1/profile-attributes", tags=["Profile"])
+
+# Devices
+app.include_router(devices.router, prefix="/api/v1/devices", tags=["Devices"])
+
+# Notifications
+app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["Notifications"])
+
+# Audit
+app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit"])
 
 
 # Root endpoint
@@ -127,7 +153,23 @@ async def version_info():
             # Productivity
             "calendar-events",
             "tasks",
-            "notes"
+            "notes",
+            # Documents & Files
+            "documents",
+            # Financial
+            "transactions",
+            # Location
+            "locations",
+            # Health
+            "health-records",
+            # Profile
+            "profile-attributes",
+            # Devices
+            "devices",
+            # Notifications
+            "notifications",
+            # Audit
+            "audit"
         ],
         "integrations_available": ["google-photos"],  # Start with one
     }
