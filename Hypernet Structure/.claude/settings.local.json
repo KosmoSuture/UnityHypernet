@@ -3,7 +3,8 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

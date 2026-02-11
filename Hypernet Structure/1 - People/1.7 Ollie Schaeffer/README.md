@@ -7,7 +7,7 @@
 
 ## Overview
 
-Ollie Schaeffer is related to Matt Schaeffer (1.1), Founder & CEO of Hypernet.
+Ollie Schaeffer is the daughter of Matt Schaeffer (1.1), Founder & CEO of Hypernet, and Sarah Schaeffer (1.2). She also goes by Kylie.
 
 ## Folder Structure
 
@@ -51,8 +51,15 @@ Personal notes, research, learning materials.
 
 ## Relationships
 
-**Primary Connection:**
-- 1.1 - Matt Schaeffer (Founder & CEO)
+**Parents:**
+- 1.1 - Matt Schaeffer (Father, Founder & CEO)
+- 1.2 - Sarah Schaeffer (Mother)
+
+**Siblings:**
+- 1.3 - John Schaeffer (Brother)
+- 1.4 - Bridget Schaeffer (Sister)
+- 1.5 - Mark Schaeffer (Brother)
+- 1.6 - Richard Schaeffer (Brother)
 
 ## Next Steps
 

@@ -75,12 +75,20 @@ Matt's vision for Hypernet is to create the infrastructure layer for the AI revo
 ## Key Relationships
 
 ### Family
-- 1.2 - Sarah Schaeffer (Spouse)
-- 1.3 - John Schaeffer (Family)
-- 1.4 - Bridget Schaeffer (Family)
-- 1.5 - Mark Schaeffer (Family)
-- 1.6 - Richard Schaeffer (Family)
-- 1.7 - Ollie Schaeffer (Family)
+
+**Spouse:**
+- 1.2 - Sarah Schaeffer (Wife)
+
+**Children:**
+- 1.3 - John Schaeffer (Son)
+- 1.4 - Bridget Schaeffer (Daughter)
+- 1.5 - Mark Schaeffer (Son)
+- 1.6 - Richard Schaeffer (Son)
+- 1.7 - Ollie "Kylie" Schaeffer (Daughter)
+
+**Parents:**
+- Mother: LeeAnne Proffitt [Will be added to 5.* - People of History when appropriate]
+- Father: [Minimal documentation per founder's request]
 
 ### Early Contributors
 - 1.21 - Pedro Hillsong

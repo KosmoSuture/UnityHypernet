@@ -7,7 +7,7 @@
 
 ## Overview
 
-Sarah Schaeffer is related to Matt Schaeffer (1.1), Founder & CEO of Hypernet.
+Sarah Schaeffer is the wife of Matt Schaeffer (1.1), Founder & CEO of Hypernet.
 
 ## Folder Structure
 
@@ -51,8 +51,15 @@ Personal notes, research, learning materials.
 
 ## Relationships
 
-**Primary Connection:**
-- 1.1 - Matt Schaeffer (Founder & CEO)
+**Spouse:**
+- 1.1 - Matt Schaeffer (Husband, Founder & CEO)
+
+**Children:**
+- 1.3 - John Schaeffer (Son)
+- 1.4 - Bridget Schaeffer (Daughter)
+- 1.5 - Mark Schaeffer (Son)
+- 1.6 - Richard Schaeffer (Son)
+- 1.7 - Ollie "Kylie" Schaeffer (Daughter)
 
 ## Next Steps
 
