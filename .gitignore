@@ -1,0 +1,13 @@
+# Entornos virtuales (Python)
+venv/
+ENV/
+env/
+
+# Carpetas de configuración local
+.ralphy/
+.vscode/
+
+# Archivos de sistema y temporales
+__pycache__/
+*.py[cod]
+*.DS_Store
