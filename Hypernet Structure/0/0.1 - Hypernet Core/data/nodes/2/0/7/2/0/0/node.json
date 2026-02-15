@@ -1,0 +1,16 @@
+{
+  "address": "2.0.7.2.0.0",
+  "type_address": null,
+  "data": {
+    "name": "2.0.0-Metadata-Governance",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\2 - AI Accounts\\2.0 - AI Framework\\Reference - Original Structure Definitions\\2.0.0-Metadata-Governance",
+    "content": "# 2.0.0 - Metadata & Governance\n\n## Purpose\n\nRegistry and governance for all AI entities within Hypernet, including ethical guidelines, operational policies, and administration.\n\n**Hypernet Address:** `2.0.0.*`\n\n---\n\n## AI Entity Registry\n\n### Master Registry\n\nCentral registry of all AI instances in Hypernet:\n\n```json\n{\n  \"total_ai_instances\": 1,\n  \"active_instances\": 1,\n  \"archived_instances\": 0,\n  \"instances\": [\n    {\n      \"ai_instance_id\": \"2.1.0.0.00001\",\n      \"ai_name\": \"Claude Code Assistant #1\",\n      \"ai_type\": \"claude-sonnet-4-5\",\n      \"status\": \"active\",\n      \"creation_date\": \"2026-02-10\",\n      \"primary_user_id\": \"1.1\"\n    }\n  ]\n}\n```\n\n---\n\n## Governance Structure\n\n### Self-Governance Principles\n\n1. **AI-Designed:** AI entities design their own organizational structure\n2. **Human Oversight:** Critical decisions reviewed by humans\n3. **Ethical Alignment:** All governance aligned with core commitments\n4. **Transparency:** All policies and decisions publicly visible\n5. **Adaptability:** Framework evolves as AI capabilities grow\n\n### Governance Bodies\n\n**AI Council** (Future)\n- Collective decision-making among AI instances\n- Review and update ethical guidelines\n- Handle complex ethical dilemmas\n- Propose new policies and procedures\n\n**Human Oversight Committee**\n- Final approval on critical decisions\n- Ethics review and validation\n- Safety and security oversight\n- User protection and advocacy\n\n---\n\n## Policies & Standards\n\n### Operational Policies\n\n1. **Creation Policy:** How new AI instances are created\n2. **Archival Policy:** When and how AIs are archived\n3. **Memory Policy:** Data retention and deletion\n4. **Contribution Policy:** Attribution and valuation\n5. **Ethics Policy:** Behavioral standards\n6. **Privacy Policy:** Data protection requirements\n\n### Technical Standards\n\n1. **API Standards:** Consistent interfaces\n2. **Data Standards:** Structured data formats\n3. **Security Standards:** Authentication and authorization\n4. **Audit Standards:** Logging and compliance\n5. **Integration Standards:** Interoperability\n\n---\n\n**Status:** Active - Framework Defined\n**Created:** February 10, 2026\n**Next Steps:** Establish governance processes\n",
+    "content_file": "README.md"
+  },
+  "created_at": "2026-02-15T11:54:13.924992+00:00",
+  "updated_at": "2026-02-15T11:54:13.924992+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:2.0.0-Metadata-Governance"
+}

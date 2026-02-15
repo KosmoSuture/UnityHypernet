@@ -1,0 +1,17 @@
+{
+  "address": "1.2.5.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.5 - Tasks & Workflows\\README.md",
+    "size": 1356,
+    "content": "# 1.2.5 - Tasks & Workflows\n\n**Hypernet Address:** `1.2.5`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Tasks & Productivity\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores task lists, to-dos, workflows, and productivity tracking organized by status.\n\n---\n\n## Structure\n\n### 1.2.5.0 - Active Tasks\nCurrent tasks and to-dos requiring attention.\n\n### 1.2.5.1 - Completed Tasks\nSuccessfully completed tasks and their outcomes.\n\n### 1.2.5.2 - Recurring Workflows\nRepeating tasks, routines, and ongoing workflows.\n\n---\n\n## What Goes Here\n\n- Individual tasks and to-dos\n- Project tasks and action items\n- Personal goals and objectives\n- Work assignments and deliverables\n- Household and personal tasks\n- Recurring routines and workflows\n- Checklists and procedures\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Private - Task lists reveal priorities and activities\n\n---\n\n## Examples\n\n```\n1.2.5 - Tasks & Workflows/\n\u251c\u2500\u2500 1.2.5.0 - Active Tasks/\n\u2502   \u251c\u2500\u2500 work-tasks/\n\u2502   \u2514\u2500\u2500 personal-tasks/\n\u251c\u2500\u2500 1.2.5.1 - Completed Tasks/\n\u2502   \u2514\u2500\u2500 archives/\n\u2514\u2500\u2500 1.2.5.2 - Recurring Workflows/\n    \u251c\u2500\u2500 daily-routines/\n    \u2514\u2500\u2500 weekly-workflows/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - task lists are private\n"
+  },
+  "created_at": "2026-02-15T11:54:08.070048+00:00",
+  "updated_at": "2026-02-15T11:54:08.070048+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

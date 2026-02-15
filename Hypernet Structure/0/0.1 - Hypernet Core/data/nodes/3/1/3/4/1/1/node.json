@@ -1,0 +1,17 @@
+{
+  "address": "3.1.3.4.1.1",
+  "type_address": null,
+  "data": {
+    "name": "3.1.3.4.1.2. Jan 2026.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.3 Human Resources\\3.1.3.4 Contribution Tracking (for profit sharing)\\3.1.3.4.1 - Matt Schaeffer\\3.1.3.4.1.2. Jan 2026.md",
+    "size": 2147,
+    "content": "\n\n# 1. Synopsis.\nThis is a template for people to record their contributions to the Hypernet.  This is a rough draft and will be modified in the future to provide additional details, but I'm starting it simple\n\n\n# 2.  Paid Hours. \nI don't get paid at this point.  All hours worked are unpaid.\n\n# 3. Unpaid hours\nThese are hours that are unpaid and will get 10 credit hours to the profit sharing pool\n\n| Date      | Time      | Total Hours | Project  or address applied to    | Description of work done.                                                                                           |\n| --------- | --------- | ----------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |\n| 20/1/2026 | 7PM-4AM   | 7           | Infrastructure                    | Creating Github account, adding people to the account.  Creating the overall Hypernet structure in github, and more |\n| 22/1/2026 | 8PM-12 PM | 4           | 3.1.3.4                           | Building out the contribution tracking and communicating with team, etc.                                            |\n| 25/1/2026 | 6PM - 9PM | 3           | Meetings and infrastructure       | Hypernet Meeting, setting up Webex, working on NS records for website                                               |\n| 27/1/2026 | 3AM -6AM  | 3           | Infrastructure and communications | Communications with team, setting up dropbox for meeting recordings, and Claude code configuration and work.        |\n| 30/1/2026 | Misc      | 3           | Infrastructure and communications | Fleshed out projects as well as some of the 0. library.                                                             |\n| 31/1/2026 | 4PM-12AM  | 6           | Infrastructure and AI             | Learning and setting up OpenClaw and other stuff                                                                    |\n|           |           |             |                                   |                                                                                                                     |\n"
+  },
+  "created_at": "2026-02-15T11:54:18.383303+00:00",
+  "updated_at": "2026-02-15T11:54:18.383303+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:3.1.3.4.1.2. Jan 2026.md"
+}

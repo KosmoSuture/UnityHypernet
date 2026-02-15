@@ -1,0 +1,14 @@
+{
+  "address": "0.4.0.0.7",
+  "type_address": null,
+  "data": {
+    "name": "0.0.7 - Web Types",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.7 - Web Types"
+  },
+  "created_at": "2026-02-15T11:54:05.034225+00:00",
+  "updated_at": "2026-02-15T11:54:05.034225+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:0.0.7 - Web Types"
+}

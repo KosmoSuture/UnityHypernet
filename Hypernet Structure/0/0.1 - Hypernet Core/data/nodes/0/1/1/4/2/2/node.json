@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.2.2",
+  "type_address": null,
+  "data": {
+    "name": "config.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\core\\config.py",
+    "size": 2273,
+    "content": "\"\"\"\nApplication Configuration\n\nLoads configuration from environment variables using Pydantic Settings.\n\"\"\"\n\nfrom typing import List\nfrom pydantic_settings import BaseSettings\nfrom pydantic import Field\n\n\nclass Settings(BaseSettings):\n    \"\"\"Application settings loaded from environment variables\"\"\"\n\n    # Database\n    DATABASE_URL: str = Field(\n        default=\"postgresql://hypernet:dev-password@localhost:5432/hypernet\",\n        description=\"PostgreSQL connection string\"\n    )\n\n    # Security\n    SECRET_KEY: str = Field(\n        default=\"dev-secret-key-change-in-production\",\n        description=\"Secret key for JWT token signing\"\n    )\n    ALGORITHM: str = Field(\n        default=\"HS256\",\n        description=\"JWT algorithm\"\n    )\n    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(\n        default=15,\n        description=\"Access token expiration in minutes\"\n    )\n    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(\n        default=30,\n        description=\"Refresh token expiration in days\"\n    )\n\n    # Server\n    HOST: str = Field(default=\"0.0.0.0\", description=\"Server host\")\n    PORT: int = Field(default=8443, description=\"Server port\")\n    RELOAD: bool = Field(default=True, description=\"Auto-reload on code changes (dev only)\")\n\n    # Redis\n    REDIS_URL: str = Field(\n        default=\"redis://localhost:6379/0\",\n        description=\"Redis connection string\"\n    )\n\n    # Storage\n    MEDIA_ROOT: str = Field(\n        default=\"/media\",\n        description=\"Root directory for media files\"\n    )\n    MAX_UPLOAD_SIZE: int = Field(\n        default=104857600,  # 100MB\n        description=\"Maximum upload size in bytes\"\n    )\n\n    # CORS\n    CORS_ORIGINS: List[str] = Field(\n        default=[\"http://localhost:3000\", \"http://localhost:8080\"],\n        description=\"Allowed CORS origins\"\n    )\n\n    # Environment\n    ENVIRONMENT: str = Field(\n        default=\"development\",\n        description=\"Environment: development, staging, production\"\n    )\n    DEBUG: bool = Field(\n        default=True,\n        description=\"Debug mode\"\n    )\n\n    class Config:\n        env_file = \".env\"\n        env_file_encoding = \"utf-8\"\n        case_sensitive = True\n\n\n# Create settings instance\nsettings = Settings()\n"
+  },
+  "created_at": "2026-02-15T11:53:48.382606+00:00",
+  "updated_at": "2026-02-15T11:53:48.382606+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:config.py"
+}

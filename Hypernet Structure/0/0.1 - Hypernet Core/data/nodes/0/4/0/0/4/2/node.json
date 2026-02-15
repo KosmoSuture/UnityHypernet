@@ -1,0 +1,17 @@
+{
+  "address": "0.4.0.0.4.2",
+  "type_address": null,
+  "data": {
+    "name": "ChatMessage.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.4 - Communication Types\\ChatMessage.md",
+    "size": 1237,
+    "content": "# ChatMessage - Instant Message\n\n**Type ID:** `hypernet.communication.chat`\n**Version:** 1.0\n**Category:** 0.0.4 - Communication Types\n**Parent:** BaseObject\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Purpose\n\nInstant messages from Slack, Discord, WhatsApp, Telegram, etc.\n\n---\n\n## Required Fields\n\n```yaml\nplatform: String(50)\n  - \"slack\", \"discord\", \"whatsapp\", \"telegram\", \"signal\"\n\nmessage_content: Text\n\nsent_at: DateTime\n\ndirection: Enum\n  - \"sent\", \"received\"\n```\n\n---\n\n## Optional Fields\n\n```yaml\nchannel_id: String(255)\n  - Channel, room, or chat ID\n\nthread_id: String(255)\n  - Message thread\n\nsender_name: String(200)\nrecipient_name: String(200)\n\nhas_attachments: Boolean\nis_edited: Boolean\nedited_at: DateTime\n\n# Reactions\nreactions: JSONB\n  - {\"\ud83d\udc4d\": 5, \"\u2764\ufe0f\": 2}\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"slack\": {\n    \"workspace\": \"hypernet\",\n    \"channel\": \"#general\",\n    \"message_ts\": \"1234567890.123456\"\n  },\n  \"discord\": {\n    \"server\": \"Hypernet Community\",\n    \"channel\": \"dev-chat\",\n    \"message_id\": \"123456789\"\n  },\n  \"attachments\": [],\n  \"mentions\": [\"@matt\", \"@claude\"]\n}\n```\n\n---\n\n**Status:** Active\n**Version:** 1.0\n"
+  },
+  "created_at": "2026-02-15T11:54:04.926701+00:00",
+  "updated_at": "2026-02-15T11:54:04.926701+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:ChatMessage.md"
+}

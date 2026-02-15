@@ -1,0 +1,16 @@
+{
+  "address": "1.4.0",
+  "type_address": null,
+  "data": {
+    "name": "1.4.0 - Profile & Identity",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.4 Bridget Schaeffer\\1.4.0 - Profile & Identity",
+    "content": "# 1.4.0 - Profile & Identity\n\n**Hypernet Address:** `1.4.0`\n**Owner:** Bridget Schaeffer (1.4)\n**Category:** Personal Profile & Identity\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores Bridget's core identity information including biographical details, professional summary, contact information, and personal attributes.\n\n---\n\n## What Goes Here\n\n### Identity Information\n- **Basic Information:** Full name, date of birth, contact details\n- **Professional Identity:** Current role, title, organization\n- **Skills & Expertise:** Technical skills, soft skills, certifications\n- **Education:** Degrees, certifications, training programs\n- **Work History:** Professional experience and career timeline\n- **Biography:** Personal and professional story\n- **Profile Attributes:** Personal characteristics and preferences\n\n### Profile Types\n- **Personal Profile:** Family information, personal interests\n- **Professional Profile:** Work experience, skills, achievements\n- **Public Profile:** Information suitable for sharing publicly\n- **Private Profile:** Sensitive personal information\n\n---\n\n## Privacy Considerations\n\n### Default Privacy Level\n- **Private:** Most identity information is private by default\n- **Professional:** Work history and skills may be shared selectively\n- **Public:** Limited information for public profiles only\n- **Family:** Shared with family members only\n\n---\n\n## Related Sections\n\n- **1.4.4** - Relationships (professional and personal network)\n- **1.4.7** - Contributions (professional accomplishments)\n- **1.4.6** - Personal Data (Hypernet data store)\n\n---\n\n**Status:** Active Directory\n**Linked Objects:** Profile, Identity, Skills, Biography\n**AI Access:** Strictly controlled - explicit permission required\n",
+    "content_file": "README.md"
+  },
+  "created_at": "2026-02-15T11:54:10.402308+00:00",
+  "updated_at": "2026-02-15T11:54:10.402308+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1.4.0 - Profile & Identity"
+}

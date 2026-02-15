@@ -1,0 +1,17 @@
+{
+  "address": "1.2.3.1.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.3 - Communications\\1.2.3.1 - Meeting Notes\\README.md",
+    "size": 933,
+    "content": "# 1.2.3.1 - Meeting Notes\n\n**Hypernet Address:** `1.2.3.1`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Communications - Meetings\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores notes from meetings, calls, and discussions including agendas, minutes, action items, and decisions.\n\n---\n\n## What Goes Here\n\n- Meeting minutes and notes\n- Call notes and summaries\n- Discussion agendas\n- Action items and follow-ups\n- Decision logs\n- 1-on-1 meeting notes\n- Conference and event notes\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Private to Confidential - Meeting notes may contain sensitive discussions\n\n---\n\n## Examples\n\n```\n1.2.3.1 - Meeting Notes/\n\u251c\u2500\u2500 work-meetings-2026/\n\u251c\u2500\u2500 one-on-one-notes/\n\u251c\u2500\u2500 team-meetings/\n\u2514\u2500\u2500 conference-notes/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - contains private discussions\n"
+  },
+  "created_at": "2026-02-15T11:54:07.731917+00:00",
+  "updated_at": "2026-02-15T11:54:07.731917+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

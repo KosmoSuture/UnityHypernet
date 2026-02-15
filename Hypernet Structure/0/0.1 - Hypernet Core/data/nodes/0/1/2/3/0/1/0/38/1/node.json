@@ -1,0 +1,17 @@
+{
+  "address": "0.1.2.3.0.1.0.38.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\0\\38\\node.json",
+    "size": 521,
+    "content": "{\n  \"address\": \"0.1.0.38\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"TECHNICAL-ARCHITECTURE.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.0 - Planning & Documentation\\\\TECHNICAL-ARCHITECTURE.md\",\n    \"size\": 62520\n  },\n  \"created_at\": \"2026-02-15T11:53:48.341608+00:00\",\n  \"updated_at\": \"2026-02-15T11:53:48.341608+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:TECHNICAL-ARCHITECTURE.md\"\n}"
+  },
+  "created_at": "2026-02-15T11:53:54.308910+00:00",
+  "updated_at": "2026-02-15T11:53:54.308910+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

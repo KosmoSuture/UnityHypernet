@@ -1,0 +1,17 @@
+{
+  "address": "1.1.1",
+  "type_address": null,
+  "data": {
+    "name": "General.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.1 Matt Schaeffer\\General.txt",
+    "size": 154,
+    "content": "1.1 - Matt Schaeffer (creator of this monstrosity)\nFirst name - Matthew\nLast Name - Schaeffer\nEmail matt@unityhypernet.com\nPhone Number (402) 238 1334"
+  },
+  "created_at": "2026-02-15T11:54:07.292821+00:00",
+  "updated_at": "2026-02-15T11:54:07.292821+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:General.txt"
+}

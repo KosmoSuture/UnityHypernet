@@ -1,0 +1,17 @@
+{
+  "address": "0.1.0.8",
+  "type_address": null,
+  "data": {
+    "name": "code-metadata-general.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.0 - Planning & Documentation\\code-metadata-general.txt",
+    "size": 64,
+    "content": "Placeholder so folders show up.  Much work to be done expanding."
+  },
+  "created_at": "2026-02-15T11:53:48.207558+00:00",
+  "updated_at": "2026-02-15T11:53:48.207558+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:code-metadata-general.txt"
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.5.8",
+  "type_address": null,
+  "data": {
+    "name": "integrations.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\routes\\integrations.py",
+    "size": 303,
+    "content": "\"\"\"\nIntegration Routes\n\nEndpoints for connecting and syncing external services.\n\"\"\"\n\nfrom fastapi import APIRouter\n\nrouter = APIRouter()\n\n\n@router.get(\"/\")\nasync def list_integrations():\n    \"\"\"List integrations (placeholder)\"\"\"\n    return {\"message\": \"Integration routes - coming soon\"}\n"
+  },
+  "created_at": "2026-02-15T11:53:48.518129+00:00",
+  "updated_at": "2026-02-15T11:53:48.518129+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:integrations.py"
+}

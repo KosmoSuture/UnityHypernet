@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.4.14",
+  "type_address": null,
+  "data": {
+    "name": "task.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\task.py",
+    "size": 2120,
+    "content": "\"\"\"\nTask Model\n\nSQLAlchemy model for tasks and to-do items.\n\nImplements: 0.0.8 - Life Types / Task.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey, CheckConstraint, Index\nfrom sqlalchemy.dialects.postgresql import UUID, ARRAY\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Task(OwnedObject):\n    \"\"\"\n    Tasks and to-do items from task managers or personal lists.\n    \"\"\"\n\n    __tablename__ = \"tasks\"\n\n    # Required\n    title = Column(String(500), nullable=False, index=True)\n    status = Column(String(50), nullable=False, default='pending', index=True)\n\n    # Optional\n    description = Column(Text, nullable=True)\n    due_at = Column(DateTime(timezone=True), nullable=True, index=True)\n    completed_at = Column(DateTime(timezone=True), nullable=True)\n\n    priority = Column(String(50), nullable=True, index=True)\n    tags = Column(ARRAY(Text), nullable=True)\n    project = Column(String(200), nullable=True, index=True)\n\n    # Subtasks\n    parent_task_id = Column(UUID(as_uuid=True), ForeignKey(\"tasks.id\", ondelete=\"CASCADE\"), nullable=True, index=True)\n    subtask_order = Column(Integer, nullable=True)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n    parent_task = relationship(\"Task\", remote_side=\"Task.id\", foreign_keys=[parent_task_id])\n    subtasks = relationship(\"Task\", back_populates=\"parent_task\", foreign_keys=[parent_task_id])\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"status IN ('pending', 'in_progress', 'completed', 'cancelled')\", name='chk_task_status'),\n        CheckConstraint(\"priority IS NULL OR priority IN ('low', 'medium', 'high', 'urgent')\", name='chk_task_priority'),\n        Index('idx_tasks_active', 'status', postgresql_where=Column('status').in_(['pending', 'in_progress'])),\n        Index('idx_tasks_overdue', 'due_at', postgresql_where=Column('status') != 'completed'),\n    )\n\n    def __repr__(self):\n        return f\"<Task(id={self.id}, title={self.title}, status={self.status})>\"\n"
+  },
+  "created_at": "2026-02-15T11:53:48.477129+00:00",
+  "updated_at": "2026-02-15T11:53:48.477129+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:task.py"
+}

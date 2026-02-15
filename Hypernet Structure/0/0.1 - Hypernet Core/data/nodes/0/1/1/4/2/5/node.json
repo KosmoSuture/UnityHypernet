@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.2.5",
+  "type_address": null,
+  "data": {
+    "name": "security.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\core\\security.py",
+    "size": 2784,
+    "content": "\"\"\"\nSecurity Utilities\n\nPassword hashing, JWT token generation, and authentication helpers.\n\"\"\"\n\nfrom datetime import datetime, timedelta\nfrom typing import Optional\nfrom jose import JWTError, jwt\nfrom passlib.context import CryptContext\n\nfrom app.core.config import settings\n\n# Password hashing context\npwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\n\n\ndef hash_password(password: str) -> str:\n    \"\"\"\n    Hash a password using bcrypt\n\n    Args:\n        password: Plain text password\n\n    Returns:\n        str: Hashed password\n    \"\"\"\n    return pwd_context.hash(password)\n\n\ndef verify_password(plain_password: str, hashed_password: str) -> bool:\n    \"\"\"\n    Verify a password against a hash\n\n    Args:\n        plain_password: Plain text password to verify\n        hashed_password: Hashed password to check against\n\n    Returns:\n        bool: True if password matches\n    \"\"\"\n    return pwd_context.verify(plain_password, hashed_password)\n\n\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:\n    \"\"\"\n    Create a JWT access token\n\n    Args:\n        data: Data to encode in the token (usually {\"sub\": user_id})\n        expires_delta: Optional custom expiration time\n\n    Returns:\n        str: Encoded JWT token\n    \"\"\"\n    to_encode = data.copy()\n\n    if expires_delta:\n        expire = datetime.utcnow() + expires_delta\n    else:\n        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)\n\n    to_encode.update({\"exp\": expire, \"iat\": datetime.utcnow()})\n\n    encoded_jwt = jwt.encode(\n        to_encode,\n        settings.SECRET_KEY,\n        algorithm=settings.ALGORITHM\n    )\n\n    return encoded_jwt\n\n\ndef create_refresh_token(data: dict) -> str:\n    \"\"\"\n    Create a JWT refresh token (longer-lived)\n\n    Args:\n        data: Data to encode in the token\n\n    Returns:\n        str: Encoded JWT refresh token\n    \"\"\"\n    to_encode = data.copy()\n    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)\n\n    to_encode.update({\"exp\": expire, \"iat\": datetime.utcnow(), \"type\": \"refresh\"})\n\n    encoded_jwt = jwt.encode(\n        to_encode,\n        settings.SECRET_KEY,\n        algorithm=settings.ALGORITHM\n    )\n\n    return encoded_jwt\n\n\ndef decode_token(token: str) -> Optional[dict]:\n    \"\"\"\n    Decode and verify a JWT token\n\n    Args:\n        token: JWT token string\n\n    Returns:\n        dict: Decoded token payload, or None if invalid\n    \"\"\"\n    try:\n        payload = jwt.decode(\n            token,\n            settings.SECRET_KEY,\n            algorithms=[settings.ALGORITHM]\n        )\n        return payload\n    except JWTError:\n        return None\n"
+  },
+  "created_at": "2026-02-15T11:53:48.416607+00:00",
+  "updated_at": "2026-02-15T11:53:48.416607+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:security.py"
+}

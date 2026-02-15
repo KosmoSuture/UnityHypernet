@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.4.4",
+  "type_address": null,
+  "data": {
+    "name": "bookmark.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\bookmark.py",
+    "size": 1571,
+    "content": "\"\"\"\nBookmark Model\n\nSQLAlchemy model for web bookmarks.\n\nImplements: 0.0.7 - Web Types / Bookmark.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, Boolean, DateTime, Index\nfrom sqlalchemy.dialects.postgresql import ARRAY\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Bookmark(OwnedObject):\n    \"\"\"\n    Browser bookmarks - saved links without full page content.\n    \"\"\"\n\n    __tablename__ = \"bookmarks\"\n\n    # Required\n    url = Column(String(2048), nullable=False, index=True)\n    title = Column(String(500), nullable=False, index=True)\n    bookmarked_at = Column(DateTime(timezone=True), nullable=False, index=True)\n\n    # Optional\n    description = Column(Text, nullable=True)\n    favicon_url = Column(String(500), nullable=True)\n\n    folder = Column(String(255), nullable=True, index=True)\n    tags = Column(ARRAY(Text), nullable=True)\n\n    is_favorite = Column(Boolean, nullable=False, default=False)\n    visit_count = Column(Integer, nullable=False, default=0)\n    last_visited_at = Column(DateTime(timezone=True), nullable=True)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n\n    # Constraints\n    __table_args__ = (\n        Index('idx_bookmarks_favorites', 'is_favorite', postgresql_where=Column('is_favorite') == True),\n        Index('idx_bookmarks_folder', 'folder', postgresql_where=Column('folder').isnot(None)),\n    )\n\n    def __repr__(self):\n        return f\"<Bookmark(id={self.id}, title={self.title[:50]})>\"\n"
+  },
+  "created_at": "2026-02-15T11:53:48.439129+00:00",
+  "updated_at": "2026-02-15T11:53:48.439129+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:bookmark.py"
+}

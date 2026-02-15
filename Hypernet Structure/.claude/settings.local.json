@@ -5,7 +5,12 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(powershell:*)",
-      "WebFetch(domain:chatgpt.com)"
+      "WebFetch(domain:chatgpt.com)",
+      "Bash(stat:*)",
+      "Bash(wc:*)",
+      "Bash(pip:*)",
+      "Bash(pip3 --version:*)",
+      "Bash(python:*)"
     ]
   }
 }

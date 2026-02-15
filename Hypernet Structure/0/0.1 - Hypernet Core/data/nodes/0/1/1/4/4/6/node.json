@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.4.6",
+  "type_address": null,
+  "data": {
+    "name": "contact.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\contact.py",
+    "size": 1958,
+    "content": "\"\"\"\nContact Model\n\nSQLAlchemy model for contact information.\n\nImplements: 0.0.8 - Life Types / Contact.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Date, ForeignKey\nfrom sqlalchemy.dialects.postgresql import UUID, ARRAY\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Contact(OwnedObject):\n    \"\"\"\n    Contact information for people (address book, phone contacts).\n    \"\"\"\n\n    __tablename__ = \"contacts\"\n\n    # Required\n    display_name = Column(String(200), nullable=False, index=True)\n\n    # Optional - Name parts\n    first_name = Column(String(100), nullable=True)\n    middle_name = Column(String(100), nullable=True)\n    last_name = Column(String(100), nullable=True, index=True)\n\n    # Contact methods\n    email_addresses = Column(ARRAY(Text), nullable=True)\n    phone_numbers = Column(ARRAY(Text), nullable=True)\n\n    # Address\n    street_address = Column(String(500), nullable=True)\n    city = Column(String(100), nullable=True)\n    state = Column(String(100), nullable=True)\n    postal_code = Column(String(20), nullable=True)\n    country = Column(String(100), nullable=True)\n\n    # Social/Work\n    company = Column(String(200), nullable=True)\n    job_title = Column(String(200), nullable=True)\n    website = Column(String(500), nullable=True)\n\n    # Profile\n    profile_photo_id = Column(UUID(as_uuid=True), ForeignKey(\"media.id\", ondelete=\"SET NULL\"), nullable=True)\n    birthday = Column(Date, nullable=True)\n    notes = Column(Text, nullable=True)\n\n    # Metadata\n    nickname = Column(String(100), nullable=True)\n    tags = Column(ARRAY(Text), nullable=True)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n    profile_photo = relationship(\"Media\", foreign_keys=[profile_photo_id], post_update=True)\n\n    def __repr__(self):\n        return f\"<Contact(id={self.id}, name={self.display_name})>\"\n"
+  },
+  "created_at": "2026-02-15T11:53:48.448130+00:00",
+  "updated_at": "2026-02-15T11:53:48.448130+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:contact.py"
+}

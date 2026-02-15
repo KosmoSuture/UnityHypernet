@@ -1,0 +1,17 @@
+{
+  "address": "1.2.4.0.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.4 - Relationships\\1.2.4.0 - Professional Network\\README.md",
+    "size": 1024,
+    "content": "# 1.2.4.0 - Professional Network\n\n**Hypernet Address:** `1.2.4.0`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Relationships - Professional\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores information about professional connections including colleagues, mentors, industry contacts, and business relationships.\n\n---\n\n## What Goes Here\n\n- Work colleagues and team members\n- Business contacts and clients\n- Mentors and advisors\n- Industry peers and connections\n- Professional references\n- Networking contacts\n- Conference and event connections\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Professional - Confidential contact information\n\n---\n\n## Examples\n\n```\n1.2.4.0 - Professional Network/\n\u251c\u2500\u2500 current-colleagues/\n\u251c\u2500\u2500 former-colleagues/\n\u251c\u2500\u2500 mentors-and-advisors/\n\u251c\u2500\u2500 industry-contacts/\n\u2514\u2500\u2500 client-relationships/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - private professional relationships\n"
+  },
+  "created_at": "2026-02-15T11:54:07.842476+00:00",
+  "updated_at": "2026-02-15T11:54:07.842476+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

@@ -1,0 +1,14 @@
+{
+  "address": "1.5.2.3",
+  "type_address": null,
+  "data": {
+    "name": "1.5.2.3 - Reference Materials",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.5 Mark Schaeffer\\1.5.2 - Documents\\1.5.2.3 - Reference Materials"
+  },
+  "created_at": "2026-02-15T11:54:11.441938+00:00",
+  "updated_at": "2026-02-15T11:54:11.441938+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1.5.2.3 - Reference Materials"
+}

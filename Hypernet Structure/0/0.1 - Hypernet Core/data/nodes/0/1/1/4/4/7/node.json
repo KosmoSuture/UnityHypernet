@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.4.7",
+  "type_address": null,
+  "data": {
+    "name": "email.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\email.py",
+    "size": 2317,
+    "content": "\"\"\"\nEmail Model\n\nSQLAlchemy model for email messages.\n\nImplements: 0.0.4 - Communication Types / Email.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, Boolean, DateTime, CheckConstraint, Index\nfrom sqlalchemy.dialects.postgresql import ARRAY\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Email(OwnedObject):\n    \"\"\"\n    Email messages from Gmail, Outlook, iCloud Mail, etc.\n    \"\"\"\n\n    __tablename__ = \"emails\"\n\n    # Required fields\n    subject = Column(String(500), nullable=False, index=True)\n    from_address = Column(String(255), nullable=False, index=True)\n    to_addresses = Column(ARRAY(Text), nullable=False)\n    sent_at = Column(DateTime(timezone=True), nullable=False, index=True)\n    direction = Column(String(50), nullable=False, index=True, doc=\"sent, received, draft\")\n\n    # Optional fields\n    cc_addresses = Column(ARRAY(Text), nullable=True)\n    bcc_addresses = Column(ARRAY(Text), nullable=True)\n\n    body_text = Column(Text, nullable=True)\n    body_html = Column(Text, nullable=True)\n\n    thread_id = Column(String(255), nullable=True, index=True)\n    message_id = Column(String(255), nullable=True, index=True, doc=\"RFC 822 Message-ID\")\n\n    has_attachments = Column(Boolean, nullable=False, default=False)\n    attachment_count = Column(Integer, nullable=False, default=0)\n\n    is_read = Column(Boolean, nullable=False, default=False)\n    is_starred = Column(Boolean, nullable=False, default=False)\n    is_important = Column(Boolean, nullable=False, default=False)\n\n    labels = Column(ARRAY(Text), nullable=True, doc=\"Gmail labels or folder names\")\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"direction IN ('sent', 'received', 'draft')\", name='chk_email_direction'),\n        CheckConstraint(\"attachment_count >= 0\", name='chk_attachment_count'),\n        Index('idx_emails_thread', 'thread_id', postgresql_where=Column('thread_id').isnot(None)),\n        Index('idx_emails_unread', 'is_read', postgresql_where=Column('is_read') == False),\n    )\n\n    def __repr__(self):\n        return f\"<Email(id={self.id}, subject={self.subject[:50]}, from={self.from_address})>\"\n"
+  },
+  "created_at": "2026-02-15T11:53:48.451128+00:00",
+  "updated_at": "2026-02-15T11:53:48.451128+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:email.py"
+}

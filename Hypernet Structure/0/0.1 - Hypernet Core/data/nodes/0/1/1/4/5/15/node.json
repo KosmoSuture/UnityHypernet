@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.5.15",
+  "type_address": null,
+  "data": {
+    "name": "users.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\routes\\users.py",
+    "size": 280,
+    "content": "\"\"\"\nUser Routes\n\nEndpoints for user profile management.\n\"\"\"\n\nfrom fastapi import APIRouter\n\nrouter = APIRouter()\n\n\n@router.get(\"/me\")\nasync def get_current_user():\n    \"\"\"Get current user profile (placeholder)\"\"\"\n    return {\"message\": \"User routes - coming soon\"}\n"
+  },
+  "created_at": "2026-02-15T11:53:48.545656+00:00",
+  "updated_at": "2026-02-15T11:53:48.545656+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:users.py"
+}

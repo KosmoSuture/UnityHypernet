@@ -1,0 +1,17 @@
+{
+  "address": "0.4.0.0.4.3",
+  "type_address": null,
+  "data": {
+    "name": "Email.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.4 - Communication Types\\Email.md",
+    "size": 1666,
+    "content": "# Email - Email Message\n\n**Type ID:** `hypernet.communication.email`\n**Version:** 1.0\n**Category:** 0.0.4 - Communication Types\n**Parent:** BaseObject\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Purpose\n\nEmail messages from Gmail, Outlook, iCloud Mail, etc.\n\n---\n\n## Required Fields\n\n```yaml\nsubject: String(500)\n\nfrom_address: String(255)\n  - Sender email\n\nto_addresses: Text[]\n  - Array of recipient emails\n\nsent_at: DateTime\n\ndirection: Enum\n  - \"sent\", \"received\", \"draft\"\n```\n\n---\n\n## Optional Fields\n\n```yaml\ncc_addresses: Text[]\nbcc_addresses: Text[]\n\nbody_text: Text (plain text)\nbody_html: Text (HTML version)\n\nthread_id: String(255)\n  - Email thread/conversation ID\n\nmessage_id: String(255)\n  - RFC 822 Message-ID\n\nhas_attachments: Boolean\nattachment_count: Integer\n\nis_read: Boolean\nis_starred: Boolean\nis_important: Boolean\n\nlabels: Text[]\n  - Gmail labels or folder names\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"headers\": {\n    \"message-id\": \"<abc@mail.gmail.com>\",\n    \"in-reply-to\": \"<xyz@mail.gmail.com>\",\n    \"references\": [\"<...>\"]\n  },\n  \"gmail\": {\n    \"thread_id\": \"thread_123\",\n    \"labels\": [\"INBOX\", \"IMPORTANT\"]\n  },\n  \"attachments\": [\n    {\n      \"filename\": \"document.pdf\",\n      \"media_id\": \"uuid\",\n      \"size\": 1024000\n    }\n  ]\n}\n```\n\n---\n\n## Relationships\n\n```yaml\nOutgoing:\n  - references: Document, Photo (attachments)\n  - part_of: EmailThread\n  - source: Integration (Gmail, Outlook)\n\nIncoming:\n  - related_to: Task, Event (emails about tasks/events)\n```\n\n---\n\n**Status:** Active - Phase 1 Priority\n**Version:** 1.0\n"
+  },
+  "created_at": "2026-02-15T11:54:04.939705+00:00",
+  "updated_at": "2026-02-15T11:54:04.939705+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:Email.md"
+}

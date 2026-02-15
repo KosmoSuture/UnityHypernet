@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.4.1",
+  "type_address": null,
+  "data": {
+    "name": "__init__.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\__init__.py",
+    "size": 227,
+    "content": "\"\"\"\nHypernet Core 0.1 - Universal Personal Data Platform\n\nThis package contains the core application code for Hypernet.\n\"\"\"\n\n__version__ = \"0.1.0\"\n__author__ = \"Matt Schaeffer & Claude (Anthropic)\"\n__license__ = \"MIT\"\n"
+  },
+  "created_at": "2026-02-15T11:53:48.370606+00:00",
+  "updated_at": "2026-02-15T11:53:48.370606+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:__init__.py"
+}

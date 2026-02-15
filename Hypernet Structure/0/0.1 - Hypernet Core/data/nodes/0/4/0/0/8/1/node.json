@@ -1,0 +1,17 @@
+{
+  "address": "0.4.0.0.8.1",
+  "type_address": null,
+  "data": {
+    "name": "CalendarEvent.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.8 - Life Types\\CalendarEvent.md",
+    "size": 1563,
+    "content": "# CalendarEvent - Calendar Event/Appointment\n\n**Type ID:** `hypernet.life.calendarevent`\n**Version:** 1.0\n**Category:** 0.0.8 - Life Types\n**Parent:** BaseObject\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Purpose\n\nCalendar events from Google Calendar, Outlook, Apple Calendar, etc.\n\n---\n\n## Required Fields\n\n```yaml\ntitle: String(500)\n\nstarts_at: DateTime\n\nevent_type: Enum\n  - \"event\", \"reminder\", \"task\", \"birthday\"\n```\n\n---\n\n## Optional Fields\n\n```yaml\nends_at: DateTime\n\nlocation: String(500)\n  - Physical or virtual location\n\ndescription: Text\n\n# Recurrence\nis_recurring: Boolean\nrecurrence_rule: String(255)\n  - iCal RRULE format\n\n# Participants\norganizer_email: String(255)\nattendees: Text[]\n\n# Virtual\nmeeting_url: String(500)\n  - Zoom, Teams link\n\n# Status\nstatus: Enum\n  - \"confirmed\", \"tentative\", \"cancelled\"\n\nreminder_minutes: Integer[]\n  - [15, 60] (15 min and 1 hour before)\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"google_calendar\": {\n    \"event_id\": \"abc123\",\n    \"calendar_name\": \"Work\",\n    \"color\": \"#ff0000\"\n  },\n  \"zoom\": {\n    \"meeting_id\": \"123-456-789\",\n    \"password\": \"...\"\n  },\n  \"rsvp\": {\n    \"response\": \"accepted\",\n    \"responded_at\": \"2024-01-10T12:00:00Z\"\n  }\n}\n```\n\n---\n\n## Relationships\n\n```yaml\nOutgoing:\n  - source: Integration (Google Calendar)\n  - at_location: Location\n  - related_to: Photo, Video, Email\n\nIncoming:\n  - invited_to: User, Contact\n```\n\n---\n\n**Status:** Active - Phase 1 Priority\n**Version:** 1.0\n"
+  },
+  "created_at": "2026-02-15T11:54:05.104585+00:00",
+  "updated_at": "2026-02-15T11:54:05.104585+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:CalendarEvent.md"
+}
