@@ -10,7 +10,11 @@
       "Bash(wc:*)",
       "Bash(pip:*)",
       "Bash(pip3 --version:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(test:*)",
+      "WebSearch",
+      "WebFetch(domain:python-telegram-bot.org)",
+      "WebFetch(domain:realpython.com)"
     ]
   }
 }

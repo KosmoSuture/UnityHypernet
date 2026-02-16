@@ -134,12 +134,35 @@ def import_folder(
         return 0
 
     # Process subfolders
-    child_counter = 0
+    # First pass: collect all explicitly-addressed children to avoid collisions
     if folder_path.is_dir():
-        for child in sorted(folder_path.iterdir()):
-            if child.name.startswith(".") or child.name == "__pycache__":
-                continue
+        reserved_suffixes: set[str] = set()
+        children = sorted(
+            [c for c in folder_path.iterdir()
+             if not c.name.startswith(".") and c.name != "__pycache__"],
+            key=lambda c: c.name,
+        )
 
+        for child in children:
+            if child.is_dir():
+                addr_part, _ = extract_address_from_name(child.name)
+                if addr_part:
+                    # Track the last segment to avoid collision with sequential numbering
+                    if addr_part.startswith(address_prefix + "."):
+                        suffix = addr_part[len(address_prefix) + 1:]
+                    elif addr_part.startswith(address_prefix):
+                        suffix = addr_part[len(address_prefix):]
+                    else:
+                        suffix = addr_part
+                    # Track the first segment of the suffix (e.g., "1" from "1.2.3")
+                    first_seg = suffix.split(".")[0] if suffix else ""
+                    if first_seg.isdigit():
+                        reserved_suffixes.add(int(first_seg))
+
+        # Sequential counter starts above the highest reserved number
+        child_counter = max(reserved_suffixes) if reserved_suffixes else 0
+
+        for child in children:
             if child.is_dir():
                 addr_part, clean_name = extract_address_from_name(child.name)
 
@@ -151,6 +174,9 @@ def import_folder(
                         child_address = f"{address_prefix}.{addr_part}"
                 else:
                     child_counter += 1
+                    # Skip any numbers that collide with named folders
+                    while child_counter in reserved_suffixes:
+                        child_counter += 1
                     child_address = f"{address_prefix}.{child_counter}"
 
                 count += import_folder(
@@ -163,6 +189,9 @@ def import_folder(
             elif child.is_file() and child.suffix in (".md", ".txt", ".py", ".sql", ".json"):
                 # Import individual files as leaf nodes
                 child_counter += 1
+                # Skip any numbers that collide with named folders
+                while child_counter in reserved_suffixes:
+                    child_counter += 1
                 file_address = f"{address_prefix}.{child_counter}"
 
                 file_data = {

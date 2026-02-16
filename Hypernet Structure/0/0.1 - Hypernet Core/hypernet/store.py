@@ -8,15 +8,18 @@ JSON files in a hierarchy matching the address structure.
 Storage layout:
   data/
     nodes/
-      1/1/1/1/00001.json     (node at address 1.1.1.1.00001)
-      2/1/node.json           (node at address 2.1)
+      1/1/1/1/00001/node.json  (node at address 1.1.1.1.00001)
+      2/1/node.json             (node at address 2.1)
     links/
-      <hash>.json             (link files, indexed by endpoints)
+      <hash>.json               (link files, indexed by endpoints)
     indexes/
-      by_type.json            (type_address -> [node addresses])
-      by_owner.json           (owner_address -> [node addresses])
-      links_from.json         (from_address -> [link hashes])
-      links_to.json           (to_address -> [link hashes])
+      by_type.json              (type_address -> [node addresses])
+      by_owner.json             (owner_address -> [node addresses])
+      links_from.json           (from_address -> [link hashes])
+      links_to.json             (to_address -> [link hashes])
+    history/
+      1/1/v0001.json            (version 1 snapshot of node 1.1)
+      1/1/v0002.json            (version 2 snapshot of node 1.1)
 
 This can be swapped for a more efficient backend later without
 changing the Node/Link/Graph interfaces.
@@ -25,6 +28,7 @@ changing the Node/Link/Graph interfaces.
 from __future__ import annotations
 import json
 import hashlib
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -41,6 +45,7 @@ class Store:
         self._nodes_dir = self.root / "nodes"
         self._links_dir = self.root / "links"
         self._index_dir = self.root / "indexes"
+        self._history_dir = self.root / "history"
 
         # In-memory indexes (loaded from disk on init, persisted on write)
         self._node_index: dict[str, str] = {}         # address -> node file path
@@ -56,14 +61,20 @@ class Store:
         self._nodes_dir.mkdir(parents=True, exist_ok=True)
         self._links_dir.mkdir(parents=True, exist_ok=True)
         self._index_dir.mkdir(parents=True, exist_ok=True)
+        self._history_dir.mkdir(parents=True, exist_ok=True)
 
     # =========================================================================
     # Node Operations
     # =========================================================================
 
     def put_node(self, node: Node) -> None:
-        """Store a node. Creates or overwrites."""
+        """Store a node. Creates or overwrites. Snapshots previous state to history."""
         path = self._node_path(node.address)
+
+        # If node already exists, snapshot current state before overwriting
+        if path.exists():
+            self._snapshot_to_history(node.address, path)
+
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(node.to_dict(), indent=2, default=str), encoding="utf-8")
 
@@ -173,6 +184,36 @@ class Store:
         return prefix.next_instance(max_instance)
 
     # =========================================================================
+    # Version History
+    # =========================================================================
+
+    def get_node_history(self, address: HypernetAddress) -> list[dict]:
+        """Get all historical versions of a node, ordered by version number.
+
+        Returns a list of snapshot dicts, each containing:
+          - version: int
+          - content_hash: str (sha256 of the JSON content, first 16 hex chars)
+          - snapshot_at: ISO timestamp of when the snapshot was taken
+          - node: dict (the serialized node at that version)
+        """
+        history_dir = self._history_dir / address.to_path()
+        if not history_dir.exists():
+            return []
+        versions = []
+        for path in sorted(history_dir.glob("v*.json")):
+            versions.append(json.loads(path.read_text(encoding="utf-8")))
+        return versions
+
+    def get_node_version(self, address: HypernetAddress, version: int) -> Optional[Node]:
+        """Retrieve a specific historical version of a node."""
+        history_dir = self._history_dir / address.to_path()
+        path = history_dir / f"v{version:04d}.json"
+        if not path.exists():
+            return None
+        snapshot = json.loads(path.read_text(encoding="utf-8"))
+        return Node.from_dict(snapshot["node"])
+
+    # =========================================================================
     # Link Operations
     # =========================================================================
 
@@ -262,9 +303,32 @@ class Store:
         """Convert address to node storage path."""
         return self._nodes_dir / address.to_path() / "node.json"
 
+    def _snapshot_to_history(self, address: HypernetAddress, current_path: Path) -> None:
+        """Copy current node state to history before overwriting."""
+        history_dir = self._history_dir / address.to_path()
+        history_dir.mkdir(parents=True, exist_ok=True)
+
+        # Determine next version number from existing snapshots
+        existing = sorted(history_dir.glob("v*.json"))
+        next_version = len(existing) + 1
+
+        # Read current content and compute content hash
+        content = current_path.read_text(encoding="utf-8")
+        content_hash = hashlib.sha256(content.encode()).hexdigest()[:16]
+
+        snapshot = {
+            "version": next_version,
+            "content_hash": content_hash,
+            "snapshot_at": datetime.now(timezone.utc).isoformat(),
+            "node": json.loads(content),
+        }
+        version_path = history_dir / f"v{next_version:04d}.json"
+        version_path.write_text(json.dumps(snapshot, indent=2, default=str), encoding="utf-8")
+
     def _link_hash(self, link: Link) -> str:
-        """Generate a deterministic hash for a link."""
-        key = f"{link.from_address}:{link.to_address}:{link.relationship}"
+        """Generate a hash for a link. Includes timestamp so multiple links
+        of the same type between the same nodes are supported."""
+        key = f"{link.from_address}:{link.to_address}:{link.relationship}:{link.created_at.isoformat()}"
         return hashlib.sha256(key.encode()).hexdigest()[:16]
 
     def _save_indexes(self) -> None:

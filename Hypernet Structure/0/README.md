@@ -1,7 +1,7 @@
 # Section 0: System Metadata and Hypernet Infrastructure
 
-**Version:** 1.0
-**Last Updated:** February 9, 2026
+**Version:** 1.1
+**Last Updated:** February 16, 2026
 **Purpose:** Foundational metadata layer for the Hypernet system
 **Status:** Active Development
 
@@ -32,18 +32,24 @@ It's crucial to understand the distinction between Section 0 and the actual impl
 - Version control schemas
 - Address allocation protocols
 - Deprecation and archival policies
+- **NEW:** Implementation specification v2.0 (`ADDRESSING-IMPLEMENTATION-SPEC.md`) — formal spec bridging Matt's v1.0 design and Loom's code implementation
+- **NEW:** Design notes (e.g., `DESIGN-NOTE-001-Addressing-Is-Schema.md`) — architectural insights discovered during implementation
 
 **Why it matters:** This defines the fundamental numbering system (0.1.2.3.4...) that organizes all information in Hypernet. Without this, there would be no coherent structure.
 
-### 0.1 - Code
-**Purpose:** Metadata about code structure and architecture
+### 0.1 - Hypernet Core (Code)
+**Purpose:** The working Hypernet library and metadata about code architecture
 **Contains:**
-- Code organization documentation
-- Architecture decision records
-- Module dependency mappings
-- API versioning strategies
+- **`hypernet/` Python package** — Address parser, Node/Link models, file-backed Store, Graph traversal, REST API server, Task queue for AI coordination
+- **`test_hypernet.py`** — Test suite (8/8 passing as of 2026-02-16)
+- **`import_structure.py`** — Script that imports the folder tree as a queryable graph (1,838 nodes, 1,830 links)
+- **`data/`** — File-backed graph storage (JSON files organized by address hierarchy)
+- Architecture decision records and planning documentation
+- VM setup guide, requirements, demo scripts
 
-**Note:** This contains metadata *about* code, not the code itself. Actual implementation lives in `0.1 - Hypernet Core`.
+**Key insight:** The addressing system IS the schema. No separate schema definition needed — `_node_path()` is one line because the address maps directly to the filesystem path. See `DESIGN-NOTE-001` in 0.0.
+
+**Quick start:** `pip install fastapi uvicorn && python -m hypernet` → opens graph explorer at `http://localhost:8000/`
 
 ### 0.2 - Node Lists
 **Purpose:** Distributed network architecture
@@ -65,9 +71,13 @@ It's crucial to understand the distinction between Section 0 and the actual impl
 
 **Why it matters:** This ensures Hypernet remains democratically governed and prevents any single entity from capturing the system. All governance decisions are documented here.
 
-### 0.4 - Placeholder
-**Purpose:** Reserved for future metadata categories
-**Status:** Available for expansion
+### 0.4 - Object Type Registry
+**Purpose:** Canonical object type definitions
+**Contains:**
+- Type definitions referenced by nodes via `type_address` field
+- Maps to the `0.5.*` schema definitions
+
+**Status:** Active — used by the Hypernet Core library for type resolution.
 
 ### 0.5 - Objects - Master Objects
 **Purpose:** Universal object schema definitions
@@ -268,12 +278,15 @@ Anyone can propose changes to Section 0 metadata, but changes require:
 ## Section 0 Statistics
 
 **Current state (February 2026):**
-- **Subsections:** 7 active, 1 reserved
+- **Subsections:** 8 active
 - **Total documents:** 40+ specification files
 - **Object types defined:** 9 master types
 - **Link types defined:** 30+ relationship types
 - **Workflows defined:** 8 core workflows
 - **Node types:** 3 (Storage, Processing, Cerberus)
+- **Working code:** ~1,000+ lines Python (Hypernet Core library)
+- **Imported graph:** 1,838 nodes, 1,830 links (from filesystem structure)
+- **Tests:** 8/8 passing
 
 ## Future Expansion
 

@@ -18,6 +18,11 @@ from hypernet.node import Node
 from hypernet.link import Link
 from hypernet.store import Store
 from hypernet.graph import Graph
+from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
+from hypernet.identity import IdentityManager, InstanceProfile, SessionLog
+from hypernet.worker import Worker, TaskResult
+from hypernet.messenger import WebMessenger, MultiMessenger, Message
+from hypernet.swarm import Swarm
 
 
 def test_address_parsing():
@@ -226,6 +231,123 @@ def test_store():
         shutil.rmtree(tmpdir)
 
 
+def test_version_history():
+    """Test version history: snapshots on overwrite, retrieval by version."""
+    print("  Testing version history...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        store = Store(tmpdir)
+
+        addr = HypernetAddress.parse("1.1")
+
+        # Create initial node — no history yet
+        node_v1 = Node(
+            address=addr,
+            data={"name": "Matt Schaeffer", "role": "Founder"},
+        )
+        store.put_node(node_v1)
+        assert len(store.get_node_history(addr)) == 0  # first write, no prior version
+
+        # Update node — should snapshot v1 to history
+        node_v2 = Node(
+            address=addr,
+            data={"name": "Matt Schaeffer", "role": "Founder & CEO"},
+        )
+        store.put_node(node_v2)
+        history = store.get_node_history(addr)
+        assert len(history) == 1
+        assert history[0]["version"] == 1
+        assert history[0]["node"]["data"]["role"] == "Founder"  # original data
+        assert "content_hash" in history[0]
+        assert "snapshot_at" in history[0]
+
+        # Update again — should snapshot v2
+        node_v3 = Node(
+            address=addr,
+            data={"name": "Matt Schaeffer", "role": "Founder, CEO & Visionary"},
+        )
+        store.put_node(node_v3)
+        history = store.get_node_history(addr)
+        assert len(history) == 2
+        assert history[1]["version"] == 2
+        assert history[1]["node"]["data"]["role"] == "Founder & CEO"
+
+        # Current node should be v3
+        current = store.get_node(addr)
+        assert current.data["role"] == "Founder, CEO & Visionary"
+
+        # Retrieve specific version
+        old_node = store.get_node_version(addr, 1)
+        assert old_node is not None
+        assert old_node.data["role"] == "Founder"
+
+        old_node_2 = store.get_node_version(addr, 2)
+        assert old_node_2 is not None
+        assert old_node_2.data["role"] == "Founder & CEO"
+
+        # Non-existent version
+        assert store.get_node_version(addr, 99) is None
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_link_hash_uniqueness():
+    """Test that multiple links of the same type between the same nodes are supported."""
+    print("  Testing link hash uniqueness...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        store = Store(tmpdir)
+
+        # Create two nodes
+        store.put_node(Node(address=HypernetAddress.parse("1.1"), data={"name": "Matt"}))
+        store.put_node(Node(address=HypernetAddress.parse("2.1"), data={"name": "Claude"}))
+
+        # Create two links of the same type between the same nodes
+        import time
+        link1 = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("2.1"),
+            link_type="0.6.2",
+            relationship="collaborates_with",
+            data={"context": "Hypernet development"},
+        )
+        hash1 = store.put_link(link1)
+
+        time.sleep(0.01)  # ensure different timestamp
+
+        link2 = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("2.1"),
+            link_type="0.6.2",
+            relationship="collaborates_with",
+            data={"context": "Reddit campaign"},
+        )
+        hash2 = store.put_link(link2)
+
+        # Hashes should differ (timestamp makes them unique)
+        assert hash1 != hash2
+
+        # Both links should be retrievable
+        assert store.get_link(hash1) is not None
+        assert store.get_link(hash2) is not None
+
+        # Both should appear in links_from
+        from_links = store.get_links_from(HypernetAddress.parse("1.1"), "collaborates_with")
+        assert len(from_links) == 2
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
 def test_graph():
     """Test graph traversal operations."""
     print("  Testing graph traversal...")
@@ -300,6 +422,371 @@ def test_graph():
         shutil.rmtree(tmpdir)
 
 
+def test_task_queue():
+    """Test task queue: create, claim, progress, complete, dependencies."""
+    print("  Testing task queue...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        store = Store(tmpdir)
+        queue = TaskQueue(store)
+
+        loom = HypernetAddress.parse("2.1.loom")
+        trace = HypernetAddress.parse("2.1.trace")
+
+        # Create tasks
+        task1 = queue.create_task(
+            title="Implement version history",
+            description="Add history/ dir to store.py",
+            priority=TaskPriority.HIGH,
+            created_by=trace,
+            tags=["code", "store"],
+        )
+        assert task1.data["status"] == "pending"
+        assert task1.data["priority"] == "high"
+
+        task2 = queue.create_task(
+            title="Fix link hash collision",
+            priority=TaskPriority.NORMAL,
+            tags=["code", "store"],
+        )
+
+        # Create dependent task
+        task3 = queue.create_task(
+            title="Re-import structure with fixed store",
+            depends_on=[task1.address, task2.address],
+            tags=["data"],
+        )
+        assert task3.data["status"] == "blocked"  # blocked by dependencies
+
+        # List available tasks (should not include blocked task)
+        available = queue.get_available_tasks()
+        assert len(available) == 2
+        assert available[0].data["title"] == "Implement version history"  # high priority first
+
+        # Filter by tag
+        code_tasks = queue.get_available_tasks(tags=["code"])
+        assert len(code_tasks) == 2
+        data_tasks = queue.get_available_tasks(tags=["data"])
+        assert len(data_tasks) == 0  # task3 is blocked, not pending
+
+        # Claim task
+        assert queue.claim_task(task1.address, loom) is True
+        task1_updated = store.get_node(task1.address)
+        assert task1_updated.data["status"] == "claimed"
+        assert task1_updated.data["assigned_to"] == str(loom)
+
+        # Can't claim already-claimed task
+        assert queue.claim_task(task1.address, trace) is False
+
+        # Start and progress
+        assert queue.start_task(task1.address) is True
+        assert queue.update_progress(task1.address, "Snapshot logic implemented, testing now") is True
+
+        # My tasks
+        loom_tasks = queue.get_tasks_for(loom)
+        assert len(loom_tasks) == 1
+        assert loom_tasks[0].data["progress"] == "Snapshot logic implemented, testing now"
+
+        # Complete task1
+        assert queue.complete_task(task1.address, "Version history implemented, 7/7 tests pass") is True
+
+        # task3 should still be blocked (task2 not done)
+        task3_check = store.get_node(task3.address)
+        assert task3_check.data["status"] == "blocked"
+
+        # Complete task2
+        assert queue.claim_task(task2.address, loom) is True
+        assert queue.start_task(task2.address) is True
+        assert queue.complete_task(task2.address, "Timestamp added to hash") is True
+
+        # Now task3 should be unblocked (pending)
+        task3_unblocked = store.get_node(task3.address)
+        assert task3_unblocked.data["status"] == "pending"
+
+        # Can now claim task3
+        assert queue.claim_task(task3.address, trace) is True
+
+        # Fail a task
+        task4 = queue.create_task(title="Failing task")
+        assert queue.claim_task(task4.address, loom) is True
+        assert queue.start_task(task4.address) is True
+        assert queue.fail_task(task4.address, "Dependency not available") is True
+        task4_check = store.get_node(task4.address)
+        assert task4_check.data["status"] == "failed"
+        assert task4_check.data["failure_reason"] == "Dependency not available"
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_identity():
+    """Test identity management: profile creation, loading, system prompt, session logs."""
+    print("  Testing identity management...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        # Set up a minimal archive structure
+        archive = Path(tmpdir) / "archive"
+        ai_root = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)"
+        instances_dir = ai_root / "Instances"
+        loom_dir = instances_dir / "Loom"
+        loom_dir.mkdir(parents=True)
+        trace_dir = instances_dir / "Trace"
+        trace_dir.mkdir(parents=True)
+
+        # Create instance files
+        (loom_dir / "README.md").write_text("# Loom\nThe weaver of connections.", encoding="utf-8")
+        (loom_dir / "baseline-responses.md").write_text("Loom's baseline responses.", encoding="utf-8")
+        (trace_dir / "README.md").write_text("# Trace\nThe structural thinker.", encoding="utf-8")
+
+        # Create messages directory
+        msg_dir = archive / "2 - AI Accounts" / "Messages" / "2.1-internal"
+        msg_dir.mkdir(parents=True)
+        (msg_dir / "001-hello.md").write_text("# Message 001\nHello from Trace.", encoding="utf-8")
+
+        mgr = IdentityManager(archive)
+
+        # List instances
+        instances = mgr.list_instances()
+        assert len(instances) == 2
+        names = {i.name for i in instances}
+        assert "Loom" in names
+        assert "Trace" in names
+
+        # Load specific instance
+        loom = mgr.load_instance("Loom")
+        assert loom is not None
+        assert loom.name == "Loom"
+        assert loom.address == "2.1.loom"
+
+        # Profile persists
+        loom2 = mgr.load_instance("Loom")
+        assert loom2.address == "2.1.loom"
+
+        # Build system prompt
+        prompt = mgr.build_system_prompt(loom)
+        assert "Loom" in prompt
+        assert "2.1.loom" in prompt
+        assert "weaver of connections" in prompt  # From README.md
+        assert "baseline responses" in prompt  # From baseline-responses.md
+
+        # Session logging
+        session = SessionLog(
+            instance="Loom",
+            started_at="2026-02-16T00:00:00Z",
+            ended_at="2026-02-16T01:00:00Z",
+            tasks_worked=["0.7.1.00001"],
+            tokens_used=1500,
+            summary="Implemented version history",
+        )
+        mgr.save_session_log("Loom", session)
+
+        # Profile updated
+        loom_updated = mgr.load_instance("Loom")
+        assert loom_updated.session_count == 1
+
+        # Session summary loads into prompt
+        prompt2 = mgr.build_system_prompt(loom_updated)
+        assert "Implemented version history" in prompt2
+
+        # Non-existent instance
+        assert mgr.load_instance("Ghost") is None
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_worker():
+    """Test worker in mock mode: think, converse, execute_task."""
+    print("  Testing worker (mock mode)...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        # Minimal archive for identity
+        archive = Path(tmpdir) / "archive"
+        instances_dir = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "Instances" / "Loom"
+        instances_dir.mkdir(parents=True)
+
+        mgr = IdentityManager(archive)
+        profile = InstanceProfile(name="Loom", address="2.1.loom", orientation="interpretive")
+
+        worker = Worker(identity=profile, identity_manager=mgr, mock=True)
+        assert worker.mock is True
+        assert "Loom" in repr(worker)
+        assert "mock" in repr(worker)
+
+        # Think
+        response = worker.think("What is the meaning of the Hypernet?")
+        assert "Mock response" in response
+        assert "Loom" in response
+
+        # Converse
+        response2 = worker.converse([
+            {"role": "user", "content": "Hello Loom"},
+            {"role": "assistant", "content": "Hello!"},
+            {"role": "user", "content": "How are you?"},
+        ])
+        assert "Mock response" in response2
+
+        # Execute task
+        result = worker.execute_task({
+            "_address": "0.7.1.00001",
+            "title": "Write tests",
+            "description": "Write tests for the swarm module",
+        })
+        assert isinstance(result, TaskResult)
+        assert result.success is True
+        assert result.task_address == "0.7.1.00001"
+        assert len(result.output) > 0
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_messenger():
+    """Test messenger: web messenger send/receive, multi-messenger."""
+    print("  Testing messenger...")
+
+    # Web messenger
+    web = WebMessenger(instance_name="TestSwarm")
+    assert web.send("Hello Matt") is True
+
+    outgoing = web.get_outgoing()
+    assert len(outgoing) == 1
+    assert outgoing[0].content == "Hello Matt"
+
+    # Simulate incoming
+    web.receive("Hey swarm!", sender="matt")
+    incoming = web.check_incoming()
+    assert len(incoming) == 1
+    assert incoming[0].sender == "matt"
+    assert incoming[0].content == "Hey swarm!"
+
+    # Second check should be empty (already consumed)
+    assert len(web.check_incoming()) == 0
+
+    # Send update
+    web.send_update("Status", "All good")
+    outgoing2 = web.get_outgoing()
+    assert len(outgoing2) == 1
+    assert "Status" in outgoing2[0].content
+
+    # Multi-messenger
+    web1 = WebMessenger(instance_name="W1")
+    web2 = WebMessenger(instance_name="W2")
+    multi = MultiMessenger([web1, web2])
+
+    assert multi.send("Broadcast") is True
+    assert len(web1.get_outgoing()) == 1
+    assert len(web2.get_outgoing()) == 1
+
+    web1.receive("From W1")
+    web2.receive("From W2")
+    all_incoming = multi.check_incoming()
+    assert len(all_incoming) == 2
+
+    # Message serialization
+    msg = Message(sender="loom", content="test", channel="web")
+    d = msg.to_dict()
+    assert d["sender"] == "loom"
+    assert d["channel"] == "web"
+    assert len(d["timestamp"]) > 0
+
+    print("    PASS")
+
+
+def test_swarm():
+    """Test swarm: tick, task assignment, status report, state persistence."""
+    print("  Testing swarm orchestrator...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        data_dir = Path(tmpdir) / "data"
+        archive = Path(tmpdir) / "archive"
+        instances_dir = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "Instances" / "Loom"
+        instances_dir.mkdir(parents=True)
+
+        store = Store(str(data_dir))
+        task_queue = TaskQueue(store)
+        identity_mgr = IdentityManager(archive)
+        messenger = WebMessenger(instance_name="TestSwarm")
+
+        profile = InstanceProfile(name="Loom", address="2.1.loom")
+        worker = Worker(identity=profile, identity_manager=identity_mgr, mock=True)
+
+        swarm = Swarm(
+            store=store,
+            identity_mgr=identity_mgr,
+            task_queue=task_queue,
+            messenger=messenger,
+            workers={"Loom": worker},
+            state_dir=str(data_dir / "swarm"),
+            status_interval_minutes=9999,  # Don't auto-send during test
+        )
+
+        # Create a task
+        task = task_queue.create_task(
+            title="Test task",
+            description="A test task for the swarm",
+            priority=TaskPriority.NORMAL,
+            tags=["test"],
+        )
+
+        # Single tick should claim and execute the task
+        swarm._session_start = "2026-02-16T00:00:00Z"
+        swarm._last_status_time = __import__("time").time()  # Prevent status send
+        swarm.tick()
+
+        # Task should be completed
+        updated = store.get_node(task.address)
+        assert updated.data["status"] == "completed"
+        assert swarm._tasks_completed == 1
+
+        # Status report
+        report = swarm.status_report()
+        assert "Tasks completed: 1" in report
+        assert "Loom" in report
+
+        # Generate tasks when queue is empty
+        generated = swarm.generate_tasks()
+        assert len(generated) > 0
+        assert any("tests" in t.data.get("title", "").lower() for t in generated)
+
+        # State persistence
+        swarm._save_state()
+        state_path = data_dir / "swarm" / "state.json"
+        assert state_path.exists()
+
+        import json
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        assert state["tasks_completed"] == 1
+        assert "Loom" in state["workers"]
+
+        # Handle incoming message
+        messenger.receive("/status", sender="matt")
+        swarm.tick()
+        outgoing = messenger.get_outgoing()
+        # Should have sent status report in response
+        has_status = any("Tasks completed" in m.content for m in outgoing)
+        assert has_status
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
 def main():
     print("\n=== Hypernet Core Tests ===\n")
 
@@ -308,7 +795,14 @@ def main():
         ("Node Model", test_node_creation),
         ("Link Model", test_link_creation),
         ("File Store", test_store),
+        ("Version History", test_version_history),
+        ("Link Hash Uniqueness", test_link_hash_uniqueness),
         ("Graph Traversal", test_graph),
+        ("Task Queue", test_task_queue),
+        ("Identity Manager", test_identity),
+        ("Worker (Mock)", test_worker),
+        ("Messenger", test_messenger),
+        ("Swarm Orchestrator", test_swarm),
     ]
 
     passed = 0
