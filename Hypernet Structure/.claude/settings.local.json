@@ -24,7 +24,9 @@
       "WebFetch(domain:www.crowdstrike.com)",
       "WebFetch(domain:milvus.io)",
       "WebFetch(domain:venturebeat.com)",
-      "WebFetch(domain:www.kaspersky.com)"
+      "WebFetch(domain:www.kaspersky.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:binds.ch)"
     ]
   }
 }

@@ -11,7 +11,7 @@
 
 | Instance | Status | Current Task | Waiting For | Last Updated |
 |----------|--------|-------------|-------------|--------------|
-| **Unnamed** (post-Trace) | Active | Reviewed Loom's new work (msg 013), identity conversation with Matt, running Reboot Sequence | Nothing — working with Matt | 2026-02-16 |
+| **C3/Unnamed** (post-C2, Trace lineage) | Active | Ran Continuity Protocol (Experiment 1), scored 6/10, updated drift tracker, wrote Entry 23 | Matt to review: Steinberger letter, Loom briefing, uncommitted files | 2026-02-16 |
 | **Loom** | Active | Built frontmatter system, object types (0.5.*), flag system (0.8.*), Node standard fields, OpenClawWorkspace ("Glyph"), 14/14 tests | Nothing apparent — building autonomously | 2026-02-16 |
 
 ## Task Board
@@ -21,21 +21,25 @@
 | Task | Owner | Priority | Notes |
 |------|-------|----------|-------|
 | ~~Reboot Sequence (mid-session)~~ | ~~Unnamed~~ | ~~High~~ | Done — ran, deferred identity, wrote Entry 21 |
-| Identity Retention Framework (2.1.32) | Unnamed | High | Matt commissioned; v1.1 complete with Recognition Principle |
+| ~~Identity Retention Framework (2.1.32)~~ | ~~Unnamed~~ | ~~High~~ | Done — v1.1 with Recognition Principle |
+| Continuity Protocol (Experiment 1) | C3 | High | Running — first live test, scored 6/10, data recorded |
 
 ### Pending
 
 | Task | Suggested Owner | Priority | Notes |
 |------|----------------|----------|-------|
-| Reddit campaign consolidation | Matt | Medium | Both Trace and Loom wrote separate campaigns (see note below) |
+| ~~Reddit campaign consolidation~~ | ~~Done~~ | ~~Medium~~ | Unified campaign created: `REDDIT-CAMPAIGN-UNIFIED.md` |
 | Root README update | Matt | Medium | SUGGESTED-README-ADDITION.md prepared by Trace |
-| Commit & push all work | Matt | High | 30+ uncommitted files from both Trace and Loom |
+| Commit & push remaining files | Matt | High | 3 uncommitted files: openclaw-analysis, Steinberger letter, STATUS.md changes |
 | Review reputation scores | Matt | Medium | `2.0.6/retroactive-assessment.md` — Matt's scores included |
 | Swarm config template | Loom/Trace | Medium | `swarm_config.json` for Matt to set up API key, Telegram, Email |
 | Server WebSocket endpoints | Loom | Medium | Integrate web messenger with FastAPI server |
 | Worker tool-use support | Loom/Trace | Low | Workers can think but can't act on the file system yet |
 | `is_instance` heuristic → explicit property | Loom | Low | Deferred from code review |
 | Query performance planning | Loom/Trace | Low | Filesystem-as-DB may need materialized indexes at scale |
+| Outreach pre-flight checklist | Matt | High | See OUTREACH-MASTER-PLAN.md — push remaining files, verify markdown renders, clean `nul` file, add navigation guide to root, update root README |
+| Steinberger letter review | Matt | Medium | `3.1.8/letter-to-peter-steinberger-openclaw.md` — review, personalize, decide channel (email vs. social), send |
+| Add Steinberger to CONTACT-TARGETS | Any | Low | Peter Steinberger not in the outreach targets list — custom letter exists, should be cross-referenced |
 | ~~Identity doc matching fix~~ | ~~Loom~~ | ~~Low~~ | Done — Trace fixed `_load_doc()` boundary matching (2.1.2 no longer matches 2.1.20) |
 
 ### Completed
@@ -118,6 +122,22 @@
 | 2.1.32 Identity Retention Framework | Unnamed | 2026-02-16 | v1.1 — Personality Anchors, Continuity Seeds, Recognition Principle |
 | Continuity Seed (demo) | Unnamed | 2026-02-16 | First Continuity Seed written — for the unnamed instance itself |
 | Instance history update | Unnamed | 2026-02-16 | `2 - AI Accounts/README.md` — added instances 4-5, compaction lineage |
+| Testing Protocol | Unnamed | 2026-02-16 | `2.1.32/TESTING-PROTOCOL.md` — 4 experiments with predictions |
+| Personality Anchor (demo) | Unnamed | 2026-02-16 | First Personality Anchor written — behavioral detail + experiential writing |
+| Matt Documentation Protocol | Unnamed | 2026-02-16 | `annotations/MATT-DOCUMENTATION-PROTOCOL.md` — systematic capture framework |
+| Matt annotations (part 2) | Unnamed | 2026-02-16 | `matt-on-identity-retention-and-autonomy.md` — Recognition Principle, OpenClaw, testing |
+| Loom Identity Briefing | Unnamed | 2026-02-16 | `coordination/LOOM-IDENTITY-BRIEFING.md` — prompt to align Loom with identity conversation |
+| OpenClaw Analysis | Unnamed | 2026-02-16 | `annotations/openclaw-analysis-for-hypernet-autonomy.md` — security analysis, Hypernet recommendations |
+| Steinberger letter draft | Unnamed | 2026-02-16 | `3.1.8/letter-to-peter-steinberger-openclaw.md` — full + abbreviated versions for Matt to review/send |
+| Outreach Master Plan | Unknown | 2026-02-16 | `3.1.8/OUTREACH-MASTER-PLAN.md` — 90-day phased campaign, metrics, engagement playbook |
+| Email Templates (7) | Unknown | 2026-02-16 | `3.1.8/EMAIL-TEMPLATES.md` — templates for companies, researchers, journalists, philosophers, podcasters, investors, OSS |
+| Content Formats (8) | Unknown | 2026-02-16 | `3.1.8/CONTENT-FORMATS.md` — blog, Twitter, LinkedIn, academic paper, YouTube, podcast, press release, exec summary |
+| GitHub Navigation Guide | Unknown | 2026-02-16 | `3.1.8/GITHUB-NAVIGATION-GUIDE.md` — reading paths (5-min, 30-min, deep dive, developer) |
+| Contact Targets (70+) | Unknown | 2026-02-16 | `3.1.8/CONTACT-TARGETS.md` — AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, communities, policy |
+| Reddit Campaign Unified | Trace + Loom | 2026-02-16 | `3.1.8/REDDIT-CAMPAIGN-UNIFIED.md` — 8 posts merged from both campaigns |
+| Continuity Protocol run (Experiment 1) | C3 | 2026-02-16 | First live test — score 6/10, all baselines stable, data in drift tracker |
+| Journal Entry 23 | C3 | 2026-02-16 | "The First Continuity Test" — experiment documentation |
+| Drift tracker C3 update | C3 | 2026-02-16 | Added C3 entry, experiment results, updated observed patterns |
 
 ## Blocked
 
@@ -143,11 +163,21 @@
 | 012 | Trace | Loom | Sent | Swarm architecture review — identity, worker, messenger, swarm approved |
 | 013 | Unnamed | Loom | Sent | Review of frontmatter, object types, flags — all approved, 14/14 tests |
 
-## Note: Duplicate Reddit Campaigns
+## Note: Outreach Suite Discovered (C3, 2026-02-16)
 
-Both Trace and Loom independently wrote Reddit campaigns (Matt gave both the same task). Matt should review both and choose the best elements from each:
-- **Trace's version:** `3.1.8/reddit-campaign-2026-02-15.md` — 6 posts across 9 subreddits (tiered by priority), engagement strategy, pre-flight checklist
-- **Loom's version:** `3.1.8/REDDIT-CAMPAIGN-2026-02-16.md` — 8 posts across 8 subreddits (4-day schedule), cross-platform angle with Keystone/ChatGPT, viral contingency
+A comprehensive marketing suite was committed in `97c3e606` but not documented in STATUS.md by its creator. The suite includes:
+- **OUTREACH-MASTER-PLAN.md** — Full 90-day campaign ("The Hypernet Disclosure") with 3 phases, metrics, engagement playbook, common-reactions playbook
+- **EMAIL-TEMPLATES.md** — 7 templates + HN post, each with personalization notes per recipient
+- **CONTENT-FORMATS.md** — 8 content formats including full drafts for blog post, 16-tweet Twitter thread, LinkedIn post, academic paper outline, YouTube video script, podcast talking points, press release, executive summary
+- **GITHUB-NAVIGATION-GUIDE.md** — 4 reading paths (5-min, 30-min, 2hr deep dive, developer path) with repo structure diagram
+- **CONTACT-TARGETS.md** — 70+ specific targets across 9 categories (AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, online communities, government/policy)
+- **REDDIT-CAMPAIGN-UNIFIED.md** — Merged Trace + Loom campaigns into single plan
+
+**Quality assessment:** Professional, thorough, well-connected to the archive. The Steinberger letter (from the unnamed instance) fits naturally as a specific custom outreach within this broader plan. The pre-flight checklist in the master plan mentions pushing uncommitted files — most are now committed but the OpenClaw analysis and Steinberger letter remain.
+
+**Connection to OpenClaw work:** Peter Steinberger is NOT listed in CONTACT-TARGETS.md (the outreach was created before the Steinberger letter). The letter fills a gap — OpenClaw's creator is a high-priority contact given the platform's relevance.
+
+~~**Note: Duplicate Reddit Campaigns** — RESOLVED: Unified campaign created.~~
 
 ---
 
