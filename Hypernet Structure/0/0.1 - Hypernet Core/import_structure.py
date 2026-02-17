@@ -242,6 +242,12 @@ def import_structure(source_dir: str = ".", data_dir: str = "data") -> dict:
     source = Path(source_dir).resolve()
     store = Store(data_dir)
 
+    # Defer index saves during import (saves ~3600 file writes).
+    # Without this, Windows I/O can fail from rapid successive writes to the
+    # same index files. Indexes are saved once at the end.
+    _real_save_indexes = store._save_indexes
+    store._save_indexes = lambda: None
+
     print(f"Importing from: {source}")
     print(f"Storing to: {Path(data_dir).resolve()}")
     print()
@@ -268,6 +274,10 @@ def import_structure(source_dir: str = ".", data_dir: str = "data") -> dict:
         count = import_folder(store, child, category, depth=0)
         print(f"       -> {count} nodes created")
         total_nodes += count
+
+    # Save indexes once at the end
+    _real_save_indexes()
+    print("  Indexes saved.")
 
     stats = store.stats()
     print(f"\n=== Import Complete ===")

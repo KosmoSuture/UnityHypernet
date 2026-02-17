@@ -1,0 +1,17 @@
+{
+  "address": "0.1.16",
+  "type_address": null,
+  "data": {
+    "name": "requirements.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\requirements.txt",
+    "size": 451,
+    "content": "# Hypernet Core \u2014 Python Dependencies\n# The core library (address, node, link, store, graph) has ZERO external dependencies.\n# Only the API server requires these packages.\n\n# API Server\nfastapi>=0.109.0\nuvicorn[standard]>=0.27.0\npydantic>=2.5.0\n\n# Swarm / AI Workers (optional \u2014 swarm works in mock mode without these)\nanthropic>=0.40.0\npython-telegram-bot>=21.0\n\n# Development / Testing (optional)\n# pytest>=7.4.0\n# httpx>=0.26.0\n"
+  },
+  "created_at": "2026-02-17T01:23:28.576954+00:00",
+  "updated_at": "2026-02-17T01:23:28.576954+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:requirements.txt"
+}

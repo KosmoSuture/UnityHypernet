@@ -8,8 +8,8 @@
     "content": "# 1.2.3.0 - Email Archives\n\n**Hypernet Address:** `1.2.3.0`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Communications - Email\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores archived email messages and threads that are important to preserve for reference, record-keeping, or legal purposes.\n\n---\n\n## What Goes Here\n\n- Important work email threads\n- Personal correspondence of significance\n- Receipts and confirmations via email\n- Legal or official email communications\n- Project-related email discussions\n- Client and vendor correspondence\n- Email with attachments worth preserving\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Highly Private - Email contains personal and confidential information\n\n---\n\n## Examples\n\n```\n1.2.3.0 - Email Archives/\n\u251c\u2500\u2500 work-email-2025/\n\u251c\u2500\u2500 personal-important/\n\u251c\u2500\u2500 receipts-and-confirmations/\n\u2514\u2500\u2500 project-correspondence/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - private correspondence\n",
     "content_file": "README.md"
   },
-  "created_at": "2026-02-15T11:54:07.689917+00:00",
-  "updated_at": "2026-02-15T11:54:07.689917+00:00",
+  "created_at": "2026-02-17T01:23:30.950674+00:00",
+  "updated_at": "2026-02-17T01:23:30.950674+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "folder:1.2.3.0 - Email Archives"

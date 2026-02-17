@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.4.0.1.1.12.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\1\\12\\node.json",
+    "size": 1385,
+    "content": "{\n  \"address\": \"0.1.1.12\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"requirements.txt\",\n    \"type\": \"file\",\n    \"extension\": \".txt\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.1 - Core System\\\\requirements.txt\",\n    \"size\": 885,\n    \"content\": \"# Hypernet Core 0.1 - Python Dependencies\\n\\n# Web Framework\\nfastapi==0.109.0\\nuvicorn[standard]==0.27.0\\npython-multipart==0.0.6  # For file uploads\\n\\n# Database\\nsqlalchemy==2.0.25\\nalembic==1.13.1\\npsycopg2-binary==2.9.9  # PostgreSQL driver\\n\\n# Authentication & Security\\npython-jose[cryptography]==3.3.0  # JWT tokens\\npasslib[bcrypt]==1.7.4  # Password hashing\\npython-dotenv==1.0.0  # Environment variables\\n\\n# Validation\\npydantic==2.5.0\\npydantic-settings==2.1.0\\nemail-validator==2.1.0\\n\\n# Utilities\\npython-dateutil==2.8.2\\npillow==10.2.0  # Image processing\\npython-magic==0.4.27  # File type detection\\n\\n# Caching\\nredis==5.0.1\\n\\n# Testing\\npytest==7.4.4\\npytest-asyncio==0.23.3\\nhttpx==0.26.0  # Async HTTP client for testing\\n\\n# Code Quality\\nruff==0.1.14  # Linting\\nblack==23.12.1  # Formatting\\nmypy==1.8.0  # Type checking\\n\\n# Development\\nipython==8.20.0\\n\"\n  },\n  \"created_at\": \"2026-02-17T01:21:59.111707+00:00\",\n  \"updated_at\": \"2026-02-17T01:21:59.111707+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:requirements.txt\"\n}"
+  },
+  "created_at": "2026-02-17T01:22:22.804843+00:00",
+  "updated_at": "2026-02-17T01:22:22.804843+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

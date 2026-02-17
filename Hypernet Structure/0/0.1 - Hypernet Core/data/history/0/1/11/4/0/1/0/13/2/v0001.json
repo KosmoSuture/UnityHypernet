@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "042c72fc53065690",
+  "snapshot_at": "2026-02-17T01:22:20.193056+00:00",
+  "node": {
+    "address": "0.1.11.4.0.1.0.13.2",
+    "type_address": null,
+    "data": {
+      "name": "node.json",
+      "type": "file",
+      "extension": ".json",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\0\\13\\node.json",
+      "size": 462,
+      "content": "{\n  \"address\": \"0.1.0.13\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"Development-Roadmap\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.0 - Planning & Documentation\\\\Development-Roadmap\"\n  },\n  \"created_at\": \"2026-02-17T01:20:04.796091+00:00\",\n  \"updated_at\": \"2026-02-17T01:20:04.796091+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:Development-Roadmap\"\n}"
+    },
+    "created_at": "2026-02-17T01:20:10.466305+00:00",
+    "updated_at": "2026-02-17T01:20:10.466305+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:node.json"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "content_hash": "ca73c2131810874c",
+  "snapshot_at": "2026-02-17T01:22:00.412738+00:00",
+  "node": {
+    "address": "0.1.10",
+    "type_address": null,
+    "data": {
+      "name": "app",
+      "type": "folder",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\app"
+    },
+    "created_at": "2026-02-17T01:20:05.363609+00:00",
+    "updated_at": "2026-02-17T01:20:05.363609+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "folder:app"
+  }
+}

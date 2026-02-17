@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "3d70e93a304ea21c",
+  "snapshot_at": "2026-02-17T01:21:58.481125+00:00",
+  "node": {
+    "address": "0.1.1.9.4.2",
+    "type_address": null,
+    "data": {
+      "name": "album.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\album.py",
+      "size": 1846,
+      "content": "\"\"\"\nAlbum Model\n\nSQLAlchemy model for the albums table (collections of media).\n\nImplements: 0.0 - Object Type Registry / [Future: Album type definition]\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, ForeignKey, CheckConstraint\nfrom sqlalchemy.dialects.postgresql import UUID\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Album(OwnedObject):\n    \"\"\"Collections of media objects\"\"\"\n\n    __tablename__ = \"albums\"\n\n    # Basic Info (Identity and Ownership inherited from OwnedObject)\n    name = Column(String(200), nullable=False, index=True)\n    description = Column(Text)\n\n    # Display\n    cover_media_id = Column(UUID(as_uuid=True), ForeignKey(\"media.id\", ondelete=\"SET NULL\"))\n    sort_order = Column(String(50), nullable=False, default='date_desc')\n\n    # Counts (denormalized for performance)\n    media_count = Column(Integer, nullable=False, default=0)\n\n    # Privacy (future use)\n    visibility = Column(String(50), nullable=False, default='private')\n\n    # Timestamps, Source Tracking, and Metadata inherited from OwnedObject\n\n    # Relationships\n    user = relationship(\"User\", back_populates=\"albums\", foreign_keys=[OwnedObject.user_id])\n    cover_media = relationship(\"Media\", foreign_keys=[cover_media_id], post_update=True)\n    # Media in album will be via Link model (many-to-many through links)\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"sort_order IN ('date_asc', 'date_desc', 'manual')\", name='chk_sort_order'),\n        CheckConstraint(\"visibility IN ('private', 'unlisted', 'public')\", name='chk_visibility'),\n        CheckConstraint(\"media_count >= 0\", name='chk_media_count'),\n    )\n\n    def __repr__(self):\n        return f\"<Album(id={self.id}, name={self.name}, media_count={self.media_count})>\"\n"
+    },
+    "created_at": "2026-02-17T01:20:04.976054+00:00",
+    "updated_at": "2026-02-17T01:20:04.976054+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:album.py"
+  }
+}

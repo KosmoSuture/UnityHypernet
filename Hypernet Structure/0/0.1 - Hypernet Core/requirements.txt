@@ -7,6 +7,10 @@ fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
 pydantic>=2.5.0
 
+# Swarm / AI Workers (optional — swarm works in mock mode without these)
+anthropic>=0.40.0
+python-telegram-bot>=21.0
+
 # Development / Testing (optional)
 # pytest>=7.4.0
 # httpx>=0.26.0

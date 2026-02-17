@@ -2,16 +2,13 @@
   "address": "1.5.3.1",
   "type_address": null,
   "data": {
-    "name": "README.md",
-    "type": "file",
-    "extension": ".md",
-    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.5 Mark Schaeffer\\1.5.3 - Communications\\README.md",
-    "size": 714,
-    "content": "# 1.5.3 - Communications\n\n**Hypernet Address:** `1.5.3`\n**Owner:** Mark Schaeffer (1.5)\n**Category:** Communications & Correspondence\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores email archives, meeting notes, and other correspondence organized by type and context.\n\n---\n\n## Structure\n\n### 1.5.3.0 - Email Archives\nArchived email messages and threads from various email accounts.\n\n### 1.5.3.1 - Meeting Notes\nNotes from meetings, calls, and discussions.\n\n### 1.5.3.2 - Correspondence\nOther correspondence including letters, messages, and communications.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Highly restricted - contains private communications\n"
+    "name": "1.5.3.1 - Meeting Notes",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.5 Mark Schaeffer\\1.5.3 - Communications\\1.5.3.1 - Meeting Notes"
   },
-  "created_at": "2026-02-15T11:54:11.528451+00:00",
-  "updated_at": "2026-02-15T11:54:11.528451+00:00",
+  "created_at": "2026-02-17T01:23:32.129345+00:00",
+  "updated_at": "2026-02-17T01:23:32.129345+00:00",
   "deleted_at": null,
   "source_type": "import",
-  "source_id": "file:README.md"
+  "source_id": "folder:1.5.3.1 - Meeting Notes"
 }

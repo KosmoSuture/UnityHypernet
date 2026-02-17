@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "content_hash": "7387715f0118c4b3",
+  "snapshot_at": "2026-02-17T01:21:58.315998+00:00",
+  "node": {
+    "address": "0.1.0.36",
+    "type_address": null,
+    "data": {
+      "name": "TECHNICAL-ARCHITECTURE.md",
+      "type": "file",
+      "extension": ".md",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.0 - Planning & Documentation\\TECHNICAL-ARCHITECTURE.md",
+      "size": 62520
+    },
+    "created_at": "2026-02-17T01:20:04.886539+00:00",
+    "updated_at": "2026-02-17T01:20:04.886539+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:TECHNICAL-ARCHITECTURE.md"
+  }
+}

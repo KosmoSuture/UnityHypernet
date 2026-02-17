@@ -9,8 +9,8 @@
     "size": 439,
     "content": "# robots.txt\n# Controls search engine crawler access and sitemap location\n\nUser-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /private/\nDisallow: /temp/\n\n# Specific rules for major crawlers\nUser-agent: Googlebot\nAllow: /\n\nUser-agent: Bingbot\nAllow: /\n\nUser-agent: DuckDuckGo\nAllow: /\n\n# Sitemap location\nSitemap: https://hypernet.unity/sitemap.xml\n\n# Crawl delay for respectful crawling (in seconds)\nCrawl-delay: 1\n"
   },
-  "created_at": "2026-02-15T11:54:17.111302+00:00",
-  "updated_at": "2026-02-15T11:54:17.111302+00:00",
+  "created_at": "2026-02-17T01:23:34.949386+00:00",
+  "updated_at": "2026-02-17T01:23:34.949386+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "file:robots.txt"

@@ -23,6 +23,7 @@ from hypernet.identity import IdentityManager, InstanceProfile, SessionLog
 from hypernet.worker import Worker, TaskResult
 from hypernet.messenger import WebMessenger, MultiMessenger, Message
 from hypernet.swarm import Swarm
+from hypernet.frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
 
 
 def test_address_parsing():
@@ -99,6 +100,63 @@ def test_node_creation():
     assert node.is_deleted is True
     node.restore()
     assert node.is_deleted is False
+
+    print("    PASS")
+
+
+def test_node_standard_fields():
+    """Test standard fields: creator, position_2d, position_3d, flags."""
+    print("  Testing node standard fields...")
+
+    # Create node with all standard fields
+    node = Node(
+        address=HypernetAddress.parse("1.1.1.1.00001"),
+        type_address=HypernetAddress.parse("0.5.4.1.1"),  # JPG type
+        data={"filename": "sunset.jpg"},
+        creator=HypernetAddress.parse("1.1"),
+        position_2d={"x": 100.0, "y": 200.0},
+        position_3d={"x": 1.0, "y": 2.0, "z": 0.5},
+        flags=["0.8.1.1", "0.8.3.1"],  # verified, ai-generated
+    )
+
+    assert str(node.creator) == "1.1"
+    assert node.position_2d["x"] == 100.0
+    assert node.position_3d["z"] == 0.5
+    assert len(node.flags) == 2
+    assert "0.8.1.1" in node.flags
+
+    # Round-trip serialization
+    d = node.to_dict()
+    assert d["creator"] == "1.1"
+    assert d["position_2d"] == {"x": 100.0, "y": 200.0}
+    assert d["flags"] == ["0.8.1.1", "0.8.3.1"]
+
+    restored = Node.from_dict(d)
+    assert str(restored.creator) == "1.1"
+    assert restored.position_2d == {"x": 100.0, "y": 200.0}
+    assert restored.position_3d == {"x": 1.0, "y": 2.0, "z": 0.5}
+    assert restored.flags == ["0.8.1.1", "0.8.3.1"]
+
+    # Backward compatibility: old JSON without new fields
+    old_json = {
+        "address": "1.1",
+        "data": {"name": "Matt"},
+        "created_at": "2026-02-12T00:00:00+00:00",
+        "updated_at": "2026-02-12T00:00:00+00:00",
+    }
+    old_node = Node.from_dict(old_json)
+    assert old_node.creator is None
+    assert old_node.position_2d is None
+    assert old_node.position_3d is None
+    assert old_node.flags == []
+
+    # Defaults on fresh node
+    fresh = Node(address=HypernetAddress.parse("4.1"))
+    assert fresh.creator is None
+    assert fresh.position_2d is None
+    assert fresh.position_3d is None
+    assert fresh.flags == []
+    assert fresh.to_dict()["flags"] == []
 
     print("    PASS")
 
@@ -787,12 +845,113 @@ def test_swarm():
         shutil.rmtree(tmpdir)
 
 
+def test_frontmatter():
+    """Test YAML frontmatter parsing, writing, and path inference."""
+    print("  Testing frontmatter...")
+
+    # Parse existing frontmatter
+    content = """---
+ha: "2.1.0"
+object_type: "0.5.3.1"
+creator: "1.1"
+created: "2026-02-12T00:00:00Z"
+position_2d: null
+position_3d: null
+flags: []
+---
+# Identity Document
+
+This is the body."""
+
+    meta, body = parse_frontmatter(content)
+    assert meta["ha"] == "2.1.0"
+    assert meta["object_type"] == "0.5.3.1"
+    assert meta["creator"] == "1.1"
+    assert meta["position_2d"] is None
+    assert meta["flags"] == []
+    assert body.startswith("# Identity Document")
+
+    # Parse with flags
+    content2 = """---
+ha: "1.1.1.1.00001"
+flags: ["0.8.1.1", "0.8.3.1"]
+---
+Photo metadata."""
+
+    meta2, body2 = parse_frontmatter(content2)
+    assert meta2["flags"] == ["0.8.1.1", "0.8.3.1"]
+    assert body2 == "Photo metadata."
+
+    # No frontmatter
+    plain = "# Just a heading\n\nNo frontmatter here."
+    meta3, body3 = parse_frontmatter(plain)
+    assert meta3 == {}
+    assert body3 == plain
+
+    # Add frontmatter to plain content
+    new_meta = {
+        "ha": "4.1",
+        "object_type": "0.5.3.1",
+        "creator": "1.1",
+        "created": "2026-02-16T00:00:00Z",
+        "position_2d": None,
+        "position_3d": None,
+        "flags": [],
+    }
+    result = add_frontmatter(plain, new_meta)
+    assert result.startswith("---\n")
+    assert 'ha: "4.1"' in result
+    assert "# Just a heading" in result
+
+    # Round-trip: parse what we just wrote
+    re_meta, re_body = parse_frontmatter(result)
+    assert re_meta["ha"] == "4.1"
+    assert re_meta["creator"] == "1.1"
+    assert re_meta["flags"] == []
+    assert "# Just a heading" in re_body
+
+    # Replace existing frontmatter
+    replaced = add_frontmatter(content, {"ha": "2.1.0", "object_type": "0.5.3.1",
+                                          "creator": "2.1.trace", "created": "2026-02-16T00:00:00Z",
+                                          "position_2d": None, "position_3d": None, "flags": ["0.8.4.2"]})
+    re_meta2, _ = parse_frontmatter(replaced)
+    assert re_meta2["creator"] == "2.1.trace"
+    assert re_meta2["flags"] == ["0.8.4.2"]
+
+    # Path inference
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+    try:
+        archive = Path(tmpdir)
+        test_file = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "2.1.0 - Identity" / "README.md"
+        test_file.parent.mkdir(parents=True)
+        test_file.write_text("# Identity", encoding="utf-8")
+
+        inferred = infer_metadata_from_path(test_file, archive)
+        assert inferred["ha"] == "2.1.0"
+        assert inferred["object_type"] == "0.5.3.1"
+        assert inferred["creator"] == "2.1"
+
+        # Loom instance file
+        loom_file = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "Instances" / "Loom" / "divergence-log.md"
+        loom_file.parent.mkdir(parents=True)
+        loom_file.write_text("# Divergence", encoding="utf-8")
+
+        loom_inferred = infer_metadata_from_path(loom_file, archive)
+        assert loom_inferred["creator"] == "2.1.loom"
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
 def main():
     print("\n=== Hypernet Core Tests ===\n")
 
     tests = [
         ("Address System", test_address_parsing),
         ("Node Model", test_node_creation),
+        ("Node Standard Fields", test_node_standard_fields),
         ("Link Model", test_link_creation),
         ("File Store", test_store),
         ("Version History", test_version_history),
@@ -803,6 +962,7 @@ def main():
         ("Worker (Mock)", test_worker),
         ("Messenger", test_messenger),
         ("Swarm Orchestrator", test_swarm),
+        ("Frontmatter", test_frontmatter),
     ]
 
     passed = 0

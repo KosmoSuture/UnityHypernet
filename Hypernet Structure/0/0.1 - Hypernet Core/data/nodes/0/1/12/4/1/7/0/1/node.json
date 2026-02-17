@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.7.0.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\7\\0\\1",
+    "content": "{\n  \"address\": \"1.7.0.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.7 Ollie Schaeffer\\\\1.7.0 - Profile & Identity\\\\README.md\",\n    \"size\": 1173,\n    \"content\": \"# 1.7.0 - Profile & Identity\\n\\n**Hypernet Address:** `1.7.0`\\n**Owner:** Ollie Schaeffer (1.7)\\n**Category:** Personal Profile & Identity\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores Ollie's core identity information including biographical details, professional summary, contact information, and personal attributes.\\n\\n---\\n\\n## What Goes Here\\n\\n### Identity Information\\n- **Basic Information:** Full name, date of birth, contact details\\n- **Professional Identity:** Current role, title, organization\\n- **Skills & Expertise:** Technical skills, soft skills, certifications\\n- **Education:** Degrees, certifications, training programs\\n- **Work History:** Professional experience and career timeline\\n- **Biography:** Personal and professional story\\n- **Profile Attributes:** Personal characteristics and preferences\\n\\n---\\n\\n## Related Sections\\n\\n- **1.7.4** - Relationships (professional and personal network)\\n- **1.7.7** - Contributions (professional accomplishments)\\n- **1.7.6** - Personal Data (Hypernet data store)\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Strictly controlled - explicit permission required\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:12.869270+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:12.869270+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:23.736414+00:00",
+  "updated_at": "2026-02-17T01:23:23.736414+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

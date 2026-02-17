@@ -14,7 +14,17 @@
       "Bash(test:*)",
       "WebSearch",
       "WebFetch(domain:python-telegram-bot.org)",
-      "WebFetch(domain:realpython.com)"
+      "WebFetch(domain:realpython.com)",
+      "Bash(for f in hypernet/identity.py hypernet/worker.py hypernet/messenger.py hypernet/swarm.py swarm_config.example.json)",
+      "Bash(do wc -l \"$f\")",
+      "Bash(done)",
+      "Bash(for f in hypernet/__init__.py hypernet/server.py requirements.txt test_hypernet.py)",
+      "WebFetch(domain:openclaw.ai)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.crowdstrike.com)",
+      "WebFetch(domain:milvus.io)",
+      "WebFetch(domain:venturebeat.com)",
+      "WebFetch(domain:www.kaspersky.com)"
     ]
   }
 }

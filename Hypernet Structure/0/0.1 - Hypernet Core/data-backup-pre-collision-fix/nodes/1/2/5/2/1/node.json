@@ -1,0 +1,17 @@
+{
+  "address": "1.2.5.2.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.5 - Tasks & Workflows\\1.2.5.2 - Recurring Workflows\\README.md",
+    "size": 898,
+    "content": "# 1.2.5.2 - Recurring Workflows\n\n**Hypernet Address:** `1.2.5.2`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Tasks - Recurring\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores recurring tasks, routines, workflows, and repeating processes.\n\n---\n\n## What Goes Here\n\n- Daily routines and habits\n- Weekly recurring tasks\n- Monthly procedures\n- Quarterly reviews and planning\n- Annual workflows and checklists\n- Standard operating procedures\n- Repeating maintenance tasks\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Private - Routines reveal lifestyle patterns\n\n---\n\n## Examples\n\n```\n1.2.5.2 - Recurring Workflows/\n\u251c\u2500\u2500 daily-routines/\n\u251c\u2500\u2500 weekly-tasks/\n\u251c\u2500\u2500 monthly-procedures/\n\u2514\u2500\u2500 annual-workflows/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - routine information is private\n"
+  },
+  "created_at": "2026-02-15T11:54:08.058047+00:00",
+  "updated_at": "2026-02-15T11:54:08.058047+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

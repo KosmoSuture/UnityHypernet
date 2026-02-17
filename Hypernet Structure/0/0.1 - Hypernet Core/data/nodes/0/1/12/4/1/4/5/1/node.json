@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.4.5.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\4\\5\\1",
+    "content": "{\n  \"address\": \"1.4.5.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.4 Bridget Schaeffer\\\\1.4.5 - Tasks & Workflows\\\\README.md\",\n    \"size\": 654,\n    \"content\": \"# 1.4.5 - Tasks & Workflows\\n\\n**Hypernet Address:** `1.4.5`\\n**Owner:** Bridget Schaeffer (1.4)\\n**Category:** Tasks & Productivity\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores task lists, to-dos, workflows, and productivity tracking organized by status.\\n\\n---\\n\\n## Structure\\n\\n### 1.4.5.0 - Active Tasks\\nCurrent tasks and to-dos requiring attention.\\n\\n### 1.4.5.1 - Completed Tasks\\nSuccessfully completed tasks and their outcomes.\\n\\n### 1.4.5.2 - Recurring Workflows\\nRepeating tasks, routines, and ongoing workflows.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Restricted - task lists are private\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:10.879481+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:10.879481+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:21.989431+00:00",
+  "updated_at": "2026-02-17T01:23:21.989431+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

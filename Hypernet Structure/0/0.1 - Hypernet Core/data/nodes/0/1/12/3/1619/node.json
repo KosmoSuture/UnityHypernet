@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.3.1619",
+  "type_address": null,
+  "data": {
+    "name": "e30bf7d7a76a2f3e.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\links\\e30bf7d7a76a2f3e.json",
+    "size": 279,
+    "content": "{\n  \"from_address\": \"0.1.2.2\",\n  \"to_address\": \"0.1.2.2.137\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-15T11:53:51.381160+00:00\",\n  \"sort_order\": null\n}"
+  },
+  "created_at": "2026-02-17T01:23:08.808527+00:00",
+  "updated_at": "2026-02-17T01:23:08.808527+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:e30bf7d7a76a2f3e.json"
+}

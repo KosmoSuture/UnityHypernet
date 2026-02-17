@@ -1,0 +1,17 @@
+{
+  "address": "1.5.6.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.5 Mark Schaeffer\\1.5.6 - Personal Data\\README.md",
+    "size": 750,
+    "content": "# 1.5.6 - Personal Data (Hypernet)\n\n**Hypernet Address:** `1.5.6`\n**Owner:** Mark Schaeffer (1.5)\n**Category:** Hypernet Data Store\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder links to personal data stored in the Hypernet platform including media, contacts, emails, transactions, and other user data.\n\n---\n\n## Structure\n\n### 1.5.6.0 - Hypernet Data Store\nLink to Hypernet user account and stored data.\n\n### 1.5.6.1 - Privacy Settings\nPrivacy configurations and permissions for data sharing.\n\n### 1.5.6.2 - Data Permissions\nSpecific permissions for AI companies and third-party integrations.\n\n---\n\n**Status:** Pending Implementation\n**AI Access:** Strictly controlled - explicit permission required\n"
+  },
+  "created_at": "2026-02-15T11:54:11.752573+00:00",
+  "updated_at": "2026-02-15T11:54:11.752573+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

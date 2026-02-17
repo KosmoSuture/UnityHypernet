@@ -1,0 +1,14 @@
+{
+  "address": "0.1.11.1.0.1.0.11",
+  "type_address": null,
+  "data": {
+    "name": "11",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\history\\0\\1\\0\\11"
+  },
+  "created_at": "2026-02-17T01:22:00.650627+00:00",
+  "updated_at": "2026-02-17T01:22:00.650627+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:11"
+}

@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.2.3",
+  "type_address": null,
+  "data": {
+    "name": "node_index.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\indexes\\node_index.json",
+    "size": 223031
+  },
+  "created_at": "2026-02-17T01:22:47.871403+00:00",
+  "updated_at": "2026-02-17T01:22:47.871403+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node_index.json"
+}

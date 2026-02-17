@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "1810a2e0a80a3b34",
+  "snapshot_at": "2026-02-17T01:22:24.510473+00:00",
+  "node": {
+    "address": "0.1.11.4.0.1.11.2.6",
+    "type_address": null,
+    "data": {
+      "name": "node.json",
+      "type": "file",
+      "extension": ".json",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\11\\2\\node.json",
+      "size": 398,
+      "content": "{\n  \"address\": \"0.1.11.2\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"indexes\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\indexes\"\n  },\n  \"created_at\": \"2026-02-17T01:20:05.412121+00:00\",\n  \"updated_at\": \"2026-02-17T01:20:05.412121+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:indexes\"\n}"
+    },
+    "created_at": "2026-02-17T01:20:13.709016+00:00",
+    "updated_at": "2026-02-17T01:20:13.709016+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:node.json"
+  }
+}

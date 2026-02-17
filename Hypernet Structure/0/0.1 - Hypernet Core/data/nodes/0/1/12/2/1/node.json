@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.2.1",
+  "type_address": null,
+  "data": {
+    "name": "links_from.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\indexes\\links_from.json",
+    "size": 62560
+  },
+  "created_at": "2026-02-17T01:22:47.869401+00:00",
+  "updated_at": "2026-02-17T01:22:47.869401+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:links_from.json"
+}

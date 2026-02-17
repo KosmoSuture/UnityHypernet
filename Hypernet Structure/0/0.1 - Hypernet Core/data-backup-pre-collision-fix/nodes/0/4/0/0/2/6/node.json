@@ -1,0 +1,17 @@
+{
+  "address": "0.4.0.0.2.6",
+  "type_address": null,
+  "data": {
+    "name": "Screenshot.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.2 - Media Types\\Screenshot.md",
+    "size": 2574,
+    "content": "# Screenshot - Screenshot Media Type\n\n**Type ID:** `hypernet.media.screenshot`\n**Version:** 1.0\n**Category:** 0.0.2 - Media Types\n**Parent:** Photo (extends Media \u2192 BaseObject)\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Identity\n\n```yaml\ntype_name: \"Screenshot\"\ntype_id: \"hypernet.media.screenshot\"\nversion: \"1.0\"\nparent_type: \"Photo\"\ncategory: \"0.0.2 - Media Types\"\nnote: \"Specialized Photo type with screenshot-specific features\"\n```\n\n---\n\n## Purpose\n\n### What\nScreenshots and screen captures - images of computer/phone screens.\n\n### Why\n- Distinct from photos (no EXIF, different metadata needs)\n- Often contains text (OCR valuable)\n- Reference/documentation use cases\n- Usually PNG format (lossless)\n\n### When to Use\n- Screen captures from desktop/mobile\n- App screenshots\n- Web page captures\n- Error messages/bug reports\n\n---\n\n## Inherited Fields\nAll Photo fields plus:\n\n---\n\n## Additional Fields\n\n```yaml\nscreen_capture_type: String(50)\n  - \"full_screen\", \"window\", \"region\", \"scrolling\"\n\napplication: String(255) (app being captured)\n  - \"Chrome\", \"Firefox\", \"VSCode\", etc.\n\nwindow_title: String(500)\nocr_text: Text (extracted text via OCR)\n\ndevice_info: String(100)\n  - \"MacBook Pro 16-inch\", \"iPhone 14 Pro\"\n\nscreenshot_tool: String(100)\n  - \"macOS Screenshot\", \"Windows Snipping Tool\", \"Snagit\"\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"screenshot\": {\n    \"capture_type\": \"window\",\n    \"application\": \"Google Chrome\",\n    \"window_title\": \"Hypernet Documentation - Google Docs\",\n    \"url\": \"https://docs.google.com/...\",\n    \"device\": \"MacBook Pro 16-inch\",\n    \"os\": \"macOS 14.2\"\n  },\n  \"ocr\": {\n    \"text\": \"extracted text content...\",\n    \"language\": \"en\",\n    \"confidence\": 0.92\n  },\n  \"tags\": [\"documentation\", \"reference\"]\n}\n```\n\n---\n\n## Relationships\n\nSame as Photo plus:\n```yaml\nOutgoing:\n  - documents: WebPage (screenshot of URL)\n  - related_to: Bug, Task (for documentation)\n\nIncoming:\n  - referenced_by: Note, Email (as reference)\n```\n\n---\n\n## Validation\n\n```sql\n-- Inherits all Photo validations\n-- Screenshots usually PNG\nCHECK (mime_type IN ('image/png', 'image/jpeg', 'image/webp'))\n\nINDEX ON (application, created_at)\nINDEX ON (ocr_text) USING GIN -- Full-text search\n```\n\n---\n\n## API Endpoints\n\n```http\nPOST /api/v1/media/upload (with screenshot metadata)\nPOST /api/v1/media/{id}/ocr (extract text)\nGET /api/v1/media/search?q=error&type=screenshot\n```\n\n---\n\n**Status:** Active - Phase 1\n**Version:** 1.0\n"
+  },
+  "created_at": "2026-02-15T11:54:04.774160+00:00",
+  "updated_at": "2026-02-15T11:54:04.774160+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:Screenshot.md"
+}

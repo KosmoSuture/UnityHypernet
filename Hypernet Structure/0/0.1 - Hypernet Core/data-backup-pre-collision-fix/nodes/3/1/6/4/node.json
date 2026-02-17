@@ -1,0 +1,14 @@
+{
+  "address": "3.1.6.4",
+  "type_address": null,
+  "data": {
+    "name": "3.1.6.4 Kickstarter Campaign",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.6 Marketing and Outreach\\3.1.6.4 Kickstarter Campaign"
+  },
+  "created_at": "2026-02-15T11:54:19.098055+00:00",
+  "updated_at": "2026-02-15T11:54:19.098055+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:3.1.6.4 Kickstarter Campaign"
+}

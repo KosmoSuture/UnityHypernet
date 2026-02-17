@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.1.2.9.1.1.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\2\\9\\1\\1\\node.json",
+    "size": 1407,
+    "content": "{\n  \"address\": \"1.2.9.1.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.2 Sarah Schaeffer\\\\1.2.9 - Notes & Knowledge\\\\1.2.9.1 - Research\\\\README.md\",\n    \"size\": 857,\n    \"content\": \"# 1.2.9.1 - Research\\n\\n**Hypernet Address:** `1.2.9.1`\\n**Owner:** Sarah Schaeffer (1.2)\\n**Category:** Notes - Research\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores research notes, investigation materials, and deep-dive study on various topics.\\n\\n---\\n\\n## What Goes Here\\n\\n- Research notes and findings\\n- Topic investigations\\n- Literature reviews\\n- Research project notes\\n- Analysis and synthesis\\n- Source compilations\\n- Research methodologies\\n\\n---\\n\\n## Privacy Considerations\\n\\n**Privacy Level:** Private - Research may contain unpublished insights\\n\\n---\\n\\n## Examples\\n\\n```\\n1.2.9.1 - Research/\\n\\u251c\\u2500\\u2500 topic-areas/\\n\\u251c\\u2500\\u2500 investigations/\\n\\u251c\\u2500\\u2500 literature-reviews/\\n\\u2514\\u2500\\u2500 research-projects/\\n```\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Restricted - research in progress\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:08.595684+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:08.595684+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:19.842884+00:00",
+  "updated_at": "2026-02-17T01:23:19.842884+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

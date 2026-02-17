@@ -9,8 +9,8 @@
     "size": 1614,
     "content": "# SocialPost - Social Media Post\n\n**Type ID:** `hypernet.social.post`\n**Version:** 1.0\n**Category:** 0.0.3 - Social Types\n**Parent:** BaseObject\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Purpose\n\nSocial media posts from Instagram, Twitter/X, Facebook, TikTok, LinkedIn, etc.\n\n---\n\n## Required Fields\n\n```yaml\nplatform: String(50)\n  - \"instagram\", \"twitter\", \"facebook\", \"tiktok\", \"linkedin\"\n\npost_type: Enum\n  - \"text\", \"photo\", \"video\", \"story\", \"reel\", \"carousel\"\n\ncontent: Text\n  - Post caption/text\n  - Can be empty for some post types\n\nposted_at: DateTime\n  - When originally posted on platform\n```\n\n---\n\n## Optional Fields\n\n```yaml\nplatform_post_id: String(255)\n  - External ID on platform\n\nplatform_url: String(500)\n  - Link to original post\n\n# Engagement\nlikes_count: Integer\ncomments_count: Integer\nshares_count: Integer\nviews_count: Integer\n\n# Status\nvisibility: Enum\n  - \"public\", \"private\", \"friends\", \"followers\"\n\nis_pinned: Boolean\nlocation: String(200)\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"instagram\": {\n    \"filter\": \"valencia\",\n    \"is_ad\": false,\n    \"tagged_users\": [\"@friend1\", \"@friend2\"]\n  },\n  \"twitter\": {\n    \"retweet_count\": 42,\n    \"quote_count\": 5,\n    \"hashtags\": [\"#hypernet\", \"#ai\"]\n  },\n  \"engagement\": {\n    \"top_comments\": [],\n    \"engagement_rate\": 0.034\n  }\n}\n```\n\n---\n\n## Relationships\n\n```yaml\nOutgoing:\n  - source: Integration\n  - references: Photo, Video (media in post)\n\nIncoming:\n  - authored_by: SocialAccount\n```\n\n---\n\n**Status:** Active\n**Version:** 1.0\n"
   },
-  "created_at": "2026-02-15T11:54:04.885195+00:00",
-  "updated_at": "2026-02-15T11:54:04.885195+00:00",
+  "created_at": "2026-02-17T01:23:29.204710+00:00",
+  "updated_at": "2026-02-17T01:23:29.204710+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "file:SocialPost.md"

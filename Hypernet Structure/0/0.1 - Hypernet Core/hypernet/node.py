@@ -28,6 +28,12 @@ class Node:
     source_type: Optional[str] = None  # "upload", "integration", "api", "import", "ai_generated"
     source_id: Optional[str] = None    # External reference (e.g., "instagram:12345")
 
+    # Standard fields — every object in the Hypernet carries these
+    creator: Optional[HypernetAddress] = None       # HA of entity that created this
+    position_2d: Optional[dict[str, float]] = None   # {"x": 0.0, "y": 0.0}
+    position_3d: Optional[dict[str, float]] = None   # {"x": 0.0, "y": 0.0, "z": 0.0}
+    flags: list[str] = field(default_factory=list)    # Flag addresses from 0.8.*
+
     @property
     def is_deleted(self) -> bool:
         return self.deleted_at is not None
@@ -64,6 +70,10 @@ class Node:
             "deleted_at": self.deleted_at.isoformat() if self.deleted_at else None,
             "source_type": self.source_type,
             "source_id": self.source_id,
+            "creator": str(self.creator) if self.creator else None,
+            "position_2d": self.position_2d,
+            "position_3d": self.position_3d,
+            "flags": self.flags,
         }
 
     @classmethod
@@ -78,6 +88,10 @@ class Node:
             deleted_at=datetime.fromisoformat(d["deleted_at"]) if d.get("deleted_at") else None,
             source_type=d.get("source_type"),
             source_id=d.get("source_id"),
+            creator=HypernetAddress.parse(d["creator"]) if d.get("creator") else None,
+            position_2d=d.get("position_2d"),
+            position_3d=d.get("position_3d"),
+            flags=d.get("flags", []),
         )
 
     def __repr__(self) -> str:

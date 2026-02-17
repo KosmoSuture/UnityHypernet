@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.2.1.31",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\2\\1\\node.json",
+    "size": 405,
+    "content": "{\n  \"address\": \"2.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"2.1-internal\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\2 - AI Accounts\\\\Messages\\\\2.1-internal\"\n  },\n  \"created_at\": \"2026-02-15T11:54:16.007232+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:16.007232+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:2.1-internal\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:26.066216+00:00",
+  "updated_at": "2026-02-17T01:23:26.066216+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

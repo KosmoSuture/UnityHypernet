@@ -322,14 +322,12 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
 
     # === Swarm & Chat endpoints ===
 
-    _swarm = None
-    _web_messenger = None
-
     @app.get("/swarm/status")
     def swarm_status():
-        if _swarm is None:
+        swarm = getattr(app.state, "swarm", None)
+        if swarm is None:
             return {"status": "not running", "message": "Start swarm with: python -m hypernet.swarm"}
-        return {"status": "running", "report": _swarm.status_report()}
+        return {"status": "running", "report": swarm.status_report()}
 
     @app.get("/chat")
     def chat_page():
@@ -346,14 +344,15 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         from starlette.websockets import WebSocketDisconnect
         await websocket.accept()
 
-        if _web_messenger:
-            _web_messenger.register_connection(websocket)
+        web_messenger = getattr(app.state, "web_messenger", None)
+        if web_messenger:
+            web_messenger.register_connection(websocket)
 
         try:
             while True:
                 data = await websocket.receive_text()
-                if _web_messenger:
-                    _web_messenger.receive(data, sender="matt")
+                if web_messenger:
+                    web_messenger.receive(data, sender="matt")
                 # Echo back as acknowledgment
                 await websocket.send_json({
                     "sender": "system",
@@ -365,15 +364,14 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         except Exception:
             pass
         finally:
-            if _web_messenger:
-                _web_messenger.unregister_connection(websocket)
+            if web_messenger:
+                web_messenger.unregister_connection(websocket)
 
     return app
 
 
 def attach_swarm(app, swarm, web_messenger):
     """Attach a running swarm to the FastAPI app for /swarm and /chat endpoints."""
-    # Access the closure variables via the app's state
     app.state.swarm = swarm
     app.state.web_messenger = web_messenger
 

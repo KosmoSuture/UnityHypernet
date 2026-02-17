@@ -8,8 +8,8 @@
     "content": "# 1.24 - Mike Wood\n\n**Person Node:** 1.24\n**Relationship to Hypernet:** Early Contributor\n**Status:** Defined\n**Hypernet User:** [Pending]\n\n## Overview\n\nMike Wood is an Early Contributor to Hypernet, connected to Matt Schaeffer (1.1), Founder & CEO of Hypernet.\n\n## Folder Structure\n\nThis person node follows the standard Hypernet person folder structure:\n\n### 1.24.0 - Profile & Identity\nPersonal information, biography, contact details.\n\n### 1.24.1 - Projects\nActive, completed, and archived projects.\n\n### 1.24.2 - Documents\nPersonal, business, and legal documents.\n\n### 1.24.3 - Communications\nEmail, meeting notes, correspondence.\n\n### 1.24.4 - Relationships\nProfessional and personal network connections.\n\n### 1.24.5 - Tasks & Workflows\nTask management and recurring workflows.\n\n### 1.24.6 - Personal Data\nHypernet platform data (when account is created).\n\n### 1.24.7 - Contributions\nContributions to Hypernet or other projects.\n\n### 1.24.8 - Media\nPhotos, videos, audio files.\n\n### 1.24.9 - Notes & Knowledge\nPersonal notes, research, learning materials.\n\n## Hypernet Account\n\n**Status:** Not yet created\n**Account Type:** [To be determined]\n**Privacy:** Private (when created)\n\n## Relationships\n\n**Primary Connection:**\n- 1.1 - Matt Schaeffer (Founder & CEO)\n\n## Next Steps\n\n- [ ] Determine if Hypernet account should be created\n- [ ] Add basic profile information\n- [ ] Configure privacy settings (if applicable)\n\n---\n\n**Created:** February 6, 2026\n**Last Updated:** February 6, 2026\n**Status:** Placeholder\n**Template:** Standard Person Node Structure\n",
     "content_file": "README.md"
   },
-  "created_at": "2026-02-15T11:54:09.368029+00:00",
-  "updated_at": "2026-02-15T11:54:09.368029+00:00",
+  "created_at": "2026-02-17T01:23:31.512524+00:00",
+  "updated_at": "2026-02-17T01:23:31.512524+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "folder:1.24 Mike Wood"

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.3.1.6.3.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\3\\1\\6\\3\\node.json",
+    "size": 486,
+    "content": "{\n  \"address\": \"3.1.6.3\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"3.1.6.3 Investor Relations\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\3 - Businesses\\\\3.1 - Hypernet\\\\3.1.6 Marketing and Outreach\\\\3.1.6.3 Investor Relations\"\n  },\n  \"created_at\": \"2026-02-15T11:54:19.078053+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:19.078053+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:3.1.6.3 Investor Relations\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:27.678770+00:00",
+  "updated_at": "2026-02-17T01:23:27.678770+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

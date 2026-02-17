@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.1.4.8.1.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\4\\8\\1\\node.json",
+    "size": 1083,
+    "content": "{\n  \"address\": \"1.4.8.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.4 Bridget Schaeffer\\\\1.4.8 - Media\\\\README.md\",\n    \"size\": 601,\n    \"content\": \"# 1.4.8 - Media\\n\\n**Hypernet Address:** `1.4.8`\\n**Owner:** Bridget Schaeffer (1.4)\\n**Category:** Media Files\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores media files including photos, videos, and audio organized by type.\\n\\n---\\n\\n## Structure\\n\\n### 1.4.8.0 - Photos\\nPhoto collections, albums, and image files.\\n\\n### 1.4.8.1 - Videos\\nVideo files, recordings, and video content.\\n\\n### 1.4.8.2 - Audio\\nAudio files, recordings, podcasts, and music.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Strictly restricted - personal media is highly private\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:11.145939+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:11.145939+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:22.211478+00:00",
+  "updated_at": "2026-02-17T01:23:22.211478+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

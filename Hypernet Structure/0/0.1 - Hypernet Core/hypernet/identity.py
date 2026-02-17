@@ -202,20 +202,36 @@ class IdentityManager:
         """Try to load a document from the AI account directory.
 
         Searches for directories or files matching the doc name prefix.
+        Uses exact address prefix matching to avoid false matches
+        (e.g., "2.1.2" should not match "2.1.20").
         """
-        # Try as directory with README.md inside
+        addr_prefix = doc_name.split(" - ")[0]  # e.g., "2.1.2"
+        name_part = doc_name.split(" - ")[-1].lower() if " - " in doc_name else ""
+
         for item in self._ai_root.iterdir():
-            if item.name.startswith(doc_name.split(" - ")[0]) and doc_name.split(" - ")[-1].lower() in item.name.lower():
-                if item.is_dir():
-                    readme = item / "README.md"
-                    if readme.exists():
-                        return readme.read_text(encoding="utf-8")
-                    # Try any .md file in the directory
-                    md_files = list(item.glob("*.md"))
-                    if md_files:
-                        return md_files[0].read_text(encoding="utf-8")
-                elif item.is_file() and item.suffix == ".md":
-                    return item.read_text(encoding="utf-8")
+            # Exact prefix match: folder must start with address followed by
+            # a space, hyphen, or end of string (prevents "2.1.2" matching "2.1.20")
+            iname = item.name
+            if not iname.startswith(addr_prefix):
+                continue
+            rest = iname[len(addr_prefix):]
+            if rest and rest[0] not in (" ", "-"):
+                continue  # e.g., "2.1.20..." starts with "2.1.2" but next char is "0"
+
+            # If we have a name part, verify it matches too
+            if name_part and name_part not in iname.lower():
+                continue
+
+            if item.is_dir():
+                readme = item / "README.md"
+                if readme.exists():
+                    return readme.read_text(encoding="utf-8")
+                # Try any .md file in the directory
+                md_files = list(item.glob("*.md"))
+                if md_files:
+                    return md_files[0].read_text(encoding="utf-8")
+            elif item.is_file() and item.suffix == ".md":
+                return item.read_text(encoding="utf-8")
         return None
 
     def _load_recent_messages(self, count: int) -> list[str]:

@@ -8,8 +8,8 @@
     "content": "# 1.6.8 - Media\n\n**Hypernet Address:** `1.6.8`\n**Owner:** Richard Schaeffer (1.6)\n**Category:** Media Files\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores media files including photos, videos, and audio organized by type.\n\n---\n\n## Structure\n\n### 1.6.8.0 - Photos\nPhoto collections, albums, and image files.\n\n### 1.6.8.1 - Videos\nVideo files, recordings, and video content.\n\n### 1.6.8.2 - Audio\nAudio files, recordings, podcasts, and music.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Strictly restricted - personal media is highly private\n",
     "content_file": "README.md"
   },
-  "created_at": "2026-02-15T11:54:12.637195+00:00",
-  "updated_at": "2026-02-15T11:54:12.637195+00:00",
+  "created_at": "2026-02-17T01:23:32.447805+00:00",
+  "updated_at": "2026-02-17T01:23:32.447805+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "folder:1.6.8 - Media"

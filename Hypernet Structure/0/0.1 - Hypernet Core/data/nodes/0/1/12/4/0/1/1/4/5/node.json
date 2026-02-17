@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.0.1.1.4.5",
+  "type_address": null,
+  "data": {
+    "name": "5",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\0\\1\\1\\4\\5",
+    "content": "{\n  \"address\": \"0.1.1.4.5\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"routes\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.1 - Core System\\\\app\\\\routes\"\n  },\n  \"created_at\": \"2026-02-15T11:53:48.488128+00:00\",\n  \"updated_at\": \"2026-02-15T11:53:48.488128+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:routes\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:12.736806+00:00",
+  "updated_at": "2026-02-17T01:23:12.736806+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:5"
+}

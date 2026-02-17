@@ -1,0 +1,17 @@
+{
+  "address": "1.2.7.1.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.7 - Contributions\\1.2.7.1 - Documentation\\README.md",
+    "size": 885,
+    "content": "# 1.2.7.1 - Documentation\n\n**Hypernet Address:** `1.2.7.1`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Contributions - Documentation\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores documentation contributions including guides, articles, tutorials, and written work.\n\n---\n\n## What Goes Here\n\n- Technical documentation\n- User guides and manuals\n- Tutorials and how-tos\n- Articles and blog posts\n- Research papers\n- Knowledge base articles\n- Process documentation\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Varies - Some documentation may be public, some private\n\n---\n\n## Examples\n\n```\n1.2.7.1 - Documentation/\n\u251c\u2500\u2500 technical-guides/\n\u251c\u2500\u2500 tutorials/\n\u251c\u2500\u2500 articles/\n\u2514\u2500\u2500 process-docs/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Depends on publication status and permissions\n"
+  },
+  "created_at": "2026-02-15T11:54:08.281119+00:00",
+  "updated_at": "2026-02-15T11:54:08.281119+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

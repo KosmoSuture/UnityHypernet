@@ -1,0 +1,17 @@
+{
+  "address": "1.1.1.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.1 Matt Schaeffer\\1.1.1 - Projects\\README.md",
+    "size": 2035,
+    "content": "# Matt Schaeffer - Projects\n\n## Overview\n\nThis folder contains all projects that Matt is involved in, organized by status.\n\n## Structure\n\n### 1.1.1.0 - Active Projects\nCurrently active projects requiring attention and resources.\n\n### 1.1.1.1 - Completed Projects\nSuccessfully completed projects that achieved their goals.\n\n### 1.1.1.2 - Archived Projects\nProjects that were discontinued, pivoted, or are no longer relevant.\n\n## Current Active Projects\n\n### Hypernet (Primary Project)\n**Folder:** 1.1.1.0 - Active Projects/Hypernet\n**Status:** Active Development\n**Timeline:** 2024 - Present\n**Role:** Founder & CEO\n\n**Description:**\nUniversal personal data platform that gives users control over their data while enabling AI companies to build better products through consensual data access.\n\n**Current Phase:** Pre-seed / Seed fundraising\n**Next Milestone:** Close $5-7.5M seed round by Month 3\n\n**Key Components:**\n- API Platform (115+ endpoints - Complete)\n- Strategic Documentation (13 documents, 440 pages - Complete)\n- Fundraising Strategy ($100M year 1 plan - Complete)\n- Team Building (CTO search - In Progress)\n- Beta Launch Preparation (Target: Month 3)\n\n**Files:**\n- Strategic documents in `0.1 - Hypernet Core/0.1.0 - Planning & Documentation`\n- Technical implementation in `0.1 - Hypernet Core/0.1.1 - Core System`\n- Business planning in `3 - Businesses/3.1 - Hypernet`\n\n## Project Management\n\n**Task Tracking:**\n- Business/strategic tasks: `3 - Businesses/3.1 - Hypernet/3.1.2 Task Management System`\n- Development tasks: Via Hypernet Tasks API\n- Personal tasks: `1.1.5 - Tasks & Workflows`\n\n**Documentation:**\n- Project docs in respective project folders\n- Links to main project documentation in business/technical areas\n- Personal notes and reflections in `1.1.9 - Notes & Knowledge`\n\n## Completed Projects\n\n[To be added as projects are completed]\n\n## Archived Projects\n\n[To be added]\n\n---\n\n**Last Updated:** February 5, 2026\n**Owner:** Matt Schaeffer\n"
+  },
+  "created_at": "2026-02-15T11:54:06.064093+00:00",
+  "updated_at": "2026-02-15T11:54:06.064093+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

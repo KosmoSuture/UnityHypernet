@@ -9,8 +9,8 @@
     "size": 973,
     "content": "# 1.2.4.1 - Personal Network\n\n**Hypernet Address:** `1.2.4.1`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Relationships - Personal\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores information about personal connections including friends, family, and social acquaintances.\n\n---\n\n## What Goes Here\n\n- Close friends and friendships\n- Extended family connections\n- Social acquaintances\n- Neighborhood connections\n- School and childhood friends\n- Hobby and interest-based friendships\n- Social network connections\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Highly Private - Personal relationships and contact information\n\n---\n\n## Examples\n\n```\n1.2.4.1 - Personal Network/\n\u251c\u2500\u2500 close-friends/\n\u251c\u2500\u2500 family-connections/\n\u251c\u2500\u2500 social-acquaintances/\n\u2514\u2500\u2500 community-connections/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Strictly restricted - highly personal information\n"
   },
-  "created_at": "2026-02-15T11:54:07.874000+00:00",
-  "updated_at": "2026-02-15T11:54:07.874000+00:00",
+  "created_at": "2026-02-17T01:23:31.024564+00:00",
+  "updated_at": "2026-02-17T01:23:31.024564+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "file:README.md"

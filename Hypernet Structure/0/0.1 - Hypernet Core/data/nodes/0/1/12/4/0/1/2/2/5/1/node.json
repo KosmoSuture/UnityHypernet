@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.0.1.2.2.5.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\0\\1\\2\\2\\5\\node.json",
+    "size": 813,
+    "content": "{\n  \"address\": \"0.1.2.2.5\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"0771cf45c6844a4c.json\",\n    \"type\": \"file\",\n    \"extension\": \".json\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\links\\\\0771cf45c6844a4c.json\",\n    \"size\": 274,\n    \"content\": \"{\\n  \\\"from_address\\\": \\\"0.1.0\\\",\\n  \\\"to_address\\\": \\\"0.1.0.15\\\",\\n  \\\"link_type\\\": \\\"0.6.3\\\",\\n  \\\"relationship\\\": \\\"contains\\\",\\n  \\\"address\\\": null,\\n  \\\"strength\\\": 1.0,\\n  \\\"bidirectional\\\": false,\\n  \\\"data\\\": {},\\n  \\\"created_at\\\": \\\"2026-02-15T11:53:48.244077+00:00\\\",\\n  \\\"sort_order\\\": null\\n}\"\n  },\n  \"created_at\": \"2026-02-15T11:53:49.053672+00:00\",\n  \"updated_at\": \"2026-02-15T11:53:49.053672+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:0771cf45c6844a4c.json\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:14.895661+00:00",
+  "updated_at": "2026-02-17T01:23:14.895661+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

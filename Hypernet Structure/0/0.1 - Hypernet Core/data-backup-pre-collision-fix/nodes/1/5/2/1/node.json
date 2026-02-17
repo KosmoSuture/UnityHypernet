@@ -1,0 +1,17 @@
+{
+  "address": "1.5.2.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.5 Mark Schaeffer\\1.5.2 - Documents\\README.md",
+    "size": 828,
+    "content": "# 1.5.2 - Documents\n\n**Hypernet Address:** `1.5.2`\n**Owner:** Mark Schaeffer (1.5)\n**Category:** Documents & Files\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores all important documents organized by type (personal, business, legal, reference).\n\n---\n\n## Structure\n\n### 1.5.2.0 - Personal Documents\nPersonal records, identification, certificates, and private documents.\n\n### 1.5.2.1 - Business Documents\nWork-related documents, contracts, proposals, and business files.\n\n### 1.5.2.2 - Legal Documents\nLegal agreements, contracts, official paperwork, and compliance documents.\n\n### 1.5.2.3 - Reference Materials\nReference documents, manuals, guides, and educational materials.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Highly restricted - explicit permission only\n"
+  },
+  "created_at": "2026-02-15T11:54:11.455455+00:00",
+  "updated_at": "2026-02-15T11:54:11.455455+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

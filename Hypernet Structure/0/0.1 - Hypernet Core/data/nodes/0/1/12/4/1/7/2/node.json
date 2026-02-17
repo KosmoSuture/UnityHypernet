@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.7.2",
+  "type_address": null,
+  "data": {
+    "name": "2",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\7\\2",
+    "content": "{\n  \"address\": \"1.7.2\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.7.2 - Documents\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.7 Ollie Schaeffer\\\\1.7.2 - Documents\",\n    \"content\": \"# 1.7.2 - Documents\\n\\n**Hypernet Address:** `1.7.2`\\n**Owner:** Ollie Schaeffer (1.7)\\n**Category:** Documents & Files\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores all important documents organized by type (personal, business, legal, reference).\\n\\n---\\n\\n## Structure\\n\\n### 1.7.2.0 - Personal Documents\\nPersonal records, identification, certificates, and private documents.\\n\\n### 1.7.2.1 - Business Documents\\nWork-related documents, contracts, proposals, and business files.\\n\\n### 1.7.2.2 - Legal Documents\\nLegal agreements, contracts, official paperwork, and compliance documents.\\n\\n### 1.7.2.3 - Reference Materials\\nReference documents, manuals, guides, and educational materials.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Highly restricted - explicit permission only\\n\",\n    \"content_file\": \"README.md\"\n  },\n  \"created_at\": \"2026-02-15T11:54:12.981254+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:12.981254+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.7.2 - Documents\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:23.829015+00:00",
+  "updated_at": "2026-02-17T01:23:23.829015+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:2"
+}

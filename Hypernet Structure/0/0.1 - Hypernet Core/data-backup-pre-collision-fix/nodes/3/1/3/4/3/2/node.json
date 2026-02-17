@@ -1,0 +1,17 @@
+{
+  "address": "3.1.3.4.3.2",
+  "type_address": null,
+  "data": {
+    "name": "3.1.3.4.3.2. Jan 2026.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.3 Human Resources\\3.1.3.4 Contribution Tracking (for profit sharing)\\3.1.3.4.3 - Valeria Campeche\\3.1.3.4.3.2. Jan 2026.md",
+    "size": 1571,
+    "content": "\n\n# 1. Synopsis.\nThis is a template for people to record their contributions to the Hypernet.  This is a rough draft and will be modified in the future to provide additional details, but I'm starting it simple\n\n\n# 2.  Paid Hours. \nThese are hours that are paid and will get 1 credit hour to the profit sharing pool\n\n| Date       | Time     | Total Hours | Project applied to              | Description of work done.                    |\n| ---------- | -------- | ----------- | ------------------------------- | -------------------------------------------- |\n| o3\\03\\2026 | 3pm =9pm | 6           | 3.1.2.1.004 Build Unity Website | Fully developed website ready for production |\n|            |          |             |                                 |                                              |\n|            |          |             |                                 |                                              |\n\n\n# 3. Unpaid hours\nThese are hours that are unpaid and will get 10 credit hours to the profit sharing pool\n\n| Date       | Time      | Total Hours | Project applied to | Description of work done.                                                                                    |\n| ---------- | --------- | ----------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |\n| 08\\02\\2026 | 3pm a 6pm | 3           | help Hillsong      | I was helping Hillsong open GitHub and understand GitHub folders and how to set his work hours with Obsidian |\n"
+  },
+  "created_at": "2026-02-15T11:54:18.622166+00:00",
+  "updated_at": "2026-02-15T11:54:18.622166+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:3.1.3.4.3.2. Jan 2026.md"
+}

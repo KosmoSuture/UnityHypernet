@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.2.4.2",
+  "type_address": null,
+  "data": {
+    "name": "2",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\2\\4\\2",
+    "content": "{\n  \"address\": \"1.2.4.2\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.2.4.2 - Organizational Affiliations\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.2 Sarah Schaeffer\\\\1.2.4 - Relationships\\\\1.2.4.2 - Organizational Affiliations\",\n    \"content\": \"# 1.2.4.2 - Organizational Affiliations\\n\\n**Hypernet Address:** `1.2.4.2`\\n**Owner:** Sarah Schaeffer (1.2)\\n**Category:** Relationships - Organizations\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores information about memberships, clubs, associations, and organizational affiliations.\\n\\n---\\n\\n## What Goes Here\\n\\n- Professional associations and memberships\\n- Clubs and social organizations\\n- Community groups and involvement\\n- Volunteer organizations\\n- Alumni associations\\n- Special interest groups\\n- Board memberships and leadership roles\\n\\n---\\n\\n## Privacy Considerations\\n\\n**Privacy Level:** Private to Semi-Public - Varies by organization\\n\\n---\\n\\n## Examples\\n\\n```\\n1.2.4.2 - Organizational Affiliations/\\n\\u251c\\u2500\\u2500 professional-associations/\\n\\u251c\\u2500\\u2500 community-organizations/\\n\\u251c\\u2500\\u2500 clubs-and-groups/\\n\\u2514\\u2500\\u2500 volunteer-involvement/\\n```\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Moderate restrictions - organizational involvement varies in sensitivity\\n\",\n    \"content_file\": \"README.md\"\n  },\n  \"created_at\": \"2026-02-15T11:54:07.887998+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:07.887998+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.2.4.2 - Organizational Affiliations\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:19.266494+00:00",
+  "updated_at": "2026-02-17T01:23:19.266494+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:2"
+}

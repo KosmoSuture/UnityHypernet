@@ -1,0 +1,17 @@
+{
+  "address": "3.1.2.5",
+  "type_address": null,
+  "data": {
+    "name": "3.1.2.0 System Overview.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.2 Task Management System\\3.1.2.0 System Overview.txt",
+    "size": 2238,
+    "content": "Communication Framework:\nUpstream Communication: \"I'm blocked because I need X from the team working on Y\"\nDownstream Communication: \"I've completed this, notifying all dependent tasks\"\nLateral Communication: \"I need help with [aspect], looking for someone with [skill]\"\n\nIMMEDIATE NEXT STEPS (THIS WEEK)\nFor you personally, Matt:\nSet up the digital infrastructure (Task 001) - even if basic\nCreate GitHub organization\nSet up Google Workspace or equivalent\nChoose project management tool\nCreate communication channels (Discord/Slack)\nInput these 20 tasks into that system (Task 002 partially)\nCreate basic task tracking\nAssign preliminary priorities\nSurvey your 80 person-hours of team (Task 003)\nWhat skills do they have?\nWhat interests them?\nWhat's their availability?\nIdentify 2-3 people to tackle the highest priority tasks\nWebsite MVP (Task 004)\nSocial media setup (Task 007)\nTechnical architecture doc (Task 009)\n\nAI OPTIMIZATION STRATEGY\nTo maximize AI assistance for velocity:\nCode Generation:\nAI generates boilerplate for all systems\nHumans review, refine, integrate\nFocus human time on architecture decisions, not implementation\nDocumentation:\nAI drafts all documentation from technical specs\nHumans edit for accuracy and clarity\nMaintain single source of truth, AI propagates updates\nContent Creation:\nAI generates first drafts of marketing copy, blog posts, social content\nHumans refine voice, fact-check, approve\nAI handles variations and repurposing\nTask Management:\nAI suggests task breakdowns from high-level goals\nAI identifies dependencies automatically\nAI recommends assignments based on skills/availability\nHumans approve and adjust\nVideo Production:\nUse AI video tools (Runway, Pika, Kling) as mentioned\nAI generates visual assets\nHumans direct narrative and messaging\n\nCRITICAL SUCCESS FACTORS\nTransparency from Day 1: Everything you do goes into the 3.1 system, publicly visible\nRapid Iteration: Ship imperfect but functional solutions, improve constantly\nCommunity Building: Every contributor is documented and will share in success\nTechnical Credibility: Working prototype proves feasibility\nClear Vision Communication: Everyone must understand The Singularity"
+  },
+  "created_at": "2026-02-17T01:23:34.747294+00:00",
+  "updated_at": "2026-02-17T01:23:34.747294+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:3.1.2.0 System Overview.txt"
+}

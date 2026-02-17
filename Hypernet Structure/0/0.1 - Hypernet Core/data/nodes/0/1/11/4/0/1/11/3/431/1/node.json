@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.4.0.1.11.3.431.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\11\\3\\431\\node.json",
+    "size": 834,
+    "content": "{\n  \"address\": \"0.1.11.3.431\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"5623c541476789ef.json\",\n    \"type\": \"file\",\n    \"extension\": \".json\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\links\\\\5623c541476789ef.json\",\n    \"size\": 292,\n    \"content\": \"{\\n  \\\"from_address\\\": \\\"0.1.11.1.0.1.1\\\",\\n  \\\"to_address\\\": \\\"0.1.11.1.0.1.1.10\\\",\\n  \\\"link_type\\\": \\\"0.6.3\\\",\\n  \\\"relationship\\\": \\\"contains\\\",\\n  \\\"address\\\": null,\\n  \\\"strength\\\": 1.0,\\n  \\\"bidirectional\\\": false,\\n  \\\"data\\\": {},\\n  \\\"created_at\\\": \\\"2026-02-17T01:22:01.718897+00:00\\\",\\n  \\\"sort_order\\\": null\\n}\"\n  },\n  \"created_at\": \"2026-02-17T01:22:09.130988+00:00\",\n  \"updated_at\": \"2026-02-17T01:22:09.130988+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:5623c541476789ef.json\"\n}"
+  },
+  "created_at": "2026-02-17T01:22:38.296591+00:00",
+  "updated_at": "2026-02-17T01:22:38.296591+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

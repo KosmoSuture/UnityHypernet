@@ -8,7 +8,7 @@ Address format: [CATEGORY].[SUBCATEGORY].[TYPE].[SUBTYPE].[INSTANCE]
 Example: 1.1.1.1.00001 = Person 1.1 > Media > Photos > Instance #1
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .address import HypernetAddress
 from .node import Node

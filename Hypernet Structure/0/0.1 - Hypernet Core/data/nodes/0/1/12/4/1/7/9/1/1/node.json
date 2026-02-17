@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.1.7.9.1.1",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\7\\9\\1\\node.json",
+    "size": 1177,
+    "content": "{\n  \"address\": \"1.7.9.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.7 Ollie Schaeffer\\\\1.7.9 - Notes & Knowledge\\\\README.md\",\n    \"size\": 685,\n    \"content\": \"# 1.7.9 - Notes & Knowledge\\n\\n**Hypernet Address:** `1.7.9`\\n**Owner:** Ollie Schaeffer (1.7)\\n**Category:** Notes & Knowledge Management\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores personal notes, research, learning materials, and knowledge management organized by type.\\n\\n---\\n\\n## Structure\\n\\n### 1.7.9.0 - Personal Notes\\nGeneral notes, thoughts, and personal writing.\\n\\n### 1.7.9.1 - Research\\nResearch notes, investigation, and study materials.\\n\\n### 1.7.9.2 - Learning Materials\\nEducational content, course notes, and learning resources.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Restricted - personal notes and knowledge\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:13.641871+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:13.641871+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:24.355186+00:00",
+  "updated_at": "2026-02-17T01:23:24.355186+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

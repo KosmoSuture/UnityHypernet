@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "1a45606fde544d7f",
+  "snapshot_at": "2026-02-17T01:21:58.662249+00:00",
+  "node": {
+    "address": "0.1.1.9.4.11",
+    "type_address": null,
+    "data": {
+      "name": "note.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\note.py",
+      "size": 1747,
+      "content": "\"\"\"\nNote Model\n\nSQLAlchemy model for personal notes.\n\nImplements: 0.0.8 - Life Types / Note.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, Boolean, CheckConstraint, Index\nfrom sqlalchemy.dialects.postgresql import ARRAY\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass Note(OwnedObject):\n    \"\"\"\n    Personal notes from note apps (Apple Notes, Notion, Evernote, Obsidian, etc.).\n    \"\"\"\n\n    __tablename__ = \"notes\"\n\n    # Required\n    title = Column(String(500), nullable=False, index=True)\n    content = Column(Text, nullable=False)\n    note_format = Column(String(50), nullable=False, default='plain')\n\n    # Optional\n    folder = Column(String(255), nullable=True, index=True)\n    tags = Column(ARRAY(Text), nullable=True)\n\n    is_pinned = Column(Boolean, nullable=False, default=False)\n    is_locked = Column(Boolean, nullable=False, default=False)\n\n    word_count = Column(Integer, nullable=True)\n\n    has_attachments = Column(Boolean, nullable=False, default=False)\n    attachment_count = Column(Integer, nullable=False, default=0)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"note_format IN ('plain', 'markdown', 'html', 'rich_text')\", name='chk_note_format'),\n        CheckConstraint(\"attachment_count >= 0\", name='chk_note_attachments'),\n        Index('idx_notes_pinned', 'is_pinned', postgresql_where=Column('is_pinned') == True),\n        Index('idx_notes_folder', 'folder', postgresql_where=Column('folder').isnot(None)),\n    )\n\n    def __repr__(self):\n        return f\"<Note(id={self.id}, title={self.title[:50]})>\"\n"
+    },
+    "created_at": "2026-02-17T01:20:05.009053+00:00",
+    "updated_at": "2026-02-17T01:20:05.009053+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:note.py"
+  }
+}

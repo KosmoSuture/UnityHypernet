@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.1.0.1.6.6.3.7",
+  "type_address": null,
+  "data": {
+    "name": "v0001.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\history\\0\\1\\6\\6\\3\\v0001.json",
+    "size": 661,
+    "content": "{\n  \"version\": 1,\n  \"content_hash\": \"4c9f61bcd8545ff9\",\n  \"snapshot_at\": \"2026-02-17T01:21:59.869760+00:00\",\n  \"node\": {\n    \"address\": \"0.1.6.6.3\",\n    \"type_address\": null,\n    \"data\": {\n      \"name\": \"6.3 - AI Contributions to Hypernet\",\n      \"type\": \"folder\",\n      \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.6 - AI Core & Identity System\\\\6.3 - AI Contributions to Hypernet\"\n    },\n    \"created_at\": \"2026-02-17T01:20:05.250088+00:00\",\n    \"updated_at\": \"2026-02-17T01:20:05.250088+00:00\",\n    \"deleted_at\": null,\n    \"source_type\": \"import\",\n    \"source_id\": \"folder:6.3 - AI Contributions to Hypernet\"\n  }\n}"
+  },
+  "created_at": "2026-02-17T01:22:02.508130+00:00",
+  "updated_at": "2026-02-17T01:22:02.508130+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:v0001.json"
+}

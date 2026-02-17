@@ -2,16 +2,13 @@
   "address": "1.7.1.1",
   "type_address": null,
   "data": {
-    "name": "README.md",
-    "type": "file",
-    "extension": ".md",
-    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.7 Ollie Schaeffer\\1.7.1 - Projects\\README.md",
-    "size": 690,
-    "content": "# 1.7.1 - Projects\n\n**Hypernet Address:** `1.7.1`\n**Owner:** Ollie Schaeffer (1.7)\n**Category:** Projects & Work\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder contains all projects that Ollie is involved in, organized by status (active, completed, archived).\n\n---\n\n## Structure\n\n### 1.7.1.0 - Active Projects\nCurrently active projects requiring attention and resources.\n\n### 1.7.1.1 - Completed Projects\nSuccessfully completed projects that achieved their goals.\n\n### 1.7.1.2 - Archived Projects\nProjects that were discontinued, pivoted, or are no longer relevant.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Configurable per project\n"
+    "name": "1.7.1.1 - Completed Projects",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.7 Ollie Schaeffer\\1.7.1 - Projects\\1.7.1.1 - Completed Projects"
   },
-  "created_at": "2026-02-15T11:54:12.954254+00:00",
-  "updated_at": "2026-02-15T11:54:12.954254+00:00",
+  "created_at": "2026-02-17T01:23:32.520815+00:00",
+  "updated_at": "2026-02-17T01:23:32.520815+00:00",
   "deleted_at": null,
   "source_type": "import",
-  "source_id": "file:README.md"
+  "source_id": "folder:1.7.1.1 - Completed Projects"
 }

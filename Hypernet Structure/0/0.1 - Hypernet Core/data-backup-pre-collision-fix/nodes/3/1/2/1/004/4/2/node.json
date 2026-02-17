@@ -1,0 +1,17 @@
+{
+  "address": "3.1.2.1.004.4.2",
+  "type_address": null,
+  "data": {
+    "name": "robots.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.2 Task Management System\\3.1.2.1 Active Tasks - status Open\\3.1.2.1.004 Build Unity Website\\website\\robots.txt",
+    "size": 439,
+    "content": "# robots.txt\n# Controls search engine crawler access and sitemap location\n\nUser-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /private/\nDisallow: /temp/\n\n# Specific rules for major crawlers\nUser-agent: Googlebot\nAllow: /\n\nUser-agent: Bingbot\nAllow: /\n\nUser-agent: DuckDuckGo\nAllow: /\n\n# Sitemap location\nSitemap: https://hypernet.unity/sitemap.xml\n\n# Crawl delay for respectful crawling (in seconds)\nCrawl-delay: 1\n"
+  },
+  "created_at": "2026-02-15T11:54:17.111302+00:00",
+  "updated_at": "2026-02-15T11:54:17.111302+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:robots.txt"
+}

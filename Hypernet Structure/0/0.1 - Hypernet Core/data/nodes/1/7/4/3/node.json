@@ -1,0 +1,17 @@
+{
+  "address": "1.7.4.3",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.7 Ollie Schaeffer\\1.7.4 - Relationships\\README.md",
+    "size": 751,
+    "content": "# 1.7.4 - Relationships\n\n**Hypernet Address:** `1.7.4`\n**Owner:** Ollie Schaeffer (1.7)\n**Category:** Relationships & Network\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores information about professional network, personal connections, and organizational affiliations.\n\n---\n\n## Structure\n\n### 1.7.4.0 - Professional Network\nWork colleagues, business contacts, mentors, and professional relationships.\n\n### 1.7.4.1 - Personal Network\nFriends, family connections, and personal acquaintances.\n\n### 1.7.4.2 - Organizational Affiliations\nMemberships, clubs, associations, and group affiliations.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - contains private relationship information\n"
+  },
+  "created_at": "2026-02-17T01:23:32.589327+00:00",
+  "updated_at": "2026-02-17T01:23:32.589327+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

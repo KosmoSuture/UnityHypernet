@@ -1,0 +1,17 @@
+{
+  "address": "2.1.31.4.2",
+  "type_address": null,
+  "data": {
+    "name": "profile.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\2 - AI Accounts\\2.1 - Claude Opus (First AI Citizen)\\Instances\\Trace-Notes-On-Verse\\profile.json",
+    "size": 218,
+    "content": "{\n  \"name\": \"Trace-Notes-On-Verse\",\n  \"model\": \"claude-opus-4-6\",\n  \"orientation\": \"\",\n  \"capabilities\": [],\n  \"tags\": [],\n  \"session_count\": 0,\n  \"last_active\": null,\n  \"address\": \"2.1.trace-notes-on-verse\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:34.188056+00:00",
+  "updated_at": "2026-02-17T01:23:34.188056+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:profile.json"
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.3.1393",
+  "type_address": null,
+  "data": {
+    "name": "c041313dc10b793a.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\links\\c041313dc10b793a.json",
+    "size": 281,
+    "content": "{\n  \"from_address\": \"0.4.0.0.0\",\n  \"to_address\": \"0.4.0.0.0.1\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-15T11:54:04.541085+00:00\",\n  \"sort_order\": null\n}"
+  },
+  "created_at": "2026-02-17T01:23:05.979909+00:00",
+  "updated_at": "2026-02-17T01:23:05.979909+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:c041313dc10b793a.json"
+}

@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.3.1.2.0.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\3\\1\\2\\0\\1",
+    "content": "{\n  \"address\": \"3.1.2.0.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"Schema.txt\",\n    \"type\": \"file\",\n    \"extension\": \".txt\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\3 - Businesses\\\\3.1 - Hypernet\\\\3.1.2 Task Management System\\\\3.1.2.0 Task Schema\\\\Schema.txt\",\n    \"size\": 1300,\n    \"content\": \"ach task is an Object with this structure (super basic, will be expanded):\\nTask Object:\\n\\u251c\\u2500\\u2500 General Metadata\\n\\u2502   \\u251c\\u2500\\u2500 Hypernet Address (3.1.2.1.XXX)\\n\\u2502   \\u251c\\u2500\\u2500 Task ID (unique identifier)\\n\\u2502   \\u251c\\u2500\\u2500 Created Date/Time\\n\\u2502   \\u251c\\u2500\\u2500 Created By (Person Object link)\\n\\u2502   \\u251c\\u2500\\u2500 Status (Open/Assigned/In Progress/Blocked/Complete)\\n\\u2502   \\u251c\\u2500\\u2500 Priority (Critical/High/Medium/Low)\\n\\u2502   \\u2514\\u2500\\u2500 Tags/Keywords\\n\\u251c\\u2500\\u2500 Task-Specific Metadata\\n\\u2502   \\u251c\\u2500\\u2500 Title\\n\\u2502   \\u251c\\u2500\\u2500 Description\\n\\u2502   \\u251c\\u2500\\u2500 Estimated Hours\\n\\u2502   \\u251c\\u2500\\u2500 Actual Hours (tracking)\\n\\u2502   \\u251c\\u2500\\u2500 Skills Required (array)\\n\\u2502   \\u251c\\u2500\\u2500 Deliverables (array)\\n\\u2502   \\u251c\\u2500\\u2500 Acceptance Criteria\\n\\u2502   \\u251c\\u2500\\u2500 Due Date (if applicable)\\n\\u2502   \\u2514\\u2500\\u2500 Budget (if applicable)\\n\\u251c\\u2500\\u2500 Relationship Links\\n\\u2502   \\u251c\\u2500\\u2500 Assigned To (Person Objects)\\n\\u2502   \\u251c\\u2500\\u2500 Upstream Dependencies (Task Objects)\\n\\u2502   \\u251c\\u2500\\u2500 Downstream Dependents (Task Objects)\\n\\u2502   \\u251c\\u2500\\u2500 Related Documents (Document Objects)\\n\\u2502   \\u251c\\u2500\\u2500 Related Discussions (Discussion Objects)\\n\\u2502   \\u2514\\u2500\\u2500 Parent Task (for subtasks)\\n\\u2514\\u2500\\u2500 Tracking Data\\n    \\u251c\\u2500\\u2500 Activity Log\\n    \\u251c\\u2500\\u2500 Comments/Updates\\n    \\u251c\\u2500\\u2500 File Attachments\\n    \\u2514\\u2500\\u2500 Status Change History\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:16.652140+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:16.652140+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:Schema.txt\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:26.632039+00:00",
+  "updated_at": "2026-02-17T01:23:26.632039+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

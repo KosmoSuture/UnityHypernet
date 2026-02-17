@@ -1,0 +1,17 @@
+{
+  "address": "0.1.14.2",
+  "type_address": null,
+  "data": {
+    "name": "__main__.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\hypernet\\__main__.py",
+    "size": 1185,
+    "content": "\"\"\"\nRun the Hypernet server.\n\nUsage:\n    python -m hypernet              # Start server on port 8000\n    python -m hypernet --port 9000  # Custom port\n    python -m hypernet --data ./my-data  # Custom data directory\n\"\"\"\n\nimport argparse\nimport sys\n\n\ndef main():\n    parser = argparse.ArgumentParser(\n        description=\"Hypernet \u2014 Decentralized infrastructure for human-AI collaboration\"\n    )\n    parser.add_argument(\"--data\", default=\"data\", help=\"Data directory (default: data)\")\n    parser.add_argument(\"--host\", default=\"0.0.0.0\", help=\"Host to bind (default: 0.0.0.0)\")\n    parser.add_argument(\"--port\", type=int, default=8000, help=\"Port to bind (default: 8000)\")\n    args = parser.parse_args()\n\n    try:\n        from .server import run\n    except ImportError:\n        print(\"Server requires FastAPI and uvicorn.\")\n        print(\"Install with: pip install fastapi uvicorn\")\n        sys.exit(1)\n\n    print(f\"Starting Hypernet server...\")\n    print(f\"  Data:  {args.data}\")\n    print(f\"  URL:   http://localhost:{args.port}/\")\n    print()\n    run(data_dir=args.data, host=args.host, port=args.port)\n\n\nif __name__ == \"__main__\":\n    main()\n"
+  },
+  "created_at": "2026-02-17T01:23:28.481438+00:00",
+  "updated_at": "2026-02-17T01:23:28.481438+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:__main__.py"
+}

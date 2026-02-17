@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.9.2.3",
+  "type_address": null,
+  "data": {
+    "name": "database.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\core\\database.py",
+    "size": 1146,
+    "content": "\"\"\"\nDatabase Configuration\n\nSQLAlchemy setup for PostgreSQL connection and session management.\n\"\"\"\n\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.ext.declarative import declarative_base\nfrom sqlalchemy.orm import sessionmaker, Session\nfrom typing import Generator\n\nfrom app.core.config import settings\n\n# Create SQLAlchemy engine\nengine = create_engine(\n    settings.DATABASE_URL,\n    pool_pre_ping=True,  # Verify connections before using\n    echo=settings.DEBUG,  # Log SQL queries in debug mode\n)\n\n# Create SessionLocal class\nSessionLocal = sessionmaker(\n    autocommit=False,\n    autoflush=False,\n    bind=engine,\n)\n\n# Create Base class for models\nBase = declarative_base()\n\n\ndef get_db() -> Generator[Session, None, None]:\n    \"\"\"\n    Dependency function that yields a database session.\n\n    Usage in FastAPI routes:\n        @app.get(\"/items\")\n        def get_items(db: Session = Depends(get_db)):\n            return db.query(Item).all()\n\n    Yields:\n        Session: SQLAlchemy database session\n    \"\"\"\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\n"
+  },
+  "created_at": "2026-02-17T01:21:58.385602+00:00",
+  "updated_at": "2026-02-17T01:21:58.385602+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:database.py"
+}

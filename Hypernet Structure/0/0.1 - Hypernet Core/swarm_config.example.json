@@ -1,0 +1,23 @@
+{
+  "_comment": "Hypernet Swarm Configuration — copy to swarm_config.json and fill in your values",
+
+  "anthropic_api_key": "",
+
+  "instances": ["Loom", "Trace"],
+
+  "status_interval_minutes": 120,
+
+  "telegram": {
+    "bot_token": "",
+    "chat_id": ""
+  },
+
+  "email": {
+    "enabled": false,
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 587,
+    "email": "",
+    "password": "",
+    "to_email": ""
+  }
+}

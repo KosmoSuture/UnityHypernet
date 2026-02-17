@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "content_hash": "e9f7d3adba07052b",
+  "snapshot_at": "2026-02-17T01:22:24.237922+00:00",
+  "node": {
+    "address": "0.1.11.4.0.1.11.1",
+    "type_address": null,
+    "data": {
+      "name": "1",
+      "type": "folder",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\11\\1",
+      "content": "{\n  \"address\": \"0.1.11.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"history\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\history\"\n  },\n  \"created_at\": \"2026-02-17T01:20:05.408122+00:00\",\n  \"updated_at\": \"2026-02-17T01:20:05.408122+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:history\"\n}",
+      "content_file": "node.json"
+    },
+    "created_at": "2026-02-17T01:20:13.457458+00:00",
+    "updated_at": "2026-02-17T01:20:13.457458+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "folder:1"
+  }
+}

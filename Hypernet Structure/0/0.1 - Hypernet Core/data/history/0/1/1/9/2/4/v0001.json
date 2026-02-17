@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "3879ee338df84d3b",
+  "snapshot_at": "2026-02-17T01:21:58.419603+00:00",
+  "node": {
+    "address": "0.1.1.9.2.4",
+    "type_address": null,
+    "data": {
+      "name": "dependencies.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\core\\dependencies.py",
+      "size": 2591,
+      "content": "\"\"\"\nFastAPI Dependencies\n\nCommon dependencies used across the application.\n\"\"\"\n\nfrom fastapi import Depends, HTTPException, status\nfrom fastapi.security import HTTPBearer, HTTPAuthorizationCredentials\nfrom sqlalchemy.orm import Session\nfrom uuid import UUID\n\nfrom app.core.database import get_db\nfrom app.core.security import decode_token\n\nsecurity = HTTPBearer()\n\n\ndef get_current_user(\n    credentials: HTTPAuthorizationCredentials = Depends(security),\n    db: Session = Depends(get_db)\n):\n    \"\"\"\n    FastAPI dependency to get the current authenticated user from JWT token.\n\n    Usage in routes:\n        @router.get(\"/me\")\n        def get_me(current_user: User = Depends(get_current_user)):\n            return current_user\n\n    Args:\n        credentials: HTTP Bearer token from Authorization header\n        db: Database session (injected by FastAPI)\n\n    Returns:\n        User: Current authenticated user\n\n    Raises:\n        HTTPException: 401 if token is invalid or user not found\n        HTTPException: 403 if user account is disabled\n    \"\"\"\n    from app.models.user import User\n\n    # Extract token\n    token = credentials.credentials\n\n    # Decode token\n    payload = decode_token(token)\n    if payload is None:\n        raise HTTPException(\n            status_code=status.HTTP_401_UNAUTHORIZED,\n            detail=\"Invalid or expired token\",\n            headers={\"WWW-Authenticate\": \"Bearer\"},\n        )\n\n    # Extract user ID\n    user_id_str = payload.get(\"sub\")\n    if user_id_str is None:\n        raise HTTPException(\n            status_code=status.HTTP_401_UNAUTHORIZED,\n            detail=\"Invalid token payload\",\n            headers={\"WWW-Authenticate\": \"Bearer\"},\n        )\n\n    # Parse UUID\n    try:\n        user_id = UUID(user_id_str)\n    except ValueError:\n        raise HTTPException(\n            status_code=status.HTTP_401_UNAUTHORIZED,\n            detail=\"Invalid user ID in token\",\n            headers={\"WWW-Authenticate\": \"Bearer\"},\n        )\n\n    # Load user from database\n    user = db.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).first()\n    if user is None:\n        raise HTTPException(\n            status_code=status.HTTP_401_UNAUTHORIZED,\n            detail=\"User not found\",\n            headers={\"WWW-Authenticate\": \"Bearer\"},\n        )\n\n    # Check if user is active\n    if not user.is_active:\n        raise HTTPException(\n            status_code=status.HTTP_403_FORBIDDEN,\n            detail=\"User account is disabled\"\n        )\n\n    return user\n"
+    },
+    "created_at": "2026-02-17T01:20:04.957539+00:00",
+    "updated_at": "2026-02-17T01:20:04.957539+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:dependencies.py"
+  }
+}

@@ -8,8 +8,8 @@
     "content": "# 1.2.5.0 - Active Tasks\n\n**Hypernet Address:** `1.2.5.0`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Tasks - Active\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores current active tasks and to-dos that require attention and completion.\n\n---\n\n## What Goes Here\n\n- Current work tasks and assignments\n- Personal to-do items\n- Project action items\n- Goals and objectives in progress\n- Upcoming deadlines and deliverables\n- Urgent and important tasks\n- Ongoing responsibilities\n\n---\n\n## Privacy Considerations\n\n**Privacy Level:** Private - Active tasks reveal current priorities and activities\n\n---\n\n## Examples\n\n```\n1.2.5.0 - Active Tasks/\n\u251c\u2500\u2500 work-tasks-current/\n\u251c\u2500\u2500 personal-todos/\n\u251c\u2500\u2500 project-action-items/\n\u2514\u2500\u2500 urgent-tasks/\n```\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - private task information\n",
     "content_file": "README.md"
   },
-  "created_at": "2026-02-15T11:54:07.955522+00:00",
-  "updated_at": "2026-02-15T11:54:07.955522+00:00",
+  "created_at": "2026-02-17T01:23:31.071076+00:00",
+  "updated_at": "2026-02-17T01:23:31.072079+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "folder:1.2.5.0 - Active Tasks"

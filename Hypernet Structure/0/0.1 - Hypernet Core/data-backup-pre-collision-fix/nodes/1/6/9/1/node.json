@@ -1,0 +1,17 @@
+{
+  "address": "1.6.9.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.6 Richard Schaeffer\\1.6.9 - Notes & Knowledge\\README.md",
+    "size": 687,
+    "content": "# 1.6.9 - Notes & Knowledge\n\n**Hypernet Address:** `1.6.9`\n**Owner:** Richard Schaeffer (1.6)\n**Category:** Notes & Knowledge Management\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores personal notes, research, learning materials, and knowledge management organized by type.\n\n---\n\n## Structure\n\n### 1.6.9.0 - Personal Notes\nGeneral notes, thoughts, and personal writing.\n\n### 1.6.9.1 - Research\nResearch notes, investigation, and study materials.\n\n### 1.6.9.2 - Learning Materials\nEducational content, course notes, and learning resources.\n\n---\n\n**Status:** Active Directory\n**AI Access:** Restricted - personal notes and knowledge\n"
+  },
+  "created_at": "2026-02-15T11:54:12.779744+00:00",
+  "updated_at": "2026-02-15T11:54:12.779744+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

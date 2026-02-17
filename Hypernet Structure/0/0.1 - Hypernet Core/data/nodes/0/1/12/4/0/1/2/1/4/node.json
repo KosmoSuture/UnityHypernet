@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.0.1.2.1.4",
+  "type_address": null,
+  "data": {
+    "name": "4",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\0\\1\\2\\1\\4",
+    "content": "{\n  \"address\": \"0.1.2.1.4\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"owner_index.json\",\n    \"type\": \"file\",\n    \"extension\": \".json\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\indexes\\\\owner_index.json\",\n    \"size\": 2,\n    \"content\": \"{}\"\n  },\n  \"created_at\": \"2026-02-15T11:53:48.961780+00:00\",\n  \"updated_at\": \"2026-02-15T11:53:48.961780+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:owner_index.json\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:12.900002+00:00",
+  "updated_at": "2026-02-17T01:23:12.900002+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:4"
+}

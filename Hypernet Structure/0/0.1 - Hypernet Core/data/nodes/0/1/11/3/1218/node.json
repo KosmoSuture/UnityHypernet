@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.3.1218",
+  "type_address": null,
+  "data": {
+    "name": "f05331edec07ba1b.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\links\\f05331edec07ba1b.json",
+    "size": 281,
+    "content": "{\n  \"from_address\": \"0.1.11.3\",\n  \"to_address\": \"0.1.11.3.136\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-17T01:20:08.049169+00:00\",\n  \"sort_order\": null\n}"
+  },
+  "created_at": "2026-02-17T01:22:18.221026+00:00",
+  "updated_at": "2026-02-17T01:22:18.221026+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:f05331edec07ba1b.json"
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.9.4.12",
+  "type_address": null,
+  "data": {
+    "name": "social_account.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\social_account.py",
+    "size": 1999,
+    "content": "\"\"\"\nSocialAccount Model\n\nSQLAlchemy model for social media accounts/profiles.\n\nImplements: 0.0.3 - Social Types / SocialAccount.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, Boolean, ForeignKey, CheckConstraint, Index\nfrom sqlalchemy.dialects.postgresql import UUID\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass SocialAccount(OwnedObject):\n    \"\"\"\n    External social media accounts belonging to the user or others.\n    \"\"\"\n\n    __tablename__ = \"social_accounts\"\n\n    # Required\n    platform = Column(String(50), nullable=False, index=True)\n    username = Column(String(100), nullable=False, index=True)\n    account_type = Column(String(50), nullable=False)\n\n    # Optional\n    display_name = Column(String(200), nullable=True)\n    profile_url = Column(String(500), nullable=True)\n    profile_picture_id = Column(UUID(as_uuid=True), ForeignKey(\"media.id\", ondelete=\"SET NULL\"), nullable=True)\n\n    # Stats\n    followers_count = Column(Integer, nullable=True)\n    following_count = Column(Integer, nullable=True)\n    posts_count = Column(Integer, nullable=True)\n\n    bio = Column(Text, nullable=True)\n    is_verified = Column(Boolean, nullable=False, default=False)\n    is_private = Column(Boolean, nullable=False, default=False)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n    profile_picture = relationship(\"Media\", foreign_keys=[profile_picture_id], post_update=True)\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"platform IN ('instagram', 'twitter', 'facebook', 'tiktok', 'linkedin')\", name='chk_platform'),\n        CheckConstraint(\"account_type IN ('own', 'following', 'other')\", name='chk_account_type'),\n        Index('idx_social_account_platform_username', 'platform', 'username'),\n    )\n\n    def __repr__(self):\n        return f\"<SocialAccount(id={self.id}, platform={self.platform}, username={self.username})>\"\n"
+  },
+  "created_at": "2026-02-17T01:21:58.664261+00:00",
+  "updated_at": "2026-02-17T01:21:58.664261+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:social_account.py"
+}

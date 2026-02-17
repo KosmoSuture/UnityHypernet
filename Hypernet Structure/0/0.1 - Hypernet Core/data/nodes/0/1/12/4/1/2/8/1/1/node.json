@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.2.8.1.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\2\\8\\1\\1",
+    "content": "{\n  \"address\": \"1.2.8.1.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.2 Sarah Schaeffer\\\\1.2.8 - Media\\\\1.2.8.1 - Videos\\\\README.md\",\n    \"size\": 771,\n    \"content\": \"# 1.2.8.1 - Videos\\n\\n**Hypernet Address:** `1.2.8.1`\\n**Owner:** Sarah Schaeffer (1.2)\\n**Category:** Media - Videos\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores video files, recordings, and video content.\\n\\n---\\n\\n## What Goes Here\\n\\n- Personal videos\\n- Family videos\\n- Event recordings\\n- Screen recordings\\n- Video messages\\n- Educational videos\\n- Presentation recordings\\n\\n---\\n\\n## Privacy Considerations\\n\\n**Privacy Level:** Highly Private - Videos contain personal content\\n\\n---\\n\\n## Examples\\n\\n```\\n1.2.8.1 - Videos/\\n\\u251c\\u2500\\u2500 family-videos/\\n\\u251c\\u2500\\u2500 events/\\n\\u251c\\u2500\\u2500 recordings/\\n\\u2514\\u2500\\u2500 personal/\\n```\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Strictly restricted - personal videos are private\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:08.445644+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:08.445644+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:19.734869+00:00",
+  "updated_at": "2026-02-17T01:23:19.734869+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

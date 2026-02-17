@@ -1,0 +1,17 @@
+{
+  "address": "0.1.1.9.4.13",
+  "type_address": null,
+  "data": {
+    "name": "social_post.py",
+    "type": "file",
+    "extension": ".py",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\social_post.py",
+    "size": 2019,
+    "content": "\"\"\"\nSocialPost Model\n\nSQLAlchemy model for social media posts.\n\nImplements: 0.0.3 - Social Types / SocialPost.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, Integer, Boolean, DateTime, CheckConstraint, Index\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass SocialPost(OwnedObject):\n    \"\"\"\n    Social media posts from Instagram, Twitter/X, Facebook, TikTok, LinkedIn, etc.\n    \"\"\"\n\n    __tablename__ = \"social_posts\"\n\n    # Required\n    platform = Column(String(50), nullable=False, index=True)\n    post_type = Column(String(50), nullable=False)\n    content = Column(Text, nullable=False, default='')\n    posted_at = Column(DateTime(timezone=True), nullable=False, index=True)\n\n    # Optional\n    platform_post_id = Column(String(255), nullable=True, index=True)\n    platform_url = Column(String(500), nullable=True)\n\n    # Engagement\n    likes_count = Column(Integer, nullable=True)\n    comments_count = Column(Integer, nullable=True)\n    shares_count = Column(Integer, nullable=True)\n    views_count = Column(Integer, nullable=True)\n\n    # Status\n    visibility = Column(String(50), nullable=True)\n    is_pinned = Column(Boolean, nullable=False, default=False)\n    location = Column(String(200), nullable=True)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n\n    # Constraints\n    __table_args__ = (\n        CheckConstraint(\"platform IN ('instagram', 'twitter', 'facebook', 'tiktok', 'linkedin')\", name='chk_social_platform'),\n        CheckConstraint(\"post_type IN ('text', 'photo', 'video', 'story', 'reel', 'carousel')\", name='chk_post_type'),\n        CheckConstraint(\"visibility IS NULL OR visibility IN ('public', 'private', 'friends', 'followers')\", name='chk_visibility'),\n        Index('idx_social_platform_posted', 'platform', 'posted_at'),\n    )\n\n    def __repr__(self):\n        return f\"<SocialPost(id={self.id}, platform={self.platform}, type={self.post_type})>\"\n"
+  },
+  "created_at": "2026-02-17T01:21:58.685780+00:00",
+  "updated_at": "2026-02-17T01:21:58.685780+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:social_post.py"
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.1.0.1.1.9.1.1",
+  "type_address": null,
+  "data": {
+    "name": "v0001.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\history\\0\\1\\1\\9\\1\\v0001.json",
+    "size": 887,
+    "content": "{\n  \"version\": 1,\n  \"content_hash\": \"b99666fe956e85c6\",\n  \"snapshot_at\": \"2026-02-17T01:21:58.343078+00:00\",\n  \"node\": {\n    \"address\": \"0.1.1.9.1\",\n    \"type_address\": null,\n    \"data\": {\n      \"name\": \"__init__.py\",\n      \"type\": \"file\",\n      \"extension\": \".py\",\n      \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.1 - Core System\\\\app\\\\__init__.py\",\n      \"size\": 227,\n      \"content\": \"\\\"\\\"\\\"\\nHypernet Core 0.1 - Universal Personal Data Platform\\n\\nThis package contains the core application code for Hypernet.\\n\\\"\\\"\\\"\\n\\n__version__ = \\\"0.1.0\\\"\\n__author__ = \\\"Matt Schaeffer & Claude (Anthropic)\\\"\\n__license__ = \\\"MIT\\\"\\n\"\n    },\n    \"created_at\": \"2026-02-17T01:20:04.940538+00:00\",\n    \"updated_at\": \"2026-02-17T01:20:04.940538+00:00\",\n    \"deleted_at\": null,\n    \"source_type\": \"import\",\n    \"source_id\": \"file:__init__.py\"\n  }\n}"
+  },
+  "created_at": "2026-02-17T01:22:01.978561+00:00",
+  "updated_at": "2026-02-17T01:22:01.978561+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:v0001.json"
+}

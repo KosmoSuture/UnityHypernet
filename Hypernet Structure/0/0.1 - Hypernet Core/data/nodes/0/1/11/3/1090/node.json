@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.3.1090",
+  "type_address": null,
+  "data": {
+    "name": "da470fad165cc59e.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\links\\da470fad165cc59e.json",
+    "size": 280,
+    "content": "{\n  \"from_address\": \"0.1.11.3\",\n  \"to_address\": \"0.1.11.3.99\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-17T01:20:07.262412+00:00\",\n  \"sort_order\": null\n}"
+  },
+  "created_at": "2026-02-17T01:22:16.766621+00:00",
+  "updated_at": "2026-02-17T01:22:16.766621+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:da470fad165cc59e.json"
+}

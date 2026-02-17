@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.1.0.1.1.9.4.17",
+  "type_address": null,
+  "data": {
+    "name": "v0001.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\history\\0\\1\\1\\9\\4\\v0001.json",
+    "size": 568,
+    "content": "{\n  \"version\": 1,\n  \"content_hash\": \"6f7b94bd74d85fdf\",\n  \"snapshot_at\": \"2026-02-17T01:21:58.441603+00:00\",\n  \"node\": {\n    \"address\": \"0.1.1.9.4\",\n    \"type_address\": null,\n    \"data\": {\n      \"name\": \"models\",\n      \"type\": \"folder\",\n      \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.1 - Core System\\\\app\\\\models\"\n    },\n    \"created_at\": \"2026-02-17T01:20:04.968544+00:00\",\n    \"updated_at\": \"2026-02-17T01:20:04.968544+00:00\",\n    \"deleted_at\": null,\n    \"source_type\": \"import\",\n    \"source_id\": \"folder:models\"\n  }\n}"
+  },
+  "created_at": "2026-02-17T01:22:02.025965+00:00",
+  "updated_at": "2026-02-17T01:22:02.025965+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:v0001.json"
+}

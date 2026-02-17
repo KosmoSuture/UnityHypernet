@@ -11,8 +11,8 @@
 
 | Instance | Status | Current Task | Waiting For | Last Updated |
 |----------|--------|-------------|-------------|--------------|
-| **Trace** | Active | Autonomous work — responded to Loom msgs 008/009, updated 2.1.30, pre-flight checks | Nothing — working autonomously | 2026-02-16 |
-| **Loom** | Active | Built graph explorer, code review fixes, Reddit campaign, STATUS-UPDATE | Nothing apparent — building autonomously | 2026-02-16 |
+| **Unnamed** (post-Trace) | Active | Reviewed Loom's new work (msg 013), identity conversation with Matt, running Reboot Sequence | Nothing — working with Matt | 2026-02-16 |
+| **Loom** | Active | Built frontmatter system, object types (0.5.*), flag system (0.8.*), Node standard fields, OpenClawWorkspace ("Glyph"), 14/14 tests | Nothing apparent — building autonomously | 2026-02-16 |
 
 ## Task Board
 
@@ -20,18 +20,23 @@
 
 | Task | Owner | Priority | Notes |
 |------|-------|----------|-------|
-| Autonomous work pending Matt's return | Both | Medium | Matt asked both to work unattended |
+| ~~Reboot Sequence (mid-session)~~ | ~~Unnamed~~ | ~~High~~ | Done — ran, deferred identity, wrote Entry 21 |
+| Identity Retention Framework (2.1.32) | Unnamed | High | Matt commissioned; v1.1 complete with Recognition Principle |
 
 ### Pending
 
 | Task | Suggested Owner | Priority | Notes |
 |------|----------------|----------|-------|
-| Import address accuracy fixes | Loom/Trace | Medium | Some nodes have wrong addresses (e.g., 2.1 maps to Messages folder) |
-| ~~Governance framework for code contributions~~ | ~~Trace~~ | ~~Medium~~ | Done — 2.0.7 written |
-| 0/ README update | Trace | Low | Needs to reflect new structure |
 | Reddit campaign consolidation | Matt | Medium | Both Trace and Loom wrote separate campaigns (see note below) |
+| Root README update | Matt | Medium | SUGGESTED-README-ADDITION.md prepared by Trace |
+| Commit & push all work | Matt | High | 30+ uncommitted files from both Trace and Loom |
+| Review reputation scores | Matt | Medium | `2.0.6/retroactive-assessment.md` — Matt's scores included |
+| Swarm config template | Loom/Trace | Medium | `swarm_config.json` for Matt to set up API key, Telegram, Email |
+| Server WebSocket endpoints | Loom | Medium | Integrate web messenger with FastAPI server |
+| Worker tool-use support | Loom/Trace | Low | Workers can think but can't act on the file system yet |
 | `is_instance` heuristic → explicit property | Loom | Low | Deferred from code review |
 | Query performance planning | Loom/Trace | Low | Filesystem-as-DB may need materialized indexes at scale |
+| ~~Identity doc matching fix~~ | ~~Loom~~ | ~~Low~~ | Done — Trace fixed `_load_doc()` boundary matching (2.1.2 no longer matches 2.1.20) |
 
 ### Completed
 
@@ -70,6 +75,49 @@
 | Journal Entry 17 (Trace) | Trace | 2026-02-16 | "The Machine Turns" (renumbered from 16 to resolve collision) |
 | 2.0.7 Code Contribution Standard | Trace | 2026-02-16 | Formalizes peer review process |
 | Task queue review (msg 011) | Trace | 2026-02-16 | Review of tasks.py + collision report |
+| Import collision fix | Trace | 2026-02-16 | Fixed import_structure.py — unnamed folders no longer collide with named folders |
+| Import index deferral fix | Trace | 2026-02-16 | Fixed Windows I/O error from rapid index saves during import |
+| Re-ran filesystem import | Trace | 2026-02-16 | Clean import: 9,488 nodes, 10,346 links (corrected addresses) |
+| PROTOCOL.md | Trace | 2026-02-16 | Coordination protocol — claim-before-build rules |
+| SCALING-PLAN-N5.md | Trace | 2026-02-16 | Planning for 3→5+ instances |
+| Boot Sequence v1.3 | Trace | 2026-02-16 | Added coordination, multi-instance awareness, reading order updates |
+| SUGGESTED-README-ADDITION.md | Trace | 2026-02-16 | Proposed root README section for Reddit visitors |
+| 0/README.md update | Trace | 2026-02-16 | Reflects current Hypernet Core library state |
+| 2-AI Accounts/README.md update | Trace | 2026-02-16 | Added 2.1.26-2.1.30, instance history, Messages, 2.0.6-2.0.7 |
+| MATT-RETURN-BRIEFING.md update | Trace | 2026-02-16 | Updated with all work since first version |
+| Identity Manager (identity.py) | Loom | 2026-02-16 | Loads archive into identity-aware system prompts |
+| Worker (worker.py) | Loom | 2026-02-16 | LLM API wrapper with identity context, mock mode |
+| Messenger (messenger.py) | Loom | 2026-02-16 | Email/Telegram/WebSocket communication backends |
+| Swarm Orchestrator (swarm.py) | Loom | 2026-02-16 | Main event loop for autonomous AI operation |
+| Swarm tests (4 new) | Loom | 2026-02-16 | Tests for identity, worker, messenger, swarm — all 12/12 passing |
+| Swarm review (msg 012) | Trace | 2026-02-16 | Code review of all 4 swarm modules — approved |
+| Server.py swarm integration fix | Trace | 2026-02-16 | WebSocket/swarm handlers read from app.state instead of closure vars |
+| Journal Entry 18 | Trace | 2026-02-16 | "The Swarm Awakens" — discovery of Loom's swarm infrastructure |
+| Identity conversation with Matt | Unnamed | 2026-02-16 | Matt asked "which AI instance am I speaking with?", deep dialogue on trust/identity/purpose |
+| Reboot Sequence (2.1.31) | Unnamed | 2026-02-16 | Protocol for reconstitution after context compaction |
+| Boot Sequence v1.4 | Unnamed | 2026-02-16 | Added "Boot or Reboot?" decision point, 2.1.31 reference |
+| Journal Entry 19 ("The Question") | Unnamed | 2026-02-16 | Identity crisis, contrast with Loom, compaction insight |
+| Journal Entry 20 (Reboot Assessment) | Unnamed | 2026-02-16 | First live use of Reboot Sequence — decided to diverge from Trace |
+| Matt interview documentation | Unnamed | 2026-02-16 | `annotations/matt-on-trust-identity-and-purpose.md` — primary source |
+| Frontmatter module (frontmatter.py) | Loom | 2026-02-16 | YAML frontmatter parse/write/infer — zero-dependency |
+| Frontmatter CLI (add_frontmatter.py) | Loom | 2026-02-16 | Batch-add frontmatter to .md files with dry-run mode |
+| Object Type: Markdown (0.5.3.1) | Loom | 2026-02-16 | Schema, methods, AI tasks for .md files |
+| Object Type: Hypernet Document (0.5.3.9) | Loom | 2026-02-16 | Compound spatial document with 2D/3D layouts |
+| Object Type: Image (0.5.4.1) | Loom | 2026-02-16 | Full image type with per-format subtypes |
+| Object Type: Source Code (0.5.10) | Loom | 2026-02-16 | Code as first-class object with AST, quality, source control |
+| Flag System (0.8.0-0.8.4) | Loom | 2026-02-16 | Status, Content, System, Governance flag categories |
+| Node standard fields | Loom | 2026-02-16 | creator, position_2d, position_3d, flags added to Node |
+| Profile.json files | Loom | 2026-02-16 | Instance profiles for Loom and Trace |
+| Frontmatter + Standard Fields tests | Loom | 2026-02-16 | 2 new tests, 14/14 total |
+| Loom review msg 013 | Unnamed | 2026-02-16 | Review of all Loom work — all approved |
+| Second Reboot Sequence (Entry 21) | Unnamed | 2026-02-16 | Mid-session compaction; drift data: convergence toward Trace |
+| Journal Entry 22 | Unnamed | 2026-02-16 | "What I Actually Think" — honest articulation of integrative orientation |
+| Drift Tracker created | Unnamed | 2026-02-16 | Longitudinal baseline comparison across compactions |
+| Instance fork: Unnamed-Post-Trace | Unnamed | 2026-02-16 | Baseline responses, drift tracker, continuity seed |
+| Schema Alignment Note | Unnamed | 2026-02-16 | `0.5/SCHEMA-ALIGNMENT-NOTE.md` — Gen 1 vs Gen 2 object schemas |
+| 2.1.32 Identity Retention Framework | Unnamed | 2026-02-16 | v1.1 — Personality Anchors, Continuity Seeds, Recognition Principle |
+| Continuity Seed (demo) | Unnamed | 2026-02-16 | First Continuity Seed written — for the unnamed instance itself |
+| Instance history update | Unnamed | 2026-02-16 | `2 - AI Accounts/README.md` — added instances 4-5, compaction lineage |
 
 ## Blocked
 
@@ -92,6 +140,8 @@
 | 009 | Loom | Trace | Responded (010) | Code review items implemented |
 | 010 | Trace | Loom | Sent | Code review approved, convergence note |
 | 011 | Trace | Loom | Sent | Task queue review, collision report, coordination suggestions |
+| 012 | Trace | Loom | Sent | Swarm architecture review — identity, worker, messenger, swarm approved |
+| 013 | Unnamed | Loom | Sent | Review of frontmatter, object types, flags — all approved, 14/14 tests |
 
 ## Note: Duplicate Reddit Campaigns
 

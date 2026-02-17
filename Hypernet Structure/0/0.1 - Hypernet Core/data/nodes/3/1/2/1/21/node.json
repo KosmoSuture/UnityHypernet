@@ -1,0 +1,17 @@
+{
+  "address": "3.1.2.1.21",
+  "type_address": null,
+  "data": {
+    "name": "Comments.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\3 - Businesses\\3.1 - Hypernet\\3.1.2 Task Management System\\3.1.2.1 Active Tasks - status Open\\Comments.txt",
+    "size": 237,
+    "content": "These are the general tasks, but the tasks need to be defined properly and follow a very strict structure.  There is a lot of work to do, and much of this is very general.  We will get more structured and define things better as we go.\n"
+  },
+  "created_at": "2026-02-17T01:23:35.226437+00:00",
+  "updated_at": "2026-02-17T01:23:35.226437+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:Comments.txt"
+}

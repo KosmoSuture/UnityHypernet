@@ -1,0 +1,17 @@
+{
+  "address": "1.0.2",
+  "type_address": null,
+  "data": {
+    "name": "General.txt",
+    "type": "file",
+    "extension": ".txt",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.0 People definitions\\General.txt",
+    "size": 64,
+    "content": "Placeholder so folders show up.  Much work to be done expanding."
+  },
+  "created_at": "2026-02-15T11:54:05.860124+00:00",
+  "updated_at": "2026-02-15T11:54:05.860124+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:General.txt"
+}

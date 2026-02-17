@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.3.241",
+  "type_address": null,
+  "data": {
+    "name": "3076c596659ec316.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\links\\3076c596659ec316.json",
+    "size": 297,
+    "content": "{\n  \"from_address\": \"0.1.11.4.0.1.0.23\",\n  \"to_address\": \"0.1.11.4.0.1.0.23.1\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-17T01:20:10.913046+00:00\",\n  \"sort_order\": null\n}"
+  },
+  "created_at": "2026-02-17T01:22:06.820178+00:00",
+  "updated_at": "2026-02-17T01:22:06.820178+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:3076c596659ec316.json"
+}

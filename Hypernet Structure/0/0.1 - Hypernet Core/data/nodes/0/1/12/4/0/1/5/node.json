@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.0.1.5",
+  "type_address": null,
+  "data": {
+    "name": "5",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\0\\1\\5",
+    "content": "{\n  \"address\": \"0.1.5\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"requirements.txt\",\n    \"type\": \"file\",\n    \"extension\": \".txt\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\requirements.txt\",\n    \"size\": 327,\n    \"content\": \"# Hypernet Core \\u2014 Python Dependencies\\n# The core library (address, node, link, store, graph) has ZERO external dependencies.\\n# Only the API server requires these packages.\\n\\n# API Server\\nfastapi>=0.109.0\\nuvicorn[standard]>=0.27.0\\npydantic>=2.5.0\\n\\n# Development / Testing (optional)\\n# pytest>=7.4.0\\n# httpx>=0.26.0\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:04.223060+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:04.223060+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:requirements.txt\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:15.931767+00:00",
+  "updated_at": "2026-02-17T01:23:15.931767+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:5"
+}

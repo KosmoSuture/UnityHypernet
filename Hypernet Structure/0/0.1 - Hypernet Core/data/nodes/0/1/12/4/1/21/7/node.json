@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.21.7",
+  "type_address": null,
+  "data": {
+    "name": "7",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\21\\7",
+    "content": "{\n  \"address\": \"1.21.7\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.21.7 - Contributions\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.21 Pedro Hillsong\\\\1.21.7 - Contributions\"\n  },\n  \"created_at\": \"2026-02-15T11:54:08.846282+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:08.846282+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.21.7 - Contributions\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:20.100925+00:00",
+  "updated_at": "2026-02-17T01:23:20.100925+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:7"
+}

@@ -1,0 +1,17 @@
+{
+  "address": "0.1.11.1.0.1.12",
+  "type_address": null,
+  "data": {
+    "name": "v0001.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\history\\0\\1\\v0001.json",
+    "size": 554,
+    "content": "{\n  \"version\": 1,\n  \"content_hash\": \"1a35fb6a62904c6f\",\n  \"snapshot_at\": \"2026-02-17T01:21:58.224479+00:00\",\n  \"node\": {\n    \"address\": \"0.1\",\n    \"type_address\": null,\n    \"data\": {\n      \"name\": \"0.1 - Hypernet Core\",\n      \"type\": \"folder\",\n      \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\"\n    },\n    \"created_at\": \"2026-02-17T01:20:04.715502+00:00\",\n    \"updated_at\": \"2026-02-17T01:20:04.715502+00:00\",\n    \"deleted_at\": null,\n    \"source_type\": \"import\",\n    \"source_id\": \"folder:0.1 - Hypernet Core\"\n  }\n}"
+  },
+  "created_at": "2026-02-17T01:22:02.645647+00:00",
+  "updated_at": "2026-02-17T01:22:02.645647+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:v0001.json"
+}

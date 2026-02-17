@@ -8,8 +8,8 @@
     "content": "# 1.2.6.2 - Data Permissions\n\n**Hypernet Address:** `1.2.6.2`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Data Permissions & Access\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder manages specific permissions for AI companies and third-party integrations to access personal data.\n\n---\n\n## AI Company Access\n\nPermissions for AI companies to access data:\n\n**Anthropic (Claude):**\n- Status: Not yet configured\n- Access Level: To be determined\n- Data Categories: To be determined\n\n**OpenAI (ChatGPT):**\n- Status: Not yet configured\n- Access Level: To be determined\n- Data Categories: To be determined\n\n---\n\n## Integration Permissions\n\nPermissions for third-party integrations:\n\n**Google Services:**\n- Status: Not yet connected\n- Access: To be configured\n\n**Microsoft Services:**\n- Status: Not yet connected\n- Access: To be configured\n\n---\n\n**Status:** Pending Configuration\n**AI Access:** Explicit permission-based access\n",
     "content_file": "README.md"
   },
-  "created_at": "2026-02-15T11:54:08.152180+00:00",
-  "updated_at": "2026-02-15T11:54:08.152180+00:00",
+  "created_at": "2026-02-17T01:23:31.156312+00:00",
+  "updated_at": "2026-02-17T01:23:31.156312+00:00",
   "deleted_at": null,
   "source_type": "import",
   "source_id": "folder:1.2.6.2 - Data Permissions"

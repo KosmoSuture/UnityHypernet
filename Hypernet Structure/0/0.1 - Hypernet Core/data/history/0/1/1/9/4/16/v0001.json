@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "9f353f6f3ffd5ca6",
+  "snapshot_at": "2026-02-17T01:21:58.777784+00:00",
+  "node": {
+    "address": "0.1.1.9.4.16",
+    "type_address": null,
+    "data": {
+      "name": "web_page.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\models\\web_page.py",
+      "size": 1507,
+      "content": "\"\"\"\nWebPage Model\n\nSQLAlchemy model for saved web pages.\n\nImplements: 0.0.7 - Web Types / WebPage.md\n\"\"\"\n\nfrom sqlalchemy import Column, String, Text, DateTime, ForeignKey\nfrom sqlalchemy.dialects.postgresql import UUID\nfrom sqlalchemy.orm import relationship\n\nfrom app.models.base import OwnedObject\n\n\nclass WebPage(OwnedObject):\n    \"\"\"\n    Saved web pages - full page archives, article content, research.\n    \"\"\"\n\n    __tablename__ = \"web_pages\"\n\n    # Required\n    url = Column(String(2048), nullable=False, index=True)\n    title = Column(String(500), nullable=False, index=True)\n    saved_at = Column(DateTime(timezone=True), nullable=False, index=True)\n\n    # Optional\n    html_content = Column(Text, nullable=True)\n    text_content = Column(Text, nullable=True)\n    screenshot_id = Column(UUID(as_uuid=True), ForeignKey(\"media.id\", ondelete=\"SET NULL\"), nullable=True)\n\n    # Metadata extracted from page\n    author = Column(String(200), nullable=True)\n    published_at = Column(DateTime(timezone=True), nullable=True)\n    site_name = Column(String(200), nullable=True)\n    description = Column(Text, nullable=True)\n\n    # Archive\n    archive_path = Column(String(512), nullable=True)\n\n    # Relationships\n    user = relationship(\"User\", foreign_keys=[OwnedObject.user_id])\n    screenshot = relationship(\"Media\", foreign_keys=[screenshot_id], post_update=True)\n\n    def __repr__(self):\n        return f\"<WebPage(id={self.id}, title={self.title[:50]})>\"\n"
+    },
+    "created_at": "2026-02-17T01:20:05.026057+00:00",
+    "updated_at": "2026-02-17T01:20:05.026057+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:web_page.py"
+  }
+}

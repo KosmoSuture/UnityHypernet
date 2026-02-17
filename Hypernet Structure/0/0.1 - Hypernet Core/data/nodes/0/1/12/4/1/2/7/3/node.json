@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.2.7.3",
+  "type_address": null,
+  "data": {
+    "name": "3",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\2\\7\\3",
+    "content": "{\n  \"address\": \"1.2.7.3\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.2.7.3 - Other Contributions\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.2 Sarah Schaeffer\\\\1.2.7 - Contributions\\\\1.2.7.3 - Other Contributions\",\n    \"content\": \"# 1.2.7.3 - Other Contributions\\n\\n**Hypernet Address:** `1.2.7.3`\\n**Owner:** Sarah Schaeffer (1.2)\\n**Category:** Contributions - Other\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores other forms of contributions that don't fit into code, documentation, or design categories.\\n\\n---\\n\\n## What Goes Here\\n\\n- Presentations and talks\\n- Teaching materials\\n- Mentoring resources\\n- Community contributions\\n- Video content\\n- Podcasts or audio\\n- Research and analysis\\n- Translations\\n- Event organization\\n\\n---\\n\\n## Privacy Considerations\\n\\n**Privacy Level:** Varies by contribution type\\n\\n---\\n\\n## Examples\\n\\n```\\n1.2.7.3 - Other Contributions/\\n\\u251c\\u2500\\u2500 presentations/\\n\\u251c\\u2500\\u2500 teaching-materials/\\n\\u251c\\u2500\\u2500 community-work/\\n\\u2514\\u2500\\u2500 research/\\n```\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Depends on content type and permissions\\n\",\n    \"content_file\": \"README.md\"\n  },\n  \"created_at\": \"2026-02-15T11:54:08.326118+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:08.326118+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.2.7.3 - Other Contributions\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:19.644573+00:00",
+  "updated_at": "2026-02-17T01:23:19.644573+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:3"
+}

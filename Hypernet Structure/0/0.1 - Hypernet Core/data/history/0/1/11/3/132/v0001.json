@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "0c28f1b53be3a43b",
+  "snapshot_at": "2026-02-17T01:22:05.466975+00:00",
+  "node": {
+    "address": "0.1.11.3.132",
+    "type_address": null,
+    "data": {
+      "name": "aa2807b7481c9d0f.json",
+      "type": "file",
+      "extension": ".json",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\links\\aa2807b7481c9d0f.json",
+      "size": 269,
+      "content": "{\n  \"from_address\": \"0.0\",\n  \"to_address\": \"0.0.4\",\n  \"link_type\": \"0.6.3\",\n  \"relationship\": \"contains\",\n  \"address\": null,\n  \"strength\": 1.0,\n  \"bidirectional\": false,\n  \"data\": {},\n  \"created_at\": \"2026-02-17T01:20:04.702165+00:00\",\n  \"sort_order\": null\n}"
+    },
+    "created_at": "2026-02-17T01:20:07.943518+00:00",
+    "updated_at": "2026-02-17T01:20:07.943518+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:aa2807b7481c9d0f.json"
+  }
+}

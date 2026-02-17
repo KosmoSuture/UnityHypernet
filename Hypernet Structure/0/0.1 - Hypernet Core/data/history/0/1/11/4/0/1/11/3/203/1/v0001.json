@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "6a82300a560f34fb",
+  "snapshot_at": "2026-02-17T01:22:34.232847+00:00",
+  "node": {
+    "address": "0.1.11.4.0.1.11.3.203.1",
+    "type_address": null,
+    "data": {
+      "name": "node.json",
+      "type": "file",
+      "extension": ".json",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\11\\3\\203\\node.json",
+      "size": 815,
+      "content": "{\n  \"address\": \"0.1.11.3.203\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"fd0d6a4167693f9a.json\",\n    \"type\": \"file\",\n    \"extension\": \".json\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\links\\\\fd0d6a4167693f9a.json\",\n    \"size\": 273,\n    \"content\": \"{\\n  \\\"from_address\\\": \\\"0.1.2\\\",\\n  \\\"to_address\\\": \\\"0.1.2.1\\\",\\n  \\\"link_type\\\": \\\"0.6.3\\\",\\n  \\\"relationship\\\": \\\"contains\\\",\\n  \\\"address\\\": null,\\n  \\\"strength\\\": 1.0,\\n  \\\"bidirectional\\\": false,\\n  \\\"data\\\": {},\\n  \\\"created_at\\\": \\\"2026-02-17T01:20:05.120571+00:00\\\",\\n  \\\"sort_order\\\": null\\n}\"\n  },\n  \"created_at\": \"2026-02-17T01:20:09.613452+00:00\",\n  \"updated_at\": \"2026-02-17T01:20:09.613452+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:fd0d6a4167693f9a.json\"\n}"
+    },
+    "created_at": "2026-02-17T01:20:18.233840+00:00",
+    "updated_at": "2026-02-17T01:20:18.233840+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:node.json"
+  }
+}

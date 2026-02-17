@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.2.7.2.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\2\\7\\2\\1",
+    "content": "{\n  \"address\": \"1.2.7.2.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.2 Sarah Schaeffer\\\\1.2.7 - Contributions\\\\1.2.7.2 - Design Work\\\\README.md\",\n    \"size\": 852,\n    \"content\": \"# 1.2.7.2 - Design Work\\n\\n**Hypernet Address:** `1.2.7.2`\\n**Owner:** Sarah Schaeffer (1.2)\\n**Category:** Contributions - Design\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores design contributions including graphics, layouts, visual designs, and creative work.\\n\\n---\\n\\n## What Goes Here\\n\\n- Graphic designs\\n- UI/UX designs\\n- Visual assets\\n- Logos and branding\\n- Illustrations\\n- Layout designs\\n- Creative artwork\\n\\n---\\n\\n## Privacy Considerations\\n\\n**Privacy Level:** Varies - Some designs may be public portfolio pieces, others proprietary\\n\\n---\\n\\n## Examples\\n\\n```\\n1.2.7.2 - Design Work/\\n\\u251c\\u2500\\u2500 graphics/\\n\\u251c\\u2500\\u2500 ui-ux-designs/\\n\\u251c\\u2500\\u2500 logos-and-branding/\\n\\u2514\\u2500\\u2500 illustrations/\\n```\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Depends on licensing and portfolio permissions\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:08.315118+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:08.315118+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:19.624573+00:00",
+  "updated_at": "2026-02-17T01:23:19.624573+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

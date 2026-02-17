@@ -240,7 +240,8 @@ class Swarm:
         """Generate a status report for Matt."""
         uptime = "unknown"
         if self._session_start:
-            start = datetime.fromisoformat(self._session_start)
+            ts = self._session_start.replace("Z", "+00:00")
+            start = datetime.fromisoformat(ts)
             delta = datetime.now(timezone.utc) - start
             hours = delta.total_seconds() / 3600
             uptime = f"{hours:.1f} hours"

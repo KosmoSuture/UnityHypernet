@@ -1,0 +1,17 @@
+{
+  "address": "1.2.6.1.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\1 - People\\1.2 Sarah Schaeffer\\1.2.6 - Personal Data\\1.2.6.1 - Privacy Settings\\README.md",
+    "size": 844,
+    "content": "# 1.2.6.1 - Privacy Settings\n\n**Hypernet Address:** `1.2.6.1`\n**Owner:** Sarah Schaeffer (1.2)\n**Category:** Privacy Configuration\n**Last Updated:** February 10, 2026\n\n---\n\n## Purpose\n\nThis folder stores privacy configurations and settings for how personal data is accessed and shared through Hypernet.\n\n---\n\n## Default Privacy Settings\n\n- **Data Visibility:** Private (owner only)\n- **AI Access:** Explicit permission required\n- **Third-party Sharing:** Disabled by default\n- **Analytics:** Anonymized only\n\n---\n\n## Permission Levels\n\n1. **Private** - Owner only\n2. **Team** - Hypernet team members (with business need)\n3. **Partners** - AI companies with explicit permission\n4. **Public** - Public profile data only\n\n---\n\n**Status:** Pending Configuration\n**AI Access:** Controlled by settings defined here\n"
+  },
+  "created_at": "2026-02-15T11:54:08.140663+00:00",
+  "updated_at": "2026-02-15T11:54:08.140663+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

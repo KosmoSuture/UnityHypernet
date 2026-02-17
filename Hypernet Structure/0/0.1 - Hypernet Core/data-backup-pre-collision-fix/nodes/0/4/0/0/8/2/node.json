@@ -1,0 +1,17 @@
+{
+  "address": "0.4.0.0.8.2",
+  "type_address": null,
+  "data": {
+    "name": "Contact.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.4 - Object Type Registry\\0.0.8 - Life Types\\Contact.md",
+    "size": 1571,
+    "content": "# Contact - Person Contact Info\n\n**Type ID:** `hypernet.life.contact`\n**Version:** 1.0\n**Category:** 0.0.8 - Life Types\n**Parent:** BaseObject\n**Status:** Active\n**Created:** 2026-02-04\n\n---\n\n## Purpose\n\nContact information for people (address book, phone contacts, etc.).\n\n---\n\n## Required Fields\n\n```yaml\ndisplay_name: String(200)\n```\n\n---\n\n## Optional Fields\n\n```yaml\nfirst_name: String(100)\nmiddle_name: String(100)\nlast_name: String(100)\n\n# Contact Methods\nemail_addresses: Text[]\nphone_numbers: Text[]\n  - [\"+1-555-0123\", ...]\n\n# Address\nstreet_address: String(500)\ncity: String(100)\nstate: String(100)\npostal_code: String(20)\ncountry: String(100)\n\n# Social\ncompany: String(200)\njob_title: String(200)\nwebsite: String(500)\n\n# Profile\nprofile_photo_id: UUID (FK to Photo)\nbirthday: Date\nnotes: Text\n\n# Metadata\nnickname: String(100)\ntags: Text[]\n  - [\"family\", \"work\", \"friends\"]\n```\n\n---\n\n## Metadata Schema\n\n```json\n{\n  \"google_contacts\": {\n    \"contact_id\": \"abc123\",\n    \"groups\": [\"My Contacts\", \"Starred\"]\n  },\n  \"social_profiles\": {\n    \"twitter\": \"@username\",\n    \"linkedin\": \"profile-url\",\n    \"instagram\": \"@handle\"\n  },\n  \"important_dates\": {\n    \"anniversary\": \"2020-06-15\"\n  }\n}\n```\n\n---\n\n## Relationships\n\n```yaml\nOutgoing:\n  - source: Integration (Google Contacts, iCloud)\n  - has_photo: Photo (profile picture)\n\nIncoming:\n  - contacted_via: Email, SMS, Call\n  - related_to: Event, Task\n```\n\n---\n\n**Status:** Active - Phase 1 Priority\n**Version:** 1.0\n"
+  },
+  "created_at": "2026-02-15T11:54:05.120341+00:00",
+  "updated_at": "2026-02-15T11:54:05.120341+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:Contact.md"
+}

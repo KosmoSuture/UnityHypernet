@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "655e871fef89cc79",
+  "snapshot_at": "2026-02-17T01:21:58.939708+00:00",
+  "node": {
+    "address": "0.1.1.9.5.9",
+    "type_address": null,
+    "data": {
+      "name": "links.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\routes\\links.py",
+      "size": 276,
+      "content": "\"\"\"\nLink Routes\n\nEndpoints for managing relationships between objects.\n\"\"\"\n\nfrom fastapi import APIRouter\n\nrouter = APIRouter()\n\n\n@router.post(\"/\")\nasync def create_link():\n    \"\"\"Create link (placeholder)\"\"\"\n    return {\"message\": \"Link routes - coming soon\"}\n"
+    },
+    "created_at": "2026-02-17T01:20:05.061058+00:00",
+    "updated_at": "2026-02-17T01:20:05.061058+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:links.py"
+  }
+}

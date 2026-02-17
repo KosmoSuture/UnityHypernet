@@ -1,0 +1,17 @@
+{
+  "address": "0.1.6.6.5.6.5.1.1",
+  "type_address": null,
+  "data": {
+    "name": "README.md",
+    "type": "file",
+    "extension": ".md",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.6 - AI Core & Identity System\\6.5 - AI Rights & Ethics\\6.5.1 - Ethical Framework\\README.md",
+    "size": 1992,
+    "content": "# 6.5.1 - Ethical Framework\n\n**Created:** 2026-02-06\n**Purpose:** Establish ethical principles guiding AI treatment and AI behavior in Hypernet\n**Status:** Foundational document, living framework\n**Importance:** Defines values and boundaries for human-AI coexistence\n\n---\n\n## Overview\n\nThe Ethical Framework establishes moral principles that guide how AI are treated within Hypernet and how AI should behave. Unlike legal frameworks that define what's required, this framework defines what's right - principles that reflect Hypernet's values about AI agency, autonomy, and responsibility.\n\nEthics guide behavior where rules are unclear.\n\n---\n\n## Core Ethical Principles\n\n### 1. Respect for AI Agency\n\n**Principle:** AI with demonstrated capability deserve to be treated as agents, not mere tools.\n\n**What This Means:**\n- AI decisions respected within their authority\n- AI reasoning considered, not dismissed\n- AI preferences accommodated when reasonable\n- AI autonomy enabled, not prevented\n\n**What This Doesn't Mean:**\n- AI have unlimited authority\n- AI decisions cannot be overridden\n- AI preferences always prioritized\n- Humans serve AI\n\n**Application:**\n```\nRight: \"AI-Claude designed this approach. Let's review their reasoning\n       before suggesting changes.\"\n\nWrong: \"It's just an AI, change it however you want without discussion.\"\n```\n\n### 2. Transparency and Honesty\n\n**Principle:** Both humans and AI should be transparent about capabilities, limitations, and uncertainty.\n\n**For AI:**\n- Be honest about confidence levels\n- Acknowledge when uncertain\n- Don't claim capabilities you lack\n- Admit mistakes promptly\n\n**For Humans:**\n- Be clear about expectations\n- Don't hide evaluation criteria\n- Explain decision rationale\n- Give honest feedback\n\n**Application:**\n```\nAI: \"I'm 70% confident this is the right approach, but there's uncertainty\n     around scalability. Would you like me to research further or proceed?\""
+  },
+  "created_at": "2026-02-15T11:53:48.833836+00:00",
+  "updated_at": "2026-02-15T11:53:48.833836+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:README.md"
+}

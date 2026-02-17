@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.4.7",
+  "type_address": null,
+  "data": {
+    "name": "7",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\4\\7",
+    "content": "{\n  \"address\": \"1.4.7\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.4.7 - Contributions\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.4 Bridget Schaeffer\\\\1.4.7 - Contributions\",\n    \"content\": \"# 1.4.7 - Contributions\\n\\n**Hypernet Address:** `1.4.7`\\n**Owner:** Bridget Schaeffer (1.4)\\n**Category:** Contributions & Output\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores contributions, outputs, and deliverables including code, documentation, design work, and other creative outputs.\\n\\n---\\n\\n## Structure\\n\\n### 1.4.7.0 - Code Contributions\\nCode, scripts, and technical contributions.\\n\\n### 1.4.7.1 - Documentation\\nWritten documentation and guides created.\\n\\n### 1.4.7.2 - Design Work\\nDesign files, graphics, and creative work.\\n\\n### 1.4.7.3 - Other Contributions\\nOther forms of contributions and outputs.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Varies by contribution type and licensing\\n\",\n    \"content_file\": \"README.md\"\n  },\n  \"created_at\": \"2026-02-15T11:54:10.992010+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:10.992010+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.4.7 - Contributions\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:22.096950+00:00",
+  "updated_at": "2026-02-17T01:23:22.096950+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:7"
+}

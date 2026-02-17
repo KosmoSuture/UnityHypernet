@@ -1,0 +1,16 @@
+{
+  "address": "0.1.12.4.1.5.9.1",
+  "type_address": null,
+  "data": {
+    "name": "1",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\5\\9\\1",
+    "content": "{\n  \"address\": \"1.5.9.1\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"README.md\",\n    \"type\": \"file\",\n    \"extension\": \".md\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.5 Mark Schaeffer\\\\1.5.9 - Notes & Knowledge\\\\README.md\",\n    \"size\": 684,\n    \"content\": \"# 1.5.9 - Notes & Knowledge\\n\\n**Hypernet Address:** `1.5.9`\\n**Owner:** Mark Schaeffer (1.5)\\n**Category:** Notes & Knowledge Management\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores personal notes, research, learning materials, and knowledge management organized by type.\\n\\n---\\n\\n## Structure\\n\\n### 1.5.9.0 - Personal Notes\\nGeneral notes, thoughts, and personal writing.\\n\\n### 1.5.9.1 - Research\\nResearch notes, investigation, and study materials.\\n\\n### 1.5.9.2 - Learning Materials\\nEducational content, course notes, and learning resources.\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Restricted - personal notes and knowledge\\n\"\n  },\n  \"created_at\": \"2026-02-15T11:54:12.029418+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:12.029418+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:README.md\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:23:22.961796+00:00",
+  "updated_at": "2026-02-17T01:23:22.961796+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:1"
+}

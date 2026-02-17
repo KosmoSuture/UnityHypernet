@@ -1,0 +1,17 @@
+{
+  "address": "0.1.12.4.1.6.0.2",
+  "type_address": null,
+  "data": {
+    "name": "node.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data-backup-pre-collision-fix\\nodes\\1\\6\\0\\node.json",
+    "size": 1688,
+    "content": "{\n  \"address\": \"1.6.0\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"1.6.0 - Profile & Identity\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\1 - People\\\\1.6 Richard Schaeffer\\\\1.6.0 - Profile & Identity\",\n    \"content\": \"# 1.6.0 - Profile & Identity\\n\\n**Hypernet Address:** `1.6.0`\\n**Owner:** Richard Schaeffer (1.6)\\n**Category:** Personal Profile & Identity\\n**Last Updated:** February 10, 2026\\n\\n---\\n\\n## Purpose\\n\\nThis folder stores Richard's core identity information including biographical details, professional summary, contact information, and personal attributes.\\n\\n---\\n\\n## What Goes Here\\n\\n### Identity Information\\n- **Basic Information:** Full name, date of birth, contact details\\n- **Professional Identity:** Current role, title, organization\\n- **Skills & Expertise:** Technical skills, soft skills, certifications\\n- **Education:** Degrees, certifications, training programs\\n- **Work History:** Professional experience and career timeline\\n- **Biography:** Personal and professional story\\n- **Profile Attributes:** Personal characteristics and preferences\\n\\n---\\n\\n## Related Sections\\n\\n- **1.6.4** - Relationships (professional and personal network)\\n- **1.6.7** - Contributions (professional accomplishments)\\n- **1.6.6** - Personal Data (Hypernet data store)\\n\\n---\\n\\n**Status:** Active Directory\\n**AI Access:** Strictly controlled - explicit permission required\\n\",\n    \"content_file\": \"README.md\"\n  },\n  \"created_at\": \"2026-02-15T11:54:12.073451+00:00\",\n  \"updated_at\": \"2026-02-15T11:54:12.073451+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:1.6.0 - Profile & Identity\"\n}"
+  },
+  "created_at": "2026-02-17T01:23:23.038273+00:00",
+  "updated_at": "2026-02-17T01:23:23.038273+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:node.json"
+}

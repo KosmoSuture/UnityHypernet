@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "content_hash": "99e76b7be386e4d1",
+  "snapshot_at": "2026-02-17T01:21:59.741229+00:00",
+  "node": {
+    "address": "0.1.6.6.2",
+    "type_address": null,
+    "data": {
+      "name": "6.2 - AI Agent Development",
+      "type": "folder",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.6 - AI Core & Identity System\\6.2 - AI Agent Development"
+    },
+    "created_at": "2026-02-17T01:20:05.224088+00:00",
+    "updated_at": "2026-02-17T01:20:05.224088+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "folder:6.2 - AI Agent Development"
+  }
+}

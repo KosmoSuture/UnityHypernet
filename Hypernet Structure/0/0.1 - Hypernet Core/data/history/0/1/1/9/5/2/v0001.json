@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "4412e1e8eb0af20a",
+  "snapshot_at": "2026-02-17T01:21:58.809294+00:00",
+  "node": {
+    "address": "0.1.1.9.5.2",
+    "type_address": null,
+    "data": {
+      "name": "albums.py",
+      "type": "file",
+      "extension": ".py",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\0.1.1 - Core System\\app\\routes\\albums.py",
+      "size": 258,
+      "content": "\"\"\"\nAlbum Routes\n\nEndpoints for album management.\n\"\"\"\n\nfrom fastapi import APIRouter\n\nrouter = APIRouter()\n\n\n@router.post(\"/\")\nasync def create_album():\n    \"\"\"Create album (placeholder)\"\"\"\n    return {\"message\": \"Album routes - coming soon\"}\n"
+    },
+    "created_at": "2026-02-17T01:20:05.037057+00:00",
+    "updated_at": "2026-02-17T01:20:05.037057+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:albums.py"
+  }
+}

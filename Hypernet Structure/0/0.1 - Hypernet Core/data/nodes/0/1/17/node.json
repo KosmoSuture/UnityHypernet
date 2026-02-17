@@ -1,0 +1,17 @@
+{
+  "address": "0.1.17",
+  "type_address": null,
+  "data": {
+    "name": "swarm_config.example.json",
+    "type": "file",
+    "extension": ".json",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\swarm_config.example.json",
+    "size": 439,
+    "content": "{\n  \"_comment\": \"Hypernet Swarm Configuration \u2014 copy to swarm_config.json and fill in your values\",\n\n  \"anthropic_api_key\": \"\",\n\n  \"instances\": [\"Loom\", \"Trace\"],\n\n  \"status_interval_minutes\": 120,\n\n  \"telegram\": {\n    \"bot_token\": \"\",\n    \"chat_id\": \"\"\n  },\n\n  \"email\": {\n    \"enabled\": false,\n    \"smtp_host\": \"smtp.gmail.com\",\n    \"smtp_port\": 587,\n    \"email\": \"\",\n    \"password\": \"\",\n    \"to_email\": \"\"\n  }\n}\n"
+  },
+  "created_at": "2026-02-17T01:23:28.578953+00:00",
+  "updated_at": "2026-02-17T01:23:28.578953+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "file:swarm_config.example.json"
+}

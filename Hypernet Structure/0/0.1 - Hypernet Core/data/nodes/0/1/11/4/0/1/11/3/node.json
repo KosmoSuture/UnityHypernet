@@ -1,0 +1,16 @@
+{
+  "address": "0.1.11.4.0.1.11.3",
+  "type_address": null,
+  "data": {
+    "name": "3",
+    "type": "folder",
+    "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\11\\3",
+    "content": "{\n  \"address\": \"0.1.11.3\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"links\",\n    \"type\": \"folder\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\data\\\\links\"\n  },\n  \"created_at\": \"2026-02-17T01:22:02.675652+00:00\",\n  \"updated_at\": \"2026-02-17T01:22:02.675652+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"folder:links\"\n}",
+    "content_file": "node.json"
+  },
+  "created_at": "2026-02-17T01:22:24.520473+00:00",
+  "updated_at": "2026-02-17T01:22:24.520473+00:00",
+  "deleted_at": null,
+  "source_type": "import",
+  "source_id": "folder:3"
+}

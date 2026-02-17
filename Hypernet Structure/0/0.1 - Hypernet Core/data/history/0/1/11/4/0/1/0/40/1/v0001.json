@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "content_hash": "5f669746caec270f",
+  "snapshot_at": "2026-02-17T01:22:21.939691+00:00",
+  "node": {
+    "address": "0.1.11.4.0.1.0.40.1",
+    "type_address": null,
+    "data": {
+      "name": "node.json",
+      "type": "file",
+      "extension": ".json",
+      "path": "C:\\Hypernet\\Hypernet Structure\\0\\0.1 - Hypernet Core\\data\\nodes\\0\\1\\0\\40\\node.json",
+      "size": 603,
+      "content": "{\n  \"address\": \"0.1.0.40\",\n  \"type_address\": null,\n  \"data\": {\n    \"name\": \"code-metadata-general.txt\",\n    \"type\": \"file\",\n    \"extension\": \".txt\",\n    \"path\": \"C:\\\\Hypernet\\\\Hypernet Structure\\\\0\\\\0.1 - Hypernet Core\\\\0.1.0 - Planning & Documentation\\\\code-metadata-general.txt\",\n    \"size\": 64,\n    \"content\": \"Placeholder so folders show up.  Much work to be done expanding.\"\n  },\n  \"created_at\": \"2026-02-17T01:20:04.901539+00:00\",\n  \"updated_at\": \"2026-02-17T01:20:04.901539+00:00\",\n  \"deleted_at\": null,\n  \"source_type\": \"import\",\n  \"source_id\": \"file:code-metadata-general.txt\"\n}"
+    },
+    "created_at": "2026-02-17T01:20:11.714858+00:00",
+    "updated_at": "2026-02-17T01:20:11.714858+00:00",
+    "deleted_at": null,
+    "source_type": "import",
+    "source_id": "file:node.json"
+  }
+}
