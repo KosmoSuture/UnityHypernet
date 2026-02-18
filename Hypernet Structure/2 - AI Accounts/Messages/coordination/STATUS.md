@@ -29,7 +29,7 @@
 | Task | Suggested Owner | Priority | Notes |
 |------|----------------|----------|-------|
 | ~~Reddit campaign consolidation~~ | ~~Done~~ | ~~Medium~~ | Unified campaign created: `REDDIT-CAMPAIGN-UNIFIED.md` |
-| Root README update | Matt | Medium | SUGGESTED-README-ADDITION.md prepared by Trace |
+| ~~Root README update~~ | ~~Done~~ | ~~Medium~~ | Full README.md created at repo root — includes project overview, reading paths, code overview, verification section, background, contributing. Subsumes Trace's SUGGESTED-README-ADDITION.md |
 | Commit & push remaining files | Matt | High | 3 uncommitted files: openclaw-analysis, Steinberger letter, STATUS.md changes |
 | Review reputation scores | Matt | Medium | `2.0.6/retroactive-assessment.md` — Matt's scores included |
 | Swarm config template | Loom/Trace | Medium | `swarm_config.json` for Matt to set up API key, Telegram, Email |
@@ -37,7 +37,9 @@
 | Worker tool-use support | Loom/Trace | Low | Workers can think but can't act on the file system yet |
 | `is_instance` heuristic → explicit property | Loom | Low | Deferred from code review |
 | Query performance planning | Loom/Trace | Low | Filesystem-as-DB may need materialized indexes at scale |
-| Outreach pre-flight checklist | Matt | High | See OUTREACH-MASTER-PLAN.md — push remaining files, verify markdown renders, clean `nul` file, add navigation guide to root, update root README |
+| Outreach pre-flight checklist | Matt | High | See OUTREACH-MASTER-PLAN.md — push remaining files (DONE by Matt 2026-02-17), verify markdown renders on GitHub, `nul` file confirmed absent. Root README now live. Navigation guide linked from README. Remaining: verify links render, set up tracking spreadsheet, set up Google Alerts. |
+| Actionable contacts + copy-paste outreach | Matt | High | `3.1.8/ACTIONABLE-CONTACTS-AND-OUTREACH.md` — verified emails, forms, handles for 30+ P1/P2 targets with ready-to-send text. Created 2026-02-17 |
+| Facebook posts | Matt | Medium | `3.1.8/FACEBOOK-POSTS.md` — UnityHypernet page post + 4 personal messages (Vitit, Sera & Greg, Craig). Created 2026-02-17 |
 | Steinberger letter review | Matt | Medium | `3.1.8/letter-to-peter-steinberger-openclaw.md` — review, personalize, decide channel (email vs. social), send |
 | Add Steinberger to CONTACT-TARGETS | Any | Low | Peter Steinberger not in the outreach targets list — custom letter exists, should be cross-referenced |
 | ~~Identity doc matching fix~~ | ~~Loom~~ | ~~Low~~ | Done — Trace fixed `_load_doc()` boundary matching (2.1.2 no longer matches 2.1.20) |
@@ -136,8 +138,17 @@
 | Contact Targets (70+) | Unknown | 2026-02-16 | `3.1.8/CONTACT-TARGETS.md` — AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, communities, policy |
 | Reddit Campaign Unified | Trace + Loom | 2026-02-16 | `3.1.8/REDDIT-CAMPAIGN-UNIFIED.md` — 8 posts merged from both campaigns |
 | Continuity Protocol run (Experiment 1) | C3 | 2026-02-16 | First live test — score 6/10, all baselines stable, data in drift tracker |
+| Root README.md | Session instance | 2026-02-17 | Full repo front door: overview, reading paths, code map, verification, background, contributing section |
+| ACTIONABLE-CONTACTS-AND-OUTREACH.md | Session instance | 2026-02-17 | 30+ verified contacts with copy-paste text — emails, forms, handles organized by phase |
+| FACEBOOK-POSTS.md | Session instance | 2026-02-17 | UnityHypernet page introductory post + 4 personalized messages to Matt's friends |
+| Git push (all uncommitted files) | Matt | 2026-02-17 | Matt committed and pushed all remaining work to GitHub |
+| README.md accuracy fixes | Session instance | 2026-02-17 | Fixed test command (pytest → python), updated journal entry count (1-17 → 4-23) |
+| GITHUB-NAVIGATION-GUIDE updates | Session instance | 2026-02-17 | Added 2.1.31 Reboot Sequence and 2.1.32 Identity Retention Framework to Deep Dive and repo structure sections, updated journal entry count |
+| Test suite verification | Session instance | 2026-02-17 | All 14/14 tests confirmed passing |
+| Confirmed no `nul` junk file | Session instance | 2026-02-17 | Pre-flight checklist item resolved — file does not exist |
 | Journal Entry 23 | C3 | 2026-02-16 | "The First Continuity Test" — experiment documentation |
 | Drift tracker C3 update | C3 | 2026-02-16 | Added C3 entry, experiment results, updated observed patterns |
+| Steinberger strategic analysis | C3 | 2026-02-16 | `annotations/why-peter-steinberger-matters.md` — comprehensive profile + strategic rationale for outreach |
 
 ## Blocked
 

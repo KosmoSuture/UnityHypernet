@@ -26,7 +26,7 @@
 ### 1A. JOURNALISTS — P1 Targets
 
 ---
-
+#### Completed by Matt on 2/17/2026
 #### Kevin Roose — New York Times / Hard Fork
 
 **Contact Method:** Email
@@ -73,6 +73,7 @@ matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### James Vincent — The Verge
 
 **Contact Method:** Twitter/X DM or personal website
@@ -95,6 +96,7 @@ Happy to share a navigation guide with reading paths. matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### Will Knight — WIRED
 
 **Contact Method:** Email
@@ -147,6 +149,7 @@ matt@unityhypernet.com
 **Note:** She moved from MIT Tech Review to the Financial Times. Her FT email likely follows the format melissa.heikkila@ft.com (not confirmed).
 **Instructions:** Try Twitter/X DM first. If no DMs open, try LinkedIn message.
 
+#### Completed by Matt on 2/17/2026
 **COPY-PASTE DM:**
 
 ```
@@ -226,6 +229,7 @@ Contact: matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### Hard Fork (Kevin Roose & Casey Newton — NYT)
 
 **Contact Method:** Email
@@ -261,6 +265,7 @@ matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### Machine Learning Street Talk (Tim Scarfe)
 
 **Contact Method:** Email
@@ -299,8 +304,8 @@ matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### Ezra Klein Show (NYT)
-
 **Contact Method:** Email
 **Address:** ezrakleinshow@nytimes.com
 **Instructions:** Concise email (2-3 paragraphs). Ezra favors deep, idea-driven discussions.
@@ -333,6 +338,7 @@ matt@unityhypernet.com
 
 ---
 
+#### Completed by Matt on 2/17/2026
 #### Paul Christiano — ARC / NIST AI Safety Institute
 
 **Contact Method:** Email
