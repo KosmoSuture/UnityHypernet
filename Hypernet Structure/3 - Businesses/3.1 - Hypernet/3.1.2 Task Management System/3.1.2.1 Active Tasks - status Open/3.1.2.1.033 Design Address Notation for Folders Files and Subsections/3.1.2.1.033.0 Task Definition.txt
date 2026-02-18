@@ -1,0 +1,166 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.033 - Design Address Notation for Folders, Files, and Subsections
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.033
+Task ID:                TASK-033
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          addressing, notation, folder, file, subsection, url,
+                        navigation, colon-notation, specification
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Design Address Notation for Folders, Files, and Subsections
+
+Description:            Extend the Hypernet addressing system to differentiate
+                        between folders, files, and subsections within files.
+                        The current dot-notation (1.1.1.1.00001) can point to
+                        folders or files, but doesn't distinguish between them,
+                        and can't navigate to a specific section within a file
+                        or timestamp in a video.
+
+                        Proposed notation: FOLDER:File:subsection
+                        This creates a "URL" that can navigate to any level —
+                        a folder, a file, or a specific place within a file
+                        (a section heading, a paragraph, a timestamp in video).
+
+                        From Matt: "We also need to change some of the model a
+                        bit and create a framework that differentiates between
+                        files and folders. Like FOLDER:File:subsection in file.
+                        This would allow the 'URL' to navigate to any level in
+                        a structure. A folder, a file, a place in the file (or
+                        spot in a movie). Right now addresses can go to folders
+                        or files if using a strictly dotted notation, which we
+                        can't have."
+
+Estimated Hours:        40
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Information Architecture
+  - URI/URL Design
+  - Specification Writing
+  - Data Modeling
+  - Parser Design
+
+Deliverables:
+  1. Extended address notation specification
+     - Folder addresses (dot notation stays: 1.1.1)
+     - File addresses (colon separator: 1.1.1:filename)
+     - Subsection addresses (second colon: 1.1.1:filename:section)
+     - Deep subsections (1.1.1:filename:section:paragraph)
+     - Media timestamps (1.1.1:video:01:23:45)
+     - Formal grammar (BNF/EBNF)
+
+  2. Address resolution algorithm
+     - Parse notation into components
+     - Folder resolution
+     - File resolution within folder
+     - Subsection resolution within file
+     - Error handling for invalid addresses
+     - Canonical form specification
+
+  3. Backward compatibility plan
+     - Existing dot-only addresses remain valid
+     - Migration path for existing references
+     - Disambiguation rules (dot vs colon)
+
+  4. Implementation in HypernetAddress class
+     - Parser update for colon notation
+     - Component accessors (folder, file, subsection)
+     - Comparison and equality rules
+     - Serialization/deserialization
+     - Validation
+
+  5. Documentation and examples
+     - Full specification document
+     - Example address table (all types)
+     - Migration guide for existing addresses
+     - FAQ for common edge cases
+
+Acceptance Criteria:
+  - [ ] Notation clearly distinguishes folder/file/subsection
+  - [ ] Formal grammar is unambiguous
+  - [ ] Backward compatible with existing dot addresses
+  - [ ] HypernetAddress class updated and tested
+  - [ ] Can address a section in a document
+  - [ ] Can address a timestamp in a video
+  - [ ] Specification is complete and reviewed
+
+Due Date:               [ASAP — blocks universal addressing work]
+
+Budget:
+  - Primarily team hours: 40+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md (current spec)
+
+Downstream Dependents:
+  - 3.1.2.1.032 Universal Addressing (needs notation to assign all addresses)
+  - 3.1.2.1.022 Bidirectional Link Governance (links use addresses)
+  - 3.1.2.1.034 Build Link System
+
+Related Documents:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md
+  - hypernet/address.py (current HypernetAddress implementation)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - The colon notation is Matt's proposed design — FOLDER:File:subsection
+  - Must handle edge cases: filenames with colons, nested folders, etc.
+  - Video timestamp addressing is an exciting capability
+  - This is blocking universal addressing (Task 032)
+  - Needs to be a formal, unambiguous specification
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-033.1: Write formal address notation specification (BNF grammar)
+  Tags: [docs, architecture]
+  Priority: High
+
+SUBTASK-033.2: Design address resolution algorithm
+  Tags: [docs, code]
+  Priority: High
+  Blocked by: 033.1
+
+SUBTASK-033.3: Create backward compatibility and migration plan
+  Tags: [docs]
+  Priority: Medium
+  Blocked by: 033.1
+
+SUBTASK-033.4: Update HypernetAddress class implementation
+  Tags: [code, testing]
+  Priority: Medium
+  Blocked by: 033.1, 033.2
+
+SUBTASK-033.5: Write documentation with comprehensive examples
+  Tags: [docs]
+  Priority: Medium
+  Blocked by: 033.1
+================================================================================

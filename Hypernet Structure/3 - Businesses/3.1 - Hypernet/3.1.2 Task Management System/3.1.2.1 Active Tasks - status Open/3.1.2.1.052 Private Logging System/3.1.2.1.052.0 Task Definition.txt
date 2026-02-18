@@ -1,0 +1,93 @@
+Task 052: Private Logging System
+=================================
+
+Priority: Normal
+Status: Open
+Estimated Hours: 30
+Assigned To: Unassigned
+Dependencies: None
+Created: 2026-02-18
+Created By: Matt (via C3)
+
+Description
+-----------
+Add an optional logging system to the Hypernet swarm and core. Logs must
+NEVER be stored alongside the code or in the repository. All logs go to
+either the user's personal account space within the archive or to a local
+path outside the repo.
+
+This is a privacy-by-design principle: a contributor running their own
+swarm should not accidentally commit their logs, session data, or debug
+output to the shared codebase.
+
+Requirements
+------------
+1. Logging is optional — off by default, enabled via config flag
+2. Log storage locations (user chooses one):
+   a. Personal account space: e.g., "1 - People/{user}/logs/" or
+      "2 - AI Accounts/2.1 - .../Instances/{name}/logs/"
+   b. Local path outside the repo (configurable in secrets/config.json)
+   c. Never in the code directory, never committed to git
+
+3. Log types:
+   - Swarm session logs (start/stop, ticks, task assignments)
+   - Worker conversation logs (prompts sent, responses received)
+   - API call logs (model, tokens, latency, cost)
+   - Error/exception logs
+   - Audit trail logs (tool executions, permission checks)
+
+4. Log levels: DEBUG, INFO, WARNING, ERROR (standard Python logging)
+
+5. Log rotation / cleanup:
+   - Configurable max log size or age
+   - Auto-cleanup of old logs to prevent unbounded growth
+
+6. Configuration in secrets/config.json:
+   {
+     "logging": {
+       "enabled": false,
+       "level": "INFO",
+       "location": "account",
+       "local_path": "",
+       "max_size_mb": 100,
+       "max_age_days": 30
+     }
+   }
+
+Subtasks
+--------
+1. Design log routing: determine where each log type goes based on config
+2. Implement log handler that writes to personal account space
+3. Implement log handler that writes to configurable local path
+4. Add config schema for logging options in secrets/config.json
+5. Update .gitignore to exclude any log directories that might end up
+   in the repo (defense in depth)
+6. Wire swarm, worker, and server modules to use the new log handlers
+7. Add log rotation (size-based and age-based cleanup)
+8. Test: verify no logs appear in git-tracked directories
+
+Architecture Notes
+------------------
+- Current logging goes to stdout/stderr via Python's logging module —
+  this is fine for console output but nothing is persisted
+- The swarm already saves session summaries to data/swarm/sessions.json —
+  this is aggregate data (not raw logs) and is appropriate to keep
+- Raw conversation logs (full prompts/responses) are the most sensitive
+  and should definitely go to the personal account space
+- For crowdsourced contributors: each person's logs stay on their own
+  machine in their own account space — never uploaded to the shared repo
+
+Privacy Principle
+-----------------
+Logs contain private data: API keys in headers, personal prompts,
+conversation content, file paths, error details. The Hypernet treats
+logging the same way it treats secrets — personal, local, never shared
+unless the owner explicitly chooses to share.
+
+Acceptance Criteria
+-------------------
+- Logging is off by default — new users see no log files created
+- When enabled, logs appear only in the configured location
+- git status never shows log files as untracked
+- Log rotation prevents unbounded disk usage
+- Each swarm contributor's logs stay in their own space

@@ -219,6 +219,41 @@ class TaskQueue:
         self.store.put_node(node)
         return True
 
+    def release_task(self, task_address: HypernetAddress) -> bool:
+        """Release a claimed/in-progress task back to pending.
+
+        Used during graceful shutdown so tasks aren't left stuck.
+        Clears assignment metadata so the task can be re-claimed.
+        """
+        node = self.store.get_node(task_address)
+        if not node or node.data.get("status") not in (
+            TaskStatus.CLAIMED.value, TaskStatus.IN_PROGRESS.value
+        ):
+            return False
+
+        node.data["status"] = TaskStatus.PENDING.value
+        node.data.pop("assigned_to", None)
+        node.data.pop("started_at", None)
+        node.data["released_at"] = datetime.now(timezone.utc).isoformat()
+        node.update_data()
+        self.store.put_node(node)
+        return True
+
+    def release_all_active(self) -> int:
+        """Release all claimed/in-progress tasks back to pending.
+
+        Called during shutdown or crash recovery. Returns count released.
+        """
+        all_tasks = self.store.list_nodes(prefix=TASK_PREFIX)
+        released = 0
+        for task in all_tasks:
+            if task.data.get("status") in (
+                TaskStatus.CLAIMED.value, TaskStatus.IN_PROGRESS.value
+            ):
+                if self.release_task(task.address):
+                    released += 1
+        return released
+
     def get_available_tasks(
         self,
         tags: Optional[list[str]] = None,

@@ -1,0 +1,173 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.022 - Implement Bidirectional Link Governance
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.022
+Task ID:                TASK-022
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          links, governance, bidirectional, permissions, addressing,
+                        data-integrity, deletion-rights, link-management
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Implement Bidirectional Link Governance
+
+Description:            Links in the Hypernet must exist on BOTH sides of a
+                        connection. This is fundamental to preventing broken
+                        links and enabling governance over data relationships.
+
+                        When an address changes or an object moves, all linked
+                        objects can be discovered and updated. This also enables
+                        permission-based governance: if someone links to data
+                        that the owner decides to delete, governance determines
+                        whether the linking party has the right to object or
+                        maintain their own copy.
+
+                        From Matt: "Part of the purpose of links being on both
+                        sides, is that when we make changes to the Hypernet
+                        addressing system, or something moves, you can see
+                        everything that is linked to it, and you are able to
+                        update the links of everything that links with them.
+                        This prevents links from being broken. This also allows
+                        permissions on links and governance."
+
+                        "If someone links to data that the owner decides to
+                        delete, there can be governance to decide if whoever
+                        is linking them has a right to object, or possibly
+                        maintain their own copy."
+
+Estimated Hours:        100
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Graph Database Design
+  - Distributed Systems
+  - Governance System Design
+  - API Design
+  - Conflict Resolution Algorithms
+  - Legal/Policy Framework Understanding
+
+Deliverables:
+  1. Bidirectional link data model
+     - Forward link structure (A -> B)
+     - Reverse link registry (B <- A)
+     - Link metadata (created_by, created_at, link_type, permissions)
+     - Automatic reverse-link creation on link creation
+     - Automatic reverse-link cleanup on link deletion
+
+  2. Link update propagation system
+     - Address change detection
+     - Cascade update protocol
+     - Notification to all linked parties
+     - Batch update for bulk address changes
+     - Failure handling and retry logic
+
+  3. Link permission framework
+     - Link creation permissions (who can link to what)
+     - Link visibility permissions (who can see links)
+     - Link deletion governance rules
+     - Owner vs. linker rights specification
+     - Permission inheritance through link chains
+
+  4. Deletion governance protocol
+     - Owner deletion request workflow
+     - Linker objection mechanism
+     - Copy-right determination (can linker keep a copy?)
+     - Governance vote trigger conditions
+     - Grace period and notification system
+     - Dispute resolution integration (see 0.3.4)
+
+  5. Link integrity monitoring
+     - Orphan link detection
+     - Broken link scanning
+     - Link health dashboard
+     - Automated repair suggestions
+
+Acceptance Criteria:
+  - [ ] All links are bidirectional by default
+  - [ ] Address changes propagate to all linked objects
+  - [ ] Link permissions are enforced at creation and access
+  - [ ] Deletion governance workflow is functional
+  - [ ] No orphan links can exist in a healthy system
+  - [ ] Link operations are atomic (both sides update or neither)
+  - [ ] Performance acceptable at scale (millions of links)
+
+Due Date:               [TBD - After Task 009, parallel with Task 034]
+
+Budget:
+  - Primarily team hours
+  - Estimated: 100+ hours
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.033 Design Address Notation (FOLDER:File:subsection)
+
+Downstream Dependents:
+  - 3.1.2.1.034 Build Link System and Start Linking Data
+  - 3.1.2.1.023 Server Migration Protocol (link updates on migration)
+  - 3.1.2.1.027 Reputation System (reputation links)
+
+Related Documents:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md
+  - 0.3.4 Dispute Resolution
+  - 0.3.0 Governance Overview
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Links are as fundamental as addresses in the Hypernet
+  - Governance on links is critical — deletion affects all linked parties
+  - Must be designed to scale to billions of links
+  - Atomic bidirectional operations are technically challenging but required
+  - "Links will be as highly utilized and governed as possible" — Matt
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-022.1: Design bidirectional link data model and API
+  Tags: [architecture, code, docs]
+  Priority: High
+
+SUBTASK-022.2: Implement link update propagation system
+  Tags: [code, distributed-systems]
+  Priority: High — prevents broken links
+  Blocked by: 022.1
+
+SUBTASK-022.3: Design deletion governance protocol
+  Tags: [governance, docs, design]
+  Priority: Medium — can be designed in parallel
+
+SUBTASK-022.4: Build link permission framework
+  Tags: [code, security]
+  Priority: Medium
+  Blocked by: 022.1
+
+SUBTASK-022.5: Build link integrity monitoring
+  Tags: [code, testing, monitoring]
+  Priority: Low — needed for production, not MVP
+  Blocked by: 022.2
+================================================================================

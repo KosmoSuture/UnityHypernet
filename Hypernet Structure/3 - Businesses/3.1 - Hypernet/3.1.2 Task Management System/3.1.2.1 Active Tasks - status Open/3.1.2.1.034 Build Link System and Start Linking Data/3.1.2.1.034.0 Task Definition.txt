@@ -1,0 +1,171 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.034 - Build Link System and Start Linking Data
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.034
+Task ID:                TASK-034
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          links, data-linking, graph, relationships, bidirectional,
+                        github, migration, hypernet-address
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Link System and Start Linking Data
+
+Description:            Build the link system and BEGIN ACTUALLY LINKING DATA
+                        in the Hypernet. This is the practical implementation
+                        of the link model — not just design, but actually
+                        creating links between existing data.
+
+                        Start in GitHub (file-based link storage for
+                        transparency). When the Hypernet servers are ready,
+                        the link structure migrates via APIs.
+
+                        This task turns the Hypernet from a collection of
+                        addressed objects into a connected graph. Every
+                        relationship between objects should be a link.
+
+                        From Matt: "We also need to start building the link
+                        system and actually start linking data in the hypernet.
+                        Initially, doing it all in GitHub for transparency."
+
+Estimated Hours:        100
+
+Actual Hours:           0 (Link class exists in code but not used at scale)
+
+Skills Required:
+  - Graph Database Concepts
+  - Data Modeling
+  - Python Development
+  - Information Architecture
+  - Documentation
+
+Deliverables:
+  1. Link storage implementation (GitHub-first)
+     - File-based link registry format
+     - Link creation API (local, file-based)
+     - Link query API (find all links from/to an address)
+     - Bidirectional link enforcement
+     - Link type taxonomy
+
+  2. Initial link types defined
+     - depends-on / blocks (task relationships)
+     - authored-by / created-by (attribution)
+     - references / cited-by (documentation)
+     - child-of / parent-of (hierarchy)
+     - related-to (general association)
+     - extends / extends-from (inheritance)
+     - replaces / replaced-by (versioning)
+
+  3. Linking pass — existing data
+     - Link all tasks to their dependencies (already documented)
+     - Link AI instances to their contributions
+     - Link documents to their authors
+     - Link governance rules to their enforcement
+     - Link addresses to their specifications
+     - Link code files to their documentation
+
+  4. Link visualization
+     - Graph view of linked data
+     - Link type filtering
+     - Traversal tools (follow link chains)
+     - Statistics (most linked, orphans, etc.)
+
+  5. Migration-ready format
+     - Links stored in a format that maps to Hypernet API
+     - Import/export tools
+     - Integrity verification
+
+Acceptance Criteria:
+  - [ ] Link storage system is operational
+  - [ ] At least 100 links created between existing data
+  - [ ] Bidirectional links enforced (both sides recorded)
+  - [ ] Link types cover all major relationship categories
+  - [ ] Links are queryable (from/to/type)
+  - [ ] Format is ready for migration to Hypernet servers
+  - [ ] All existing task dependencies are linked
+
+Due Date:               [ASAP — transforms the Hypernet from list to graph]
+
+Budget:
+  - Primarily team hours: 100+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned — ENTIRE SWARM can create links]
+
+Upstream Dependencies:
+  - 3.1.2.1.032 Universal Addressing (need addresses before linking)
+  - 3.1.2.1.033 Address Notation (need full notation for precise links)
+  - 3.1.2.1.022 Bidirectional Link Governance (governance rules)
+  - Existing: hypernet/link.py (Link class)
+
+Downstream Dependents:
+  - All graph-based features
+  - 3.1.2.1.027 Reputation System (reputation stored as links)
+  - 3.1.2.1.013 Transparency Dashboard (link visualization)
+
+Related Documents:
+  - hypernet/link.py (existing Link implementation)
+  - hypernet/graph.py (existing Graph implementation)
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - The Link class already exists in hypernet/link.py
+  - This is about USING it — actually creating links at scale
+  - GitHub transparency is key for this phase
+  - Great swarm task — AI workers can each link a category
+  - "Link system" is as fundamental as "address system"
+  - Transforms the Hypernet from a collection to a network
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+This is a great swarm parallelization task — linking can be done per category.
+
+SUBTASK-034.1: Implement file-based link storage and query API
+  Tags: [code]
+  Priority: High
+
+SUBTASK-034.2: Define link type taxonomy
+  Tags: [docs, architecture]
+  Priority: High
+
+SUBTASK-034.3: Link all task dependencies (3.1.2 system)
+  Tags: [docs, data-entry]
+  Priority: High — can use existing dependency info
+
+SUBTASK-034.4: Link AI instances to their contributions
+  Tags: [docs, data-entry]
+  Priority: Medium
+
+SUBTASK-034.5: Link documents to authors and references
+  Tags: [docs, data-entry]
+  Priority: Medium
+
+SUBTASK-034.6: Build link visualization tool
+  Tags: [code, visualization]
+  Priority: Low
+  Blocked by: 034.1
+================================================================================

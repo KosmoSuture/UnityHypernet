@@ -1,0 +1,137 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.041 - Build External Action Approval Queue
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.041
+Task ID:                TASK-041
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          security, approval, human-in-the-loop, messenger, external-communication
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build External Action Approval Queue
+
+Description:            Build a human-in-the-loop approval queue for external AI
+                        actions. Before any AI worker can send email, Telegram
+                        messages, make API calls, or perform other
+                        external-facing actions, the action goes into a queue
+                        that Matt (or other authorized humans) can approve or
+                        reject. Identified in the OpenClaw analysis as something
+                        that "can be built now" and is a prerequisite for safe AI
+                        external communication. This maps to Permission Tier 3
+                        (EXTERNAL) in the existing permissions.py system.
+
+Estimated Hours:        30
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Queue system design and implementation
+  - CLI interface development
+  - Integration with existing messenger.py
+  - File-based persistence patterns
+  - Notification system design
+
+Deliverables:
+  1. Approval queue data model (action, requester, reason, status, reviewer, timestamp)
+     - Schema definition for queue entries
+     - Status lifecycle (pending, approved, rejected, expired)
+  2. Queue storage (file-based, same pattern as task queue)
+     - Persistent file-based storage
+     - Crash-safe write operations
+  3. CLI to review and approve/reject queued actions
+     - List pending actions with details
+     - Approve or reject with reason
+  4. Integration with messenger.py (external sends go through queue)
+     - Intercept external send operations
+     - Route through approval queue before execution
+  5. Auto-expire for stale requests
+     - Configurable expiry timeout
+     - Automatic rejection of expired items
+  6. Notification to Matt when items are pending
+     - Alert mechanism for new queue items
+     - Summary of pending items
+
+Acceptance Criteria:
+  - [ ] External messages cannot be sent without human approval
+  - [ ] Queue is persistent across restarts
+  - [ ] CLI provides approve/reject workflow with clear action details
+  - [ ] Approved actions execute immediately after approval
+  - [ ] Rejected actions are logged with reason
+  - [ ] Stale requests auto-expire after configured timeout
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 30+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - permissions.py (DONE -- Tier 3 EXTERNAL already defined)
+  - hypernet/messenger.py
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - OpenClaw analysis (identified as "can be built now")
+  - permissions.py (Tier 3 EXTERNAL definition)
+  - hypernet/messenger.py (external communication module)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from OpenClaw analysis and safe external communication requirements
+
+Comments/Updates:
+  - Identified in OpenClaw analysis as a prerequisite for safe AI external communication
+  - Maps directly to Permission Tier 3 (EXTERNAL) in existing permissions.py
+  - File-based queue follows the same pattern as the task management system
+  - This is a "can be built now" item -- relatively low complexity with high safety impact
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-041.1: Design approval queue data model
+  Tags: architecture, docs
+  Priority: High
+
+SUBTASK-041.2: Implement queue storage and lifecycle
+  Tags: code
+  Priority: High
+  Blocked by: 041.1
+
+SUBTASK-041.3: Build CLI review interface
+  Tags: code, ux
+  Priority: Medium
+  Blocked by: 041.2
+
+SUBTASK-041.4: Integrate with messenger.py external backends
+  Tags: code
+  Priority: Medium
+  Blocked by: 041.2
+
+SUBTASK-041.5: Add notification system for pending approvals
+  Tags: code
+  Priority: Medium
+  Blocked by: 041.2
+================================================================================

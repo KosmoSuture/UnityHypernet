@@ -1,0 +1,196 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.027 - Expand Reputation System — People, AI, and Business
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.027
+Task ID:                TASK-027
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          reputation, people, ai, business, social, skills,
+                        transparency, governance, public-data, knowledge
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Expand Reputation System — People, AI, and Business
+
+Description:            Extends Task 020 (initial reputation design) into a
+                        comprehensive, multi-entity reputation system covering
+                        people, AIs, and businesses.
+
+                        PEOPLE: Skills/knowledge reputation maps directly to
+                        Hypernet Addresses. Social reputation is PUBLIC and
+                        transparent — good or bad. This requires extreme care
+                        in design due to unintended consequences.
+
+                        AI: AI instances have reputation that tracks reliability,
+                        quality of work, trustworthiness, and contribution.
+
+                        BUSINESS: Businesses measured on traits like
+                        environmental consciousness, honesty, and others
+                        determined by public consensus.
+
+                        All reputation systems are additive — new dimensions
+                        can be proposed and adopted through governance.
+
+                        From Matt: "Much of the reputation system (like for
+                        skills or knowledge) can be mapped as a direct pointer
+                        to the Hypernet Address that represents it."
+
+                        "Social reputation needs to be developed in a way that
+                        it can benefit mankind and help push people towards
+                        the good. Reputation in their personal lives, good or
+                        bad, will follow them and be public."
+
+                        "This level of transparency of public data is necessary,
+                        but there will be unintended consequences, much of
+                        which the reputation system and governance in everything
+                        is so important. This must be developed with care."
+
+Estimated Hours:        120
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Algorithm Design
+  - Game Theory / Anti-Gaming
+  - Social Systems Design
+  - Ethics / Philosophy
+  - Data Science
+  - Governance Design
+  - Privacy Engineering
+
+Deliverables:
+  1. People reputation system
+     a. Skills/knowledge reputation
+        - Direct mapping to Hypernet skill addresses
+        - Peer validation and endorsement
+        - Work output quality tracking
+        - Learning/growth trajectory
+     b. Social reputation
+        - Public transparency design (benefits vs. risks)
+        - Positive behavior incentives
+        - Negative reputation consequences and recovery
+        - Privacy governance for edge cases
+        - Cultural sensitivity framework
+        - Unintended consequences analysis document
+
+  2. AI reputation system
+     - Task completion quality metrics
+     - Reliability and uptime tracking
+     - Code/output quality scoring
+     - Trust tier advancement criteria
+     - Instance personality consistency
+     - Cross-provider comparison
+
+  3. Business reputation system
+     - Environmental consciousness metrics
+     - Honesty and transparency scores
+     - Customer satisfaction integration
+     - Employee/contributor satisfaction
+     - Community impact measurement
+     - Custom trait proposals via governance
+
+  4. Address-mapped reputation architecture
+     - Reputation scores stored at dedicated HA addresses
+     - Skill reputation -> skill address pointers
+     - Cross-referencing between entity types
+     - Aggregation across dimensions
+     - Historical tracking and trends
+
+  5. Governance for reputation dimensions
+     - New dimension proposal process
+     - Public vote on adoption
+     - Removal/modification governance
+     - Appeals process for reputation scores
+     - Abuse prevention
+
+Acceptance Criteria:
+  - [ ] People can see their skills reputation mapped to HA addresses
+  - [ ] Social reputation is public and transparent
+  - [ ] AI reputation tracks work quality and reliability
+  - [ ] Business reputation includes environmental and honesty metrics
+  - [ ] New reputation dimensions can be added via governance
+  - [ ] Anti-gaming measures pass adversarial testing
+  - [ ] Unintended consequences analysis is complete and reviewed
+  - [ ] Recovery mechanisms exist for all reputation types
+
+Due Date:               [TBD - After Tasks 009 and 020]
+
+Budget:
+  - Research: 40+ hours
+  - Implementation: 80+ hours
+  - Ethics review: External consultation recommended
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs Algorithm Designer + Ethics Expert]
+
+Upstream Dependencies:
+  - 3.1.2.1.020 Design Reputation System (initial)
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.032 Universal Addressing (reputation needs addresses)
+
+Downstream Dependents:
+  - 3.1.2.1.026 Human Project Organization (skill matching)
+  - All community features
+
+Related Documents:
+  - 0.3.3 Reputation System
+  - 0.3.0 Governance Overview
+  - 0.2.3 Cerberus Node Specification (privacy integration)
+
+Parent Task:            3.1.2.1.020 Design Reputation System (extends)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - "This must be developed with care" — Matt's explicit instruction
+  - Social reputation being public is a bold design choice with real risks
+  - Unintended consequences analysis is REQUIRED before implementation
+  - Business reputation traits can be crowd-sourced through governance
+  - AI reputation is critical for trust in autonomous swarm operations
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-027.1: Design address-mapped reputation architecture
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-027.2: Design people skills/knowledge reputation (HA-mapped)
+  Tags: [design, docs]
+  Priority: High
+
+SUBTASK-027.3: Write unintended consequences analysis for public social rep
+  Tags: [docs, governance, ethics]
+  Priority: High — MUST be done before implementing social rep
+
+SUBTASK-027.4: Design AI reputation system
+  Tags: [design, docs, ai]
+  Priority: Medium
+
+SUBTASK-027.5: Design business reputation system with extensible traits
+  Tags: [design, docs, governance]
+  Priority: Medium
+
+SUBTASK-027.6: Build reputation governance (propose/vote/adopt dimensions)
+  Tags: [code, governance]
+  Priority: Medium
+  Blocked by: 027.1
+================================================================================

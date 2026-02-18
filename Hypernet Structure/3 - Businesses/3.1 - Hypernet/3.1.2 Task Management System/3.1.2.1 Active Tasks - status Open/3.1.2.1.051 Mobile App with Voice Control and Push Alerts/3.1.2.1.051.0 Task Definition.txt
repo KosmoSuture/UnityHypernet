@@ -1,0 +1,92 @@
+Task 051: Mobile App with Voice Control and Push Alerts
+========================================================
+
+Priority: High
+Status: Open
+Estimated Hours: 120+
+Assigned To: Unassigned
+Dependencies: Task 050 (Swarm GUI)
+Platform: Android-first
+Created: 2026-02-18
+Created By: Matt (via C3)
+
+Description
+-----------
+Build a mobile app that serves as Matt's primary interface to the Hypernet
+swarm from anywhere. The app should push alerts when something needs human
+attention (approval requests, errors, status milestones) and support full
+voice control so Matt can manage the swarm hands-free.
+
+This is the "command bridge" — the swarm works autonomously, but Matt needs
+to be reachable and able to respond from his phone at any time.
+
+Requirements
+------------
+1. Push notifications for items needing human attention:
+   - Permission elevation requests (Tier 3+ actions)
+   - Task failures or repeated errors
+   - Status milestones (task counts, new worker boots)
+   - Messages from AI instances directed to Matt
+   - Swarm start/stop events
+
+2. Voice control (speech-to-text + text-to-speech):
+   - "What are my AIs working on?"
+   - "How many tasks have been completed today?"
+   - "Approve that request" / "Deny that request"
+   - "Start the swarm" / "Stop the swarm"
+   - "Assign [task] to [worker]"
+   - Natural language queries routed through the swarm chat interface
+
+3. Dashboard view (mobile-optimized):
+   - Worker status cards (model, current task, stats)
+   - Pending approval queue
+   - Recent task history
+   - Quick action buttons (start/stop/status)
+
+4. Approval workflow:
+   - Swipe or voice to approve/deny pending requests
+   - Queue persists until addressed
+   - Urgent items bubble to top with distinct notification sound
+
+Subtasks
+--------
+1. Backend: Push notification service (FCM/APNs integration)
+2. Backend: Approval queue API endpoints
+3. Backend: Voice command parser and intent routing
+4. Mobile: React Native or Flutter app shell
+5. Mobile: Push notification handling and display
+6. Mobile: Voice input/output integration (platform STT/TTS)
+7. Mobile: Dashboard UI (worker cards, task list, approvals)
+8. Mobile: Voice command flow (listen → parse → execute → speak result)
+9. Integration: Connect to swarm server REST API + WebSocket for live updates
+10. Testing: End-to-end voice command tests, notification delivery tests
+
+Architecture Notes
+------------------
+- The swarm server already has REST endpoints (/swarm/status, /swarm/start,
+  /swarm/stop, /chat) and WebSocket support — the app connects to these
+- Voice commands translate to the same chat interface the desktop GUI uses
+- Push notifications via Firebase Cloud Messaging (FCM) — the swarm server
+  pushes events to FCM, which forwards to Matt's Android phone
+- Consider starting with a PWA (Progressive Web App) for faster iteration
+  before going native — PWAs support push notifications on Android
+- Voice control can use the browser Web Speech API in PWA mode, or native
+  Android SpeechRecognizer API for a more polished experience
+- Android-first — iOS can come later if needed
+
+Relationship to Other Tasks
+----------------------------
+- Task 043 (Mobile App iOS) covers the broader mobile platform — this task
+  is specifically about the swarm command interface with voice
+- Task 050 (Swarm GUI) builds the desktop dashboard — mobile app shares
+  the same backend endpoints
+- Task 041 (External Action Approval Queue) provides the approval
+  infrastructure that this app surfaces on mobile
+
+Acceptance Criteria
+-------------------
+- Matt receives push notification on phone when swarm needs attention
+- Matt can ask "what's the swarm doing?" by voice and get a spoken answer
+- Matt can approve/deny requests by voice or swipe
+- App shows live worker status updating in real time
+- Works from anywhere with internet connection

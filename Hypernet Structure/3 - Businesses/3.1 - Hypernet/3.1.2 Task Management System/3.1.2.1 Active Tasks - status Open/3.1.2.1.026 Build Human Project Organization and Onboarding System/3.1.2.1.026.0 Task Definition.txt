@@ -1,0 +1,171 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.026 - Build Human Project Organization and Onboarding System
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.026
+Task ID:                TASK-026
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          human-organization, onboarding, project-structure, skills,
+                        task-tree, upstream-downstream, contributor, accessibility
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Human Project Organization and Onboarding System
+
+Description:            Create a clear, navigable project structure that allows
+                        humans to easily find where they can contribute. The
+                        current system is confusing for newcomers. Need a
+                        hierarchical project/task tree with skill descriptions
+                        so people can match their abilities to available work.
+
+                        Must include upstream/downstream task linking so issues
+                        can escalate up the tree. Copy-paste-ready documentation
+                        with clear instructions for minimal human friction.
+
+                        From Matt: "Things need to be better organized for the
+                        humans using it to know what they can do. Right now, it
+                        is very confusing... There needs to be a structure for
+                        Projects, that goes all the way down the tree... There
+                        needs to be a clear structure, and skill descriptions
+                        that a person can navigate and find things they are
+                        capable of helping with easily."
+
+                        "There must be upstream and downstream conditions where
+                        tasks can be linked to higher and higher levels of the
+                        tree to get them taken care of at that level."
+
+                        "Whatever their skills are, we want to point them to
+                        where they can help."
+
+Estimated Hours:        80
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Information Architecture
+  - UX/UI Design
+  - Technical Writing
+  - Project Management
+  - Skills Taxonomy Design
+  - Documentation
+
+Deliverables:
+  1. Project hierarchy structure
+     - Top-level project categories
+     - Sub-project breakdown
+     - Task tree that goes "all the way down"
+     - Clear parent-child relationships
+     - Visual navigation (tree view, search)
+
+  2. Skills taxonomy and matching
+     - Skills catalog (coding, design, email outreach, etc.)
+     - Skill-to-task mapping
+     - Difficulty levels per task
+     - Time commitment indicators
+     - "I can help with..." entry point
+
+  3. Upstream/downstream task linking
+     - Escalation pathways (task -> subtask -> sub-subtask)
+     - Blocked-by / blocking relationships
+     - Automatic escalation triggers
+     - Status propagation up/down the tree
+
+  4. Contributor onboarding flow
+     - "Start here" guide
+     - Skill self-assessment
+     - Task recommendation engine
+     - Copy-paste-ready contribution guides
+     - Minimal-friction first contribution path
+     - Progress tracking for contributors
+
+  5. Documentation standards
+     - Every task has clear instructions
+     - Acceptance criteria are human-readable
+     - Examples provided for complex tasks
+     - Templates for common task types
+
+Acceptance Criteria:
+  - [ ] New contributor can find suitable work in <5 minutes
+  - [ ] Skills taxonomy covers all current task types
+  - [ ] Upstream/downstream links work for escalation
+  - [ ] All documentation is copy-paste ready
+  - [ ] Task tree is navigable and searchable
+  - [ ] Tested with actual humans for usability
+
+Due Date:               [TBD - High priority for growth]
+
+Budget:
+  - Primarily team hours
+  - Estimated: 80+ hours
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.003 Define All Job Roles & Skills Matrix
+  - 3.1.2.1.012 Create Contributor Onboarding System
+
+Downstream Dependents:
+  - 3.1.2.1.027 Reputation System (skill reputation feeds from here)
+  - All future human contributions
+
+Related Documents:
+  - 3.1.2.0 System Overview.txt (existing task management overview)
+  - 3.1.2.0 Task Schema/Schema.txt (existing task schema)
+  - Messages/coordination/PROTOCOL.md
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - "There are so many tasks that people could help with, even if it's
+    just sending emails to different people, or finding ways to expand
+    the awareness, maybe coding or design." — Matt
+  - Recent copy-paste-ready docs were a good step forward
+  - This overlaps with Tasks 003 and 012 but is more comprehensive
+  - Skills matching is key: people need to find their fit quickly
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-026.1: Design project hierarchy and task tree structure
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-026.2: Build skills taxonomy and task-skill mapping
+  Tags: [docs, design]
+  Priority: High
+
+SUBTASK-026.3: Implement upstream/downstream task linking
+  Tags: [code, architecture]
+  Priority: Medium
+  Blocked by: 026.1
+
+SUBTASK-026.4: Create contributor onboarding flow and guides
+  Tags: [docs, ux]
+  Priority: High
+
+SUBTASK-026.5: Build "find work for me" recommendation system
+  Tags: [code, ai]
+  Priority: Medium
+  Blocked by: 026.2
+================================================================================

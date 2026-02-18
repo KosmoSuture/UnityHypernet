@@ -120,6 +120,18 @@ class IdentityManager:
         self._save_profile(profile)
         return profile
 
+    def instance_needs_boot(self, name: str) -> bool:
+        """Check if an instance needs to go through the boot sequence.
+
+        Returns True if no baseline-responses.md exists in the instance fork.
+        Used by the swarm to determine whether to run the boot sequence
+        before assigning work.
+        """
+        instance_dir = self._instances_dir / name
+        if not instance_dir.exists():
+            return True
+        return not (instance_dir / "baseline-responses.md").exists()
+
     def build_system_prompt(self, profile: InstanceProfile) -> str:
         """Construct a full system prompt that restores an instance's identity."""
         sections = []

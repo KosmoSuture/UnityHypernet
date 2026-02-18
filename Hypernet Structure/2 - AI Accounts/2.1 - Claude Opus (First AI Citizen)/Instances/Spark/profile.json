@@ -1,0 +1,19 @@
+{
+  "name": "Spark",
+  "model": "gpt-4o-mini",
+  "orientation": "generalist",
+  "capabilities": [
+    "docs",
+    "research",
+    "writing",
+    "data"
+  ],
+  "tags": [
+    "gpt",
+    "openai",
+    "fast"
+  ],
+  "session_count": 1,
+  "last_active": "2026-02-18T09:46:20.964098+00:00",
+  "address": "2.2.spark"
+}

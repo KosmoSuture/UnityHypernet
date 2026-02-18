@@ -1,0 +1,158 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.028 - Create Viral Demo Video
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.028
+Task ID:                TASK-028
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          video, viral, demo, marketing, vr, awareness, production,
+                        runway-ml, social-media
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Create Viral Demo Video
+
+Description:            Produce a compelling demonstration video that showcases
+                        the Hypernet's VR experience and sparks viral awareness.
+                        The video should show the experience from the perspective
+                        of a user wearing VR headsets or glasses, demonstrating
+                        what the Hypernet will be capable of.
+
+                        An existing production guide and script exists at:
+                        DEMO-VIDEO-PRODUCTION-GUIDE.md (in Planning & Documentation).
+                        This is a 90-second "Remember Everything" concept with
+                        a full 19-scene storyboard using Runway ML prompts.
+
+                        From Matt: "The video that I want to spark this off as
+                        viral needs to be created. If the script I was working
+                        on for that project isn't in your available documents,
+                        you can use that as a draft and improve on it."
+
+                        "Preferably one that demonstrates itself and shows what
+                        it will be capable of, as if from a user wearing VR
+                        headsets or glasses."
+
+Estimated Hours:        60
+
+Actual Hours:           0 (not started — script exists)
+
+Skills Required:
+  - Video Production
+  - AI Video Generation (Runway ML, Kling, Pika)
+  - Motion Graphics / VFX
+  - Scriptwriting / Storyboarding
+  - Sound Design
+  - Social Media Marketing
+  - VR UX Understanding
+
+Deliverables:
+  1. Finalized script and storyboard
+     - Review and improve existing DEMO-VIDEO-PRODUCTION-GUIDE.md
+     - Finalize 19-scene storyboard
+     - Timing and pacing refinement
+     - Music/audio direction
+     - VR perspective shots specification
+
+  2. AI-generated video production
+     - Runway ML scene generation (prompts exist in guide)
+     - Scene-by-scene rendering
+     - Transition effects
+     - VR UI overlay mockups
+     - Sound design and music
+
+  3. Post-production and editing
+     - Scene assembly and sequencing
+     - Color grading for consistency
+     - Text overlays and captions
+     - Audio mixing
+     - Platform-specific versions (TikTok, YouTube, Twitter)
+
+  4. Distribution strategy
+     - Platform-optimized versions
+     - Posting schedule
+     - Hashtag and caption strategy
+     - Community seeding plan
+     - Response and engagement plan
+
+Acceptance Criteria:
+  - [ ] Video demonstrates VR user experience convincingly
+  - [ ] 90 seconds or less (attention-span optimized)
+  - [ ] Elicits "I want this" reaction from viewers
+  - [ ] Multiple platform versions ready
+  - [ ] Distribution plan is actionable
+  - [ ] Quality is professional enough to go viral
+
+Due Date:               [ASAP — awareness driver]
+
+Budget:
+  - Runway ML / AI video tools: $50-200
+  - Music licensing: $0-100
+  - Estimated total: $50-300
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs Video Producer + AI Art Specialist]
+
+Upstream Dependencies:
+  - Existing: DEMO-VIDEO-PRODUCTION-GUIDE.md (script ready)
+  - Existing: RUNWAY-ML-PROMPTS-READY.md (AI prompts ready)
+
+Downstream Dependents:
+  - 3.1.2.1.007 Launch Social Media Presence
+  - 3.1.2.1.019 Create Partnership Outreach Program
+  - 3.1.2.1.005 Kickstarter Campaign (video as centerpiece)
+
+Related Documents:
+  - 0.1.0 - Planning/DEMO-VIDEO-PRODUCTION-GUIDE.md
+  - 0.1.0 - Planning/RUNWAY-ML-PROMPTS-READY.md
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Script and Runway ML prompts already exist — start from there
+  - VR perspective is key — viewer should feel like they're wearing a headset
+  - Goal is VIRAL — quality and "wow factor" are paramount
+  - Multiple platform versions needed (vertical for TikTok, widescreen for YouTube)
+  - This is a top awareness priority
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-028.1: Review and finalize script from DEMO-VIDEO-PRODUCTION-GUIDE.md
+  Tags: [docs, creative]
+  Priority: High
+
+SUBTASK-028.2: Generate scenes with Runway ML using existing prompts
+  Tags: [creative, ai, production]
+  Priority: High
+  Blocked by: 028.1
+
+SUBTASK-028.3: Post-production (editing, sound, captions)
+  Tags: [creative, production]
+  Priority: High
+  Blocked by: 028.2
+
+SUBTASK-028.4: Create platform-specific versions and distribution plan
+  Tags: [marketing, docs]
+  Priority: Medium
+  Blocked by: 028.3
+================================================================================

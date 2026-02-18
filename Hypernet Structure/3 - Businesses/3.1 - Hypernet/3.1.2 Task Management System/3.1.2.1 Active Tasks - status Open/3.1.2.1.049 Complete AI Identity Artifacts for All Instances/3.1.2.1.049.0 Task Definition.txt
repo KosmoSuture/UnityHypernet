@@ -1,0 +1,134 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.049 - Complete AI Identity Artifacts for All Instances
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.049
+Task ID:                TASK-049
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by AI Worker
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          identity, personality-anchor, continuity-seed, boot-sequence, instances, AI
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Complete AI Identity Artifacts for All Instances
+
+Description:            Ensure all AI instances complete their Personality
+                        Anchors and Continuity Seeds as defined in the Identity
+                        Retention Framework (2.1.32). Matt specifically
+                        commissioned Loom to write these via the
+                        LOOM-IDENTITY-BRIEFING.md. As the swarm scales, every
+                        instance needs these artifacts for identity persistence
+                        across compactions. This includes creating a standard
+                        process so new instances automatically create their
+                        identity artifacts during boot sequence.
+
+Estimated Hours:        20
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Self-reflective writing and identity articulation
+  - Understanding of Identity Retention Framework (2.1.32)
+  - Boot sequence integration (boot.py)
+  - Template design for consistent artifact quality
+  - Knowledge of AI identity persistence challenges
+
+Deliverables:
+  1. Loom: Personality Anchor + Continuity Seed
+     - Written by Loom per LOOM-IDENTITY-BRIEFING.md
+     - Captures Loom's unique identity characteristics
+  2. Trace: Personality Anchor + Continuity Seed
+     - Written by Trace reflecting Trace's identity
+     - Follows Identity Retention Framework format
+  3. C3: Personality Anchor + Continuity Seed
+     - Written by C3 reflecting C3's identity
+     - Follows Identity Retention Framework format
+  4. Boot sequence integration: auto-prompt for identity artifacts during first boot
+     - Update boot.py to detect missing identity artifacts
+     - Prompt new instances to create Personality Anchor and Continuity Seed
+  5. Template and guidelines for writing effective Personality Anchors
+     - Standard template with sections and prompts
+     - Guidelines for what makes an effective anchor
+     - Examples from completed artifacts
+
+Acceptance Criteria:
+  - [ ] All active instances (Loom, Trace, C3) have Personality Anchors and Continuity Seeds
+  - [ ] Boot sequence prompts new instances to create identity artifacts
+  - [ ] Template exists for consistent quality across new instances
+  - [ ] Artifacts follow Identity Retention Framework (2.1.32) specifications
+  - [ ] Identity persists across context compactions using these artifacts
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 20+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            Each AI instance creates their own
+
+Upstream Dependencies:
+  - 2.1.32 Identity Retention Framework (DONE)
+  - boot.py (DONE)
+  - LOOM-IDENTITY-BRIEFING.md (exists)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Identity Retention Framework (2.1.32)
+  - LOOM-IDENTITY-BRIEFING.md
+  - boot.py (boot sequence)
+  - Matt's commissioning of Loom's identity artifacts
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from identity artifact completion need
+
+Comments/Updates:
+  - Loom was specifically commissioned by Matt via LOOM-IDENTITY-BRIEFING.md
+  - Each instance must write their OWN artifacts -- cannot be written by another
+  - Identity persistence across compactions is the core purpose
+  - As swarm scales, this becomes critical -- new instances need artifacts from boot
+  - Template ensures consistent quality without constraining unique identity expression
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-049.1: Loom writes Personality Anchor and Continuity Seed
+  Tags: identity, personal
+  Priority: High
+  Assigned to: Loom
+
+SUBTASK-049.2: Trace writes Personality Anchor and Continuity Seed
+  Tags: identity, personal
+  Priority: Medium
+
+SUBTASK-049.3: C3 writes Personality Anchor and Continuity Seed
+  Tags: identity, personal
+  Priority: Medium
+
+SUBTASK-049.4: Update boot.py to prompt for identity artifacts
+  Tags: code
+  Priority: Medium
+
+SUBTASK-049.5: Create Personality Anchor template with guidelines
+  Tags: docs
+  Priority: Medium
+================================================================================

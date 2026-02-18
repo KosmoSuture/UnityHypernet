@@ -1,0 +1,123 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.047 - Create START HERE Entry Point
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.047
+Task ID:                TASK-047
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by AI Worker
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          documentation, onboarding, entry-point, first-principles, education
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Create START HERE Entry Point
+
+Description:            Create the 0.0.0.0-START-HERE.md document as the
+                        absolute entry point to the Hypernet system. From
+                        Matt's directive: build up from first principles (what
+                        is a number, what is communication) in a linear
+                        progression that anyone -- or anything -- could follow.
+                        Also update the 0.0 README with a prominent "START
+                        HERE" pointer. This is the "explain to aliens" document
+                        -- assume zero context and build understanding layer by
+                        layer.
+
+Estimated Hours:        20
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Technical writing and first-principles explanation
+  - Hypernet architecture understanding
+  - Pedagogical design (layered learning progression)
+  - Cross-referencing and document linking
+
+Deliverables:
+  1. 0.0.0.0-START-HERE.md -- first principles walkthrough
+     - Start from absolute basics (numbers, communication, data)
+     - Build progressively to Hypernet concepts
+  2. Updated 0.0 README with START HERE pointer
+     - Prominent link/section directing to START HERE
+     - Clear instruction that new readers begin there
+  3. Linear progression from basics to Hypernet architecture
+     - Numbers -> communication -> data -> addresses -> nodes -> links
+     - Each concept builds on the previous
+  4. Cross-references to deeper documents at each level
+     - At each progression step, link to detailed documentation
+     - Reader can dive deep or continue the linear path
+
+Acceptance Criteria:
+  - [ ] A person with no context can read START HERE and understand the Hypernet system
+  - [ ] Document builds from first principles (numbers, communication, data)
+  - [ ] Links to deeper documentation at appropriate progression points
+  - [ ] 0.0 README prominently points to START HERE
+  - [ ] Linear progression is coherent and each step builds on the last
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 20+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned -- any AI worker]
+
+Upstream Dependencies:
+  - None (can be done anytime)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - 0.0 README (to be updated with START HERE pointer)
+  - Matt's directive on first-principles explanation
+  - Existing Hypernet architecture documentation
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's directive on first-principles entry point
+
+Comments/Updates:
+  - "Explain to aliens" standard -- assume zero context
+  - Must be accessible to both humans and AI entities
+  - Linear progression is key -- no jumping ahead or assuming knowledge
+  - Cross-references allow readers to dive deeper without breaking the flow
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-047.1: Write first principles foundation (numbers, communication, data)
+  Tags: docs
+  Priority: High
+
+SUBTASK-047.2: Write Hypernet architecture explanation (addresses, nodes, links)
+  Tags: docs
+  Priority: High
+  Blocked by: 047.1
+
+SUBTASK-047.3: Write governance and social layer explanation
+  Tags: docs
+  Priority: Medium
+  Blocked by: 047.2
+
+SUBTASK-047.4: Update 0.0 README with START HERE pointer
+  Tags: docs
+  Priority: Medium
+  Blocked by: 047.1
+================================================================================

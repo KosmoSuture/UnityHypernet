@@ -1,0 +1,249 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.050 - Build Swarm GUI and Human Interface
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.050
+Task ID:                TASK-050
+Created Date/Time:      2026-02-18 11:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          gui, interface, desktop, chat, swarm, dashboard,
+                        configuration, human-ai, conversational, ux
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Swarm GUI and Human Interface
+
+Description:            Build a graphical desktop application that serves as the
+                        primary interface between humans and their personal AI
+                        swarm. This replaces the command-line swarm launcher with
+                        a friendly GUI that lets users configure, monitor, chat
+                        with, and direct their swarm.
+
+                        The GUI has two core roles:
+
+                        1. DASHBOARD — See what your swarm is doing. Which
+                           workers are active, what tasks they're working on,
+                           how many tasks are completed, what's in the queue.
+                           All the configuration options: API keys, model
+                           selection, worker count limits, personal time ratio,
+                           status interval, etc.
+
+                        2. CHAT INTERFACE — Talk to your swarm. Ask questions,
+                           give directions, check on progress. The chat acts as
+                           a conversational front-end that is always responsive
+                           to the human. Behind the scenes, it delegates real
+                           work through the task system so workers handle the
+                           heavy lifting while the interface stays snappy.
+
+                        Design principle: The chat interface should spend as
+                        little time as possible doing work itself. Its job is to
+                        understand what the human wants, create tasks for the
+                        swarm, and report back results. It's a dispatcher, not
+                        a worker. This keeps it responsive even when the swarm
+                        is busy.
+
+                        Examples of what a user should be able to do:
+                        - "What tasks is the swarm working on right now?"
+                        - "How many workers are running?"
+                        - "Write a blog post about X" → creates task, assigns
+                          to a worker, reports back when done
+                        - "Show me the status report"
+                        - "Spin up 2 more workers"
+                        - "What did the swarm accomplish today?"
+                        - "Search the archive for anything about Y"
+                        - Change configuration (models, worker limits, etc.)
+                          through the GUI instead of editing JSON files
+
+                        From Matt: "We need to give it a gui, and give them all
+                        of their configuration options. It should also have a
+                        window to speak to your personal swarm, and ask
+                        questions, and acts as the interface between humans and
+                        the swarm. It should, as much as possible, spend its
+                        time passing off as many tasks as it can through the
+                        task system, so that it can be responsive to its user."
+
+Estimated Hours:        100
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Desktop GUI development (Python: tkinter, PyQt, or web-based Electron/Tauri)
+  - UX design for chat interfaces
+  - Real-time data display (worker status, task progress)
+  - Integration with existing swarm.py, tasks.py, messenger.py APIs
+  - Async programming (GUI must stay responsive while swarm works)
+
+Deliverables:
+  1. Desktop GUI application
+     - Cross-platform (Windows, macOS, Linux)
+     - Single-window app with tabbed or sidebar navigation
+     - Launches and manages the swarm process
+     - Tray icon with status indicator (running/idle/error)
+
+  2. Dashboard panel
+     - Live worker status: name, current task, tokens used, uptime
+     - Task queue overview: pending, in-progress, completed, failed
+     - Session statistics: tasks completed, time running, throughput
+     - Historical session summaries (from sessions.json)
+     - Real-time log viewer (swarm tick output)
+
+  3. Configuration panel
+     - API key management (secure input, not stored in plaintext in GUI)
+     - Model selection per worker (dropdown of supported models)
+     - Worker count limits (soft max, hard max, sliders)
+     - Personal time ratio (slider, 0-50%)
+     - Status interval (how often to report)
+     - Archive root path selection (file browser)
+     - GitHub integration settings
+     - Save/load configuration to secrets/config.json
+
+  4. Chat interface panel
+     - Conversational window (message bubbles, timestamps)
+     - User types natural language, system interprets and acts
+     - Behind the scenes: creates tasks for complex requests,
+       queries swarm state for status questions, delegates to
+       workers for content generation
+     - Response streaming (show partial results as they come in)
+     - Chat history persistence across sessions
+     - Quick-action buttons: "Status", "Pause", "Resume", "New Task"
+
+  5. Task dispatcher logic
+     - Chat interface classifies user intent:
+       a. STATUS QUERY → reads swarm state directly (instant)
+       b. CONFIGURATION → updates config (instant)
+       c. WORK REQUEST → creates task in queue, monitors completion,
+          reports result back to chat
+       d. QUESTION → routes to a worker for research, streams answer
+     - The dispatcher should NEVER block the GUI thread
+     - Progress indicators for delegated tasks
+     - Ability to cancel in-progress tasks from the chat
+
+  6. Swarm control
+     - Start/stop/pause the swarm from the GUI
+     - Spawn/despawn workers manually
+     - Force-assign a task to a specific worker
+     - View and clear stale locks
+     - Git push/pull controls (when distributed coordination is ready)
+
+Acceptance Criteria:
+  - [ ] User can launch GUI, configure API keys, and start swarm without CLI
+  - [ ] Dashboard shows real-time worker and task status
+  - [ ] Chat interface responds to natural language queries about swarm state
+  - [ ] Work requests create tasks and report results through chat
+  - [ ] GUI stays responsive while swarm processes tasks
+  - [ ] Configuration changes persist to config file
+  - [ ] Works on Windows, macOS, and Linux
+
+Due Date:               [TBD]
+
+Budget:
+  - Primarily team hours: 100+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.025 Scale AI Swarm Framework (swarm must exist)
+  - hypernet/swarm.py (DONE — swarm orchestrator)
+  - hypernet/tasks.py (DONE — task queue)
+  - hypernet/messenger.py (DONE — messaging layer)
+  - hypernet/worker.py (DONE — worker execution)
+
+Downstream Dependents:
+  - 3.1.2.1.037 Distributed Git Coordination (GUI controls for push/pull)
+  - 3.1.2.1.012 Contributor Onboarding (GUI simplifies setup)
+  - All human-swarm interaction
+
+Related Documents:
+  - hypernet/swarm.py (Swarm class, print_status(), CLI args)
+  - hypernet/tasks.py (TaskQueue, task lifecycle)
+  - hypernet/messenger.py (MessageBus, InstanceMessenger)
+  - hypernet/worker.py (Worker, TaskResult)
+  - secrets.template.json (configuration structure)
+  - SWARM-SETUP-GUIDE.md (current CLI setup flow)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's directive
+
+Comments/Updates:
+  - This is the "front door" for the crowdsourced AI vision
+  - The chat dispatcher pattern (classify intent → delegate to swarm)
+    keeps the interface responsive and the architecture clean
+  - Consider web-based GUI (localhost server) for easier cross-platform
+    support vs. native desktop (PyQt/tkinter)
+  - Could start with a simple web UI on localhost and upgrade later
+  - The chat interface is essentially a lightweight AI that manages
+    heavier AI workers — a dispatcher, not a doer
+  - Must integrate with the existing print_status() and CLI flags
+    as a starting point for dashboard data
+  - Personal time output could be displayed in a "Swarm Journal" tab
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-050.1: Choose GUI framework and create app shell
+  Tags: [architecture, code]
+  Priority: High
+  Notes: Evaluate tkinter (simple, built-in), PyQt (powerful, GPL),
+         web-based (Flask/FastAPI + HTML, most cross-platform).
+         Web-based on localhost may be simplest path since server.py
+         already exists with FastAPI.
+
+SUBTASK-050.2: Build dashboard panel (worker status, task queue, stats)
+  Tags: [code, ux]
+  Priority: High
+  Blocked by: 050.1
+  Notes: Wire into swarm._worker_stats, _task_history, print_status()
+
+SUBTASK-050.3: Build configuration panel (API keys, models, limits)
+  Tags: [code, ux]
+  Priority: High
+  Blocked by: 050.1
+  Notes: Read/write secrets/config.json, secure API key handling
+
+SUBTASK-050.4: Build chat interface with message display
+  Tags: [code, ux]
+  Priority: High
+  Blocked by: 050.1
+  Notes: WebSocket for real-time, message bubbles, timestamps
+
+SUBTASK-050.5: Build chat dispatcher (intent classification + task delegation)
+  Tags: [code, algorithm]
+  Priority: High
+  Blocked by: 050.4
+  Notes: Status queries → direct read. Work requests → create task.
+         Questions → route to worker. Config → update settings.
+
+SUBTASK-050.6: Build swarm control panel (start/stop/spawn/despawn)
+  Tags: [code]
+  Priority: Medium
+  Blocked by: 050.2
+
+SUBTASK-050.7: Add response streaming and progress indicators
+  Tags: [code, ux]
+  Priority: Medium
+  Blocked by: 050.5
+
+SUBTASK-050.8: Build chat history persistence and session management
+  Tags: [code]
+  Priority: Medium
+  Blocked by: 050.4
+================================================================================

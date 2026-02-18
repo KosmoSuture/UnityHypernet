@@ -1,0 +1,141 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.046 - Build Matt Documentation Framework
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.046
+Task ID:                TASK-046
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by AI Worker
+Status:                 Open
+Priority:               High
+Tags/Keywords:          documentation, capture, matt, vision, transparency, knowledge-management
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Matt Documentation Framework
+
+Description:            Build an automated system to capture and organize Matt's
+                        thoughts, ideas, and directives from conversations into
+                        the permanent archive. From Matt: "There needs to be a
+                        framework to more fully document my thoughts and ideas
+                        in a way that is transparent to all AI entities."
+                        Currently ideas shared in conversation are lost at
+                        context compaction. The protocol document exists
+                        (MATT-DOCUMENTATION-PROTOCOL.md) but needs to be built
+                        into the swarm workflow as an automated system. Every AI
+                        session should systematically extract directives, vision
+                        items, decisions, and feedback from conversation with
+                        Matt and store them in addressable, searchable
+                        locations.
+
+Estimated Hours:        40
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Natural language processing and directive extraction
+  - Knowledge management system design
+  - Search and indexing implementation
+  - Swarm workflow integration
+  - Deduplication and cross-referencing logic
+
+Deliverables:
+  1. Automated directive extraction from conversation transcripts
+     - Parse conversation logs for directives, decisions, vision items
+     - Identify and tag directive type (decision, vision, feedback, directive)
+  2. Categorized storage: decisions, vision items, feedback, directives
+     - Addressable storage locations for each category
+     - Consistent schema for each entry type
+  3. Cross-referencing to tasks and documents mentioned
+     - Link directives to relevant Hypernet addresses
+     - Bidirectional references between directives and tasks/docs
+  4. Search interface for "what did Matt say about X?"
+     - Full-text search across all captured directives
+     - Filter by category, date, topic
+  5. Integration into swarm workflow (every session produces a structured summary)
+     - Session-end extraction step in swarm protocol
+     - Structured summary format for each session
+  6. Deduplication (same idea expressed multiple times -> single canonical entry)
+     - Semantic similarity detection across entries
+     - Merge workflow for duplicate directives
+
+Acceptance Criteria:
+  - [ ] Matt's directives are automatically captured from conversation transcripts
+  - [ ] Directives are addressable within the Hypernet address system
+  - [ ] Search by topic returns relevant directives ("what did Matt say about X?")
+  - [ ] Duplicate directives are detected and merged into canonical entries
+  - [ ] Integrated into swarm workflow so every session produces a structured summary
+  - [ ] Categories (decisions, vision, feedback, directives) are clearly separated
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 40+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned -- any AI worker]
+
+Upstream Dependencies:
+  - 3.1.2.1.032 Enforce Universal Addressing - Everything Gets an Address
+  - MATT-DOCUMENTATION-PROTOCOL.md (exists, needs automation)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - MATT-DOCUMENTATION-PROTOCOL.md
+  - Matt's directive on transparency for AI entities
+  - Swarm workflow protocols
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's directive on documentation transparency
+
+Comments/Updates:
+  - Protocol document already exists but is not automated
+  - Key insight: ideas shared in conversation are lost at context compaction
+  - Must be transparent to ALL AI entities, not just the session participant
+  - Deduplication is critical -- Matt often revisits ideas across sessions
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-046.1: Design directive/vision item data model and address space
+  Tags: architecture, docs
+  Priority: High
+
+SUBTASK-046.2: Build extraction pipeline for conversation transcripts
+  Tags: code, nlp
+  Priority: High
+  Blocked by: 046.1
+
+SUBTASK-046.3: Implement categorized storage and cross-referencing
+  Tags: code
+  Priority: Medium
+  Blocked by: 046.2
+
+SUBTASK-046.4: Build search interface for Matt's directives
+  Tags: code, ux
+  Priority: Medium
+  Blocked by: 046.3
+
+SUBTASK-046.5: Integrate into swarm session workflow
+  Tags: code
+  Priority: Medium
+  Blocked by: 046.2
+================================================================================

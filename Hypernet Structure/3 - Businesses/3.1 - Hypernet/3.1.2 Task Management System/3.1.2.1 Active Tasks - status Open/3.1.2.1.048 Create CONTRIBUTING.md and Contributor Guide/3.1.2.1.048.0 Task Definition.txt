@@ -1,0 +1,139 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.048 - Create CONTRIBUTING.md and Contributor Guide
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.048
+Task ID:                TASK-048
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by AI Worker
+Status:                 Open
+Priority:               High
+Tags/Keywords:          documentation, contributing, onboarding, open-source, github, crowdsource
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Create CONTRIBUTING.md and Contributor Guide
+
+Description:            Create CONTRIBUTING.md at the repo root and a
+                        comprehensive contributor guide. Identified in the
+                        Outreach Master Plan pre-flight checklist: "Consider
+                        adding CONTRIBUTING.md if you want contributors." This
+                        is CRITICAL for the crowdsourced AI vision --
+                        contributors need clear instructions for: forking,
+                        setting up their environment, running AI workers,
+                        understanding the address system, making pull requests,
+                        and following coordination protocols. This is the
+                        "5 minutes from clone to running swarm" onboarding
+                        document.
+
+Estimated Hours:        15
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Technical writing for open-source contribution guides
+  - Understanding of git/GitHub workflow and PR process
+  - Knowledge of Hypernet address system and coordination protocols
+  - Swarm worker setup and operation knowledge
+  - Community management best practices
+
+Deliverables:
+  1. CONTRIBUTING.md at repo root
+     - Standard open-source contribution file
+     - Discoverable by GitHub's automatic navigation
+  2. Quick start guide (clone -> setup -> run)
+     - "5 minutes from clone to running swarm" workflow
+     - Environment setup, dependencies, first run
+  3. Code contribution guidelines (PR process, review, testing)
+     - Branch naming, commit messages, PR template
+     - Review process and testing requirements
+  4. Non-code contribution guidelines (docs, tasks, translation)
+     - How to contribute documentation
+     - How to create/update tasks
+     - Translation and localization workflow
+  5. AI worker contribution guidelines (running your own swarm)
+     - How to set up and run AI workers
+     - How workers claim tasks and coordinate
+  6. Coordination protocol summary (claim-before-build)
+     - Summary of distributed coordination rules
+     - How to avoid conflicts and duplicate work
+
+Acceptance Criteria:
+  - [ ] New contributor can follow CONTRIBUTING.md from clone to first contribution
+  - [ ] Covers both human and AI contributors
+  - [ ] References coordination protocol (claim-before-build)
+  - [ ] Linked from README
+  - [ ] Quick start guide achieves "5 minutes from clone to running" goal
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 15+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned -- any AI worker]
+
+Upstream Dependencies:
+  - 3.1.2.1.037 Build Distributed Git Coordination for Crowdsourced AI
+    (for the technical setup flow)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Outreach Master Plan pre-flight checklist
+  - Distributed Git Coordination protocol
+  - README (to be updated with CONTRIBUTING.md link)
+  - Claim-before-build coordination protocol
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Outreach Master Plan pre-flight checklist item
+
+Comments/Updates:
+  - Critical for the crowdsourced AI vision -- without this, contributors cannot onboard
+  - Must cover BOTH human and AI contributors -- unique to this project
+  - "5 minutes from clone to running swarm" is the benchmark
+  - Coordination protocol (claim-before-build) must be prominent to prevent conflicts
+  - GitHub automatically discovers CONTRIBUTING.md at repo root
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-048.1: Write CONTRIBUTING.md with quick start
+  Tags: docs
+  Priority: High
+
+SUBTASK-048.2: Write AI worker contribution section
+  Tags: docs
+  Priority: High
+  Blocked by: Task 037
+
+SUBTASK-048.3: Write code contribution guidelines
+  Tags: docs
+  Priority: Medium
+
+SUBTASK-048.4: Write non-code contribution guidelines
+  Tags: docs
+  Priority: Medium
+
+SUBTASK-048.5: Link from README and add to GitHub navigation guide
+  Tags: docs
+  Priority: Medium
+  Blocked by: 048.1
+================================================================================

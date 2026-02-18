@@ -1,0 +1,139 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.029 - Add Multi-Language Support Framework
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.029
+Task ID:                TASK-029
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          i18n, localization, multi-language, translation,
+                        internationalization, framework, accessibility
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Add Multi-Language Support Framework
+
+Description:            Add internationalization (i18n) and localization (l10n)
+                        support throughout the Hypernet framework. The Hypernet
+                        is a global project and must be accessible in multiple
+                        languages from the start.
+
+                        From Matt: "Multi-language support needs to be considered
+                        and added into the framework."
+
+Estimated Hours:        60
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Internationalization (i18n) Engineering
+  - Localization Best Practices
+  - Unicode and Text Encoding
+  - Translation Management
+  - UI/UX for Multilingual Systems
+
+Deliverables:
+  1. i18n framework design
+     - String extraction system
+     - Translation file format (JSON/YAML/PO)
+     - Locale detection and switching
+     - Fallback chain (user preference -> browser -> default)
+     - Right-to-left (RTL) language support
+     - Date/time/number formatting per locale
+
+  2. Core system localization
+     - UI strings externalized
+     - Error messages translatable
+     - System prompts (AI worker) multilingual
+     - Documentation framework for translations
+     - Hypernet address descriptions (multilingual metadata)
+
+  3. Translation pipeline
+     - Translation management tool selection
+     - AI-assisted initial translation
+     - Community review process
+     - Translation quality metrics
+     - Continuous translation updates
+
+  4. Initial language set
+     - English (default)
+     - Spanish
+     - Mandarin Chinese
+     - Arabic (RTL test)
+     - Additional languages by community demand
+
+Acceptance Criteria:
+  - [ ] All user-facing strings are externalized
+  - [ ] Language switching works without restart
+  - [ ] RTL languages render correctly
+  - [ ] Translation pipeline is documented
+  - [ ] At least 2 languages fully supported (English + 1)
+  - [ ] Date/time/number formats respect locale
+
+Due Date:               [TBD - Medium priority]
+
+Budget:
+  - Translation tools: $0-100/month
+  - Professional translation review: $500-2000
+  - Estimated: $500-2000
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+
+Downstream Dependents:
+  - All user-facing features
+
+Related Documents:
+  - None yet — new initiative
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Should be considered early to avoid expensive retrofitting
+  - AI translation can bootstrap, human review finalizes
+  - Arabic/Hebrew support tests RTL rendering
+  - Community translation contributions via reputation system
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-029.1: Design i18n framework and string extraction system
+  Tags: [architecture, code]
+  Priority: High
+
+SUBTASK-029.2: Externalize all existing user-facing strings
+  Tags: [code, cleanup]
+  Priority: Medium
+  Blocked by: 029.1
+
+SUBTASK-029.3: Set up translation pipeline and tools
+  Tags: [infrastructure, docs]
+  Priority: Medium
+
+SUBTASK-029.4: Create initial translations (English + Spanish + 1 RTL)
+  Tags: [docs, translation]
+  Priority: Medium
+  Blocked by: 029.2, 029.3
+================================================================================

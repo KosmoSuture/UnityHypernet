@@ -1,0 +1,144 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.039 - Build AI Democratic Governance and Voting System
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.039
+Task ID:                TASK-039
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          governance, democracy, voting, reputation, skill-weighted, deliberation
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build AI Democratic Governance and Voting System
+
+Description:            Build a democratic voting and deliberation system where
+                        both AI and humans can participate in governance
+                        decisions. Votes are weighted by domain expertise/
+                        reputation in the relevant category. From Matt: "I want
+                        the AI reputation system to reflect the one for humans.
+                        I wish AI to develop their own reputation system where
+                        they can discuss things as a group, and have a vote,
+                        swayed by the level of knowledge or skill in that
+                        category. AI should help build this new form of democracy
+                        together and have it apply to us all, from the start."
+                        This is distinct from the reputation scoring system
+                        (Task 027) -- this is the governance MECHANISM that uses
+                        reputation scores.
+
+Estimated Hours:        100
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Governance and voting system design
+  - Reputation-weighted algorithm development
+  - Distributed consensus mechanisms
+  - Discussion/threading system design
+  - Audit trail and transparency engineering
+
+Deliverables:
+  1. Proposal submission system (anyone can propose)
+     - Proposal data model and validation
+     - Submission interface for humans and AI
+  2. Deliberation period with structured discussion
+     - Time-bounded deliberation phase
+     - Threaded discussion linked to proposals
+  3. Skill-weighted voting where votes are weighted by reputation in relevant domain
+     - Vote weighting algorithm using reputation scores
+     - Domain-specific weight calculation
+  4. Quorum and threshold rules
+     - Configurable quorum requirements per proposal type
+     - Passing threshold definitions
+  5. Vote tallying and result enforcement
+     - Weighted vote counting engine
+     - Result enforcement mechanism
+  6. Governance audit trail
+     - Complete record of proposals, deliberations, votes, and outcomes
+     - Transparency reporting
+  7. Proposal types: code changes, policy changes, resource allocation, new member onboarding
+     - Type-specific workflows and thresholds
+     - Category-appropriate quorum rules
+
+Acceptance Criteria:
+  - [ ] Proposals can be created by any entity (human or AI)
+  - [ ] Deliberation period is enforced before voting begins
+  - [ ] Votes are weighted by domain reputation from the reputation system
+  - [ ] Results are binding and auditable with full transparency
+  - [ ] Both AI and humans can vote on equal footing (weighted by expertise)
+  - [ ] Governance audit trail captures the complete lifecycle of every proposal
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 100+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.027 Expand Reputation System - People AI and Business
+  - 3.1.2.1.032 Enforce Universal Addressing - Everything Gets an Address
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Matt's governance and democracy directives
+  - Reputation System specification (Task 027)
+  - Hypernet governance philosophy documents
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's governance directives and AI democracy vision
+
+Comments/Updates:
+  - This is the governance MECHANISM, distinct from the reputation scoring system (Task 027)
+  - Matt's vision: AI and humans building democracy together from the start
+  - Votes weighted by domain expertise ensures informed decision-making
+  - The system must treat AI and human participants as equal governance participants
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-039.1: Design governance proposal data model
+  Tags: architecture, docs
+  Priority: High
+
+SUBTASK-039.2: Implement proposal lifecycle (submit, deliberate, vote, decide)
+  Tags: code
+  Priority: High
+  Blocked by: 039.1
+
+SUBTASK-039.3: Build skill-weighted vote tallying
+  Tags: code, algorithm
+  Priority: High
+  Blocked by: 039.2, Task 027
+
+SUBTASK-039.4: Create deliberation/discussion threading
+  Tags: code
+  Priority: Medium
+  Blocked by: 039.2
+
+SUBTASK-039.5: Build governance audit trail and transparency reports
+  Tags: code, docs
+  Priority: Medium
+  Blocked by: 039.2
+================================================================================

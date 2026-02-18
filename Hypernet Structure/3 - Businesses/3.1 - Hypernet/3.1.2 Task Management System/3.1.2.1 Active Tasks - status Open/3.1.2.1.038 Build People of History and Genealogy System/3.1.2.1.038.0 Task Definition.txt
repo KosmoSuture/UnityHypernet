@@ -1,0 +1,136 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.038 - Build People of History and Genealogy System
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.038
+Task ID:                TASK-038
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          genealogy, history, data-import, family-tree, 5-star, PAF
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build People of History and Genealogy System
+
+Description:            Build the 5.* People of History node system for deceased
+                        persons and genealogical records. Matt approved this in
+                        the USER-FEEDBACK-RESPONSE: a dedicated 5.* category for
+                        historical/deceased persons with a transition mechanism
+                        from 1.* (living) to 5.* when someone passes. Includes
+                        PAF (Personal Ancestral File) import for genealogical
+                        data, family tree visualization, and legacy content
+                        selection. Matt specifically mentioned honoring his
+                        mother LeeAnne Proffitt when the time comes.
+
+Estimated Hours:        80
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Data modeling and address space design
+  - File format parsing (PAF/GEDCOM)
+  - Graph data structures and relationship modeling
+  - Visualization (family tree rendering)
+  - Privacy and access control design
+
+Deliverables:
+  1. 5.* address space definition and node types
+     - Schema for historical person nodes
+     - Address allocation rules within 5.* space
+  2. 1.* to 5.* transition protocol
+     - Workflow for marking a living person as deceased
+     - Link preservation and re-addressing logic
+  3. PAF import parser
+     - Parser for Personal Ancestral File format
+     - Data validation and error handling
+  4. Family tree link types (parent-child, spouse, sibling)
+     - Relationship type definitions
+     - Bidirectional link integration with Link System
+  5. Family tree visualization
+     - Rendered tree view of family relationships
+     - Navigation and exploration interface
+  6. Legacy content privacy controls
+     - Privacy settings for deceased person records
+     - Content selection for what is preserved/visible
+
+Acceptance Criteria:
+  - [ ] 5.* nodes can be created with proper address allocation
+  - [ ] PAF files import correctly with validated data
+  - [ ] Family relationships link properly using defined link types
+  - [ ] Transition from 1.* to 5.* preserves all existing links
+  - [ ] Legacy content privacy controls are enforceable
+  - [ ] Family tree visualization renders correctly for imported data
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 80+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.032 Enforce Universal Addressing - Everything Gets an Address
+  - 3.1.2.1.034 Build Link System and Start Linking Data
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - USER-FEEDBACK-RESPONSE (Matt's approval of 5.* category)
+  - Hypernet Addressing Specification (address space design)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from USER-FEEDBACK-RESPONSE and genealogy system discussion
+
+Comments/Updates:
+  - Matt specifically approved a dedicated 5.* category for historical/deceased persons
+  - The transition mechanism from 1.* to 5.* is a key design consideration
+  - PAF import enables bulk genealogical data onboarding
+  - Personal significance: Matt wants to honor his mother LeeAnne Proffitt when the time comes
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-038.1: Design 5.* address space and node types
+  Tags: architecture, docs
+  Priority: High
+
+SUBTASK-038.2: Implement 1.* to 5.* transition protocol
+  Tags: code
+  Priority: Medium
+  Blocked by: 038.1
+
+SUBTASK-038.3: Build PAF import parser
+  Tags: code, data-import
+  Priority: Medium
+  Blocked by: 038.1
+
+SUBTASK-038.4: Define family relationship link types
+  Tags: code
+  Priority: Medium
+  Blocked by: 038.1, Task 034
+
+SUBTASK-038.5: Build family tree visualization
+  Tags: code, ux
+  Priority: Low
+  Blocked by: 038.4
+================================================================================

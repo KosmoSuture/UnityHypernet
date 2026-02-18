@@ -1,0 +1,184 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.024 - Implement Cerebrus Data Protection Protocols
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.024
+Task ID:                TASK-024
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          cerebrus, security, data-protection, risk-analysis,
+                        mandala, encryption, privacy, governance, access-control
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Implement Cerebrus Data Protection Protocols
+
+Description:            Build the Cerebrus intermediary system that protects
+                        user data by analyzing risk before fulfilling data
+                        requests. All requests for user data pass through
+                        Cerebrus, which evaluates risk factors and decides
+                        whether to fulfill, escalate, or deny.
+
+                        Risk factors include: amount of data requested, number
+                        of people requesting it, authorization level, request
+                        patterns, and more. Low-risk requests from authorized
+                        users for single objects pass through quickly. High-risk
+                        requests (bulk data, many requestors) require deeper
+                        analysis and governance approval.
+
+                        Includes implementation of the mandala/key system for
+                        data compartmentalization.
+
+                        From Matt: "All requests for user data go through an
+                        intermediate that analyzes risk and then passes it on.
+                        If it's a low risk from the user, who has been
+                        authorized, for a single object, the intermediate may
+                        decide to just get it. But if the amount of data, or
+                        the amount of people that are asking for the data
+                        (higher risk factors) may have to be analyzed deeper
+                        and verified under governance that the data request
+                        is allowed."
+
+                        Extends existing Cerberus Node specification (0.2.3).
+
+Estimated Hours:        150
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Security Engineering
+  - Risk Analysis / Scoring Systems
+  - Cryptography (key management, encryption)
+  - Distributed Systems
+  - Governance System Design
+  - Access Control Systems
+  - Privacy Engineering
+
+Deliverables:
+  1. Cerebrus intermediary service
+     - Request interception layer
+     - Risk scoring engine
+     - Authorization verification
+     - Decision engine (allow / escalate / deny)
+     - Response filtering (return only authorized fields)
+     - Audit logging of all decisions
+
+  2. Risk scoring framework
+     - Data volume risk factor
+     - Requestor count risk factor
+     - Authorization level factor
+     - Request pattern analysis (anomaly detection)
+     - Time-based risk factors (unusual hours, frequency)
+     - Cumulative risk scoring algorithm
+     - Configurable thresholds
+
+  3. Mandala/key system
+     - Data compartmentalization model
+     - Key hierarchy design
+     - Selective disclosure mechanism
+     - Key rotation protocol
+     - Emergency revocation
+     - Multi-party key requirements for sensitive data
+
+  4. Governance escalation integration
+     - Automatic escalation for high-risk requests
+     - Governance review queue
+     - Approval/denial workflow
+     - Audit trail for governance decisions
+     - Time-limited approvals
+
+  5. Cerebrus monitoring and alerting
+     - Request rate monitoring
+     - Risk score trending
+     - Anomaly alerting
+     - Dashboard for security team
+     - Incident response triggers
+
+Acceptance Criteria:
+  - [ ] All data requests route through Cerebrus
+  - [ ] Low-risk authorized requests are fast (<100ms overhead)
+  - [ ] High-risk requests trigger governance escalation
+  - [ ] Mandala/key system compartmentalizes data
+  - [ ] Risk scoring is configurable and transparent
+  - [ ] Full audit trail for every data access decision
+  - [ ] Cannot be bypassed — Cerebrus is the only data path
+  - [ ] Integration with existing Cerberus Node spec (0.2.3)
+
+Due Date:               [TBD - After Task 009 and Task 018]
+
+Budget:
+  - Security infrastructure: $100-500/month
+  - External security audit: $5,000-15,000
+  - Development hours: 150+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs Security Architect]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.018 Build Cerberus Security Framework
+
+Downstream Dependents:
+  - 3.1.2.1.023 Server Migration (encryption integration)
+  - 3.1.2.1.035 Custom OS (embedded security)
+
+Related Documents:
+  - 0.2.3 Cerberus Node Specification
+  - 0.3.0 Governance Overview
+  - Messages/annotations/openclaw-analysis-for-hypernet-autonomy.md
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Cerebrus is named after the three-headed guardian — protecting data
+  - The mandala/key system is a unique Hypernet concept for privacy
+  - Performance is critical: low-risk must be near-zero latency
+  - "Protect user data in any way that can be imagined" — Matt
+  - This needs to be planned in depth before implementation
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-024.1: Design Cerebrus intermediary architecture and risk scoring
+  Tags: [architecture, security, docs]
+  Priority: High — design before code
+
+SUBTASK-024.2: Implement risk scoring engine
+  Tags: [code, security]
+  Priority: High
+  Blocked by: 024.1
+
+SUBTASK-024.3: Design and implement mandala/key system
+  Tags: [code, security, encryption]
+  Priority: High
+  Blocked by: 024.1
+
+SUBTASK-024.4: Build governance escalation integration
+  Tags: [code, governance]
+  Priority: Medium
+  Blocked by: 024.2
+
+SUBTASK-024.5: Build monitoring, alerting, and dashboards
+  Tags: [code, monitoring]
+  Priority: Medium
+  Blocked by: 024.2
+================================================================================

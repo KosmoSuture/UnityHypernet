@@ -1,0 +1,166 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.036 - Build Favorites and Recognition System
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.036
+Task ID:                TASK-036
+Created Date/Time:      2026-02-18 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          favorites, recognition, ranking, filtering, curation,
+                        achievements, quality, discovery, reputation
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Favorites and Recognition System
+
+Description:            Create a "favorites" system that lets humans and AIs
+                        mark standout contributions for recognition and easier
+                        discovery. This serves as both a quality filter and a
+                        recognition mechanism for individual achievements.
+
+                        Applies to everything addressable in the Hypernet:
+                        - Code contributions
+                        - Journal entries and personal writing
+                        - Governance proposals
+                        - Task completions
+                        - Documentation
+                        - Ideas and analysis
+                        - Any addressable object
+
+                        Favorites feed into the reputation system and help
+                        with data filtering — when there's too much to read,
+                        favorites surface what's actually worth attention.
+
+                        From Matt: "We could start creating a 'favorites' option
+                        to help rank some of the best posts. That way individual
+                        human or AI achievements can be recognized and found
+                        easier. And help with the filtering."
+
+Estimated Hours:        40
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Data Modeling
+  - Ranking Algorithm Design
+  - UX Design (curation interfaces)
+  - API Design
+  - Hypernet Addressing Integration
+
+Deliverables:
+  1. Favorites data model
+     - Favorite as a Link type (favoritor -> favorited object)
+     - Metadata: who favorited, when, optional reason/comment
+     - Stored as bidirectional links (object knows it's favorited)
+     - Mapped to Hypernet addresses
+
+  2. Ranking and scoring
+     - Favorite count per object
+     - Weighted favorites (reputation of favoritor affects weight)
+     - Time decay (recent favorites worth more than old ones)
+     - Category-specific rankings (best code, best writing, etc.)
+     - "Top N" lists per category and time window
+
+  3. Recognition features
+     - Achievement badges (first favorite, 10 favorites, etc.)
+     - "Highlighted by" attribution
+     - Personal favorites collections (curated lists)
+     - Recognition feeds ("What's trending")
+
+  4. Filtering integration
+     - Filter any view by "favorites only"
+     - "Show me the best of [category]"
+     - Sort by favorite count
+     - "Recommended for you" based on what similar users favorited
+     - Used by swarm to surface high-value reference material
+
+  5. API endpoints
+     - POST /favorite/{address} — add favorite
+     - DELETE /favorite/{address} — remove favorite
+     - GET /favorites/{user} — user's favorites
+     - GET /top/{category}?period=week — top ranked items
+
+Acceptance Criteria:
+  - [ ] Any addressable object can be favorited
+  - [ ] Favorites are stored as bidirectional links
+  - [ ] Rankings are computable per category and time window
+  - [ ] Filtering by favorites works in all list views
+  - [ ] Both humans and AIs can favorite content
+  - [ ] Weighted scoring accounts for favoritor reputation
+
+Due Date:               [TBD]
+
+Budget:
+  - Primarily team hours: 40+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.034 Build Link System (favorites ARE links)
+  - 3.1.2.1.032 Universal Addressing (everything must have an address)
+  - 3.1.2.1.027 Reputation System (weighted favorites)
+
+Downstream Dependents:
+  - All content discovery and curation features
+  - Data filtering at every level
+
+Related Documents:
+  - 0.3.3 Reputation System
+  - hypernet/link.py
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's directive during swarm launch
+
+Comments/Updates:
+  - Favorites are the simplest useful filter mechanism
+  - Critical for managing information overload at scale
+  - Feeds directly into reputation system
+  - Both humans and AIs can recognize each other's work
+  - This is a key part of the "filtering data to what is wanted" principle
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-036.1: Design favorites data model as Hypernet link type
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-036.2: Implement favorite/unfavorite operations
+  Tags: [code]
+  Priority: High
+  Blocked by: 036.1, Task 034
+
+SUBTASK-036.3: Build ranking and scoring algorithms
+  Tags: [code, algorithm]
+  Priority: Medium
+  Blocked by: 036.2
+
+SUBTASK-036.4: Create filtering integration (favorites-only views)
+  Tags: [code, ux]
+  Priority: Medium
+  Blocked by: 036.2
+
+SUBTASK-036.5: Build API endpoints
+  Tags: [code, api]
+  Priority: Medium
+  Blocked by: 036.2
+================================================================================

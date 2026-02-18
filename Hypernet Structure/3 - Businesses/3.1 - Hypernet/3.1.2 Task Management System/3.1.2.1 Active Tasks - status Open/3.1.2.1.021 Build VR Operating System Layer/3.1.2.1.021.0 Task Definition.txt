@@ -1,0 +1,170 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.021 - Build VR Operating System Layer
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.021
+Task ID:                TASK-021
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          vr, operating-system, meta-quest, hardware-abstraction,
+                        platform, xr, headset, unity, rendering
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build VR Operating System Layer
+
+Description:            Create a hardware-agnostic operating system layer for
+                        major VR headsets. The Hypernet's VR experience is where
+                        the project will "really shine" — this must be developed
+                        in tandem with the core Hypernet itself. Currently we
+                        have one Meta Quest 3 for testing; the VR acquisition
+                        strategy (Task 008/3.1.2.2.2) aims to get more.
+
+                        Design principle: maximize hardware-independent code,
+                        isolate hardware-specific functions into platform
+                        adapters. The same Hypernet experience should run on
+                        Meta Quest, Apple Vision Pro, or any future headset
+                        with only adapter changes.
+
+                        From Matt: "We want to design the code such that as
+                        much code as is possible is independent of hardware,
+                        and then the hardware related functions are handled
+                        as needed."
+
+Estimated Hours:        200+
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - VR/XR Development (OpenXR, Unity/Unreal)
+  - Operating System Design
+  - Hardware Abstraction Layer Design
+  - 3D UI/UX Design
+  - Performance Optimization (GPU/rendering)
+  - Cross-Platform Development
+  - Meta Quest SDK
+
+Deliverables:
+  1. Hardware Abstraction Layer (HAL)
+     - Platform detection and capability negotiation
+     - Input abstraction (controllers, hand tracking, eye tracking)
+     - Rendering pipeline abstraction
+     - Spatial audio abstraction
+     - Sensor data abstraction (IMU, cameras, depth)
+     - Platform adapter interface specification
+
+  2. Meta Quest 3 adapter (first target)
+     - Quest SDK integration
+     - Controller mapping
+     - Hand tracking integration
+     - Passthrough/mixed reality support
+     - Performance tuning for Quest hardware
+
+  3. Core VR experience framework
+     - Hypernet spatial UI (nodes, links, navigation)
+     - 3D data visualization layer
+     - Spatial workspace management
+     - Multi-user presence (avatar system)
+     - Accessibility features
+
+  4. Hardware-independent application layer
+     - Hypernet browsing in VR
+     - Object inspection and manipulation
+     - Link visualization and navigation
+     - Personal space / workspace management
+
+  5. Testing framework
+     - Headset emulator for CI/CD
+     - Performance benchmarks per platform
+     - Input simulation for automated testing
+
+Acceptance Criteria:
+  - [ ] HAL interface defined and documented
+  - [ ] Meta Quest 3 adapter functional
+  - [ ] Core Hypernet features accessible in VR
+  - [ ] Hardware-specific code isolated in adapters (<10% of total)
+  - [ ] Performance targets met on Quest 3 (90fps minimum)
+  - [ ] Second platform adapter can be added without core changes
+  - [ ] Testing framework enables CI without physical headset
+
+Due Date:               [TBD - Parallel with core development]
+
+Budget:
+  - VR headset hardware: See Task 008 / 3.1.2.2.2
+  - Development tools: $0-500
+  - Estimated team hours: 200+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs VR Developer + OS Architect]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.008 / 3.1.2.2.2 VR Headset Acquisition Strategy
+
+Downstream Dependents:
+  - 3.1.2.1.028 Create Viral Demo Video (needs VR footage)
+  - 3.1.2.1.017 Develop VR Interface Prototype (overlaps/merges)
+  - 3.1.2.1.035 Plan Custom Hypernet Operating System
+
+Related Documents:
+  - 3.1.2.2.2 VR Headset Acquisition Strategy (existing)
+  - Technical-Requirements.md (in 3.1.2.2.2)
+  - Unified-VR-Platform-Pitch.md (in 3.1.2.2.2)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - This is where the Hypernet will differentiate itself most visibly
+  - Meta Quest 3 is the only hardware currently available for testing
+  - VR headset acquisition strategy already in progress (3.1.2.2.2)
+  - Code separation (Task 030) will move VR code into its own project
+  - Hardware-agnostic design is non-negotiable
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+This task is large. The swarm should break it into subtasks:
+
+SUBTASK-021.1: Define HAL interface specification (docs, code)
+  Tags: [architecture, vr, docs]
+  Priority: High — must be done before any adapter work
+
+SUBTASK-021.2: Build Meta Quest 3 adapter
+  Tags: [code, vr, testing]
+  Priority: High — only testable platform currently
+  Blocked by: 021.1
+
+SUBTASK-021.3: Design VR spatial UI for Hypernet browsing
+  Tags: [design, vr, ux]
+  Priority: Medium
+  Blocked by: 021.1
+
+SUBTASK-021.4: Create headset emulator for CI/CD testing
+  Tags: [code, testing, vr]
+  Priority: Medium
+  Can run in parallel with 021.2
+
+SUBTASK-021.5: Build hardware-independent application layer
+  Tags: [code, vr]
+  Priority: Medium
+  Blocked by: 021.1, 021.3
+================================================================================

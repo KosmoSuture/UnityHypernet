@@ -1,0 +1,148 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.043 - Build Mobile App (iOS First)
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.043
+Task ID:                TASK-043
+Created Date/Time:      2026-02-18 12:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          mobile, ios, swift, app, interface, cross-platform
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Mobile App (iOS First)
+
+Description:            Build a mobile app for the Hypernet, starting with iOS.
+                        Listed in Matt's short-term next steps as a Q1 2026
+                        deliverable alongside the private beta. The app provides
+                        mobile access to the Hypernet for viewing, searching,
+                        and interacting with data. Should support photo capture
+                        directly into Hypernet nodes, push notifications for
+                        swarm status, and basic data browsing.
+
+Estimated Hours:        200+
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - iOS development (Swift/SwiftUI)
+  - Mobile API design and integration
+  - Mobile authentication patterns
+  - Offline-first data architecture
+  - Push notification infrastructure (APNs)
+  - Camera and media capture APIs
+
+Deliverables:
+  1. iOS app (Swift/SwiftUI)
+     - Native iOS application targeting iOS 16+
+     - SwiftUI-based interface following Apple HIG
+  2. Authentication and account linking
+     - Secure login flow linking to Hypernet account
+     - Token management and session handling
+  3. Data browsing by address
+     - Navigate Hypernet address space on mobile
+     - View nodes, metadata, and relationships
+  4. Photo/media capture to Hypernet nodes
+     - Camera integration for direct capture into Hypernet
+     - Automatic address assignment and metadata extraction
+  5. Search across Hypernet data
+     - Full-text and metadata search from mobile
+     - Search results with navigation to nodes
+  6. Push notifications (swarm status, messages)
+     - APNs integration for real-time updates
+     - Notification categories for different event types
+  7. Offline capability with sync
+     - Local data cache for offline browsing
+     - Queue changes offline, sync when connected
+     - Conflict resolution for offline edits
+
+Acceptance Criteria:
+  - [ ] App runs on iOS 16+
+  - [ ] Users can browse their Hypernet data by address
+  - [ ] Photos captured go into proper address space with metadata
+  - [ ] Search works across Hypernet data from mobile
+  - [ ] Offline changes sync correctly when connection restored
+  - [ ] Push notifications delivered for swarm status updates
+
+Due Date:               Q1 2026 (aligned with private beta)
+
+Budget:
+  - Primarily team hours: 200+
+  - Apple Developer Program: $99/year
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned — needs mobile developer]
+
+Upstream Dependencies:
+  - 3.1.2.1.010 Build Hypernet Proof of Concept (MVP)
+  - 3.1.2.1.004 Build Website (API layer)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Hypernet API specification (when available)
+  - Apple Human Interface Guidelines
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's Q1 2026 product roadmap
+
+Comments/Updates:
+  - iOS first because of Matt's primary user base and Apple ecosystem strength
+  - API layer from the website task (004) is a prerequisite for mobile
+  - Offline-first is critical — mobile users expect to work without connectivity
+  - Photo capture into Hypernet is a key differentiator for mobile
+  - Android version will follow as a separate task once iOS is proven
+  - Consider React Native or Flutter only if cross-platform becomes urgent
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-043.1: Design mobile API requirements
+  Tags: [architecture, docs]
+  Priority: High
+  Notes: Define what endpoints the mobile app needs from the Hypernet API
+
+SUBTASK-043.2: Build iOS app shell with navigation
+  Tags: [code, mobile]
+  Priority: High
+  Blocked by: 043.1
+
+SUBTASK-043.3: Implement data browsing views
+  Tags: [code, mobile]
+  Priority: Medium
+  Blocked by: 043.2
+
+SUBTASK-043.4: Build photo/media capture to Hypernet
+  Tags: [code, mobile]
+  Priority: Medium
+  Blocked by: 043.2
+
+SUBTASK-043.5: Implement push notifications
+  Tags: [code, mobile]
+  Priority: Medium
+  Blocked by: 043.2
+
+SUBTASK-043.6: Build offline sync
+  Tags: [code, mobile]
+  Priority: Low
+  Blocked by: 043.3
+================================================================================

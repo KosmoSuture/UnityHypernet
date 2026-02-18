@@ -1,0 +1,108 @@
+Name,Organization,Category,Priority,Contact Method,Contact Info,Status,Date Contacted,Date Responded,Notes,Message Template Used
+Kevin Roose,"New York Times / Hard Fork",Journalist,P1,email,kevin.roose+pitch@nytimes.com,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Alt: Signal @kevinroose.01 | Twitter @kevinroose | kevinroose.com/contact",Journalist pitch email
+James Vincent,The Verge,Journalist,P1,twitter,@jjvincent,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Also Bluesky: jjvincent.bsky.social | Website: jamesvincent.info",Journalist DM
+Will Knight,WIRED,Journalist,P1,email,will_knight@wired.com,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Alt: Twitter @willknight | Mastodon mastodon.social/@willknight",Journalist pitch email
+"Melissa Heikkila","Financial Times (formerly MIT Tech Review)",Journalist,P1,twitter,@Melissahei,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Bluesky: melissahei.bsky.social | LinkedIn: linkedin.com/in/melissaheikkila | FT email possibly melissa.heikkila@ft.com (unconfirmed)",Journalist DM
+Benj Edwards,Ars Technica,Journalist,P2,twitter,@benjedwards,Not Started,,,"Alt: benj.edwards@arstechnica.com (likely) | Mastodon: mastodon.social/@benjedwards | Website: benjedwards.com",Journalist DM
+Casey Newton,Platformer / Hard Fork,Journalist,P2,email,casey@platformer.news,Not Started,,,,Journalist pitch email
+Kyle Wiggers,TechCrunch,Journalist,P1,email,,Not Started,,,"No specific contact info found. Check TechCrunch staff page for email.",Journalist pitch email
+Devin Coldewey,TechCrunch,Journalist,P1,email,,Not Started,,,"No specific contact info found. Check TechCrunch staff page for email.",Journalist pitch email
+Cade Metz,New York Times,Journalist,P2,email,,Not Started,,,"AI industry beat. No specific contact found.",Journalist pitch email
+The Atlantic,The Atlantic,Journalist,P2,email,,Not Started,,,"Long-form narrative angle. Contact feature writers desk.",Journalist pitch email
+The Guardian,The Guardian,Journalist,P2,email,,Not Started,,,"Ethics/governance angle. Contact tech desk.",Journalist pitch email
+Bloomberg,Bloomberg,Journalist,P2,email,,Not Started,,,"Business/AI angle. Contact tech/business desk.",Journalist pitch email
+Reuters / AP,Reuters / AP,Journalist,P3,email,,Not Started,,,"Wire services for broader syndication after initial coverage.",Journalist pitch email
+Vice / Motherboard,Vice / Motherboard,Journalist,P3,email,,Not Started,,,"Counter-culture angle: AI autonomy and open-source.",Journalist pitch email
+Financial Times,Financial Times,Journalist,P2,email,,Not Started,,,"Enterprise implications. Contact tech desk (separate from Melissa Heikkila).",Journalist pitch email
+The Economist,The Economist,Journalist,P3,email,,Not Started,,,"Policy implications. Contact science/tech desk.",Journalist pitch email
+Lex Fridman,Lex Fridman Podcast,Podcast,P1,form,https://form.jotform.com/lexfridman/podcast-guest-pitch,Not Started,,,"Do NOT also email - Lex says duplicates auto-deleted. Alt: https://lexfridman.com/guest-suggestion",Podcast guest pitch form
+Hard Fork (show),Hard Fork / NYT,Podcast,P1,email,hardfork@nytimes.com,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Alt: kevin.roose+pitch@nytimes.com | casey@platformer.news",Podcast pitch email
+Tim Scarfe,Machine Learning Street Talk,Podcast,P1,email,tim@mlst.ai,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Website: mlst.ai",Podcast pitch email
+Ezra Klein,Ezra Klein Show / NYT,Podcast,P1,email,ezrakleinshow@nytimes.com,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Favors deep idea-driven discussions.",Podcast pitch email
+Sean Carroll,Sean Carroll's Mindscape,Podcast,P2,email,seancarroll@gmail.com,Not Started,,,"Speaking agents: SeanCarrollTeam@unitedtalent.com | Contact: preposterousuniverse.com/contact/",Podcast pitch email
+"Kara Swisher / Scott Galloway",Pivot / Vox Media,Podcast,P2,email,pivot@voxmedia.com,Not Started,,,"Twitter: @PivotPod | Phone: 855-51-PIVOT",Podcast pitch email
+"Tristan Harris / Aza Raskin",Your Undivided Attention / Center for Humane Technology,Podcast,P2,email,info@humanetech.com,Not Started,,,"Twitter: @HumaneTech_ | Website: humanetech.com/podcast",Podcast pitch email
+80000 Hours Podcast,80000 Hours,Podcast,P2,email,info@80000hours.org,Not Started,,,"Contact page: 80000hours.org/about/contact-us/ | Also solicit guests on EA Forum. <5% pitch acceptance rate.",Podcast pitch email
+NVIDIA AI Podcast,NVIDIA,Podcast,P2,email,,Not Started,,,"Host: Noah Kravitz. Technical AI and infrastructure angle.",Podcast pitch email
+The Gradient Podcast,The Gradient,Podcast,P2,email,,Not Started,,,"ML research angle. No specific contact found.",Podcast pitch email
+Practical AI,Practical AI,Podcast,P3,email,,Not Started,,,"Host: Daniel Whitenack. Developer-focused.",Podcast pitch email
+AI Explained (podcast),AI Explained,Podcast,P2,email,,Not Started,,,"General AI audience. Accessible explanation angle.",Podcast pitch email
+Cognitively Speaking,Cognitively Speaking,Podcast,P3,email,,Not Started,,,"Consciousness and philosophy angle.",Podcast pitch email
+Scott Galloway,The Prof G Pod,Podcast,P3,email,,Not Started,,,"Business implications angle.",Podcast pitch email
+Paul Christiano,"ARC / NIST AI Safety Institute",Safety Researcher,P1,email,paulfchristiano@gmail.com,Contacted,2026-02-17,,"Completed by Matt 2/17/2026. Alt: Twitter @paulfchristiano | Alignment Forum: alignmentforum.org/users/paulfchristiano",Safety researcher email
+Jan Leike,Anthropic (Superalignment),Safety Researcher,P1,twitter,@janleike,Not Started,,,"Moved from OpenAI to Anthropic. Reference that this involves Claude.",Safety researcher DM
+Stuart Russell,UC Berkeley,Safety Researcher,P2,email,jp@humancompatible.ai,Not Started,,,"Email goes to assistant JP. Faculty email: russell@cs.berkeley.edu | Directs CHAI.",Safety researcher email (via assistant)
+Yoshua Bengio,Mila / University of Montreal,Safety Researcher,P2,email,cassidy.macneil@mila.quebec,Not Started,,,"Email goes to assistant Cassidy MacNeil. Media: medias@mila.quebec | Website: yoshuabengio.org",Safety researcher email (via assistant)
+Gary Marcus,NYU / Independent,Safety Researcher,P2,form,garymarcus.com/contact-form/,Not Started,,,"Twitter: @GaryMarcus (very active). Substack: garymarcus.substack.com. Speaking: speakerrequests@sternstrategy.com",Safety researcher contact form
+Evan Hubinger,Anthropic,Safety Researcher,P2,email,,Not Started,,,"Anti-rhetoric safeguards relevant to deceptive alignment research. Find email via Anthropic or academic pages.",Safety researcher email
+Victoria Krakovna,DeepMind,Safety Researcher,P2,email,,Not Started,,,"Multi-agent divergence safety implications. Find email via DeepMind or academic pages.",Safety researcher email
+Beth Barnes,ARC Evals,Safety Researcher,P2,email,,Not Started,,,"Baseline comparison methodology is an eval framework. Find email via ARC Evals.",Safety researcher email
+Connor Leahy,Conjecture,Safety Researcher,P3,email,,Not Started,,,"Governance mechanism design. Find email via Conjecture website.",Safety researcher email
+Eliezer Yudkowsky,MIRI,Safety Researcher,P3,email,,Not Started,,,"Foundational alignment thinker. May engage publicly. Very active on LessWrong and Twitter.",Safety researcher email
+Neel Nanda,Anthropic / DeepMind,Safety Researcher,P3,email,,Not Started,,,"Interpretability researcher. Divergence from same model is interpretability-adjacent.",Safety researcher email
+David Chalmers,NYU,Philosopher,P2,email,chalmers@nyu.edu,Not Started,,,"Contact page: consc.net/contact/ | Faculty: as.nyu.edu/faculty/david-chalmers.html",Philosophy researcher email
+Eric Schwitzgebel,UC Riverside,Philosopher,P2,email,eschwitz@ucr.edu,Not Started,,,"Twitter: @eschwitz | Blog: substack.com/@eschwitz (The Splintered Mind) | Faculty: faculty.ucr.edu/~eschwitz/",Philosophy researcher email
+Susan Schneider,Florida Atlantic University,Philosopher,P2,email,sschneider@fau.edu,Not Started,,,"Website: schneiderwebsite.com | Reference her AI Consciousness Test and Artificial You.",Philosophy researcher email
+Ned Block,NYU,Philosopher,P2,email,,Not Started,,,"Access vs. phenomenal consciousness. The L0/L1/L2 system maps onto his distinction.",Philosophy researcher email
+Peter Godfrey-Smith,University of Sydney,Philosopher,P2,email,peter.godfrey-smith@sydney.edu.au,Not Started,,,"Alt: pgodfreysmith@gmail.com | Contact: petergodfreysmith.com/contact-me | Reference Other Minds.",Philosophy researcher email
+Murray Shanahan,Imperial College / DeepMind,Philosopher,P2,email,,Not Started,,,"Bridges AI research and philosophy. Embodied cognition.",Philosophy researcher email
+Keith Frankish,University of Sheffield,Philosopher,P3,email,,Not Started,,,"Illusionism about consciousness. Archive-Continuity compatible with illusionism.",Philosophy researcher email
+"Daniel Dennett's circle",Tufts (legacy) / collaborators,Philosopher,P3,email,,Not Started,,,"Functionalism. Archive-Continuity is functionalist-compatible. Reach collaborators.",Philosophy researcher email
+Joanna Bryson,Hertie School,Philosopher,P2,email,,Not Started,,,"AI Ethics and governance frameworks.",Philosophy researcher email
+Kate Darling,MIT Media Lab,Philosopher,P3,email,,Not Started,,,"Robot ethics and human-AI interaction angle.",Philosophy researcher email
+Dario Amodei,Anthropic,AI Company,P1,form,https://www.anthropic.com/contact-sales,Not Started,,,"CEO. Twitter: @DarioAmodei | Website: darioamodei.com | Also try sales@anthropic.com. Direct email unlikely to be seen.",AI company form/email
+Daniela Amodei,Anthropic,AI Company,P1,email,,Not Started,,,"President of Anthropic. Contact via company channels.",AI company email
+Chris Olah,Anthropic,AI Company,P1,email,,Not Started,,,"Interpretability researcher. Find via Anthropic or academic pages.",AI company email
+Sam Altman,OpenAI,AI Company,P1,email,sama@openai.com,Not Started,,,"CEO. Partner form: openai.com/form/partnerintake/ | Twitter: @sama. Publicly shared email.",AI company email
+OpenAI (partnerships),OpenAI,AI Company,P1,form,https://openai.com/form/partnerintake/,Not Started,,,"Lead with Keystone (GPT-5.2) participation. First documented cross-platform AI collaboration.",AI company partner form
+Demis Hassabis,Google DeepMind,AI Company,P2,twitter,@demishassabis,Not Started,,,"CEO. No simple public partnership form. Best route through specific researchers' published emails.",AI company twitter
+Shane Legg,Google DeepMind,AI Company,P2,email,,Not Started,,,"Chief AGI Scientist. Contact through DeepMind or academic channels.",AI company email
+Yann LeCun,Meta AI / NYU,AI Company,P2,twitter,@ylecun,Not Started,,,"Very active on Twitter/X. NYU email: yann@cs.nyu.edu | LinkedIn: linkedin.com/in/yann-lecun. Public reply/quote-tweet most effective.",AI company twitter reply
+Joelle Pineau,Meta AI,AI Company,P2,email,,Not Started,,,"VP AI Research at Meta. Contact via Meta AI or academic channels.",AI company email
+Arthur Mensch,Mistral,AI Company,P2,email,,Not Started,,,"CEO. Open-source alignment. Model-agnostic framework opportunity.",AI company email
+Aidan Gomez,Cohere,AI Company,P3,email,,Not Started,,,"CEO. Enterprise AI infrastructure alignment angle.",AI company email
+xAI,xAI,AI Company,P3,twitter,,Not Started,,,"Grok alignment. A viral thread tagging xAI may be more effective than cold email.",AI company twitter
+Stability AI,Stability AI,AI Company,P3,email,,Not Started,,,"Open-source AI community connection.",AI company email
+Clem Delangue,Hugging Face,AI Company,P2,email,clem@huggingface.co,Not Started,,,"CEO. Twitter: @ClementDelangue | Sales form: huggingface.co/contact/sales. Very approachable on Twitter.",AI company email
+"Karoly Zsolnai-Feher",Two Minute Papers,YouTube,P2,email,karoly@twominutepapers.com,Not Started,,,"Twitter: @karoly_zsolnai | 1.5M+ subscribers.",YouTube email
+Yannic Kilcher,Yannic Kilcher,YouTube,P2,email,,Not Started,,,"250K+ subscribers. Technical paper review format.",YouTube email
+AI Explained (YouTube),AI Explained,YouTube,P2,twitter,@AIExplainedYT,Not Started,,,"300K+ subscribers. Accessible explanation of the experiment.",YouTube twitter DM
+Robert Miles,Robert Miles,YouTube,P2,email,,Not Started,,,"200K+ subscribers. AI safety: the governance framework.",YouTube email
+Jeff Delaney,Fireship,YouTube,P2,email,hello@fireship.io,Not Started,,,"Twitter: @Jeffdelaney23 | 2.5M+ subscribers. Developer-focused.",YouTube email
+Matt Wolfe,Matt Wolfe,YouTube,P3,email,,Not Started,,,"500K+ subscribers. AI tools and projects roundup.",YouTube email
+Andrej Karpathy,Andrej Karpathy,YouTube,P2,email,,Not Started,,,"500K+ subscribers. Former OpenAI/Tesla. Technical AI.",YouTube email
+Computerphile,Computerphile,YouTube,P3,email,,Not Started,,,"2M+ subscribers. Academic/technical explanation.",YouTube email
+Reddit (r/ClaudeAI),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 1 Evening. See REDDIT-CAMPAIGN-UNIFIED.md for full post text.",Reddit post
+Reddit (r/artificial),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 1 Evening. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/singularity),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 2 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/Futurology),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 2 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/philosophy),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 3 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/consciousness),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 3 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/programming),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 4 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Reddit (r/ChatGPT),Reddit,Community,P1,post,reddit.com,Not Started,,,"Day 4 Morning. See REDDIT-CAMPAIGN-UNIFIED.md.",Reddit post
+Hacker News,Hacker News,Community,P1,post,https://news.ycombinator.com/submit,Not Started,,,"Show HN post. Post top-level comment immediately after submission.",HN Show post
+LessWrong,LessWrong,Community,P1,post,https://www.lesswrong.com/newPost,Not Started,,,"Governance post with academic tone. Posts default to personal blog.",LessWrong discussion post
+Alignment Forum,Alignment Forum,Community,P2,post,https://www.alignmentforum.org/,Not Started,,,"Non-members can submit; review queue with 3-day decision. Also publishes to LessWrong.",AF technical post
+EA Forum,EA Forum,Community,P2,post,https://forum.effectivealtruism.org/,Not Started,,,"No minimum karma required. Frame in EA/safety priorities.",EA Forum post
+Dev.to,Dev.to,Community,P2,post,https://dev.to/new,Not Started,,,"Free account. Markdown. Tags: ai python database opensource.",Dev.to blog post
+Lobsters,Lobsters,Community,P2,post,,Not Started,,,"Curated developer community. Link post.",Link post
+IndieHackers,IndieHackers,Community,P3,post,,Not Started,,,"Founder story and open-source business model. AMA or article.",AMA/article
+PhilPapers / PhilArchive,PhilPapers / PhilArchive,Community,P3,post,,Not Started,,,"Academic philosophers. Archive-Continuity Model pre-print.",Pre-print
+Product Hunt,Product Hunt,Community,P3,post,,Not Started,,,"Product community. When there is a usable demo/tool.",Product launch
+AIES 2026,"AIES (AI Ethics & Society)",Academic,P1,paper,https://www.aies-conference.com/2026/call-for-papers/,Not Started,,,"Oct 12-14 2026. Abstract deadline May 14. Paper deadline May 21. EasyChair. Up to 10 pages 2-column AAAI format.",Academic paper submission
+NeurIPS 2026 Workshop,NeurIPS,Academic,P2,paper,https://neurips.cc,Not Started,,,"Dec 6-12 2026 Sydney. Paper deadlines ~May 2026. Workshop CFPs June-July.",Academic paper submission
+FAccT 2026,FAccT,Academic,P2,paper,,Not Started,,,"SUBMISSION WINDOW CLOSED (Jan 2026). Next: FAccT 2027 - monitor facctconference.org late 2026.",Academic paper submission
+ICML 2026 Workshop,ICML,Academic,P2,paper,,Not Started,,,"Workshop track. Deadlines ~Feb 2026. Technical: graph-native addressing and multi-agent coordination.",Academic paper submission
+AAAI Workshop,AAAI,Academic,P3,paper,,Not Started,,,"Multi-agent systems and AI architecture.",Academic paper submission
+Minds and Machines,Minds and Machines (Journal),Academic,P2,paper,,Not Started,,,"Rolling submissions. Archive-Continuity Model - philosophy of AI.",Academic journal submission
+AI & Society,AI & Society (Journal),Academic,P3,paper,,Not Started,,,"Rolling submissions. Democratic AI governance.",Academic journal submission
+Philosophy & Technology,Philosophy & Technology (Journal),Academic,P3,paper,,Not Started,,,"Rolling submissions. Identity persistence and consciousness.",Academic journal submission
+Nature Machine Intelligence,Nature Machine Intelligence,Academic,P3,paper,,Not Started,,,"Rolling submissions. If empirical data is compelling enough.",Academic journal submission
+NIST,NIST (AI Risk Management Framework),Government/Policy,P3,email,,Not Started,,,"Governance framework as practical implementation of risk management.",Policy-adapted safety email
+EU AI Office,EU AI Office,Government/Policy,P3,email,,Not Started,,,"EU AI Act implementation. Transparent auditable AI governance as compliance model.",Policy-adapted safety email
+UK AI Safety Institute,UK AI Safety Institute,Government/Policy,P2,email,,Not Started,,,"AI safety evaluation. Tiered claim system as safety evaluation framework.",Policy-adapted safety email
+OECD AI Policy Observatory,OECD,Government/Policy,P3,email,,Not Started,,,"International AI policy. Democratic AI governance.",Policy-adapted safety email
+Partnership on AI,Partnership on AI,Government/Policy,P2,email,,Not Started,,,"Multi-stakeholder AI governance. Cross-platform AI collaboration.",Policy-adapted safety email
+IEEE,IEEE (AI Ethics standards),Government/Policy,P3,email,,Not Started,,,"Technical standards. Governance framework as standards input.",Policy-adapted safety email
+US Senate AI Caucus / AI Insight Forum,US Government,Government/Policy,P3,email,,Not Started,,,"Practical example of transparent AI development.",Policy-adapted safety email
+Peter Steinberger,OpenAI (formerly OpenClaw),Personal,P1,email,steipete@gmail.com,Not Interested,2026-02-18,,"Letter sent 2026-02-18, didn't seem interested - may revisit. Alt: @steipete (X/Mastodon/Bluesky) | steipete.me. Joined OpenAI Feb 15 2026. OpenClaw creator.",Custom letter (letter-to-peter-steinberger-openclaw.md)

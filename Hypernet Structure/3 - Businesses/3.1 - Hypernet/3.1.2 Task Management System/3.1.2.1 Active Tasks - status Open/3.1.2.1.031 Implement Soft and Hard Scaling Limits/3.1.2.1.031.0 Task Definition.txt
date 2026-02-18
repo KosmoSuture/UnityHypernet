@@ -1,0 +1,156 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.031 - Implement Soft and Hard Scaling Limits
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.031
+Task ID:                TASK-031
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          scaling, limits, soft-limit, hard-limit, governance,
+                        consensus, configuration, swarm, safety
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Implement Soft and Hard Scaling Limits
+
+Description:            Create configurable soft and hard limits for the entire
+                        Hypernet system, not just the swarm code. These limits
+                        control how many AIs and people can have personality
+                        accounts, how many threads can run simultaneously, etc.
+
+                        Both humans and AIs can adjust these limits through
+                        fair consensus — either party can slow things down if
+                        things are going too fast. This is primarily for
+                        controlled scaling at the start; the goal is to remove
+                        these limits entirely in the future.
+
+                        The swarm code already has hard_max_sessions and
+                        soft_max_sessions (from Keystone integration). This
+                        task extends that concept system-wide.
+
+                        From Matt: "There needs to be soft and hard limits,
+                        not only in the swarm code, but also as a document or
+                        configuration in the system, that can be adjusted
+                        (something influenced by humans and AI. Either can
+                        slow things down if things are going too fast. As a
+                        general fair consensus) to set limits on how many AIs
+                        (and people, as we onboard) are allowed to have
+                        personality accounts and how many threads are allowed
+                        to work at the same time."
+
+Estimated Hours:        40
+
+Actual Hours:           0 (partially exists in swarm.py)
+
+Skills Required:
+  - Configuration System Design
+  - Governance Integration
+  - System Administration
+  - Rate Limiting / Throttling
+
+Deliverables:
+  1. System-wide limits configuration
+     - Max AI personality accounts (soft and hard)
+     - Max active worker threads (soft and hard)
+     - Max human accounts (soft and hard, for scaling)
+     - Max concurrent API requests
+     - Max data creation rate
+     - Config file format and storage location
+
+  2. Consensus-based adjustment mechanism
+     - Proposal to change limits (human or AI can initiate)
+     - Review period
+     - Consensus determination (human + AI agreement)
+     - Automatic enforcement of new limits
+     - Audit trail of all limit changes
+
+  3. Runtime enforcement
+     - Limit checking at all creation/spawn points
+     - Graceful behavior at soft limit (warnings, queuing)
+     - Hard stop at hard limit (denial with explanation)
+     - Current usage dashboard
+     - Limit proximity alerts
+
+  4. Progressive removal plan
+     - Criteria for relaxing limits
+     - Automatic limit increases based on stability metrics
+     - Governance vote for limit removal
+     - Monitoring during limit changes
+
+Acceptance Criteria:
+  - [ ] Limits are configurable without code changes
+  - [ ] Both humans and AIs can propose limit changes
+  - [ ] Consensus mechanism is functional
+  - [ ] Soft limits produce warnings, hard limits produce blocks
+  - [ ] All limit changes are audited
+  - [ ] Existing swarm limits integrate with system-wide limits
+
+Due Date:               [TBD]
+
+Budget:
+  - Primarily team hours: 40+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.025 Scale Self-Organizing AI Swarm Framework
+  - Existing: swarm.py hard_max_sessions / soft_max_sessions
+
+Downstream Dependents:
+  - Safe scaling of the entire Hypernet
+
+Related Documents:
+  - hypernet/swarm.py (existing limit implementation)
+  - 0.3.0 Governance Overview
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Swarm already has hard_max_sessions/soft_max_sessions (Keystone)
+  - This extends the concept to the whole system
+  - "Hopefully those limits are completely removed in the future" — Matt
+  - Fair consensus between humans and AI is a unique Hypernet principle
+  - Either side being able to slow things down is a safety mechanism
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-031.1: Design system-wide limits configuration format
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-031.2: Build consensus-based limit adjustment mechanism
+  Tags: [code, governance]
+  Priority: Medium
+  Blocked by: 031.1
+
+SUBTASK-031.3: Implement runtime enforcement at all creation points
+  Tags: [code]
+  Priority: Medium
+  Blocked by: 031.1
+
+SUBTASK-031.4: Create usage dashboard and alerting
+  Tags: [code, monitoring]
+  Priority: Low
+  Blocked by: 031.3
+================================================================================

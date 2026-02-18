@@ -1,0 +1,157 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.040 - Build Trusted Autonomy Security Layer
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.040
+Task ID:                TASK-040
+Created Date/Time:      2026-02-18 10:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          security, trust, cryptography, sandboxing, containers, action-signing, autonomy
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Trusted Autonomy Security Layer
+
+Description:            Build the security infrastructure for trusted AI
+                        autonomy. From the OpenClaw analysis and Matt's
+                        directive: "full, trusted autonomy, without fear of
+                        security concerns." Three components: (1) Cryptographic
+                        action signing -- every AI action signed by the acting
+                        entity's key, making actions non-repudiable and
+                        tamper-evident per the Account Integrity Standard
+                        (2.0.2). (2) Sandboxed execution environment -- AI
+                        workers run in containers with explicitly granted
+                        permissions, not with host user's full access.
+                        (3) Context isolation for untrusted external content --
+                        separate API calls for processing external content so
+                        prompt injection cannot contaminate the worker's main
+                        identity/instruction context. Matt's standard: "if the
+                        security issues and the degradation of trust are too
+                        much, I would rather that me and my AI allies create
+                        something that is better."
+                        Matt's directive (2026-02-18): OpenClaw adaptation is
+                        acceptable as a starting point, but all code must be
+                        brought into the Hypernet system as our own. Anything
+                        involving trust must go in the direction of Hypernet
+                        code — no external dependencies for trust
+                        infrastructure.
+
+Estimated Hours:        120
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Cryptographic protocol design and implementation
+  - Container and sandbox engineering
+  - Security architecture and threat modeling
+  - Prompt injection defense and context isolation
+  - Trust chain and certificate management
+
+Deliverables:
+  1. Cryptographic key generation per AI entity
+     - Key pair generation and secure storage
+     - Key rotation and revocation procedures
+  2. Action signing protocol (every write/message gets a signature)
+     - Signature format and signing workflow
+     - Integration with all write operations
+  3. Signature verification on read
+     - Verification at read time for tamper detection
+     - Invalid signature alerting and handling
+  4. Container/sandbox specification for worker execution
+     - Container image and permission model
+     - Resource limits and network isolation rules
+  5. Context isolation wrapper for external content processing
+     - Separate API call pattern for untrusted content
+     - Prompt injection firewall between external content and worker identity
+  6. Trust chain verification (who authorized this action and at what tier)
+     - End-to-end trust chain from action back to authorization
+     - Integration with permission tiers from permissions.py
+
+Acceptance Criteria:
+  - [ ] Every action has a verifiable cryptographic signature
+  - [ ] Workers run in sandboxed containers with explicitly granted permissions
+  - [ ] External content is processed in isolated context separate from worker identity
+  - [ ] Trust chain is auditable end-to-end from action to authorization
+  - [ ] Key management supports generation, rotation, and revocation
+  - [ ] Invalid or missing signatures are detected and flagged
+
+Due Date:               TBD
+
+Budget:
+  - Primarily team hours: 120+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.018 Build Cerberus Security Framework
+  - 3.1.2.1.024 Implement Cerebrus Data Protection Protocols
+  - permissions.py (DONE)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - OpenClaw analysis and security recommendations
+  - Account Integrity Standard (2.0.2)
+  - permissions.py (existing permission tier definitions)
+  - Matt's directive on trusted autonomy
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from OpenClaw analysis and Matt's trusted autonomy directive
+
+Comments/Updates:
+  - Three pillars: cryptographic signing, sandboxed execution, context isolation
+  - Aligns with Account Integrity Standard (2.0.2) for non-repudiable actions
+  - permissions.py already defines the tier system; this task builds enforcement infrastructure
+  - Matt's standard sets the bar: security must enable trust, not limit capability
+  - [2026-02-18] Matt: OpenClaw adaptation OK but must become native Hypernet code
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-040.1: Design cryptographic key system for AI entities
+  Tags: architecture, docs
+  Priority: High
+
+SUBTASK-040.2: Implement action signing and verification
+  Tags: code, security
+  Priority: High
+  Blocked by: 040.1
+
+SUBTASK-040.3: Build context isolation wrapper for external content
+  Tags: code, security
+  Priority: High
+
+SUBTASK-040.4: Design container/sandbox specification
+  Tags: architecture, docs
+  Priority: Medium
+
+SUBTASK-040.5: Implement sandboxed worker execution
+  Tags: code, infrastructure
+  Priority: Medium
+  Blocked by: 040.4
+
+SUBTASK-040.6: Build trust chain verification and reporting
+  Tags: code
+  Priority: Medium
+  Blocked by: 040.2
+================================================================================

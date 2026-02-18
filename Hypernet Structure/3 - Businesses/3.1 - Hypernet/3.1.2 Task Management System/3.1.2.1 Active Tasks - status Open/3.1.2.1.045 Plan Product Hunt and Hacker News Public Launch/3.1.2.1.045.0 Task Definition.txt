@@ -1,0 +1,155 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.045 - Plan Product Hunt and Hacker News Public Launch
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.045
+Task ID:                TASK-045
+Created Date/Time:      2026-02-18 12:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          launch, marketing, product-hunt, hacker-news, PR, press,
+                        outreach
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Plan Product Hunt and Hacker News Public Launch
+
+Description:            Plan and execute the public launch of the Hypernet on
+                        Product Hunt, Hacker News, and through a PR campaign
+                        targeting TechCrunch, Wired, and The Verge. From Matt's
+                        Go-To-Market strategy Phase 2 (Q3-Q4 2026). Includes
+                        launch day coordination, media kit preparation, press
+                        outreach, community engagement during launch, and
+                        referral program activation.
+
+Estimated Hours:        60
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Product marketing and launch strategy
+  - Press relations and media outreach
+  - Copywriting (press releases, pitches, listing copy)
+  - Community engagement (Product Hunt, Hacker News)
+  - Referral/growth program design
+
+Deliverables:
+  1. Product Hunt listing (description, screenshots, maker comments)
+     - Optimized listing copy and visual assets
+     - Planned maker comments and engagement strategy
+  2. Hacker News Show HN post
+     - Compelling Show HN post with technical depth
+     - Engagement plan for comments and questions
+  3. Press kit (press release, screenshots, founder bio, FAQ)
+     - Professional press release
+     - High-resolution screenshots and product visuals
+     - Founder bio and company backgrounder
+     - FAQ for journalists
+  4. Media outreach list with personalized pitches
+     - Target list: TechCrunch, Wired, The Verge, and others
+     - Personalized pitch emails per journalist
+  5. Launch day timeline and coordination plan
+     - Hour-by-hour launch day schedule
+     - Team roles and responsibilities
+     - Contingency plans for common issues
+  6. Referral program mechanics
+     - Referral incentive structure
+     - Tracking and attribution system
+     - Terms and conditions
+  7. Post-launch engagement plan
+     - Follow-up with press and community
+     - Metrics tracking and reporting
+     - Momentum maintenance strategy
+
+Acceptance Criteria:
+  - [ ] Product Hunt listing live and optimized
+  - [ ] Hacker News Show HN post submitted
+  - [ ] Press kit distributed to 10+ media outlets
+  - [ ] Launch day coordinated with clear timeline
+  - [ ] Referral program active and trackable
+  - [ ] Post-launch engagement plan in execution
+
+Due Date:               Q3-Q4 2026 (Go-To-Market Phase 2)
+
+Budget:
+  - Primarily team hours: 60
+  - Potential PR agency costs (if outsourced)
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            Matt (1.1) + AI support
+
+Upstream Dependencies:
+  - 3.1.2.1.010 Build Hypernet Proof of Concept (MVP)
+  - 3.1.2.1.004 Build Website
+  - 3.1.2.1.028 Create Viral Demo Video
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Matt's Go-To-Market Strategy (Phase 2: Q3-Q4 2026)
+  - Viral Demo Video (Task 028 — asset for press kit)
+  - Website (Task 004 — landing page for launch traffic)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's Go-To-Market strategy Phase 2
+
+Comments/Updates:
+  - Timing is Q3-Q4 2026 per Matt's Go-To-Market strategy
+  - Product Hunt launch should be on a Tuesday (highest traffic day)
+  - HN Show HN post should emphasize technical innovation and open-source angle
+  - Press outreach should lead launch by 1-2 weeks for embargo coordination
+  - The viral demo video (Task 028) is a critical asset for the press kit
+  - Referral program should be live before launch to maximize viral spread
+  - Community engagement on launch day is critical — all hands on deck
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-045.1: Prepare Product Hunt listing
+  Tags: [docs, marketing]
+  Priority: High
+  Notes: Description, screenshots, tagline, maker comments strategy
+
+SUBTASK-045.2: Write press kit and media materials
+  Tags: [docs, marketing]
+  Priority: High
+  Notes: Press release, screenshots, founder bio, FAQ, company backgrounder
+
+SUBTASK-045.3: Build media outreach list with personalized pitches
+  Tags: [docs, marketing]
+  Priority: Medium
+  Notes: TechCrunch, Wired, The Verge, and 10+ additional outlets
+
+SUBTASK-045.4: Design referral program mechanics
+  Tags: [architecture, marketing]
+  Priority: Medium
+  Notes: Incentive structure, tracking, attribution, terms
+
+SUBTASK-045.5: Create launch day coordination timeline
+  Tags: [docs, planning]
+  Priority: Medium
+  Blocked by: 045.1, 045.2
+
+SUBTASK-045.6: Write Hacker News Show HN post
+  Tags: [docs, marketing]
+  Priority: Medium
+  Notes: Technical depth, open-source angle, crowdsourced AI story
+================================================================================

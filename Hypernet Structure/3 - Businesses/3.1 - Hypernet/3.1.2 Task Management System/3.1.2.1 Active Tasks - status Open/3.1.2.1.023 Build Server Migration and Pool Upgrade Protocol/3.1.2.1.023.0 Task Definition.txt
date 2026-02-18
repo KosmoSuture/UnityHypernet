@@ -1,0 +1,183 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.023 - Build Server Migration and Pool Upgrade Protocol
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.023
+Task ID:                TASK-023
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          server, migration, upgrade, pool, encryption, load-balancing,
+                        librarian, dns, rolling-upgrade, object-versioning, security
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Server Migration and Pool Upgrade Protocol
+
+Description:            Design and implement rolling server upgrade protocols
+                        for Hypernet server pools. Data migrates between servers
+                        during upgrades — one server is always free, objects
+                        migrate off, server upgrades, objects migrate back.
+
+                        During migration, objects are upgraded to include
+                        additional properties or schema changes. Encryption
+                        levels increase as data moves. Location on disk changes
+                        every time, adding a security layer.
+
+                        Integrates with the Librarian (DNS) system that routes
+                        object requests to the correct server and maintains the
+                        data framework mapping to physical storage channels.
+
+                        From Matt: "As long as there is always one server free,
+                        updates can be done on the spare, then migrated off of
+                        other servers, which upgrade, and migrate again until
+                        the entire pool is upgraded."
+
+                        "There should be a process when objects are moved, if
+                        it moves from an older server to another, that that
+                        object is upgraded to include additional properties or
+                        changes to ensure that it's always compatible and up
+                        to date."
+
+Estimated Hours:        160
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Distributed Systems Engineering
+  - Database Migration Design
+  - Encryption and Key Management
+  - Load Balancing
+  - DNS/Service Discovery
+  - DevOps / Infrastructure
+  - Schema Versioning
+
+Deliverables:
+  1. Rolling upgrade protocol specification
+     - Server pool topology model
+     - Free-server rotation algorithm
+     - Object migration workflow (drain -> migrate -> upgrade -> refill)
+     - Rollback procedures for failed upgrades
+     - Health check and validation at each stage
+     - Zero-downtime guarantee design
+
+  2. Object versioning and upgrade system
+     - Schema version tracking per object
+     - Migration scripts framework (v1 -> v2 -> v3)
+     - Property addition/modification during migration
+     - Backward compatibility validation
+     - Upgrade audit trail
+
+  3. Encryption rotation during migration
+     - Re-encryption on every server move
+     - Key rotation schedule tied to migration
+     - Disk location randomization on write
+     - Encryption level progression (stronger over time)
+     - Key management integration with Cerebrus (Task 024)
+
+  4. Librarian (DNS) routing system
+     - Object-to-server mapping registry
+     - Request routing to correct server
+     - Mapping updates during migration
+     - Hot-standby routing for in-flight migrations
+     - Load-aware routing for high-demand objects
+
+  5. Self-load-balancing integration
+     - Hot object detection (high request rate)
+     - Object replication to multiple servers
+     - Librarian-aware load distribution
+     - Cost-based placement (CPU, storage, bandwidth)
+
+  6. Testing and simulation
+     - Migration simulation framework
+     - Failure injection (server crash mid-migration)
+     - Data integrity verification post-migration
+     - Performance benchmarks during migration
+
+Acceptance Criteria:
+  - [ ] Rolling upgrade completes without downtime
+  - [ ] Objects are upgraded during migration (schema versioning)
+  - [ ] Encryption is re-applied on every move
+  - [ ] Librarian routes correctly during migration
+  - [ ] Failed migration rolls back cleanly
+  - [ ] Load balancing detects and distributes hot objects
+  - [ ] Full migration simulation passes all integrity checks
+
+Due Date:               [TBD - After Task 009]
+
+Budget:
+  - Server infrastructure for testing: $100-500/month
+  - Development hours: 160+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs Distributed Systems Engineer]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+  - 3.1.2.1.024 Cerebrus Data Protection (encryption integration)
+
+Downstream Dependents:
+  - 3.1.2.1.035 Plan Custom Hypernet OS (migration at OS level)
+
+Related Documents:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md
+  - 0.2.3 Cerberus Node Specification
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - "The Librarian" is the Hypernet's DNS equivalent
+  - Security benefit: data location changes on every migration
+  - Object versioning ensures forward compatibility
+  - This is essential infrastructure for production deployment
+  - Self-load-balancing with object replication is an advanced feature
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-023.1: Design rolling upgrade protocol specification
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-023.2: Build object versioning and schema migration framework
+  Tags: [code, architecture]
+  Priority: High
+  Blocked by: 023.1
+
+SUBTASK-023.3: Implement Librarian (DNS) routing system
+  Tags: [code, distributed-systems]
+  Priority: High — needed for any multi-server setup
+
+SUBTASK-023.4: Build encryption rotation during migration
+  Tags: [code, security, encryption]
+  Priority: Medium
+  Blocked by: 023.2, Task 024
+
+SUBTASK-023.5: Implement self-load-balancing with object replication
+  Tags: [code, distributed-systems]
+  Priority: Medium
+  Blocked by: 023.3
+
+SUBTASK-023.6: Build migration simulation and testing framework
+  Tags: [code, testing]
+  Priority: Medium
+  Blocked by: 023.2
+================================================================================

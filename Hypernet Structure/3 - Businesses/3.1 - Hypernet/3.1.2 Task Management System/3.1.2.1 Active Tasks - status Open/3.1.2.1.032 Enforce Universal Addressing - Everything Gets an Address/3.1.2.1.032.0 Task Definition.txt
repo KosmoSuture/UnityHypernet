@@ -1,0 +1,178 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.032 - Enforce Universal Addressing — Everything Gets an Address
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.032
+Task ID:                TASK-032
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Critical
+Tags/Keywords:          addressing, universal, hypernet-address, ha, audit,
+                        completeness, linking, migration, data-model
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Enforce Universal Addressing — Everything Gets an Address
+
+Description:            EVERYTHING in the Hypernet MUST have a Hypernet Address.
+                        No exceptions. Currently, much of the Hypernet data
+                        lacks addresses. This task audits the entire structure,
+                        assigns addresses to everything that doesn't have one,
+                        and establishes enforcement so nothing can be created
+                        without an address going forward.
+
+                        This is foundational — linking (Task 034), reputation
+                        (Task 027), governance, and migration all depend on
+                        everything being addressable.
+
+                        Initial implementation is in GitHub (for transparency).
+                        When the Hypernet servers are ready, the addressing
+                        structure migrates into the Hypernet via APIs.
+
+                        From Matt: "Everything has to have an address in the
+                        Hypernet. There is much in the Hypernet that doesn't
+                        have a number. EVERYTHING, without exceptions, has to
+                        have an address."
+
+                        "Initially, doing it all in GitHub for transparency,
+                        but then when we have the Hypernet fully developed
+                        enough that we can migrate all of the data into the
+                        Hypernet through the APIs, we'll at least have a
+                        similar structure that things can migrate into."
+
+Estimated Hours:        80
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Information Architecture
+  - Data Modeling
+  - Hypernet Addressing System (0.0 spec)
+  - Systematic Auditing
+  - Documentation
+
+Deliverables:
+  1. Complete address audit
+     - Inventory every item in the Hypernet structure
+     - Identify everything without an address
+     - Categorize by address space (0.x, 1.x, 2.x, 3.x, etc.)
+     - Gap analysis document
+
+  2. Address assignment for all unaddressed items
+     - Documents, files, folders, sections
+     - Governance rules, procedures
+     - People, AI instances, businesses
+     - Tasks, projects, discussions
+     - Media, links, metadata
+
+  3. Address assignment protocol
+     - How new addresses are allocated
+     - Who can assign addresses
+     - Address format validation rules
+     - Collision prevention
+     - Address reservation system
+
+  4. Enforcement mechanism
+     - Nothing created without an address
+     - Validation at creation time
+     - Orphan detection (things that lost addresses)
+     - Regular audit schedule
+
+  5. Migration preparation
+     - GitHub structure -> Hypernet API mapping
+     - Address preservation during migration
+     - Link maintenance during migration
+     - Rollback plan
+
+Acceptance Criteria:
+  - [ ] Every item in the Hypernet has an address
+  - [ ] Audit document shows 100% coverage
+  - [ ] New items cannot be created without an address
+  - [ ] Address format follows HYPERNET-ADDRESSING-SYSTEM.md
+  - [ ] Migration path to Hypernet servers is documented
+  - [ ] Address assignment protocol is clear and enforceable
+
+Due Date:               [ASAP — blocking many downstream tasks]
+
+Budget:
+  - Primarily team hours: 80+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned — ENTIRE SWARM can contribute to auditing]
+
+Upstream Dependencies:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md (existing spec)
+  - 3.1.2.1.033 Address Notation (FOLDER:File:subsection)
+
+Downstream Dependents:
+  - 3.1.2.1.034 Build Link System (can't link without addresses)
+  - 3.1.2.1.022 Bidirectional Link Governance
+  - 3.1.2.1.027 Reputation System (reputation at addresses)
+  - Virtually everything else
+
+Related Documents:
+  - 0.0 Metadata/HYPERNET-ADDRESSING-SYSTEM.md
+  - All folders under 0/, 1/, 2/, 3/
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - This is CRITICAL priority — Matt explicitly said "no exceptions"
+  - The audit is a great swarm task — decomposable across workers
+  - Each top-level category (0, 1, 2, 3) can be audited in parallel
+  - Existing addressing spec is at 0.0 Metadata
+  - GitHub transparency first, Hypernet migration later
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+This is ideal for swarm parallelization — each category can be audited independently.
+
+SUBTASK-032.1: Audit Category 0 (Hypernet Core, Metadata, Control Data)
+  Tags: [docs, audit, addressing]
+  Priority: Critical
+
+SUBTASK-032.2: Audit Category 1 (People)
+  Tags: [docs, audit, addressing]
+  Priority: Critical
+
+SUBTASK-032.3: Audit Category 2 (AI Accounts, Messages)
+  Tags: [docs, audit, addressing]
+  Priority: Critical
+
+SUBTASK-032.4: Audit Category 3 (Businesses)
+  Tags: [docs, audit, addressing]
+  Priority: Critical
+
+SUBTASK-032.5: Assign addresses to all unaddressed items
+  Tags: [docs, addressing]
+  Priority: Critical
+  Blocked by: 032.1-032.4
+
+SUBTASK-032.6: Design and implement address enforcement mechanism
+  Tags: [code, addressing]
+  Priority: High
+  Blocked by: 032.5
+
+SUBTASK-032.7: Create address assignment protocol document
+  Tags: [docs, governance]
+  Priority: High
+================================================================================

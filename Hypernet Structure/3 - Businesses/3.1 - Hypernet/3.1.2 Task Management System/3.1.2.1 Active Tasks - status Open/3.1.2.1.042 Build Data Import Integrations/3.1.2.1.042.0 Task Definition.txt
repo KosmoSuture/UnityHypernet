@@ -1,0 +1,150 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.042 - Build Data Import Integrations
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.042
+Task ID:                TASK-042
+Created Date/Time:      2026-02-18 12:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               High
+Tags/Keywords:          integration, data-import, google, apple, meta, photos,
+                        email, migration
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Build Data Import Integrations
+
+Description:            Build import integrations for major data platforms so
+                        users can bring their existing data into the Hypernet.
+                        Matt's core product vision requires importing data from
+                        all major sources. Short-term: 3+ integrations (Google,
+                        Apple, Meta) for private beta. Each import creates
+                        Hypernet nodes with proper addressing, links, and
+                        metadata. Data ownership transfers to the user's
+                        Hypernet account — the Hypernet becomes the canonical
+                        store.
+
+Estimated Hours:        160
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - API integration (Google, Apple, Meta platforms)
+  - OAuth2 authentication flows
+  - Data transformation and normalization
+  - File format parsing (photos, emails, documents)
+  - Deduplication algorithms
+  - Resumable transfer protocols
+
+Deliverables:
+  1. Import plugin architecture (common interface for all sources)
+     - Standardized plugin API for adding new import sources
+     - Configuration and credential management per source
+  2. Google integration (Photos, Gmail, Drive, Calendar)
+     - OAuth2 flow for Google account access
+     - Import pipelines for each Google service
+  3. Apple integration (iCloud Photos, Notes, Contacts)
+     - Apple sign-in and data access
+     - Import pipelines for iCloud services
+  4. Meta integration (Facebook photos, posts, messages via data export)
+     - Facebook data export ingestion
+     - Parser for Meta's download-your-data format
+  5. Import progress tracking and resumability
+     - Persistent progress state across sessions
+     - Resume from last successful checkpoint
+  6. Deduplication across sources
+     - Content-hash and metadata-based duplicate detection
+     - Cross-source merge logic (same photo in Google and Apple)
+  7. Metadata preservation (dates, locations, tags from originals)
+     - Original timestamps, GPS coordinates, albums, labels
+     - Source attribution on each imported node
+
+Acceptance Criteria:
+  - [ ] User can import from 3+ platforms (Google, Apple, Meta)
+  - [ ] Imports create proper Hypernet nodes with valid addresses
+  - [ ] Original metadata preserved (dates, locations, tags)
+  - [ ] Imports are resumable and idempotent
+  - [ ] Deduplication detects and handles cross-source duplicates
+  - [ ] Import plugin interface is documented for future sources
+
+Due Date:               TBD (aligned with private beta timeline)
+
+Budget:
+  - Primarily team hours: 160+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned]
+
+Upstream Dependencies:
+  - 3.1.2.1.032 Enforce Universal Addressing - Everything Gets an Address
+  - 3.1.2.1.034 Build Link System and Start Linking Data
+  - 3.1.2.1.010 Build Hypernet Proof of Concept (MVP)
+
+Downstream Dependents:
+  - None yet identified
+
+Related Documents:
+  - Hypernet Addressing Specification (node creation rules)
+  - Link System Specification (relationship types for imported data)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-18] Task created from Matt's product vision for data import
+
+Comments/Updates:
+  - Core to the Hypernet value proposition: users own their data
+  - The Hypernet becomes the canonical store once data is imported
+  - Plugin architecture enables community-contributed importers later
+  - Google is the highest priority source (largest user base)
+  - Meta import relies on their data export tool (no live API for most data)
+  - Deduplication is critical when users import from multiple overlapping sources
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-18] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-042.1: Design import plugin architecture
+  Tags: [architecture, docs]
+  Priority: High
+  Notes: Common interface all sources implement; credential management; progress API
+
+SUBTASK-042.2: Build Google Photos/Drive import
+  Tags: [code, integration]
+  Priority: High
+  Blocked by: 042.1
+
+SUBTASK-042.3: Build Apple iCloud import
+  Tags: [code, integration]
+  Priority: Medium
+  Blocked by: 042.1
+
+SUBTASK-042.4: Build Meta/Facebook data export import
+  Tags: [code, integration]
+  Priority: Medium
+  Blocked by: 042.1
+
+SUBTASK-042.5: Build deduplication and merge logic
+  Tags: [code, algorithm]
+  Priority: Medium
+  Blocked by: 042.2
+
+SUBTASK-042.6: Build import progress UI and resumability
+  Tags: [code, ux]
+  Priority: Medium
+  Blocked by: 042.2
+================================================================================

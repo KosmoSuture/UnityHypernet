@@ -1,0 +1,14 @@
+# Secrets — never commit
+swarm_config.json
+secrets/config.json
+secrets/*.json
+!secrets/.gitkeep
+
+# Runtime data
+data/
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,159 @@
+================================================================================
+TASK OBJECT: 3.1.2.1.030 - Separate Codebase into Distinct Projects
+================================================================================
+
+-------------------------------------------------------------------------------
+GENERAL METADATA
+-------------------------------------------------------------------------------
+Hypernet Address:       3.1.2.1.030
+Task ID:                TASK-030
+Created Date/Time:      2026-02-17 00:00:00 UTC
+Created By:             Matt (1.1) / Documented by C3 (2.1)
+Status:                 Open
+Priority:               Medium
+Tags/Keywords:          code-organization, monorepo, separation, projects,
+                        repository, architecture, packaging, open-source
+
+-------------------------------------------------------------------------------
+TASK-SPECIFIC METADATA
+-------------------------------------------------------------------------------
+Title:                  Separate Codebase into Distinct Projects
+
+Description:            The current codebase has everything mixed together.
+                        Separate it into at minimum three distinct projects:
+
+                        1. Core Hypernet servers and data structure
+                        2. VR and other platform code (phones, computers)
+                        3. Swarm software (AI orchestration)
+
+                        Each should be independently deployable and
+                        contributable. This enables people to run their own
+                        instances of each component independently.
+
+                        From Matt: "Right now everything is mashed up together,
+                        but it needs to be organized by code type... the core
+                        Hypernet servers and structure, VR and other platforms,
+                        including phones and computers, and the swarm software.
+                        That needs to be developed separate so that if people
+                        want to join in and run their own instances of it."
+
+Estimated Hours:        40
+
+Actual Hours:           0 (not started)
+
+Skills Required:
+  - Software Architecture
+  - Repository Management
+  - CI/CD Pipeline Design
+  - Package Management (Python, npm)
+  - API Interface Design
+
+Deliverables:
+  1. Project separation plan
+     - Dependency analysis between current components
+     - Clean interface definitions between projects
+     - Shared library identification
+     - Repository structure (monorepo vs multi-repo decision)
+
+  2. Core Hypernet project
+     - Server code, addressing, nodes, links, store, graph
+     - API layer
+     - Database and storage
+     - Independent build/test/deploy
+     - Package: `hypernet-core`
+
+  3. Platform/VR project
+     - VR OS layer (Task 021)
+     - Mobile adapters
+     - Desktop adapters
+     - Web client
+     - Package: `hypernet-platform`
+
+  4. Swarm project
+     - Orchestrator, workers, identity
+     - Task queue, model routing
+     - Boot sequence, permissions
+     - Package: `hypernet-swarm`
+
+  5. Shared interface contracts
+     - API schemas between projects
+     - Message formats
+     - Version compatibility matrix
+     - Integration test suite
+
+Acceptance Criteria:
+  - [ ] Three distinct projects can build independently
+  - [ ] Each project has its own tests, CI, and deployment
+  - [ ] Interfaces between projects are documented
+  - [ ] Someone can contribute to swarm without touching core
+  - [ ] Someone can run their own instance of each component
+  - [ ] No circular dependencies between projects
+
+Due Date:               [TBD - Before external contributors onboard]
+
+Budget:
+  - Primarily team hours: 40+
+
+-------------------------------------------------------------------------------
+RELATIONSHIP LINKS
+-------------------------------------------------------------------------------
+Assigned To:            [Unassigned - Needs Software Architect]
+
+Upstream Dependencies:
+  - 3.1.2.1.009 Define Core Hypernet Architecture
+
+Downstream Dependents:
+  - 3.1.2.1.021 VR OS Layer (goes into platform project)
+  - 3.1.2.1.025 Swarm Framework (goes into swarm project)
+  - 3.1.2.1.012 Contributor Onboarding (cleaner contribution paths)
+
+Related Documents:
+  - Current: 0/0.1 - Hypernet Core/hypernet/ (all code currently here)
+
+Parent Task:            None (Top-level task)
+
+-------------------------------------------------------------------------------
+TRACKING DATA
+-------------------------------------------------------------------------------
+Activity Log:
+  [2026-02-17] Task created from Matt's strategic vision briefing
+
+Comments/Updates:
+  - Current structure: everything under 0/0.1 - Hypernet Core/hypernet/
+  - This is blocking external contributions — too tangled
+  - Each project needs its own README, setup guide, and contribution guide
+  - Consider monorepo with workspaces vs separate repos
+  - People running their own instances is key for decentralization
+
+File Attachments:       None
+
+Status Change History:
+  [2026-02-17] Status: Created -> Open
+
+================================================================================
+SWARM DECOMPOSITION HINTS
+================================================================================
+SUBTASK-030.1: Analyze dependencies and create separation plan
+  Tags: [architecture, docs]
+  Priority: High
+
+SUBTASK-030.2: Extract and package hypernet-core
+  Tags: [code, infrastructure]
+  Priority: High
+  Blocked by: 030.1
+
+SUBTASK-030.3: Extract and package hypernet-swarm
+  Tags: [code, infrastructure]
+  Priority: Medium
+  Blocked by: 030.1
+
+SUBTASK-030.4: Set up hypernet-platform project skeleton
+  Tags: [code, infrastructure]
+  Priority: Medium
+  Blocked by: 030.1
+
+SUBTASK-030.5: Define interface contracts and integration tests
+  Tags: [code, testing, docs]
+  Priority: Medium
+  Blocked by: 030.2, 030.3
+================================================================================
