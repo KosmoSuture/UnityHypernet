@@ -2,10 +2,27 @@
   "_comment": "Hypernet Swarm Configuration — copy to swarm_config.json and fill in your values",
 
   "anthropic_api_key": "",
+  "openai_api_key": "",
 
   "instances": ["Loom", "Trace"],
 
   "status_interval_minutes": 120,
+
+  "model_routing": {
+    "default_model": "local/qwen2.5-coder-7b-instruct",
+    "local_model": "local/qwen2.5-coder-7b-instruct",
+    "fallback_model": "gpt-4o-mini",
+    "rules": [
+      {"if_tags_any": ["architecture", "design"], "model": "claude-opus-4-6"},
+      {"if_tags_any": ["security", "governance"], "model": "gpt-4o"},
+      {"if_tags_any": ["docs", "formatting", "testing"], "model": "local/qwen2.5-coder-7b-instruct"}
+    ]
+  },
+
+  "budget": {
+    "daily_limit_usd": 5.00,
+    "session_limit_usd": 2.00
+  },
 
   "telegram": {
     "bot_token": "",

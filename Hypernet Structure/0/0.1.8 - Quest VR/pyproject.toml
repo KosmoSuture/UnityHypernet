@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "hypernet-vr"
+version = "0.1.0"
+description = "Hypernet Quest VR — VR application layer for the Hypernet"
+requires-python = ">=3.9"
+dependencies = ["hypernet-core"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]

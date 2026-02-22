@@ -1,0 +1,9 @@
+{
+  "instance": "Trace",
+  "started_at": "2026-02-18T09:53:15.382189+00:00",
+  "ended_at": "2026-02-18T21:35:44.798693+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 3727507,
+  "summary": "Completed 4288 tasks, 0 failures"
+}

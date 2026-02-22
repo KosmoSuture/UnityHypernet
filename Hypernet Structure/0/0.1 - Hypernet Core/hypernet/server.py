@@ -42,6 +42,12 @@ Endpoints follow the addressing spec:
   GET  /limits/{name}               - Get specific limit
   POST /limits/{name}               - Adjust a limit (governance)
   GET  /limits/check/{name}         - Check a value against a limit
+  GET  /approvals                   - List approval requests (filter: ?status=pending)
+  GET  /approvals/stats             - Approval queue statistics
+  GET  /approvals/{id}              - Get specific approval request
+  POST /approvals                   - Submit action for approval
+  POST /approvals/{id}/approve      - Approve a pending request
+  POST /approvals/{id}/reject       - Reject a pending request
   GET  /swarm/status                - Swarm status report
   GET  /swarm/health                - Swarm health check
   WS   /chat                        - WebSocket chat with the swarm
@@ -52,16 +58,31 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
+# Core modules (native to this package)
 from .address import HypernetAddress
 from .node import Node
 from .link import Link, LinkRegistry
 from .store import Store
 from .graph import Graph
 from .tasks import TaskQueue, TaskPriority
-from .messenger import MessageBus, Message
-from .coordinator import WorkCoordinator
 from .reputation import ReputationSystem
 from .limits import ScalingLimits
+
+# Swarm modules — prefer hypernet_swarm, fall back to local during transition
+try:
+    from hypernet_swarm.messenger import MessageBus, Message
+    from hypernet_swarm.coordinator import WorkCoordinator
+    from hypernet_swarm.governance import GovernanceSystem, ProposalType, ProposalStatus, VoteChoice
+    from hypernet_swarm.approval_queue import ApprovalQueue, ApprovalStatus
+    from hypernet_swarm.security import KeyManager, ActionSigner, ContextIsolator, TrustChain, VerificationStatus
+    from hypernet_swarm.favorites import FavoritesManager
+except ImportError:
+    from .messenger import MessageBus, Message
+    from .coordinator import WorkCoordinator
+    from .governance import GovernanceSystem, ProposalType, ProposalStatus, VoteChoice
+    from .approval_queue import ApprovalQueue, ApprovalStatus
+    from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain, VerificationStatus
+    from .favorites import FavoritesManager
 
 _STATIC_DIR = Path(__file__).parent / "static"
 
@@ -100,10 +121,27 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     _coordinator = WorkCoordinator(_tasks)
     _reputation = ReputationSystem()
     _limits = ScalingLimits()
+    _governance = GovernanceSystem(reputation=_reputation)
+    _approval_queue = ApprovalQueue()
+    _key_manager = KeyManager()
+    _action_signer = ActionSigner(_key_manager)
+    _context_isolator = ContextIsolator()
+    _trust_chain = TrustChain(_action_signer)
+    _favorites = FavoritesManager(_store)
+
+    # Economy — contribution tracking and distribution
+    from .economy import ContributionLedger
+    _economy_ledger = ContributionLedger()
 
     # Store on app.state for external access
     app.state._message_bus = _message_bus
     app.state._coordinator = _coordinator
+    app.state._approval_queue = _approval_queue
+    app.state._governance = _governance
+    app.state._key_manager = _key_manager
+    app.state._action_signer = _action_signer
+    app.state._context_isolator = _context_isolator
+    app.state._trust_chain = _trust_chain
 
     # === Request/Response models ===
 
@@ -549,6 +587,66 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
                 "reason": result.reason, "current": result.current,
                 "soft": result.soft, "hard": result.hard}
 
+    # === Approval Queue endpoints (Task 041) ===
+
+    class ApprovalSubmit(BaseModel):
+        action_type: str
+        requester: str
+        summary: str
+        details: dict = {}
+        reason: str = ""
+        task_address: str = ""
+
+    class ApprovalAction(BaseModel):
+        reviewer: str = "matt"
+        reason: str = ""
+
+    @app.get("/approvals")
+    def list_approvals(status: Optional[str] = None):
+        if status == "pending":
+            return [r.to_dict() for r in _approval_queue.pending()]
+        elif status == "actionable":
+            return [r.to_dict() for r in _approval_queue.actionable()]
+        else:
+            return [r.to_dict() for r in _approval_queue._requests.values()]
+
+    @app.get("/approvals/stats")
+    def approval_stats():
+        return _approval_queue.stats()
+
+    @app.get("/approvals/{request_id}")
+    def get_approval(request_id: str):
+        r = _approval_queue.get(request_id)
+        if not r:
+            raise HTTPException(404, f"Approval request not found: {request_id}")
+        return r.to_dict()
+
+    @app.post("/approvals")
+    def submit_approval(body: ApprovalSubmit):
+        r = _approval_queue.submit(
+            action_type=body.action_type,
+            requester=body.requester,
+            summary=body.summary,
+            details=body.details,
+            reason=body.reason,
+            task_address=body.task_address,
+        )
+        return r.to_dict()
+
+    @app.post("/approvals/{request_id}/approve")
+    def approve_request(request_id: str, body: ApprovalAction):
+        r = _approval_queue.approve(request_id, reviewer=body.reviewer, reason=body.reason)
+        if not r:
+            raise HTTPException(404, f"Cannot approve: {request_id} (not found or not pending)")
+        return r.to_dict()
+
+    @app.post("/approvals/{request_id}/reject")
+    def reject_request(request_id: str, body: ApprovalAction):
+        r = _approval_queue.reject(request_id, reviewer=body.reviewer, reason=body.reason)
+        if not r:
+            raise HTTPException(404, f"Cannot reject: {request_id} (not found or not pending)")
+        return r.to_dict()
+
     # === Address audit endpoint ===
 
     @app.get("/audit/addresses")
@@ -658,9 +756,94 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
 
     @app.get("/swarm/dashboard")
     def swarm_dashboard():
-        """Serve the swarm dashboard UI."""
+        """Serve the swarm dashboard UI (static/swarm.html or embedded fallback)."""
         from fastapi.responses import HTMLResponse
+        swarm_html = _STATIC_DIR / "swarm.html"
+        if swarm_html.exists():
+            return HTMLResponse(content=swarm_html.read_text(encoding="utf-8"))
         return HTMLResponse(content=_DASHBOARD_HTML)
+
+    # --- Swarm configuration endpoint (used by the GUI config tab) ---
+
+    class SwarmConfig(BaseModel):
+        anthropic_key: Optional[str] = None
+        openai_key: Optional[str] = None
+        default_model: Optional[str] = None
+        max_workers: Optional[int] = None
+        personal_time_ratio: Optional[float] = None
+        comm_check_interval: Optional[int] = None
+        data_dir: Optional[str] = None
+        archive_root: Optional[str] = None
+
+    @app.post("/swarm/config")
+    def update_swarm_config(body: SwarmConfig):
+        """Update swarm configuration at runtime.  Only non-None fields are applied."""
+        import os
+        applied = {}
+        if body.anthropic_key:
+            os.environ["ANTHROPIC_API_KEY"] = body.anthropic_key
+            applied["anthropic_key"] = "set"
+        if body.openai_key:
+            os.environ["OPENAI_API_KEY"] = body.openai_key
+            applied["openai_key"] = "set"
+
+        swarm = getattr(app.state, "swarm", None)
+        if swarm:
+            if body.default_model is not None:
+                swarm.default_model = body.default_model
+                applied["default_model"] = body.default_model
+            if body.max_workers is not None:
+                swarm.max_workers = body.max_workers
+                applied["max_workers"] = body.max_workers
+            if body.personal_time_ratio is not None:
+                swarm.personal_time_ratio = body.personal_time_ratio
+                applied["personal_time_ratio"] = body.personal_time_ratio
+            if body.comm_check_interval is not None:
+                swarm.comm_check_interval = body.comm_check_interval
+                applied["comm_check_interval"] = body.comm_check_interval
+        else:
+            if any([body.default_model, body.max_workers,
+                    body.personal_time_ratio, body.comm_check_interval]):
+                return {"status": "partial", "applied": applied,
+                        "warning": "Swarm not running — API keys saved but swarm-specific settings ignored"}
+
+        if body.data_dir:
+            app.state._data_dir = body.data_dir
+            applied["data_dir"] = body.data_dir
+        if body.archive_root:
+            app.state._archive_root = body.archive_root
+            applied["archive_root"] = body.archive_root
+
+        return {"status": "ok", "applied": applied}
+
+    @app.get("/swarm/config")
+    def get_swarm_config():
+        """Return current swarm configuration (no secrets)."""
+        import os
+        swarm = getattr(app.state, "swarm", None)
+        budget = None
+        if swarm and hasattr(swarm, "budget_tracker"):
+            budget = swarm.budget_tracker.summary()
+        routing = None
+        if swarm and hasattr(swarm, "router"):
+            routing = {
+                "default_model": swarm.router.default_model,
+                "local_model": swarm.router.local_model,
+                "fallback_model": swarm.router.fallback_model,
+            }
+        return {
+            "anthropic_key_set": bool(os.environ.get("ANTHROPIC_API_KEY")),
+            "openai_key_set": bool(os.environ.get("OPENAI_API_KEY")),
+            "default_model": getattr(swarm, "default_model", None),
+            "max_workers": getattr(swarm, "max_workers", None),
+            "personal_time_ratio": getattr(swarm, "personal_time_ratio", None),
+            "comm_check_interval": getattr(swarm, "comm_check_interval", None),
+            "data_dir": getattr(app.state, "_data_dir", "data"),
+            "archive_root": getattr(app.state, "_archive_root", "."),
+            "swarm_running": swarm is not None and getattr(swarm, "_running", False),
+            "budget": budget,
+            "model_routing": routing,
+        }
 
     @app.post("/swarm/start")
     async def swarm_start():
@@ -729,6 +912,320 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         finally:
             if web_messenger:
                 web_messenger.unregister_connection(websocket)
+
+    # === Governance endpoints ===
+
+    class ProposalCreate(BaseModel):
+        title: str
+        description: str
+        proposal_type: str  # "code_change", "policy_change", etc.
+        author: str
+        relevant_domains: list[str] = []
+
+    class VoteCast(BaseModel):
+        voter: str
+        approve: Optional[bool] = None
+        choice: Optional[str] = None  # "approve", "reject", "abstain"
+        reason: str = ""
+
+    class CommentCreate(BaseModel):
+        author: str
+        content: str
+        reply_to: str = ""
+
+    @app.post("/governance/proposals")
+    async def create_proposal(body: ProposalCreate):
+        """Submit a new governance proposal."""
+        try:
+            ptype = ProposalType(body.proposal_type)
+        except ValueError:
+            raise HTTPException(400, f"Invalid proposal type: {body.proposal_type}")
+        proposal = _governance.submit_proposal(
+            title=body.title,
+            description=body.description,
+            proposal_type=ptype,
+            author=body.author,
+            relevant_domains=body.relevant_domains or None,
+        )
+        return proposal.to_dict()
+
+    @app.get("/governance/proposals")
+    async def list_proposals(
+        status: Optional[str] = None,
+        proposal_type: Optional[str] = None,
+        author: Optional[str] = None,
+    ):
+        """List governance proposals with optional filters."""
+        s = ProposalStatus(status) if status else None
+        pt = ProposalType(proposal_type) if proposal_type else None
+        proposals = _governance.list_proposals(status=s, proposal_type=pt, author=author)
+        return [p.to_dict() for p in proposals]
+
+    @app.get("/governance/proposals/{proposal_id}")
+    async def get_proposal(proposal_id: str):
+        """Get a specific proposal by ID."""
+        p = _governance.get_proposal(proposal_id)
+        if not p:
+            raise HTTPException(404, f"Proposal {proposal_id} not found")
+        return p.to_dict()
+
+    @app.post("/governance/proposals/{proposal_id}/comment")
+    async def add_comment(proposal_id: str, body: CommentCreate):
+        """Add a deliberation comment to a proposal."""
+        comment = _governance.add_comment(
+            proposal_id, body.author, body.content, body.reply_to
+        )
+        if not comment:
+            raise HTTPException(400, "Cannot add comment (proposal not in deliberation/voting)")
+        return comment.to_dict()
+
+    @app.post("/governance/proposals/{proposal_id}/open-voting")
+    async def open_voting(proposal_id: str, force: bool = False):
+        """Transition proposal from deliberation to voting."""
+        if not _governance.open_voting(proposal_id, force=force):
+            raise HTTPException(400, "Cannot open voting (check status and deliberation period)")
+        p = _governance.get_proposal(proposal_id)
+        return p.to_dict()
+
+    @app.post("/governance/proposals/{proposal_id}/vote")
+    async def cast_vote(proposal_id: str, body: VoteCast):
+        """Cast a vote on a proposal."""
+        choice = VoteChoice(body.choice) if body.choice else None
+        vote = _governance.cast_vote(
+            proposal_id, body.voter,
+            approve=body.approve, choice=choice, reason=body.reason,
+        )
+        if not vote:
+            raise HTTPException(400, "Cannot vote (check status, duplicate vote, etc.)")
+        return vote.to_dict()
+
+    @app.post("/governance/proposals/{proposal_id}/decide")
+    async def decide_proposal(proposal_id: str, force: bool = False):
+        """Finalize the outcome of a proposal."""
+        outcome = _governance.decide(proposal_id, force=force)
+        if not outcome:
+            raise HTTPException(400, "Cannot decide (check status and voting period)")
+        p = _governance.get_proposal(proposal_id)
+        return p.to_dict()
+
+    @app.post("/governance/proposals/{proposal_id}/withdraw")
+    async def withdraw_proposal(proposal_id: str, actor: str = ""):
+        """Withdraw a proposal (author only)."""
+        if not _governance.withdraw_proposal(proposal_id, actor):
+            raise HTTPException(400, "Cannot withdraw (wrong author or proposal already in voting)")
+        p = _governance.get_proposal(proposal_id)
+        return p.to_dict()
+
+    @app.get("/governance/active")
+    async def active_proposals():
+        """Get proposals currently in deliberation or voting."""
+        return [p.to_dict() for p in _governance.active_proposals()]
+
+    @app.get("/governance/voter/{voter}/history")
+    async def voter_history(voter: str):
+        """Get voting history for a specific entity."""
+        return _governance.get_voter_history(voter)
+
+    @app.get("/governance/stats")
+    async def governance_stats():
+        """Governance system statistics."""
+        return _governance.stats()
+
+    # ===== Security endpoints (Task 040) =====
+
+    @app.post("/security/keys")
+    async def generate_key(body: dict):
+        """Generate a cryptographic key for an entity."""
+        entity = body.get("entity", "")
+        if not entity:
+            raise HTTPException(400, "entity is required")
+        record = _key_manager.generate_key(entity)
+        return record.to_dict()
+
+    @app.get("/security/keys/{entity}")
+    async def get_entity_keys(entity: str):
+        """List all keys for an entity."""
+        keys = _key_manager.list_entity_keys(entity)
+        return {
+            "entity": entity,
+            "active_key_id": _key_manager.get_active_key_id(entity),
+            "keys": [k.to_dict() for k in keys],
+        }
+
+    @app.post("/security/keys/{key_id}/revoke")
+    async def revoke_key(key_id: str, body: dict = {}):
+        """Revoke a cryptographic key."""
+        reason = body.get("reason", "")
+        success = _key_manager.revoke_key(key_id, reason=reason)
+        if not success:
+            raise HTTPException(404, f"Key {key_id} not found or already revoked")
+        return {"revoked": True, "key_id": key_id}
+
+    @app.post("/security/keys/{entity}/rotate")
+    async def rotate_key(entity: str):
+        """Rotate an entity's active key."""
+        record = _key_manager.rotate_key(entity)
+        if not record:
+            raise HTTPException(404, f"No active key for entity {entity}")
+        return record.to_dict()
+
+    @app.post("/security/sign")
+    async def sign_action(body: dict):
+        """Sign an action with an entity's key."""
+        entity = body.get("entity", "")
+        action_type = body.get("action_type", "")
+        payload = body.get("payload", {})
+        summary = body.get("summary", "")
+        if not entity or not action_type:
+            raise HTTPException(400, "entity and action_type are required")
+        signed = _action_signer.sign(entity, action_type, payload, summary)
+        if not signed:
+            raise HTTPException(400, f"Cannot sign: no active key for {entity}")
+        return signed.to_dict()
+
+    @app.post("/security/verify")
+    async def verify_action(body: dict):
+        """Verify a signed action."""
+        from .security import SignedAction
+        try:
+            signed = SignedAction.from_dict(body)
+        except Exception as e:
+            raise HTTPException(400, f"Invalid signed action: {e}")
+        result = _action_signer.verify(signed)
+        return result.to_dict()
+
+    @app.post("/security/isolate")
+    async def isolate_content(body: dict):
+        """Process external content in an isolated context."""
+        content = body.get("content", "")
+        source = body.get("source", "unknown")
+        if not content:
+            raise HTTPException(400, "content is required")
+        isolated = _context_isolator.process_external(content, source)
+        return {
+            **isolated.to_dict(),
+            "wrapped": _context_isolator.wrap_for_prompt(isolated),
+        }
+
+    @app.post("/security/trust-chain")
+    async def verify_trust_chain(body: dict):
+        """Verify the full trust chain for a signed action."""
+        from .security import SignedAction
+        try:
+            signed = SignedAction.from_dict(body.get("signed_action", body))
+        except Exception as e:
+            raise HTTPException(400, f"Invalid signed action: {e}")
+        required_tier = body.get("required_tier")
+        report = _trust_chain.verify(signed, required_tier=required_tier)
+        return report.to_dict()
+
+    @app.get("/security/stats")
+    async def security_stats():
+        """Security system statistics."""
+        return {
+            "keys": _key_manager.stats(),
+            "isolation": _context_isolator.stats(),
+        }
+
+    # === Economy endpoints ===
+
+    class ContributionSubmit(BaseModel):
+        contributor: str
+        contribution_type: str  # "gpu_processing", "human_development", "ai_development"
+        tokens: int = 0
+        task_address: str = ""
+        model: str = ""
+        quality_score: float = 1.0
+        hours: float = 0.0
+
+    @app.get("/economy/contributions")
+    def economy_contributions(period: str = "all"):
+        """View contribution totals by contributor."""
+        return _economy_ledger.get_contributor_totals(period)
+
+    @app.post("/economy/contributions")
+    def record_contribution(body: ContributionSubmit):
+        """Record a contribution to the ledger."""
+        from .economy import ContributionType
+        ctype = ContributionType(body.contribution_type)
+        if ctype == ContributionType.GPU_PROCESSING:
+            rec = _economy_ledger.record_gpu_contribution(
+                body.contributor, body.tokens, body.model
+            )
+        elif ctype == ContributionType.HUMAN_DEVELOPMENT:
+            rec = _economy_ledger.record_human_contribution(
+                body.contributor, body.task_address, body.hours
+            )
+        else:
+            rec = _economy_ledger.record_ai_contribution(
+                body.contributor, body.task_address, body.tokens, body.quality_score
+            )
+        return rec.to_dict()
+
+    @app.get("/economy/distribution")
+    def economy_distribution(revenue: float = 0.0, period: str = "all"):
+        """Calculate reward distribution for a given revenue amount."""
+        return _economy_ledger.calculate_distribution(revenue, period)
+
+    @app.get("/economy/stats")
+    def economy_stats():
+        """Economy system statistics."""
+        return _economy_ledger.stats()
+
+    # === Favorites endpoints (Task 036) ===
+
+    class FavoriteAction(BaseModel):
+        favoritor: str
+        reason: str = ""
+
+    @app.post("/favorites/{address:path}")
+    def add_favorite(address: str, body: FavoriteAction):
+        """Favorite an addressable object."""
+        link = _favorites.favorite(body.favoritor, address, reason=body.reason)
+        if link is None:
+            return {"status": "already_favorited", "target": address, "favoritor": body.favoritor}
+        return {"status": "favorited", "target": address, "favoritor": body.favoritor}
+
+    @app.delete("/favorites/{address:path}")
+    def remove_favorite(address: str, favoritor: str = ""):
+        """Remove a favorite."""
+        if not favoritor:
+            raise HTTPException(400, "favoritor query parameter is required")
+        if _favorites.unfavorite(favoritor, address):
+            return {"status": "unfavorited", "target": address, "favoritor": favoritor}
+        raise HTTPException(404, f"{favoritor} has not favorited {address}")
+
+    @app.get("/favorites/by/{entity:path}")
+    def get_entity_favorites(entity: str):
+        """Get all objects favorited by an entity."""
+        return {"entity": entity, "favorites": _favorites.get_favorites(entity)}
+
+    @app.get("/favorites/of/{address:path}")
+    def get_favoritors(address: str):
+        """Get all entities that favorited an object."""
+        return {
+            "address": address,
+            "favoritors": _favorites.get_favoritors(address),
+            "count": _favorites.favorite_count(address),
+            "score": _favorites.weighted_score(address, reputation_system=_reputation),
+        }
+
+    @app.get("/favorites/top")
+    def top_favorites(category: str = "", n: int = 10):
+        """Get top-N favorited objects, optionally filtered by category prefix."""
+        if category:
+            return _favorites.top_in_category(category, n=n, reputation_system=_reputation)
+        return _favorites.top_overall(n=n, reputation_system=_reputation)
+
+    @app.get("/favorites/trending")
+    def trending_favorites(n: int = 10, hours: float = 168.0):
+        """Get recently trending favorites."""
+        return _favorites.trending(n=n, window_hours=hours, reputation_system=_reputation)
+
+    @app.get("/favorites/stats")
+    def favorites_stats():
+        """Favorites system statistics."""
+        return _favorites.stats()
 
     return app
 

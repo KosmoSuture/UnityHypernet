@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cd \"C:/Hypernet/Hypernet Structure/0/0.1 - Hypernet Core\" && python -c \"import hypernet; print\\(hypernet.__version__\\)\" 2>&1)"
+    ]
+  }
+}

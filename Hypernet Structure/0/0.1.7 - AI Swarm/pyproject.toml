@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "hypernet-swarm"
+version = "0.1.0"
+description = "Hypernet AI Swarm — Autonomous AI orchestration layer"
+requires-python = ">=3.9"
+dependencies = ["hypernet-core"]
+
+[project.optional-dependencies]
+anthropic = ["anthropic"]
+openai = ["openai"]
+all = ["anthropic", "openai"]
+
+[tool.setuptools.packages.find]
+include = ["hypernet_swarm*"]

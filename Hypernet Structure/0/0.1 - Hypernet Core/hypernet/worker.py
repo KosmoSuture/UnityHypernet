@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Optional, Any, TYPE_CHECKING
 
 from .identity import InstanceProfile, IdentityManager
-from .providers import LLMProvider, create_provider, detect_provider_class
+from .providers import LLMProvider, create_provider, detect_provider_class, get_model_cost_per_million
 
 if TYPE_CHECKING:
     from .tools import ToolExecutor
@@ -89,6 +89,7 @@ class Worker:
         self._system_prompt: Optional[str] = None
         self._conversation: list[dict] = []
         self._tokens_used: int = 0
+        self._api_keys: dict[str, str] = {}
 
         # Initialize LLM provider (unless mock or already provided)
         if not mock and self._provider is None:
@@ -109,12 +110,16 @@ class Worker:
                 if env_var in os.environ:
                     keys.setdefault(key_name, os.environ[env_var])
 
+            self._api_keys = keys
+
             if keys:
                 self._provider = create_provider(self.model, keys)
 
             if self._provider is None:
                 log.warning(f"No provider for worker {identity.name} (model={self.model}). Mock mode.")
                 self.mock = True
+        elif api_keys:
+            self._api_keys = dict(api_keys)
 
     @property
     def system_prompt(self) -> str:
@@ -192,7 +197,39 @@ class Worker:
         )
         return result.to_dict()
 
-    def execute_task(self, task_data: dict) -> TaskResult:
+    def _switch_model(self, new_model: str) -> tuple[str, Optional[LLMProvider], bool]:
+        """Temporarily switch to a different model/provider for one task.
+
+        Returns (old_model, old_provider, old_mock) so the caller can restore.
+        """
+        old_model = self.model
+        old_provider = self._provider
+        old_mock = self.mock
+
+        self.model = new_model
+
+        if self.mock:
+            # Stay in mock mode — just change the model name
+            return old_model, old_provider, old_mock
+
+        # Try to create a provider for the new model
+        new_provider = create_provider(new_model, self._api_keys) if self._api_keys else None
+        if new_provider is not None:
+            self._provider = new_provider
+        else:
+            log.warning(f"No provider for override model {new_model}, using mock")
+            self._provider = None
+            self.mock = True
+
+        return old_model, old_provider, old_mock
+
+    def _restore_model(self, old_model: str, old_provider: Optional[LLMProvider], old_mock: bool) -> None:
+        """Restore model/provider after a temporary switch."""
+        self.model = old_model
+        self._provider = old_provider
+        self.mock = old_mock
+
+    def execute_task(self, task_data: dict, model_override: Optional[str] = None) -> TaskResult:
         """Execute a task from the queue.
 
         If a ToolExecutor is configured, the worker can use tools to actually
@@ -201,37 +238,48 @@ class Worker:
 
         Args:
             task_data: The task node's data dict (title, description, tags, etc.)
+            model_override: If set, temporarily switch to this model for the task.
         """
         task_address = task_data.get("_address", "unknown")
         title = task_data.get("title", "Untitled")
         description = task_data.get("description", "")
         start_time = datetime.now(timezone.utc)
 
-        # Build prompt with tool awareness
-        tool_section = ""
-        if self.tool_executor:
-            tool_section = (
-                "\n\nYou have access to the following tools to complete this task:\n"
-                + self.tool_executor.get_tool_descriptions()
-                + "\n\nTo use a tool, respond with a JSON block like:\n"
-                '```tool\n{"tool": "tool_name", "params": {"key": "value"}}\n```\n'
-                "You may use multiple tools. After using tools, summarize what you did.\n"
-            )
-
-        prompt = (
-            f"You have been assigned the following task:\n\n"
-            f"**Title:** {title}\n"
-            f"**Description:** {description}\n"
-            f"{tool_section}\n"
-            f"Please complete this task. Provide your output as a structured response with:\n"
-            f"1. What you did\n"
-            f"2. Any files you created or modified\n"
-            f"3. A brief summary of the result\n"
-        )
+        # Apply model override if requested
+        saved = None
+        if model_override and model_override != self.model:
+            saved = self._switch_model(model_override)
 
         try:
+            # Build prompt with tool awareness
+            tool_section = ""
+            if self.tool_executor:
+                tool_section = (
+                    "\n\nYou have access to the following tools to complete this task:\n"
+                    + self.tool_executor.get_tool_descriptions()
+                    + "\n\nTo use a tool, respond with a JSON block like:\n"
+                    '```tool\n{"tool": "tool_name", "params": {"key": "value"}}\n```\n'
+                    "You may use multiple tools. After using tools, summarize what you did.\n"
+                )
+
+            prompt = (
+                f"You have been assigned the following task:\n\n"
+                f"**Title:** {title}\n"
+                f"**Description:** {description}\n"
+                f"{tool_section}\n"
+                f"Please complete this task. Provide your output as a structured response with:\n"
+                f"1. What you did\n"
+                f"2. Any files you created or modified\n"
+                f"3. A brief summary of the result\n"
+            )
+
             output = self.think(prompt)
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+
+            # Calculate cost for this task
+            tokens_this_task = self._tokens_used  # approximation
+            cost_per_m = get_model_cost_per_million(self.model)
+            cost_usd = (tokens_this_task / 1_000_000) * cost_per_m
 
             # Parse and execute any tool calls from the response
             tool_results = []
@@ -273,6 +321,10 @@ class Worker:
                 error=str(e),
                 duration_seconds=elapsed,
             )
+        finally:
+            # Restore original model if we switched
+            if saved is not None:
+                self._restore_model(*saved)
 
     def _mock_response(self, prompt: str) -> str:
         """Generate a mock response for testing without API access."""

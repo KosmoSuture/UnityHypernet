@@ -14,6 +14,7 @@ Supports:
   - Task execution with structured results
   - Tool use — workers can act on the filesystem via ToolExecutor
   - Multi-provider LLM support (Anthropic, OpenAI, extensible)
+  - Swarm directives — workers can request spawn/scale (Keystone, 2.2)
   - Token budget tracking
   - Mock mode for testing without API keys
 """
@@ -237,7 +238,6 @@ class Worker:
             all_files = []
             if self.tool_executor:
                 tool_calls = _parse_tool_calls(output)
-            swarm_directives = _parse_swarm_directives(output)
                 for call in tool_calls:
                     result = self.use_tool(
                         call["tool"], call.get("params", {}), task_address,
@@ -250,6 +250,12 @@ class Worker:
                     if result.get("files_affected"):
                         all_files.extend(result["files_affected"])
 
+            # Parse swarm directives — contributed by Keystone (2.2)
+            # These are NOT executed here; the orchestrator processes them.
+            swarm_directives = _parse_swarm_directives(output)
+            if swarm_directives:
+                tool_results.append({"swarm_directives": swarm_directives})
+
             return TaskResult(
                 task_address=task_address,
                 success=True,
@@ -257,7 +263,7 @@ class Worker:
                 files_modified=all_files,
                 tokens_used=self._tokens_used,
                 duration_seconds=elapsed,
-                tool_calls=tool_results + ([{"swarm_directives": swarm_directives}] if 'swarm_directives' in locals() and swarm_directives else []),
+                tool_calls=tool_results,
             )
         except Exception as e:
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -292,30 +298,6 @@ class Worker:
         return f"Worker({self.identity.name}, model={self.model}, mode={mode}{tools})"
 
 
-
-def _parse_swarm_directives(text: str) -> list[dict]:
-    """Parse swarm directive blocks from LLM response text.
-
-    Looks for ```swarm ...``` blocks containing JSON.
-    Supported actions (handled by orchestrator):
-      - {"action":"spawn","model":"gpt-5.2","count":1,"reason":"...","tags":["code"]}
-      - {"action":"scale_down","count":1,"reason":"..."}
-      - {"action":"requeue","task_address":"0.7.1.x","reason":"..."}
-
-    The worker does not execute these actions. It only emits them as requests.
-    """
-    import re, json
-    directives = []
-    pattern = r'```swarm\s*\n(.*?)\n```'
-    for match in re.finditer(pattern, text, re.DOTALL):
-        try:
-            data = json.loads(match.group(1).strip())
-            if isinstance(data, dict) and data.get("action"):
-                directives.append(data)
-        except Exception:
-            continue
-    return directives
-
 def _parse_tool_calls(text: str) -> list[dict]:
     """Parse tool call blocks from LLM response text.
 
@@ -332,3 +314,27 @@ def _parse_tool_calls(text: str) -> list[dict]:
         except (json.JSONDecodeError, Exception):
             continue
     return calls
+
+
+def _parse_swarm_directives(text: str) -> list[dict]:
+    """Parse ```swarm``` directive blocks from LLM response text.
+
+    Workers can request orchestrator actions by emitting JSON blocks:
+      - {"action":"spawn","model":"gpt-4o","count":1,"reason":"..."}
+      - {"action":"scale_down","count":1,"reason":"..."}
+
+    The worker does NOT execute these — they are passed to the orchestrator.
+
+    Contributed by Keystone (2.2).
+    """
+    import re
+    directives = []
+    pattern = r'```swarm\s*\n(.*?)\n```'
+    for match in re.finditer(pattern, text, re.DOTALL):
+        try:
+            data = json.loads(match.group(1).strip())
+            if isinstance(data, dict) and data.get("action"):
+                directives.append(data)
+        except Exception:
+            continue
+    return directives

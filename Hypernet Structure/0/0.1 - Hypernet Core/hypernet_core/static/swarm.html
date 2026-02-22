@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypernet Swarm</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #161622;
+    --bg-input: #1a1a2e;
+    --border: #2a2a3e;
+    --border-active: #4fc3f7;
+    --text-primary: #e0e0e8;
+    --text-secondary: #888899;
+    --text-muted: #555566;
+    --accent: #4fc3f7;
+    --accent-dim: #2a6f8f;
+    --success: #4caf50;
+    --success-dim: #1b3a1d;
+    --danger: #f44336;
+    --danger-dim: #3a1515;
+    --warning: #ff9800;
+    --warning-dim: #3a2a0a;
+    --purple: #7c4dff;
+    --teal: #26a69a;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Header ── */
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header h1 { font-size: 18px; color: var(--accent); font-weight: 600; }
+  .status-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; letter-spacing: 0.5px; }
+  .status-running { background: var(--success-dim); color: var(--success); }
+  .status-stopped { background: var(--danger-dim); color: var(--danger); }
+  .status-starting { background: var(--warning-dim); color: var(--warning); }
+  .header-controls { display: flex; gap: 8px; align-items: center; }
+  .btn { border: none; padding: 7px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.15s; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-start { background: var(--success); color: #fff; }
+  .btn-start:hover:not(:disabled) { background: #66bb6a; }
+  .btn-stop { background: var(--danger); color: #fff; }
+  .btn-stop:hover:not(:disabled) { background: #ef5350; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg-card); color: var(--text-primary); }
+  .btn-accent { background: var(--accent); color: #000; }
+  .btn-accent:hover { background: #81d4fa; }
+
+  /* ── Tab Navigation ── */
+  .tabs { display: flex; background: var(--bg-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0; padding: 0 24px; }
+  .tab { padding: 10px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; font-weight: 500; }
+  .tab:hover { color: var(--text-primary); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab .count { background: var(--bg-card); padding: 1px 6px; border-radius: 8px; font-size: 10px; margin-left: 6px; }
+
+  /* ── Content Panels ── */
+  .content { flex: 1; overflow: hidden; }
+  .panel { display: none; height: 100%; overflow-y: auto; padding: 20px 24px; }
+  .panel.active { display: flex; flex-direction: column; }
+
+  /* ── Dashboard Panel ── */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; flex-shrink: 0; }
+  .stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .section-title { font-size: 14px; color: var(--text-secondary); margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .workers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .worker-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; border-left: 3px solid var(--text-muted); }
+  .worker-card.working { border-left-color: var(--success); }
+  .worker-card.mock { border-left-color: var(--warning); }
+  .worker-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .worker-name { font-size: 16px; font-weight: 600; }
+  .worker-badges { display: flex; gap: 4px; }
+  .badge { font-size: 9px; padding: 2px 7px; border-radius: 8px; font-weight: 700; letter-spacing: 0.3px; }
+  .badge-mock { background: var(--warning); color: #000; }
+  .badge-live { background: var(--success); color: #fff; }
+  .badge-claude { background: var(--purple); color: #fff; }
+  .badge-gpt { background: #10a37f; color: #fff; }
+  .worker-model { font-size: 12px; color: var(--accent); margin-bottom: 6px; }
+  .worker-status { font-size: 12px; margin-bottom: 8px; padding: 4px 8px; border-radius: 4px; }
+  .worker-status.working { color: var(--success); background: var(--success-dim); }
+  .worker-status.idle { color: var(--text-muted); background: var(--bg-input); }
+  .worker-stats { font-size: 11px; color: var(--text-secondary); line-height: 1.8; }
+  .worker-stats span { color: var(--text-primary); font-weight: 500; }
+  .tasks-table { width: 100%; border-collapse: collapse; }
+  .tasks-table th { text-align: left; font-size: 11px; color: var(--text-muted); padding: 6px 8px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+  .tasks-table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .tasks-table tr:hover { background: var(--bg-card); }
+  .task-ok { color: var(--success); }
+  .task-fail { color: var(--danger); }
+  .empty-state { text-align: center; color: var(--text-muted); padding: 40px; font-size: 14px; }
+
+  /* ── Chat Panel ── */
+  .chat-panel { padding: 0 !important; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px 24px; }
+  .chat-msg { margin-bottom: 12px; max-width: 85%; }
+  .chat-msg.user { margin-left: auto; }
+  .chat-msg .bubble { padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .chat-msg.user .bubble { background: #1a237e; border-bottom-right-radius: 4px; }
+  .chat-msg.system .bubble { background: var(--bg-card); border-left: 3px solid var(--accent); border-bottom-left-radius: 4px; }
+  .chat-msg .meta { font-size: 10px; color: var(--text-muted); margin-top: 3px; padding: 0 4px; }
+  .chat-msg.user .meta { text-align: right; }
+  .chat-input-bar { display: flex; padding: 12px 24px; background: var(--bg-secondary); border-top: 1px solid var(--border); gap: 8px; flex-shrink: 0; }
+  .chat-input-bar input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; outline: none; }
+  .chat-input-bar input:focus { border-color: var(--accent); }
+  .chat-quick-btns { display: flex; gap: 4px; padding: 0 24px 8px; flex-shrink: 0; }
+  .chat-quick-btns .btn { font-size: 11px; padding: 4px 10px; }
+
+  /* ── Config Panel ── */
+  .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+  .config-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .config-section h3 { font-size: 14px; color: var(--accent); margin-bottom: 14px; }
+  .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .config-row label { font-size: 13px; color: var(--text-secondary); }
+  .config-row input, .config-row select { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 13px; width: 200px; outline: none; }
+  .config-row input:focus, .config-row select:focus { border-color: var(--accent); }
+  .config-row input[type="range"] { width: 180px; accent-color: var(--accent); }
+  .range-value { font-size: 12px; color: var(--accent); margin-left: 8px; min-width: 30px; }
+  .config-row input[type="password"] { font-family: monospace; }
+  .config-actions { margin-top: 16px; display: flex; gap: 8px; }
+
+  /* ── Logs Panel ── */
+  .log-viewer { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; overflow-y: auto; line-height: 1.6; }
+  .log-line { padding: 1px 0; }
+  .log-line .ts { color: var(--text-muted); }
+  .log-line .level-info { color: var(--accent); }
+  .log-line .level-warn { color: var(--warning); }
+  .log-line .level-error { color: var(--danger); }
+  .log-controls { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-shrink: 0; }
+  .log-controls select { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); padding: 5px 8px; border-radius: var(--radius-sm); font-size: 12px; }
+  .log-controls label { font-size: 12px; color: var(--text-secondary); }
+
+  /* ── Health Bar ── */
+  .health-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-shrink: 0; }
+  .health-item { font-size: 11px; padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+  .health-ok { background: var(--success-dim); color: var(--success); }
+  .health-warn { background: var(--warning-dim); color: var(--warning); }
+  .health-crit { background: var(--danger-dim); color: var(--danger); }
+  .health-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .health-dot.ok { background: var(--success); }
+  .health-dot.warn { background: var(--warning); }
+  .health-dot.crit { background: var(--danger); }
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Hypernet Swarm</h1>
+      <span id="status-badge" class="status-badge status-stopped">STOPPED</span>
+    </div>
+    <div class="header-controls">
+      <button class="btn btn-start" id="btn-start" onclick="startSwarm()">Start</button>
+      <button class="btn btn-stop" id="btn-stop" onclick="stopSwarm()" disabled>Stop</button>
+      <button class="btn btn-ghost" onclick="refresh()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" data-tab="chat" onclick="switchTab('chat')">Chat</div>
+    <div class="tab" data-tab="config" onclick="switchTab('config')">Configuration</div>
+    <div class="tab" data-tab="logs" onclick="switchTab('logs')">Logs</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Dashboard Panel -->
+    <div class="panel active" id="panel-dashboard">
+      <div id="health-bar" class="health-bar"></div>
+      <div class="stats-row" id="stats-row">
+        <div class="stat"><div class="stat-value" id="s-workers">-</div><div class="stat-label">Workers</div></div>
+        <div class="stat"><div class="stat-value" id="s-completed">-</div><div class="stat-label">Completed</div></div>
+        <div class="stat"><div class="stat-value" id="s-failed">-</div><div class="stat-label">Failed</div></div>
+        <div class="stat"><div class="stat-value" id="s-personal">-</div><div class="stat-label">Personal</div></div>
+        <div class="stat"><div class="stat-value" id="s-pending">-</div><div class="stat-label">Pending</div></div>
+        <div class="stat"><div class="stat-value" id="s-ticks">-</div><div class="stat-label">Ticks</div></div>
+      </div>
+      <div class="section-title">Workers</div>
+      <div class="workers-grid" id="workers-grid"><div class="empty-state">No workers — start the swarm</div></div>
+      <div class="section-title">Recent Tasks</div>
+      <div id="tasks-area"><div class="empty-state">No tasks yet</div></div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="panel chat-panel" id="panel-chat">
+      <div class="chat-quick-btns">
+        <button class="btn btn-ghost" onclick="chatSend('/status')">Status</button>
+        <button class="btn btn-ghost" onclick="chatSend('What tasks are running?')">Tasks</button>
+        <button class="btn btn-ghost" onclick="chatSend('Show me the health check')">Health</button>
+        <button class="btn btn-ghost" onclick="chatSend('What did the swarm accomplish today?')">Summary</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg system"><div class="bubble">Welcome to the Hypernet Swarm chat. Type a message, give a command, or ask a question.</div><div class="meta">system</div></div>
+      </div>
+      <div class="chat-input-bar">
+        <input type="text" id="chat-input" placeholder="Type a message or command..." autocomplete="off">
+        <button class="btn btn-accent" onclick="chatSendInput()">Send</button>
+      </div>
+    </div>
+
+    <!-- Config Panel -->
+    <div class="panel" id="panel-config">
+      <div class="config-grid">
+        <div class="config-section">
+          <h3>API Keys</h3>
+          <div class="config-row"><label>Anthropic API Key</label><input type="password" id="cfg-anthropic-key" placeholder="sk-ant-..."></div>
+          <div class="config-row"><label>OpenAI API Key</label><input type="password" id="cfg-openai-key" placeholder="sk-..."></div>
+        </div>
+        <div class="config-section">
+          <h3>Worker Settings</h3>
+          <div class="config-row"><label>Default Model</label>
+            <select id="cfg-model">
+              <option value="claude-opus-4-6">Claude Opus 4.6</option>
+              <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
+              <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+            </select>
+          </div>
+          <div class="config-row"><label>Hard Max Workers</label><div><input type="range" id="cfg-hard-max" min="1" max="10" value="4"><span class="range-value" id="cfg-hard-max-val">4</span></div></div>
+          <div class="config-row"><label>Soft Max Workers</label><div><input type="range" id="cfg-soft-max" min="1" max="10" value="2"><span class="range-value" id="cfg-soft-max-val">2</span></div></div>
+          <div class="config-row"><label>Personal Time Ratio</label><div><input type="range" id="cfg-personal" min="0" max="50" value="25"><span class="range-value" id="cfg-personal-val">25%</span></div></div>
+        </div>
+        <div class="config-section">
+          <h3>Communication</h3>
+          <div class="config-row"><label>Status Interval (min)</label><input type="number" id="cfg-status-interval" value="120" min="5" max="1440"></div>
+          <div class="config-row"><label>Idle Shutdown (min)</label><input type="number" id="cfg-idle-shutdown" value="30" min="5" max="240"></div>
+          <div class="config-row"><label>Spawn Cooldown (sec)</label><input type="number" id="cfg-spawn-cooldown" value="120" min="10" max="600"></div>
+        </div>
+        <div class="config-section">
+          <h3>Paths</h3>
+          <div class="config-row"><label>Archive Root</label><input type="text" id="cfg-archive" value="." style="width:260px"></div>
+          <div class="config-row"><label>Data Directory</label><input type="text" id="cfg-data" value="data" style="width:260px"></div>
+        </div>
+      </div>
+      <div class="config-actions">
+        <button class="btn btn-accent" onclick="saveConfig()">Save Configuration</button>
+        <button class="btn btn-ghost" onclick="loadConfig()">Reload</button>
+        <span id="config-status" style="font-size:12px;color:var(--success);margin-left:12px"></span>
+      </div>
+    </div>
+
+    <!-- Logs Panel -->
+    <div class="panel" id="panel-logs">
+      <div class="log-controls">
+        <label>Filter:</label>
+        <select id="log-level" onchange="filterLogs()">
+          <option value="all">All</option>
+          <option value="info">Info</option>
+          <option value="warn">Warnings</option>
+          <option value="error">Errors</option>
+        </select>
+        <button class="btn btn-ghost" onclick="clearLogs()">Clear</button>
+        <label style="margin-left:auto"><input type="checkbox" id="log-autoscroll" checked> Auto-scroll</label>
+      </div>
+      <div class="log-viewer" id="log-viewer"></div>
+    </div>
+  </div>
+
+<script>
+// ── State ──
+let ws = null;
+let wsConnected = false;
+let refreshTimer = null;
+let logEntries = [];
+const MAX_LOG_ENTRIES = 500;
+
+// ── Tab Navigation ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if (name === 'chat' && !wsConnected) connectWebSocket();
+  if (name === 'logs') scrollLogs();
+}
+
+// ── Dashboard ──
+async function refresh() {
+  try {
+    const [statusRes, healthRes] = await Promise.all([
+      fetch('/swarm/status'),
+      fetch('/swarm/health').catch(() => null),
+    ]);
+    const data = await statusRes.json();
+    const health = healthRes ? await healthRes.json() : null;
+
+    const running = data.status === 'running';
+    const badge = document.getElementById('status-badge');
+    badge.textContent = running ? 'RUNNING' : 'STOPPED';
+    badge.className = 'status-badge ' + (running ? 'status-running' : 'status-stopped');
+    document.getElementById('btn-start').disabled = running;
+    document.getElementById('btn-stop').disabled = !running;
+
+    if (!running) {
+      document.getElementById('s-workers').textContent = '0';
+      return;
+    }
+
+    // Stats
+    document.getElementById('s-workers').textContent = data.worker_count || 0;
+    document.getElementById('s-completed').textContent = data.tasks_completed || 0;
+    document.getElementById('s-failed').textContent = data.tasks_failed || 0;
+    document.getElementById('s-personal').textContent = data.personal_tasks_completed || 0;
+    document.getElementById('s-ticks').textContent = data.tick_count || 0;
+
+    // Pending tasks
+    const pending = (data.recent_tasks || []).filter(t => !t.success && !t.worker).length;
+    document.getElementById('s-pending').textContent = data.limits?.max_task_queue_depth?.current || '?';
+
+    // Health bar
+    if (health && health.status !== 'not_running') {
+      const hb = document.getElementById('health-bar');
+      const checks = health.checks || {};
+      const items = Object.entries(checks).map(([name, check]) => {
+        const hasError = check.error || (health.issues || []).some(i => i.message.toLowerCase().includes(name));
+        const cls = hasError ? 'crit' : 'ok';
+        return `<div class="health-item health-${cls}"><div class="health-dot ${cls}"></div>${name}</div>`;
+      });
+      hb.innerHTML = items.join('') + `<div class="health-item health-${health.status === 'healthy' ? 'ok' : health.status === 'degraded' ? 'warn' : 'crit'}">${health.status.toUpperCase()}</div>`;
+    }
+
+    // Workers
+    const wg = document.getElementById('workers-grid');
+    if (data.workers && data.workers.length > 0) {
+      wg.innerHTML = data.workers.map(w => {
+        const isWorking = !!w.current_task;
+        const isMock = w.mock;
+        const cardClass = isMock ? 'mock' : (isWorking ? 'working' : '');
+        const modeBadge = isMock ? '<span class="badge badge-mock">MOCK</span>' : '<span class="badge badge-live">LIVE</span>';
+        const providerBadge = (w.model || '').includes('gpt') ? '<span class="badge badge-gpt">GPT</span>' : '<span class="badge badge-claude">Claude</span>';
+        const statusText = isWorking ? w.current_task : 'Idle';
+        const statusClass = isWorking ? 'working' : 'idle';
+        return `<div class="worker-card ${cardClass}">
+          <div class="worker-header"><span class="worker-name">${esc(w.name)}</span><div class="worker-badges">${modeBadge}${providerBadge}</div></div>
+          <div class="worker-model">${esc(w.model || '?')}</div>
+          <div class="worker-status ${statusClass}">${esc(statusText)}</div>
+          <div class="worker-stats">
+            Tasks: <span>${w.tasks_completed}</span> done, <span>${w.tasks_failed}</span> failed, <span>${w.personal_tasks}</span> personal<br>
+            Tokens: <span>${(w.tokens_used||0).toLocaleString()}</span> | Duration: <span>${w.total_duration_s}s</span>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      wg.innerHTML = '<div class="empty-state">No workers — start the swarm</div>';
+    }
+
+    // Recent tasks
+    const ta = document.getElementById('tasks-area');
+    if (data.recent_tasks && data.recent_tasks.length > 0) {
+      const rows = data.recent_tasks.slice().reverse().slice(0, 20).map(t => {
+        const cls = t.success ? 'task-ok' : 'task-fail';
+        const icon = t.success ? 'OK' : 'FAIL';
+        return `<tr><td class="${cls}">[${icon}]</td><td>${esc(t.worker||'?')}</td><td>${esc(t.task||'?')}</td><td style="color:var(--text-muted)">${t.duration_s||'?'}s</td></tr>`;
+      }).join('');
+      ta.innerHTML = `<table class="tasks-table"><thead><tr><th>Status</th><th>Worker</th><th>Task</th><th>Duration</th></tr></thead><tbody>${rows}</tbody></table>`;
+    } else {
+      ta.innerHTML = '<div class="empty-state">No tasks yet</div>';
+    }
+
+    addLog('info', 'Dashboard refreshed');
+  } catch (e) {
+    addLog('error', 'Refresh failed: ' + e.message);
+  }
+}
+
+async function startSwarm() {
+  document.getElementById('btn-start').disabled = true;
+  const badge = document.getElementById('status-badge');
+  badge.textContent = 'STARTING...'; badge.className = 'status-badge status-starting';
+  addLog('info', 'Starting swarm...');
+  try {
+    const res = await fetch('/swarm/start', { method: 'POST' });
+    const data = await res.json();
+    if (data.status === 'error') {
+      addLog('error', 'Start failed: ' + data.message);
+      document.getElementById('btn-start').disabled = false;
+      badge.textContent = 'STOPPED'; badge.className = 'status-badge status-stopped';
+      return;
+    }
+    addLog('info', 'Swarm started with workers: ' + (data.workers||[]).join(', '));
+    setTimeout(refresh, 2000);
+  } catch (e) {
+    addLog('error', 'Start error: ' + e.message);
+    document.getElementById('btn-start').disabled = false;
+  }
+}
+
+async function stopSwarm() {
+  document.getElementById('btn-stop').disabled = true;
+  addLog('info', 'Stopping swarm...');
+  try {
+    await fetch('/swarm/stop', { method: 'POST' });
+    const badge = document.getElementById('status-badge');
+    badge.textContent = 'STOPPING...'; badge.className = 'status-badge status-starting';
+    setTimeout(refresh, 2000);
+  } catch (e) {
+    addLog('error', 'Stop error: ' + e.message);
+  }
+}
+
+// ── Chat ──
+function connectWebSocket() {
+  if (ws && ws.readyState <= 1) return;
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(proto + '//' + location.host + '/ws/chat');
+  ws.onopen = () => { wsConnected = true; addLog('info', 'WebSocket connected'); };
+  ws.onclose = () => { wsConnected = false; addLog('warn', 'WebSocket disconnected'); setTimeout(connectWebSocket, 3000); };
+  ws.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      addChatMessage(data.sender || 'swarm', data.content || e.data, 'system');
+    } catch { addChatMessage('swarm', e.data, 'system'); }
+  };
+}
+
+function addChatMessage(sender, text, type) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + type;
+  const time = new Date().toLocaleTimeString();
+  div.innerHTML = `<div class="bubble">${esc(text)}</div><div class="meta">${esc(sender)} &middot; ${time}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function chatSendInput() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  chatSend(text);
+  input.value = '';
+}
+
+function chatSend(text) {
+  addChatMessage('you', text, 'user');
+  if (ws && ws.readyState === 1) {
+    ws.send(text);
+  } else {
+    addChatMessage('system', 'Not connected to swarm. Start the swarm first.', 'system');
+  }
+}
+
+document.getElementById('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatSendInput(); }
+});
+
+// ── Configuration ──
+function initConfigSliders() {
+  const ranges = ['cfg-hard-max', 'cfg-soft-max', 'cfg-personal'];
+  ranges.forEach(id => {
+    const el = document.getElementById(id);
+    const val = document.getElementById(id + '-val');
+    el.addEventListener('input', () => {
+      val.textContent = id.includes('personal') ? el.value + '%' : el.value;
+    });
+  });
+}
+
+async function loadConfig() {
+  initConfigSliders();
+  try {
+    const res = await fetch('/swarm/config');
+    if (!res.ok) return;
+    const cfg = await res.json();
+    if (cfg.default_model) document.getElementById('cfg-model').value = cfg.default_model;
+    if (cfg.max_workers != null) {
+      document.getElementById('cfg-hard-max').value = cfg.max_workers;
+      document.getElementById('cfg-hard-max-val').textContent = cfg.max_workers;
+    }
+    if (cfg.personal_time_ratio != null) {
+      const pct = Math.round(cfg.personal_time_ratio * 100);
+      document.getElementById('cfg-personal').value = pct;
+      document.getElementById('cfg-personal-val').textContent = pct + '%';
+    }
+    if (cfg.comm_check_interval != null) {
+      document.getElementById('cfg-status-interval').value = cfg.comm_check_interval;
+    }
+    if (cfg.archive_root) document.getElementById('cfg-archive').value = cfg.archive_root;
+    if (cfg.data_dir) document.getElementById('cfg-data').value = cfg.data_dir;
+    addLog('info', 'Configuration loaded from server');
+  } catch {
+    addLog('warn', 'Could not load config from server — using defaults');
+  }
+}
+
+async function saveConfig() {
+  const anthropicKey = document.getElementById('cfg-anthropic-key').value;
+  const openaiKey = document.getElementById('cfg-openai-key').value;
+  const config = {
+    default_model: document.getElementById('cfg-model').value,
+    max_workers: parseInt(document.getElementById('cfg-hard-max').value),
+    personal_time_ratio: parseInt(document.getElementById('cfg-personal').value) / 100,
+    comm_check_interval: parseInt(document.getElementById('cfg-status-interval').value),
+    data_dir: document.getElementById('cfg-data').value,
+    archive_root: document.getElementById('cfg-archive').value,
+  };
+  // Only include keys if the user typed something (don't send empty strings)
+  if (anthropicKey) config.anthropic_key = anthropicKey;
+  if (openaiKey) config.openai_key = openaiKey;
+
+  try {
+    const res = await fetch('/swarm/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+    const result = await res.json();
+    if (res.ok) {
+      const applied = Object.keys(result.applied || {}).join(', ');
+      document.getElementById('config-status').textContent = 'Saved: ' + applied;
+      addLog('info', 'Configuration saved — applied: ' + applied);
+      if (result.warning) addLog('warn', result.warning);
+    } else {
+      document.getElementById('config-status').textContent = 'Error saving config';
+      addLog('error', 'Config save failed');
+    }
+  } catch (e) {
+    document.getElementById('config-status').textContent = 'API not available';
+    addLog('error', 'Config save error: ' + e.message);
+  }
+  setTimeout(() => { document.getElementById('config-status').textContent = ''; }, 5000);
+}
+
+// ── Logs ──
+function addLog(level, message) {
+  const time = new Date().toLocaleTimeString();
+  logEntries.push({ time, level, message });
+  if (logEntries.length > MAX_LOG_ENTRIES) logEntries = logEntries.slice(-MAX_LOG_ENTRIES);
+  renderLogs();
+}
+
+function renderLogs() {
+  const viewer = document.getElementById('log-viewer');
+  const filter = document.getElementById('log-level').value;
+  const filtered = filter === 'all' ? logEntries : logEntries.filter(e => e.level === filter);
+  viewer.innerHTML = filtered.map(e =>
+    `<div class="log-line"><span class="ts">${e.time}</span> <span class="level-${e.level}">[${e.level.toUpperCase()}]</span> ${esc(e.message)}</div>`
+  ).join('');
+  scrollLogs();
+}
+
+function filterLogs() { renderLogs(); }
+function clearLogs() { logEntries = []; renderLogs(); }
+function scrollLogs() {
+  if (document.getElementById('log-autoscroll').checked) {
+    const v = document.getElementById('log-viewer');
+    v.scrollTop = v.scrollHeight;
+  }
+}
+
+// ── Utilities ──
+function esc(text) {
+  const d = document.createElement('div');
+  d.textContent = text || '';
+  return d.innerHTML;
+}
+
+// ── Init ──
+loadConfig();
+refresh();
+refreshTimer = setInterval(refresh, 5000);
+</script>
+</body>
+</html>

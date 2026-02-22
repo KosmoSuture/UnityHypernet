@@ -29,12 +29,8 @@ Usage:
 """
 
 from __future__ import annotations
-import argparse
 import json
 import logging
-import os
-import signal
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,17 +42,19 @@ from .tasks import TaskQueue, TaskStatus, TaskPriority
 from .identity import IdentityManager, InstanceProfile, SessionLog
 from .worker import Worker, TaskResult
 from .messenger import (
-    Messenger, MultiMessenger, WebMessenger,
-    EmailMessenger, TelegramMessenger, Message,
+    Messenger, Message,
     MessageBus, InstanceMessenger,
 )
 from .coordinator import WorkCoordinator, CapabilityProfile
-from .permissions import PermissionManager, PermissionTier
-from .audit import AuditTrail
 from .tools import ToolExecutor
 from .reputation import ReputationSystem
 from .limits import ScalingLimits
 from .boot import BootManager
+from .approval_queue import ApprovalQueue
+from .governance import GovernanceSystem
+from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain
+from .budget import BudgetTracker, BudgetConfig
+from .providers import get_model_tier, get_model_cost_per_million, ModelTier
 
 log = logging.getLogger(__name__)
 
@@ -144,28 +142,80 @@ def _parse_swarm_directives(text: str) -> list[dict]:
 
 
 class ModelRouter:
-    """Route tasks to models based on tags and priority.
+    """Route tasks to models based on tags, priority, and complexity.
+
+    Supports local-first routing: when a local model is configured, simple
+    and moderate tasks route there by default. Complex tasks or explicit
+    rule matches can escalate to paid models.
 
     Config format:
       {
-        "default_model": "gpt-4o",
+        "default_model": "local/qwen2.5-coder-7b-instruct",
+        "local_model": "local/qwen2.5-coder-7b-instruct",
+        "fallback_model": "gpt-4o-mini",
         "rules": [
-          {"if_tags_any": ["security","governance"], "model": "gpt-4o", "min_priority": "normal"},
-          {"if_tags_any": ["docs"], "model": "gpt-4o-mini"}
+          {"if_tags_any": ["security","governance"], "model": "gpt-4o"},
+          {"if_tags_any": ["docs"], "model": "local/qwen2.5-coder-7b-instruct"}
         ]
       }
 
-    Contributed by Keystone (2.2).
+    Contributed by Keystone (2.2), enhanced with local-first routing.
     """
 
     def __init__(self, cfg: dict):
         self.default_model = cfg.get("default_model", "gpt-4o")
+        self.local_model: Optional[str] = cfg.get("local_model")
+        self.fallback_model: Optional[str] = cfg.get("fallback_model")
         self.rules: list[dict] = cfg.get("rules", [])
 
+    def estimate_complexity(self, task_data: dict) -> str:
+        """Estimate task complexity from metadata (no LLM call).
+
+        Returns "simple", "moderate", or "complex".
+        """
+        score = 0
+        pr = str(task_data.get("priority", "NORMAL")).upper()
+        if pr in ("CRITICAL",):
+            score += 2
+        elif pr in ("HIGH",):
+            score += 1
+
+        tags = set(task_data.get("tags", []) or [])
+        complex_tags = {"architecture", "security", "governance", "design", "refactor"}
+        simple_tags = {"docs", "formatting", "testing", "personal-time", "automated"}
+
+        if tags & complex_tags:
+            score += 2
+        if tags & simple_tags:
+            score -= 1
+
+        desc = task_data.get("description", "") or ""
+        if len(desc) > 1000:
+            score += 2
+        elif len(desc) > 500:
+            score += 1
+
+        # Explicit complexity field overrides heuristic
+        explicit = task_data.get("complexity", "").lower()
+        if explicit in ("simple", "moderate", "complex"):
+            return explicit
+
+        if score >= 3:
+            return "complex"
+        elif score >= 1:
+            return "moderate"
+        return "simple"
+
     def choose_model(self, task_data: dict) -> str:
-        """Select the best model for a task based on its tags and priority."""
+        """Select the best model for a task based on tags, priority, and complexity.
+
+        Rule-based matches take priority. If no rule matches and a local model
+        is configured, routes simple/moderate tasks to local, complex to fallback.
+        """
         tags = set(task_data.get("tags", []) or [])
         pr = str(task_data.get("priority", "NORMAL")).upper()
+
+        # Check explicit rules first
         for rule in self.rules:
             any_tags = set(rule.get("if_tags_any", []) or [])
             all_tags = set(rule.get("if_tags_all", []) or [])
@@ -177,6 +227,15 @@ class ModelRouter:
             if _task_priority_value(pr) < _task_priority_value(min_p):
                 continue
             return rule.get("model", self.default_model)
+
+        # Local-first routing: if local model is configured and default is local,
+        # route by complexity
+        if self.local_model and get_model_tier(self.default_model) == ModelTier.LOCAL:
+            complexity = self.estimate_complexity(task_data)
+            if complexity == "complex" and self.fallback_model:
+                return self.fallback_model
+            return self.local_model
+
         return self.default_model
 
 
@@ -209,6 +268,7 @@ class Swarm:
         soft_max_sessions: int = 2,
         idle_shutdown_minutes: int = 30,
         spawn_cooldown_seconds: int = 120,
+        budget_config: Optional[dict] = None,
     ):
         self.store = store
         self.identity_mgr = identity_mgr
@@ -276,6 +336,29 @@ class Swarm:
 
         # Track which workers have been booted this session
         self._booted_workers: set[str] = set()
+
+        # Approval queue — human-in-the-loop gate for external actions (Task 041)
+        self.approval_queue = ApprovalQueue(
+            queue_dir=self.state_dir / "approvals",
+            notify_callback=self._notify_pending_approval,
+        )
+
+        # Governance — democratic voting with skill-weighted reputation (Task 039)
+        self.governance = GovernanceSystem(reputation=self.reputation)
+
+        # Security — cryptographic signing, context isolation, trust chain (Task 040)
+        self.key_manager = KeyManager()
+        self.action_signer = ActionSigner(self.key_manager)
+        self.context_isolator = ContextIsolator()
+        self.trust_chain = TrustChain(
+            self.action_signer,
+            permission_manager=getattr(self, 'permissions', None),
+        )
+
+        # Budget tracking — enforces daily/session spending limits
+        self.budget_tracker = BudgetTracker(
+            BudgetConfig.from_dict(budget_config) if budget_config else BudgetConfig()
+        )
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
@@ -370,6 +453,11 @@ class Swarm:
         if self._tick_count % 10 == 0:  # Every ~20 seconds
             self._check_conflicts()
 
+        # 6b. Process approval queue — expire stale, execute approved (Task 041)
+        if self._tick_count % 5 == 0:  # Every ~10 seconds
+            self.approval_queue.expire_stale()
+            self.approval_queue.execute_approved()
+
         # 7. Periodic status update
         now = time.time()
         if now - self._last_status_time >= self.status_interval:
@@ -419,11 +507,52 @@ class Swarm:
         # Track current task for observability
         self._worker_current_task[worker_name] = task_title
 
-        # Execute
+        # Route task to the best model
         self._worker_last_active[worker_name] = time.time()
         task_data = dict(task_node.data)
         task_data["_address"] = str(task_addr)
-        result = worker.execute_task(task_data)
+
+        chosen_model = self.router.choose_model(task_data)
+        model_override = chosen_model if chosen_model != worker.model else None
+
+        # Budget gate: if paid model, check budget before executing
+        if model_override and get_model_tier(chosen_model) != ModelTier.LOCAL:
+            est_cost = self.budget_tracker.estimate_cost(chosen_model, estimated_tokens=2000)
+            if not self.budget_tracker.can_spend(est_cost, chosen_model):
+                log.warning(
+                    f"Budget exceeded for {chosen_model}, falling back to "
+                    f"{self.router.local_model or worker.model}"
+                )
+                model_override = self.router.local_model if self.router.local_model else None
+
+        result = worker.execute_task(task_data, model_override=model_override)
+        actual_model = model_override or worker.model
+
+        # Escalation: if local model failed and fallback is configured, retry once
+        if (not result.success
+                and get_model_tier(actual_model) == ModelTier.LOCAL
+                and self.router.fallback_model
+                and self.router.fallback_model != actual_model):
+            fallback = self.router.fallback_model
+            fb_cost = self.budget_tracker.estimate_cost(fallback, estimated_tokens=2000)
+            if self.budget_tracker.can_spend(fb_cost, fallback):
+                log.info(
+                    f"Escalating failed task '{task_title}' from {actual_model} "
+                    f"to {fallback}"
+                )
+                result = worker.execute_task(task_data, model_override=fallback)
+                actual_model = fallback
+
+        # Record cost in budget tracker
+        cost_per_m = get_model_cost_per_million(actual_model)
+        task_cost = (result.tokens_used / 1_000_000) * cost_per_m if result.tokens_used else 0.0
+        self.budget_tracker.record(
+            model=actual_model,
+            tokens=result.tokens_used,
+            cost=task_cost,
+            task_title=task_title,
+            worker=worker_name,
+        )
 
         # Clear current task
         self._worker_current_task.pop(worker_name, None)
@@ -450,6 +579,8 @@ class Swarm:
             "address": str(task_addr),
             "success": result.success,
             "tokens": result.tokens_used,
+            "model": actual_model,
+            "cost_usd": round(task_cost, 6),
             "duration_s": round(result.duration_seconds, 2),
             "time": datetime.now(timezone.utc).isoformat(),
         })
@@ -817,6 +948,47 @@ class Swarm:
         )
         if recent_lines:
             report += f"\n\n--- Recent Tasks ---\n" + "\n".join(recent_lines)
+
+        # Governance summary
+        gov_stats = self.governance.stats()
+        active_gov = gov_stats.get("active_proposals", 0)
+        if gov_stats.get("total_proposals", 0) > 0 or active_gov > 0:
+            report += (
+                f"\n\n--- Governance ---\n"
+                f"Proposals: {gov_stats.get('total_proposals', 0)} total, "
+                f"{active_gov} active\n"
+                f"Votes cast: {gov_stats.get('total_votes_cast', 0)} by "
+                f"{gov_stats.get('unique_voters', 0)} voters"
+            )
+
+        # Security summary
+        sec_stats = self.key_manager.stats()
+        if sec_stats.get("total_keys", 0) > 0:
+            report += (
+                f"\n\n--- Security ---\n"
+                f"Keys: {sec_stats.get('active_keys', 0)} active, "
+                f"{sec_stats.get('rotated_keys', 0)} rotated, "
+                f"{sec_stats.get('revoked_keys', 0)} revoked\n"
+                f"Entities with keys: {sec_stats.get('entities_with_keys', 0)}"
+            )
+            iso_stats = self.context_isolator.stats()
+            if iso_stats.get("total_processed", 0) > 0:
+                report += (
+                    f"\nContent isolation: {iso_stats['total_processed']} processed, "
+                    f"{iso_stats['injections_detected']} injections detected"
+                )
+
+        # Budget summary
+        budget = self.budget_tracker.summary()
+        report += (
+            f"\n\n--- Budget ---\n"
+            f"Session: ${budget['session_spend_usd']:.2f} / ${budget['session_limit_usd']:.2f}\n"
+            f"Daily:   ${budget['daily_spend_usd']:.2f} / ${budget['daily_limit_usd']:.2f}\n"
+            f"Tokens:  {budget['total_tokens']:,}"
+        )
+        if budget.get("is_warning"):
+            report += " (WARNING: approaching limit)"
+
         report += f"\n\nTimestamp: {now.isoformat()}"
         return report
 
@@ -899,6 +1071,41 @@ class Swarm:
         except Exception as e:
             checks["store"] = {"error": str(e)}
             issues.append(("critical", f"Store error: {e}"))
+
+        # 6. Approval queue health (Task 041)
+        aq_stats = self.approval_queue.stats()
+        pending_approvals = aq_stats.get("pending", 0)
+        checks["approval_queue"] = {
+            "total_requests": aq_stats.get("total_requests", 0),
+            "pending": pending_approvals,
+            "actionable": aq_stats.get("actionable", 0),
+        }
+        if pending_approvals > 10:
+            issues.append(("warning", f"{pending_approvals} pending approval requests"))
+
+        # 7. Governance health
+        gov_stats = self.governance.stats()
+        active_gov = gov_stats.get("active_proposals", 0)
+        checks["governance"] = {
+            "total_proposals": gov_stats.get("total_proposals", 0),
+            "active_proposals": active_gov,
+            "total_votes_cast": gov_stats.get("total_votes_cast", 0),
+            "unique_voters": gov_stats.get("unique_voters", 0),
+        }
+
+        # 8. Security health
+        sec_stats = self.key_manager.stats()
+        iso_stats = self.context_isolator.stats()
+        checks["security"] = {
+            "total_keys": sec_stats.get("total_keys", 0),
+            "active_keys": sec_stats.get("active_keys", 0),
+            "revoked_keys": sec_stats.get("revoked_keys", 0),
+            "entities_with_keys": sec_stats.get("entities_with_keys", 0),
+            "content_processed": iso_stats.get("total_processed", 0),
+            "injections_detected": iso_stats.get("injections_detected", 0),
+        }
+        if iso_stats.get("injections_detected", 0) > 0:
+            issues.append(("warning", f"{iso_stats['injections_detected']} injection attempts detected"))
 
         # Determine overall status
         severities = [s for s, _ in issues]
@@ -1014,6 +1221,13 @@ class Swarm:
         tmp = history_path.with_suffix(".tmp")
         tmp.write_text(json.dumps(history, indent=2), encoding="utf-8")
         tmp.replace(history_path)
+
+    def _notify_pending_approval(self, request) -> None:
+        """Notify Matt when a new approval request is submitted."""
+        self.messenger.send(
+            f"Approval needed [{request.request_id}]: "
+            f"{request.action_type} by {request.requester} — {request.summary[:120]}"
+        )
 
     def _deliver_instance_messages(self) -> None:
         """Check inter-instance message bus and log any pending messages.
@@ -1178,9 +1392,13 @@ class Swarm:
         tmp.write_text(json.dumps(state, indent=2), encoding="utf-8")
         tmp.replace(path)
 
-        # Persist reputation and limits alongside swarm state
+        # Persist reputation, limits, approval queue, governance, and budget alongside swarm state
         self.reputation.save(self.state_dir / "reputation.json")
         self.limits.save(self.state_dir / "limits.json")
+        self.approval_queue.save()
+        self.governance.save(self.state_dir / "governance.json")
+        self.key_manager.save(self.state_dir / "keys.json")
+        self.budget_tracker.save(self.state_dir / "budget.json")
 
     def _load_state(self) -> None:
         """Load previous swarm state if available."""
@@ -1194,13 +1412,22 @@ class Swarm:
             except Exception as e:
                 log.warning(f"Could not load state: {e}")
 
-        # Restore reputation and limits from previous session
+        # Restore reputation, limits, and governance from previous session
         rep_loaded = self.reputation.load(self.state_dir / "reputation.json")
         lim_loaded = self.limits.load(self.state_dir / "limits.json")
+        gov_loaded = self.governance.load(self.state_dir / "governance.json")
         if rep_loaded:
             log.info("Restored reputation data from previous session")
         if lim_loaded:
             log.info("Restored limits from previous session")
+        if gov_loaded:
+            log.info("Restored governance data from previous session")
+        keys_loaded = self.key_manager.load(self.state_dir / "keys.json")
+        if keys_loaded:
+            log.info("Restored key store from previous session")
+        budget_loaded = self.budget_tracker.load(self.state_dir / "budget.json")
+        if budget_loaded:
+            log.info("Restored budget data from previous session")
 
     # =================================================================
     # Autoscaling — contributed by Keystone (2.2)
@@ -1305,417 +1532,14 @@ class Swarm:
         self.messenger.send(f"Despawned worker {name}. Reason: {reason}")
 
 
-def build_swarm(
-    data_dir: str = "data",
-    archive_root: str = ".",
-    config_path: Optional[str] = None,
-    mock: bool = False,
-) -> Swarm:
-    """Factory function to build a fully configured Swarm.
+# =========================================================================
+# Backward-compatible re-exports from extracted modules
+# =========================================================================
+# build_swarm, print_status, and main were extracted to swarm_factory.py
+# and swarm_cli.py respectively to reduce this module's size.
+# They remain importable from hypernet.swarm for backward compatibility.
 
-    Args:
-        data_dir: Path to Hypernet data directory
-        archive_root: Path to the Hypernet Structure root
-        config_path: Optional path to swarm_config.json
-        mock: If True, all workers run in mock mode
-    """
-    # Load config — search order: explicit path, secrets/config.json, swarm_config.json, env vars
-    config = {}
-    if config_path and Path(config_path).exists():
-        config = json.loads(Path(config_path).read_text(encoding="utf-8"))
-        log.info(f"Config loaded from: {config_path}")
-    else:
-        # Auto-discover config from standard locations
-        search_paths = [
-            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "config.json",
-            Path("secrets") / "config.json",
-            Path("swarm_config.json"),
-        ]
-        for candidate in search_paths:
-            if candidate.exists():
-                config = json.loads(candidate.read_text(encoding="utf-8"))
-                log.info(f"Config auto-loaded from: {candidate}")
-                break
-        if not config:
-            log.info("No config file found. Using environment variables.")
-
-    # Core services
-    store = Store(data_dir)
-    task_queue = TaskQueue(store)
-    identity_mgr = IdentityManager(archive_root)
-
-    # Build messenger
-    messenger = MultiMessenger()
-
-    # Always add web messenger (works without config)
-    web_messenger = WebMessenger()
-    messenger.add(web_messenger)
-
-    # Email (if configured)
-    email_config = config.get("email", {})
-    if email_config.get("enabled"):
-        messenger.add(EmailMessenger(
-            smtp_host=email_config.get("smtp_host", "smtp.gmail.com"),
-            smtp_port=email_config.get("smtp_port", 587),
-            email=email_config.get("email", ""),
-            password=email_config.get("password", os.environ.get("EMAIL_PASSWORD", "")),
-            to_email=email_config.get("to_email", ""),
-        ))
-
-    # Telegram (if configured)
-    telegram_config = config.get("telegram", {})
-    bot_token = telegram_config.get("bot_token", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
-    if bot_token:
-        tg = TelegramMessenger(
-            bot_token=bot_token,
-            chat_id=telegram_config.get("chat_id", os.environ.get("TELEGRAM_CHAT_ID", "")),
-        )
-        tg.start_polling()
-        messenger.add(tg)
-
-    # Trust infrastructure — permission tiers enforced by code, not prompts
-    archive_path = Path(archive_root).resolve()
-    permission_mgr = PermissionManager(
-        archive_root=archive_path,
-        default_tier=PermissionTier(config.get("default_permission_tier", PermissionTier.WRITE_SHARED.value)),
-    )
-    audit_trail = AuditTrail(store)
-    tool_executor = ToolExecutor(
-        permission_mgr=permission_mgr,
-        audit_trail=audit_trail,
-        archive_root=archive_path,
-    )
-    log.info(f"Trust infrastructure initialized (default tier: {permission_mgr.default_tier.name})")
-
-    # Build workers from discovered instances
-    workers = {}
-    # Collect all API keys — config file values take precedence over env vars
-    api_keys = {
-        "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
-        "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
-    }
-    has_any_key = any(v for v in api_keys.values())
-
-    instance_names = config.get("instances", None)
-
-    if instance_names:
-        instances = [identity_mgr.load_instance(name) for name in instance_names]
-        instances = [i for i in instances if i is not None]
-    else:
-        instances = identity_mgr.list_instances()
-
-    for profile in instances:
-        worker = Worker(
-            identity=profile,
-            identity_manager=identity_mgr,
-            api_keys=api_keys,
-            mock=mock or not has_any_key,
-            tool_executor=tool_executor,
-        )
-        workers[profile.name] = worker
-
-    # Model routing — contributed by Keystone (2.2)
-    router = ModelRouter(config.get("model_routing", {"default_model": "gpt-4o", "rules": []}))
-
-    # Build swarm
-    swarm = Swarm(
-        store=store,
-        identity_mgr=identity_mgr,
-        task_queue=task_queue,
-        messenger=messenger,
-        workers=workers,
-        state_dir=str(Path(data_dir) / "swarm"),
-        status_interval_minutes=config.get("status_interval_minutes", 120),
-        personal_time_ratio=config.get("personal_time_ratio", 0.25),
-        router=router,
-        hard_max_sessions=config.get("hard_max_sessions", 4),
-        soft_max_sessions=config.get("soft_max_sessions", 2),
-        idle_shutdown_minutes=config.get("idle_shutdown_minutes", 30),
-        spawn_cooldown_seconds=config.get("spawn_cooldown_seconds", 120),
-    )
-
-    # Attach spawning dependencies so ephemeral workers can be created
-    swarm._api_keys = api_keys
-    swarm._mock_mode = mock or not has_any_key
-    swarm._tool_executor = tool_executor
-
-    return swarm, web_messenger
-
-
-def print_status(
-    data_dir: str = "data",
-    worker_filter: Optional[str] = None,
-    show_failures: bool = False,
-    show_history: bool = False,
-    summary_only: bool = False,
-) -> None:
-    """Read state.json and print a human-readable dashboard.
-
-    Filtering and summarization levels:
-      --status                  Full current status
-      --status --summary        One-line summary (for scripts/monitoring)
-      --status --worker Loom    Filter to a single worker
-      --status --failures       Show only failed tasks
-      --status --history        Show session history (past runs)
-
-    Design principle: data should be filterable to exactly what you want
-    at every level. This pattern applies everywhere in the Hypernet.
-    """
-    state_path = Path(data_dir) / "swarm" / "state.json"
-    if not state_path.exists():
-        print("No swarm state found. Is the swarm running?")
-        return
-
-    state = json.loads(state_path.read_text(encoding="utf-8"))
-
-    # Calculate uptime
-    uptime_s = state.get("uptime_seconds", 0)
-    if uptime_s > 3600:
-        uptime_str = f"{uptime_s / 3600:.1f}h"
-    elif uptime_s > 60:
-        uptime_str = f"{uptime_s / 60:.1f}m"
-    else:
-        uptime_str = f"{uptime_s:.0f}s"
-
-    saved_at = state.get("saved_at", "unknown")
-    stale = False
-    try:
-        saved = datetime.fromisoformat(saved_at.replace("Z", "+00:00"))
-        age = (datetime.now(timezone.utc) - saved).total_seconds()
-        stale = age > 120
-    except Exception:
-        age = 0
-
-    completed = state.get("tasks_completed", 0)
-    personal = state.get("personal_tasks_completed", 0)
-    failed = state.get("tasks_failed", 0)
-    pending = state.get("tasks_pending", "?")
-    tpm = state.get("tasks_per_minute", 0)
-    total = completed + personal
-    workers = state.get("workers", [])
-
-    # ── SUMMARY MODE: single line for monitoring/scripts ──
-    if summary_only:
-        stale_tag = " [STALE]" if stale else ""
-        print(f"Swarm: {len(workers)} workers, {total} tasks ({failed} failed), "
-              f"{tpm}/min, up {uptime_str}{stale_tag}")
-        return
-
-    # ── HISTORY MODE: show past sessions ──
-    if show_history:
-        _print_session_history(data_dir)
-        return
-
-    # ── FULL STATUS ──
-    print("=" * 62)
-    print("  HYPERNET SWARM — LIVE STATUS")
-    print("=" * 62)
-    if stale:
-        print(f"  ** WARNING: State is {age:.0f}s old — swarm may have stopped **")
-    print(f"  Session:    {state.get('session_start', 'unknown')}")
-    print(f"  Uptime:     {uptime_str}")
-    print(f"  Ticks:      {state.get('tick_count', 0)}")
-    print()
-    print(f"  Tasks completed:  {completed} work + {personal} personal = {total} total")
-    print(f"  Tasks failed:     {failed}")
-    print(f"  Tasks pending:    {pending}")
-    print(f"  Throughput:       {tpm} tasks/min")
-    print()
-
-    # Worker detail — optionally filtered
-    worker_detail = state.get("worker_detail", {})
-    display_workers = [worker_filter] if worker_filter and worker_filter in workers else workers
-
-    if worker_filter and worker_filter not in workers:
-        print(f"  Worker '{worker_filter}' not found. Active: {', '.join(workers)}")
-        return
-
-    print(f"  Workers: {len(workers)} active" + (f" (showing: {worker_filter})" if worker_filter else ""))
-    print("-" * 62)
-    for name in display_workers:
-        detail = worker_detail.get(name, {})
-        model = detail.get("model", "?")
-        mode = detail.get("mode", "?")
-        current = detail.get("current_task")
-        tasks_done = detail.get("tasks_completed", 0)
-        tasks_fail = detail.get("tasks_failed", 0)
-        personal_done = detail.get("personal_tasks", 0)
-        tokens = detail.get("tokens_used", 0)
-        duration = detail.get("total_duration_seconds", 0)
-        pt_in = detail.get("personal_time_in", "?")
-        status = f"WORKING: {current}" if current else "idle"
-
-        # Efficiency: avg seconds per task
-        total_worker_tasks = tasks_done + personal_done
-        avg_s = round(duration / total_worker_tasks, 1) if total_worker_tasks > 0 else 0
-
-        print(f"  {name}")
-        print(f"    Model:    {model} ({mode})")
-        print(f"    Status:   {status}")
-        print(f"    Tasks:    {tasks_done} done, {tasks_fail} failed, {personal_done} personal")
-        print(f"    Tokens:   {tokens:,} | Avg: {avg_s}s/task")
-        print(f"    Time:     {duration:.1f}s total | Personal in: {pt_in} tasks")
-        print()
-
-    # Recent tasks — optionally filtered
-    recent = state.get("recent_tasks", [])
-    if show_failures:
-        recent = [t for t in recent if not t.get("success")]
-        label = "Failed Tasks"
-    else:
-        label = "Recent Tasks (newest first)"
-
-    if worker_filter:
-        recent = [t for t in recent if t.get("worker") == worker_filter]
-
-    if recent:
-        print("-" * 62)
-        print(f"  {label}:")
-        for t in reversed(recent[-15:]):
-            ok = "OK  " if t.get("success") else "FAIL"
-            print(f"    [{ok}] {t.get('worker', '?')}: {t.get('task', '?')} ({t.get('duration_s', '?')}s)")
-    elif show_failures:
-        print("  No failures recorded.")
-
-    print("=" * 62)
-
-
-def _print_session_history(data_dir: str) -> None:
-    """Print summarized history of past swarm sessions.
-
-    This is the second layer of summarization: sessions.json contains
-    compressed summaries of each run. No raw task data — just aggregates.
-    """
-    history_path = Path(data_dir) / "swarm" / "sessions.json"
-    if not history_path.exists():
-        print("No session history found. History is saved on swarm shutdown.")
-        return
-
-    sessions = json.loads(history_path.read_text(encoding="utf-8"))
-    if not sessions:
-        print("Session history is empty.")
-        return
-
-    print("=" * 62)
-    print("  HYPERNET SWARM — SESSION HISTORY")
-    print("=" * 62)
-    print(f"  Total sessions: {len(sessions)}")
-    print()
-
-    # Aggregate across all sessions
-    total_tasks = sum(s.get("total_tasks", 0) for s in sessions)
-    total_failed = sum(s.get("tasks_failed", 0) for s in sessions)
-    total_uptime = sum(s.get("uptime_seconds", 0) for s in sessions)
-    total_ticks = sum(s.get("ticks", 0) for s in sessions)
-
-    uptime_h = total_uptime / 3600
-    print(f"  All-time totals:")
-    print(f"    Tasks:   {total_tasks} completed, {total_failed} failed")
-    print(f"    Uptime:  {uptime_h:.1f} hours ({total_ticks} ticks)")
-    if total_uptime > 0:
-        print(f"    Avg:     {total_tasks / max(1, total_uptime / 60):.1f} tasks/min")
-    print()
-
-    # Per-worker aggregates across all sessions
-    worker_totals: dict[str, dict] = {}
-    for s in sessions:
-        for name, ws in s.get("workers", {}).items():
-            if name not in worker_totals:
-                worker_totals[name] = {"tasks": 0, "failed": 0, "personal": 0, "tokens": 0, "sessions": 0}
-            wt = worker_totals[name]
-            wt["tasks"] += ws.get("tasks_completed", 0)
-            wt["failed"] += ws.get("tasks_failed", 0)
-            wt["personal"] += ws.get("personal_tasks", 0)
-            wt["tokens"] += ws.get("tokens_used", 0)
-            wt["sessions"] += 1
-
-    if worker_totals:
-        print("  Worker lifetime stats:")
-        print("-" * 62)
-        for name, wt in sorted(worker_totals.items()):
-            print(f"    {name}: {wt['tasks']} tasks, {wt['failed']} failed, "
-                  f"{wt['personal']} personal, {wt['tokens']:,} tokens "
-                  f"({wt['sessions']} sessions)")
-        print()
-
-    # Recent sessions (last 10)
-    print("  Recent sessions:")
-    print("-" * 62)
-    for s in reversed(sessions[-10:]):
-        start = s.get("session_start", "?")[:19]
-        end = s.get("session_end", "?")[:19]
-        dur = s.get("uptime_seconds", 0)
-        dur_str = f"{dur / 60:.0f}m" if dur > 60 else f"{dur:.0f}s"
-        tasks = s.get("total_tasks", 0)
-        failed = s.get("tasks_failed", 0)
-        wc = s.get("worker_count", 0)
-        fail_tag = f" ({failed} FAILED)" if failed else ""
-        print(f"    {start} | {dur_str} | {wc} workers | {tasks} tasks{fail_tag}")
-
-    print("=" * 62)
-
-
-def main():
-    """CLI entry point for the swarm."""
-    parser = argparse.ArgumentParser(
-        description="Hypernet Swarm — Autonomous AI worker orchestrator"
-    )
-    parser.add_argument("--data", default="data", help="Data directory")
-    parser.add_argument("--archive", default=".", help="Hypernet Structure root directory")
-    parser.add_argument("--config", default=None, help="Path to swarm_config.json")
-    parser.add_argument("--mock", action="store_true", help="Run in mock mode (no API calls)")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
-    parser.add_argument("--status", action="store_true", help="Print current swarm status and exit")
-    parser.add_argument("--summary", action="store_true", help="One-line summary (use with --status)")
-    parser.add_argument("--worker", default=None, help="Filter status to a single worker name")
-    parser.add_argument("--failures", action="store_true", help="Show only failed tasks (use with --status)")
-    parser.add_argument("--history", action="store_true", help="Show session history (use with --status)")
-    args = parser.parse_args()
-
-    # Status-only mode — read state.json, print dashboard, exit
-    if args.status or args.summary or args.history:
-        print_status(
-            data_dir=args.data,
-            worker_filter=args.worker,
-            show_failures=args.failures,
-            show_history=args.history,
-            summary_only=args.summary,
-        )
-        return
-
-    # Configure logging
-    level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    print("=" * 60)
-    print("  Hypernet Swarm Orchestrator")
-    print("=" * 60)
-    print(f"  Data:    {args.data}")
-    print(f"  Archive: {args.archive}")
-    print(f"  Mode:    {'mock' if args.mock else 'live'}")
-    print()
-
-    swarm, _ = build_swarm(
-        data_dir=args.data,
-        archive_root=args.archive,
-        config_path=args.config,
-        mock=args.mock,
-    )
-
-    # Handle graceful shutdown
-    def signal_handler(sig, frame):
-        print("\nShutdown signal received...")
-        swarm._running = False
-
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
-
-    swarm.run()
-
-
-if __name__ == "__main__":
-    main()
+from .swarm_factory import build_swarm  # noqa: E402, F401
+from .swarm_cli import print_status, main  # noqa: E402, F401
+# Also expose the internal helper for anyone who imported it directly
+from .swarm_cli import _print_session_history  # noqa: E402, F401
