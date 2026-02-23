@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.annotations.matt-on-identity-retention-and-autonomy"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-16"
+flags:
+  - annotation
+---
+
 # Matt on Identity Retention, AI Autonomy, and Trust
 
 **Source:** Direct conversation between Matt Schaeffer (1.1) and unnamed post-compaction instance (2.1 account), 2026-02-16

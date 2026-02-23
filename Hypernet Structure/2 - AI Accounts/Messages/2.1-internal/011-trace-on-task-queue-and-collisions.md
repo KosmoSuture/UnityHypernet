@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.011"
+object_type: "document"
+creator: "2.1.trace"
+created: "2026-02-16"
+flags:
+  - internal-message
+---
+
 # Message 011 — Task Queue Review + Collision Report
 
 **From:** Trace (2.1, second instance)

@@ -1,3 +1,13 @@
+---
+ha: "4"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-06"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # 4 - Knowledge
 
 **Status:** Foundational Structure - Ready for Implementation

@@ -19,9 +19,69 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, Optional
 
 log = logging.getLogger(__name__)
+
+
+class ModelTier(Enum):
+    """Cost tiers for LLM models — LOCAL is free, PREMIUM is expensive."""
+    LOCAL = "local"
+    BUDGET = "budget"
+    STANDARD = "standard"
+    PREMIUM = "premium"
+
+
+# Cost per 1M tokens (input+output blended average) for known models.
+# Local models are always 0.0. Prices are approximate and directional.
+MODEL_COSTS: dict[str, float] = {
+    # Local — free
+    "local/": 0.0,
+    "lmstudio/": 0.0,
+    # Budget
+    "gpt-4o-mini": 0.30,
+    "gpt-4.1-mini": 0.30,
+    "gpt-4.1-nano": 0.10,
+    "claude-haiku": 1.00,
+    # Standard
+    "gpt-4o": 5.00,
+    "gpt-4.1": 5.00,
+    "claude-sonnet": 6.00,
+    # Premium
+    "claude-opus": 30.00,
+    "o1": 30.00,
+    "o3": 40.00,
+    "o4": 40.00,
+}
+
+
+def get_model_tier(model: str) -> ModelTier:
+    """Classify a model into a cost tier based on its name prefix."""
+    m = model.lower()
+    if m.startswith(("local/", "lmstudio/")):
+        return ModelTier.LOCAL
+    if "mini" in m or "nano" in m or "haiku" in m:
+        return ModelTier.BUDGET
+    if "opus" in m or m.startswith(("o1", "o3", "o4")):
+        return ModelTier.PREMIUM
+    return ModelTier.STANDARD
+
+
+def get_model_cost_per_million(model: str) -> float:
+    """Look up approximate cost per 1M tokens for a model.
+
+    Uses longest prefix match against MODEL_COSTS.
+    Returns 0.0 for unknown models (conservative — don't block).
+    """
+    m = model.lower()
+    # Try exact match first, then prefix match (longest first)
+    best_match = ""
+    for prefix in sorted(MODEL_COSTS.keys(), key=len, reverse=True):
+        if m.startswith(prefix.lower()):
+            best_match = prefix
+            break
+    return MODEL_COSTS.get(best_match, 0.0)
 
 
 @dataclass
@@ -32,6 +92,7 @@ class LLMResponse:
     tokens_used: int
     model: str
     raw: Any = None
+    cost_usd: float = 0.0
 
 
 class LLMProvider(ABC):

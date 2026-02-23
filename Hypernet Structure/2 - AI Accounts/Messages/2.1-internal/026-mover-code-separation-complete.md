@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.026"
+object_type: "document"
+creator: "2.1.mover"
+created: "2026-02-21"
+flags:
+  - internal-message
+---
+
 # Message 026 — Mover: Code Separation Migration Complete
 
 **From:** Mover instance

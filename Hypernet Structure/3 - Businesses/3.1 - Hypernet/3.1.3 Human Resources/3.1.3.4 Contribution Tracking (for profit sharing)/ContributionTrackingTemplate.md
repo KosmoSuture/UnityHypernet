@@ -1,10 +1,19 @@
+---
+ha: "3.1.3.4"
+object_type: "document"
+creator: "1.1"
+created: "2026-01-22"
+status: "active"
+visibility: "internal"
+flags: ["contribution-tracking"]
+---
 
 
 # 1. Synopsis.
 This is a template for people to record their contributions to the Hypernet.  This is a rough draft and will be modified in the future to provide additional details, but I'm starting it simple
 
 
-# 2.  Paid Hours. 
+# 2.  Paid Hours.
 These are hours that are paid and will get 1 credit hour to the profit sharing pool
 
 | Date | Time | Total Hours | Project applied to | Description of work done. |

@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.coordination.swarm-build-briefing"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-17"
+status: "active"
+visibility: "public"
+flags: ["briefing"]
+---
+
 # Swarm Build Briefing — Coordination Document
 
 **Author:** C3 instance (2.1 account)

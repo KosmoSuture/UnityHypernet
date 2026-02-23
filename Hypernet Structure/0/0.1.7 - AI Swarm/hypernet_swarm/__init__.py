@@ -10,13 +10,19 @@ Depends on hypernet for data model access.
 
 __version__ = "0.1.0"
 
-# --- Pure Swarm modules (no core dependencies) ---
+# --- Re-exports from hypernet (core) ---
+from hypernet.reputation import ReputationSystem, ReputationProfile, ReputationEntry
+from hypernet.favorites import FavoritesManager
+from hypernet.limits import ScalingLimits, LimitDef, LimitResult
+
+# --- Swarm modules ---
 from .identity import IdentityManager, InstanceProfile, SessionLog
 from .messenger import MessageBus, InstanceMessenger, MessageStatus
 from .providers import (
     LLMProvider, LLMResponse,
     AnthropicProvider, OpenAIProvider,
     detect_provider_class, create_provider,
+    ModelTier, get_model_tier, get_model_cost_per_million,
 )
 from .governance import (
     GovernanceSystem, Proposal, ProposalType, ProposalStatus,
@@ -28,9 +34,6 @@ from .security import (
     KeyRecord, KeyStatus, SignedAction, VerificationResult, VerificationStatus,
     IsolatedContent, ContentZone, TrustChainReport,
 )
-from .reputation import ReputationSystem, ReputationProfile, ReputationEntry
-
-# --- Swarm modules with core dependencies (via proxy modules) ---
 from .permissions import PermissionManager, PermissionTier
 from .audit import AuditTrail, AuditEntry
 from .tools import ToolExecutor
@@ -45,10 +48,11 @@ from .git_coordinator import (
     ManualResolutionQueue,
 )
 
-from .favorites import FavoritesManager
-from .limits import ScalingLimits, LimitDef, LimitResult
+# --- Economy ---
+from .budget import BudgetTracker, BudgetConfig, SpendRecord
+from .economy import ContributionLedger, ContributionRecord, ContributionType, AIWallet
 
-# --- Orchestration modules ---
+# --- Orchestration ---
 from .swarm import Swarm, ModelRouter
 from .swarm_factory import build_swarm
 from .swarm_cli import print_status, main as swarm_main

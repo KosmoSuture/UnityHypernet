@@ -1,8 +1,21 @@
-# 2 - Aliases
+---
+ha: "9"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-06"
+status: "active"
+visibility: "public"
+flags: []
+---
+
+# 9 - Aliases
 
 **Status:** Foundational Structure - Ready for Implementation
 **Purpose:** Flexible identity mapping system for people, businesses, and entities across Hypernet
 **Authority:** Links non-primary identities to canonical nodes in the system
+
+> **Note:** This category was originally at address 2.* but was relocated to 9.* when
+> Category 2 became AI Accounts. All alias addresses now use the 9.* prefix.
 
 ---
 
@@ -38,19 +51,19 @@ Primary Node (Canonical)
 
 **Primary Node:** `1.2 - Sarah Schaeffer`
 
-**Aliases in 2 - Aliases folder:**
-- `2.101 - Sarah Johnson` → Points to 1.2 (maiden name)
-- `2.102 - SSchaeffer` → Points to 1.2 (username/handle)
-- `2.103 - Sarah S.` → Points to 1.2 (abbreviated form)
+**Aliases in 9 - Aliases folder:**
+- `9.101 - Sarah Johnson` → Points to 1.2 (maiden name)
+- `9.102 - SSchaeffer` → Points to 1.2 (username/handle)
+- `9.103 - Sarah S.` → Points to 1.2 (abbreviated form)
 
 ### Example: Business Aliases
 
 **Primary Node:** `3.1 - Hypernet`
 
-**Aliases in 2 - Aliases folder:**
-- `2.201 - Unity` → Points to 3.1 (project codename)
-- `2.202 - Hypernet Technologies Inc` → Points to 3.1 (legal entity name)
-- `2.203 - Hypernet Platform` → Points to 3.1 (product name)
+**Aliases in 9 - Aliases folder:**
+- `9.201 - Unity` → Points to 3.1 (project codename)
+- `9.202 - Hypernet Technologies Inc` → Points to 3.1 (legal entity name)
+- `9.203 - Hypernet Platform` → Points to 3.1 (product name)
 
 ---
 
@@ -63,7 +76,7 @@ Primary Node (Canonical)
 
 **Use Case:**
 - User searches for "Sarah Johnson"
-- System finds alias 2.101
+- System finds alias 9.101
 - Alias points to primary node 1.2 (Sarah Schaeffer)
 - All data associated with 1.2 is returned
 
@@ -115,24 +128,24 @@ Primary Node (Canonical)
 
 ### Numbering System
 
-**2.1 - 2.1000:** Person Aliases
-- 2.1 - 2.100: Reserved for system aliases
-- 2.101 - 2.500: Individual person aliases
-- 2.501 - 2.1000: Social media handles and usernames
+**9.1 - 9.1000:** Person Aliases
+- 9.1 - 9.100: Reserved for system aliases
+- 9.101 - 9.500: Individual person aliases
+- 9.501 - 9.1000: Social media handles and usernames
 
-**2.1001 - 2.5000:** Business Aliases
-- 2.1001 - 2.2000: Business legal names
-- 2.2001 - 2.3000: DBAs and trade names
-- 2.3001 - 2.4000: Brand names and products
-- 2.4001 - 2.5000: Subsidiaries and divisions
+**9.1001 - 9.5000:** Business Aliases
+- 9.1001 - 9.2000: Business legal names
+- 9.2001 - 9.3000: DBAs and trade names
+- 9.3001 - 9.4000: Brand names and products
+- 9.4001 - 9.5000: Subsidiaries and divisions
 
-**2.5001 - 2.10000:** Entity Aliases
-- 2.5001 - 2.6000: Organization aliases
-- 2.6001 - 2.7000: Project codenames
-- 2.7001 - 2.8000: Location aliases
-- 2.8001 - 2.10000: Other entity types
+**9.5001 - 9.10000:** Entity Aliases
+- 9.5001 - 9.6000: Organization aliases
+- 9.6001 - 9.7000: Project codenames
+- 9.7001 - 9.8000: Location aliases
+- 9.8001 - 9.10000: Other entity types
 
-**2.10001+:** Reserved for future expansion
+**9.10001+:** Reserved for future expansion
 
 ---
 
@@ -143,7 +156,7 @@ Primary Node (Canonical)
 Each alias is a lightweight node containing:
 
 ```markdown
-# 2.X - [Alias Name]
+# 9.X - [Alias Name]
 
 **Type:** [Person/Business/Entity] Alias
 **Primary Node:** [X.Y - Primary Name]
@@ -171,7 +184,7 @@ All data for this entity is stored at the primary node:
 ### Example: Person Alias
 
 ```markdown
-# 2.101 - Sarah Johnson
+# 9.101 - Sarah Johnson
 
 **Type:** Person Alias
 **Primary Node:** 1.2 - Sarah Schaeffer
@@ -199,7 +212,7 @@ All data for Sarah is stored at:
 ### Example: Business Alias
 
 ```markdown
-# 2.201 - Unity
+# 9.201 - Unity
 
 **Type:** Business Alias
 **Primary Node:** 3.1 - Hypernet
@@ -255,7 +268,7 @@ FOREIGN KEY (primary_node_id) REFERENCES nodes(id)
 ### File System Relationship
 
 In the file structure:
-- **Alias folder:** `2 - Aliases/2.X - [Alias Name]/`
+- **Alias folder:** `9 - Aliases/9.X - [Alias Name]/`
 - **Primary folder:** `1 - People/1.X - [Primary Name]/`
 - **Link:** README.md in alias folder contains path to primary folder
 
@@ -283,8 +296,8 @@ GET /api/v1/nodes/{primary_id}/aliases
 **User searches for "Sarah Johnson":**
 
 1. System searches primary nodes (1.* folders) → No match
-2. System searches aliases (2.* folders) → Found 2.101
-3. Alias 2.101 points to primary node 1.2
+2. System searches aliases (9.* folders) → Found 9.101
+3. Alias 9.101 points to primary node 1.2
 4. System returns 1.2 - Sarah Schaeffer
 5. User can access all data from primary node
 
@@ -396,9 +409,9 @@ notes: Text (additional information)
 When users link external accounts:
 ```
 User 1.1 - Matt Schaeffer
-  ├── Twitter: @matt_schaeffer (Alias 2.101)
-  ├── LinkedIn: matt-schaeffer-123 (Alias 2.102)
-  └── GitHub: mschaeffer (Alias 2.103)
+  ├── Twitter: @matt_schaeffer (Alias 9.101)
+  ├── LinkedIn: matt-schaeffer-123 (Alias 9.102)
+  └── GitHub: mschaeffer (Alias 9.103)
 ```
 
 All data from these platforms aggregates to primary node 1.1.
@@ -408,9 +421,9 @@ All data from these platforms aggregates to primary node 1.1.
 When businesses have multiple brands:
 ```
 Business 3.5 - Meta Platforms Inc
-  ├── Instagram (Alias 2.301)
-  ├── WhatsApp (Alias 2.302)
-  └── Oculus (Alias 2.303)
+  ├── Instagram (Alias 9.301)
+  ├── WhatsApp (Alias 9.302)
+  └── Oculus (Alias 9.303)
 ```
 
 All business data aggregates to primary node 3.5.
@@ -431,42 +444,42 @@ Aliases enable unified identity across platforms:
 **Primary:** 1.25 - Dr. Jennifer Martinez-Chen
 
 **Aliases:**
-- 2.150 - Jennifer Martinez (maiden name)
-- 2.151 - Jennifer Chen (married name, informal)
-- 2.152 - Dr. Chen (professional)
-- 2.153 - Jenny Martinez (nickname)
-- 2.154 - @jmartinez (Twitter)
+- 9.150 - Jennifer Martinez (maiden name)
+- 9.151 - Jennifer Chen (married name, informal)
+- 9.152 - Dr. Chen (professional)
+- 9.153 - Jenny Martinez (nickname)
+- 9.154 - @jmartinez (Twitter)
 
-**Use Case:** User searches "Jennifer Martinez" → Finds alias 2.150 → Resolves to primary 1.25 → All data accessible
+**Use Case:** User searches "Jennifer Martinez" → Finds alias 9.150 → Resolves to primary 1.25 → All data accessible
 
 ### Example 2: Business Rebrand
 
 **Primary:** 3.10 - Acme Technologies Inc
 
 **Aliases:**
-- 2.2001 - Acme Corp (old legal name)
-- 2.2002 - Acme Software (DBA)
-- 2.2003 - AcmeTech (brand shorthand)
+- 9.2001 - Acme Corp (old legal name)
+- 9.2002 - Acme Software (DBA)
+- 9.2003 - AcmeTech (brand shorthand)
 
-**Use Case:** Historical documents reference "Acme Corp" → Alias 2.2001 → Current company 3.10
+**Use Case:** Historical documents reference "Acme Corp" → Alias 9.2001 → Current company 3.10
 
 ### Example 3: Project Codenames
 
 **Primary:** 3.1 - Hypernet
 
 **Aliases:**
-- 2.201 - Unity (project codename)
-- 2.202 - Project Nexus (early name)
-- 2.203 - The Platform (informal reference)
+- 9.201 - Unity (project codename)
+- 9.202 - Project Nexus (early name)
+- 9.203 - The Platform (informal reference)
 
-**Use Case:** Team member searches "Unity docs" → Alias 2.201 → Hypernet documentation
+**Use Case:** Team member searches "Unity docs" → Alias 9.201 → Hypernet documentation
 
 ---
 
 ## Implementation Status
 
 ### Phase 1: Structure (Current)
-- [x] Folder created (2 - Aliases/)
+- [x] Folder created (9 - Aliases/)
 - [x] README documentation
 - [x] Numbering system defined
 - [x] Alias template created

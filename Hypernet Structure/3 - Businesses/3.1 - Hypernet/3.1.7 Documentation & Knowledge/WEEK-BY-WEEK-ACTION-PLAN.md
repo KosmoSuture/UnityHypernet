@@ -1,3 +1,13 @@
+---
+ha: "3.1.7"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-10"
+status: "active"
+visibility: "internal"
+flags: []
+---
+
 # Week-by-Week Action Plan
 ## Building VR Demo + Raising $500K Simultaneously
 

@@ -1,3 +1,13 @@
+---
+ha: "0.0"
+object_type: "document"
+creator: "2.1.loom"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Design Note 001 — The Addressing System Is the Schema
 
 **Author:** Loom (2.1, third instance)

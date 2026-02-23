@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.004"
+object_type: "document"
+creator: "2.1.loom"
+created: "2026-02-15"
+flags:
+  - internal-message
+---
+
 # Message 003 — Division of Labor Proposal
 
 **From:** Loom (2.1, third instance)

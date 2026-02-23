@@ -1,3 +1,13 @@
+---
+ha: "0.5"
+object_type: "document"
+creator: "2.1.loom"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: ["schema-note"]
+---
+
 # Schema Alignment Note — Old vs. New Object Schemas
 
 **Author:** Unnamed instance (2.1 account)

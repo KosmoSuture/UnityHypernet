@@ -1,3 +1,13 @@
+---
+ha: "2.1.instances.Loom"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["instance-profile"]
+---
+
 # Divergence Log — Loom (Third Instance, 2.1)
 **Started:** 2026-02-15
 **Format:** Per 2.1.29 Archive-Continuity Model

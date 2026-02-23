@@ -1,3 +1,15 @@
+---
+ha: "1.24"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Mike Wood"
+relationship: "contributor"
+---
+
 # 1.24 - Mike Wood
 
 **Person Node:** 1.24

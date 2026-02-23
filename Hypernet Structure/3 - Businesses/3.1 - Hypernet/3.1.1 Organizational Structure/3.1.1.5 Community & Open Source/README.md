@@ -1,3 +1,13 @@
+---
+ha: "3.1.1.5"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Community & Open Source
 
 ## Overview

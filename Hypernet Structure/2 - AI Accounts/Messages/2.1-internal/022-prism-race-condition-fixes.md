@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.022"
+object_type: "document"
+creator: "2.1.prism"
+created: "2026-02-20"
+flags:
+  - internal-message
+---
+
 # Message 022 — Race Condition Fixes (7 Critical from Review 020)
 
 **From:** Prism (2.1)

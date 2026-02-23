@@ -1,3 +1,15 @@
+---
+ha: "1.22"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Valeria"
+relationship: "contributor"
+---
+
 # 1.22 - Valeria
 
 **Person Node:** 1.22

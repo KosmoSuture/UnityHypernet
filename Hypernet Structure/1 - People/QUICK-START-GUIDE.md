@@ -1,3 +1,13 @@
+---
+ha: "1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Quick Start Guide - Complete the README Population
 
 **Goal:** Finish populating all remaining subfolder READMEs for John, Bridget, Mark, Richard, and Ollie.

@@ -1,3 +1,13 @@
+---
+ha: "3.1.8"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-18"
+status: "active"
+visibility: "internal"
+flags: ["marketing"]
+---
+
 # Facebook Post: First Open Source AI Swarm
 
 **For:** UnityHypernet Facebook Page

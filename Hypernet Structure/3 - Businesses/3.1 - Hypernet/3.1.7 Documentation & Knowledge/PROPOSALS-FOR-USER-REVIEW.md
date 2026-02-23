@@ -1,3 +1,13 @@
+---
+ha: "3.1.7"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-10"
+status: "active"
+visibility: "internal"
+flags: []
+---
+
 # Proposals for User Review
 
 ## Date: February 10, 2026

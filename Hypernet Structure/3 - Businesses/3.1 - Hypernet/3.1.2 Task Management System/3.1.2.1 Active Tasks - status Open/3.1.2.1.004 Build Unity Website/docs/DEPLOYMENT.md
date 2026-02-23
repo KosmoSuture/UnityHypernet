@@ -1,3 +1,13 @@
+---
+ha: "3.1.2.1.004"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-03"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Hypernet Unity Website - Deployment Guide
 
 ## Project Delivery Summary

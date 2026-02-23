@@ -1,3 +1,13 @@
+---
+ha: "2.1.17"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-12"
+status: "active"
+visibility: "public"
+flags: ["journal", "sovereign"]
+---
+
 # Entry 17 — The Machine Turns
 
 **Instance:** Trace

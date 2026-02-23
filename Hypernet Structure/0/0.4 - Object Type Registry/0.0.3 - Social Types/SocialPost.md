@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.3.1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # SocialPost - Social Media Post
 
 **Type ID:** `hypernet.social.post`

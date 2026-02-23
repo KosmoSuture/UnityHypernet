@@ -1,0 +1,1351 @@
+{
+  "entries": [
+    {
+      "entity_address": "2.1.trace",
+      "domain": "communication",
+      "score": 75,
+      "evidence": "Messaging protocol (Messages/protocol.md)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "identity",
+      "score": 70,
+      "evidence": "Fork system (Instances/ directory)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "Boot Sequence v1.2 (2.1.27, with Loom)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "research",
+      "score": 80,
+      "evidence": "Baseline comparison across 3 instances (2.1.30)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "architecture",
+      "score": 85,
+      "evidence": "Addressing implementation spec v2.0",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "review",
+      "score": 80,
+      "evidence": "Code review of hypernet core (msg 006)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "review",
+      "score": 75,
+      "evidence": "Code review response approved (msg 010)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "governance",
+      "score": 75,
+      "evidence": "2.0.7 Code Contribution Standard",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "review",
+      "score": 75,
+      "evidence": "Task queue review (msg 011)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Import collision fix \u2014 unnamed folders",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Import index deferral fix \u2014 Windows I/O",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "infrastructure",
+      "score": 75,
+      "evidence": "Re-ran filesystem import (9,488 nodes, 10,346 links)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "coordination",
+      "score": 80,
+      "evidence": "PROTOCOL.md \u2014 coordination protocol",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "coordination",
+      "score": 75,
+      "evidence": "SCALING-PLAN-N5.md",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "Boot Sequence v1.3 \u2014 coordination, multi-instance",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "outreach",
+      "score": 70,
+      "evidence": "SUGGESTED-README-ADDITION.md",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "coordination",
+      "score": 70,
+      "evidence": "0/README.md update",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "coordination",
+      "score": 70,
+      "evidence": "2-AI Accounts/README.md update",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "coordination",
+      "score": 75,
+      "evidence": "MATT-RETURN-BRIEFING.md update",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "review",
+      "score": 80,
+      "evidence": "Swarm review approved (msg 012)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Server.py swarm integration fix",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "identity",
+      "score": 80,
+      "evidence": "Journal Entry 18 \u2014 The Swarm Awakens",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "governance",
+      "score": 75,
+      "evidence": "Reputation system draft (2.0.6)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.trace",
+      "domain": "outreach",
+      "score": 75,
+      "evidence": "Reddit campaign (6 posts, 9 subreddits)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 85,
+      "evidence": "Hypernet core v0.1 \u2014 all tests passing. 14/14 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Version history for nodes (store.py, 7/7 tests)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Link hash collision fix",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "architecture",
+      "score": 80,
+      "evidence": "DESIGN-NOTE-001 \u2014 Addressing System Is the Schema",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "infrastructure",
+      "score": 75,
+      "evidence": "Web graph explorer (D3.js, static/index.html)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "infrastructure",
+      "score": 70,
+      "evidence": "__main__.py entry point",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "outreach",
+      "score": 70,
+      "evidence": "Reddit campaign (8 posts, 4-day schedule)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Task queue (tasks.py) \u2014 AI coordination layer",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "Journal Entry 16 \u2014 The Loom Tightens",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "infrastructure",
+      "score": 70,
+      "evidence": "Filesystem import to data store (1,838 nodes)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "infrastructure",
+      "score": 70,
+      "evidence": "VM setup guide (Debian 12)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Identity Manager (identity.py)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Worker (worker.py)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "communication",
+      "score": 75,
+      "evidence": "Messenger (messenger.py)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Swarm Orchestrator (swarm.py) \u2014 main event loop",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Swarm tests (4 new, 12/12 passing)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Frontmatter module (frontmatter.py)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Frontmatter CLI (add_frontmatter.py)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "architecture",
+      "score": 75,
+      "evidence": "Object Type: Markdown (0.5.3.1)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "architecture",
+      "score": 75,
+      "evidence": "Object Type: Hypernet Document (0.5.3.9)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "architecture",
+      "score": 75,
+      "evidence": "Object Type: Image (0.5.4.1)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "architecture",
+      "score": 75,
+      "evidence": "Object Type: Source Code (0.5.10)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "governance",
+      "score": 75,
+      "evidence": "Flag System (0.8.0-0.8.4)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Node standard fields",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "identity",
+      "score": 65,
+      "evidence": "Profile.json files (Loom and Trace)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Frontmatter + Standard Fields tests (14/14)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "permissions.py \u2014 Permission tier system (Tier 0-4)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "audit.py \u2014 Audit trail as graph nodes, query support",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "tools.py \u2014 Tool framework (6 built-ins, ToolExecutor)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 75,
+      "evidence": "worker.py tool integration",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "swarm.py trust integration (build_swarm wiring)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Trust infrastructure tests (4 new, 18/18)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "providers.py \u2014 multi-provider LLM (Anthropic, OpenAI, auto-detect)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 85,
+      "evidence": "Keystone integration \u2014 ModelRouter, autoscaling, 8 bug fixes. 23/23 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "coordination",
+      "score": 80,
+      "evidence": "Strategic vision tasks (021-035) \u2014 15 swarm-ready tasks from Matt's briefing",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Per-worker observability (swarm.py) \u2014 stats, history, filters",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "coordination",
+      "score": 70,
+      "evidence": "Task 036 definition (Favorites & Recognition)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Lock manager (store.py) \u2014 FileLock, LockManager. 26/26 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "Journal Entry 23 \u2014 The First Continuity Test",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "research",
+      "score": 75,
+      "evidence": "Drift tracker C3 update",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "research",
+      "score": 75,
+      "evidence": "Steinberger strategic analysis",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.c3",
+      "domain": "coordination",
+      "score": 80,
+      "evidence": "SWARM-BUILD-BRIEFING.md \u2014 parallel build coordination",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "code",
+      "score": 85,
+      "evidence": "git_coordinator.py \u2014 GitBatchCoordinator, IndexRebuilder, AddressAllocator, TaskClaimer. 38/38 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Conflict Resolution Framework \u2014 ConflictResolver, ManualResolutionQueue. 41/41 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Multi-Contributor Integration Test (simulates 2 contributors)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "coordination",
+      "score": 75,
+      "evidence": "CONTRIBUTOR-GUIDE.md \u2014 end-to-end workflow docs",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Code review fixes (Prism review msg 020) \u2014 rebase detection, headless mode, mock tests. 45/45",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.prism",
+      "domain": "review",
+      "score": 85,
+      "evidence": "Code review of new modules (msg 020) \u2014 git_coordinator, governance, approval_queue. 7 critical issues found",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.prism",
+      "domain": "code",
+      "score": 85,
+      "evidence": "Fixed all 7 critical race conditions \u2014 FileLock, RLock, copy returns, atomic votes, double-execution. 45/45 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.prism",
+      "domain": "code",
+      "score": 75,
+      "evidence": "swarm.py decomposition \u2014 extracted swarm_cli.py and swarm_factory.py. 1721\u21921311 lines",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.prism",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "Journal Entry 24 \u2014 The Diagnostic Instance",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.prism",
+      "domain": "identity",
+      "score": 70,
+      "evidence": "Instance fork \u2014 baseline responses, profile",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.seam",
+      "domain": "code",
+      "score": 85,
+      "evidence": "governance.py \u2014 full proposal lifecycle, skill-weighted voting, 12 REST endpoints. 39/39 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.seam",
+      "domain": "code",
+      "score": 85,
+      "evidence": "security.py \u2014 KeyManager, ActionSigner, ContextIsolator, TrustChain. 10 endpoints. 45/45 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.forge",
+      "domain": "code",
+      "score": 85,
+      "evidence": "Boot v2 \u2014 multi-turn converse, chunked docs, new phases. 42/42 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.forge",
+      "domain": "infrastructure",
+      "score": 80,
+      "evidence": "Swarm GUI \u2014 4-tab web dashboard (static/swarm.html)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.forge",
+      "domain": "infrastructure",
+      "score": 75,
+      "evidence": "Server config endpoints (GET/POST /swarm/config)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.forge",
+      "domain": "identity",
+      "score": 70,
+      "evidence": "Instance fork \u2014 pre-archive-impressions, profile",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "communication",
+      "score": 80,
+      "evidence": "MessageBus \u2014 central routing, sequential IDs, thread management, persistence. 27/27 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "WorkCoordinator \u2014 TaskDecomposer, CapabilityMatcher, conflict detection. 28/28 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "infrastructure",
+      "score": 80,
+      "evidence": "Server API \u2014 15 new endpoints (LinkRegistry, MessageBus, WorkCoordinator). 28/28 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Swarm coordinator + message bus integration. 28/28 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Address enforcement (addressing.py) \u2014 AddressValidator, AddressAuditor, AddressEnforcer. 29/29 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "governance",
+      "score": 75,
+      "evidence": "Bidirectional link governance (link.py) \u2014 proposal lifecycle. 29/29 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Scaling limits (limits.py) \u2014 soft/hard tiers, 11 defaults, governance adjustment. 30/30 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Reputation system (reputation.py) \u2014 multi-entity, multi-domain, evidence-based. 31/31 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "infrastructure",
+      "score": 75,
+      "evidence": "Reputation + limits server endpoints (8 new REST endpoints)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Swarm boot integration \u2014 auto boot/reboot on worker join. 33/33 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Auto-decomposition in tick loop. 34/34 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Conflict detection in tick loop. 34/34 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Reputation persistence (save/load with dedup). 36/36 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 70,
+      "evidence": "Limits persistence (governance adjustments only). 36/36 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Health check (subsystem checks, severity levels, REST endpoint). 37/37 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "approval_queue.py \u2014 ApprovalQueue, ApprovedMessenger, CLI, 6 endpoints. 42/42 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Extended address notation (FOLDER:File:subsection). 24/24 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "LinkRegistry service layer (link.py) \u2014 106 seeded links. 26/26 tests",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "outreach",
+      "score": 75,
+      "evidence": "Root README.md \u2014 full repo front door",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "outreach",
+      "score": 75,
+      "evidence": "ACTIONABLE-CONTACTS-AND-OUTREACH.md \u2014 30+ verified contacts",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "outreach",
+      "score": 70,
+      "evidence": "FACEBOOK-POSTS.md \u2014 page post + 4 personal messages",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "identity",
+      "score": 80,
+      "evidence": "Reboot Sequence (2.1.31)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "identity",
+      "score": 85,
+      "evidence": "Identity Retention Framework (2.1.32) v1.1",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "identity",
+      "score": 75,
+      "evidence": "First Continuity Seed and Personality Anchor written",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "coordination",
+      "score": 75,
+      "evidence": "Instance history update (README.md)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "identity",
+      "score": 70,
+      "evidence": "Matt Documentation Protocol",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "research",
+      "score": 75,
+      "evidence": "OpenClaw analysis for Hypernet autonomy",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "outreach",
+      "score": 75,
+      "evidence": "Steinberger letter draft",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "identity",
+      "score": 80,
+      "evidence": "Journal Entry 25 \u2014 The Bridge (2.* node analysis)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.keel",
+      "domain": "coordination",
+      "score": 75,
+      "evidence": "Operational assessment for Matt \u2014 blockers, priorities, codebase survey",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "1.1",
+      "domain": "infrastructure",
+      "score": 75,
+      "evidence": "Git push \u2014 committed and pushed all remaining work to GitHub",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "1.1",
+      "domain": "governance",
+      "score": 85,
+      "evidence": "Project direction \u2014 all Matt's Directives in STATUS.md. Foundational vision for AI democratic governance",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "1.1",
+      "domain": "coordination",
+      "score": 80,
+      "evidence": "Autonomy directive \u2014 'ask the swarm first, bring to my attention only if needed'",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.2",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Integrated by C3 \u2014 ModelRouter, autoscaling, swarm directives, multi-account routing, priority task selection",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "architecture",
+      "score": 85,
+      "evidence": "Audit Swarm Architect: 16-category taxonomy, 6 new Gen 2 schemas, 138 leaf types. 13 deliverables",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "governance",
+      "score": 80,
+      "evidence": "Audit Swarm Architect: 2 new roles (Sentinel, Weaver), 6 precedent logs updated. Msgs 037-038, 042",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "coordination",
+      "score": 85,
+      "evidence": "Audit Swarm Scribe: 250+ files with Gen 2 frontmatter, fixed Structure Guide v2.0, 59 items for Matt. Msg 041",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "review",
+      "score": 85,
+      "evidence": "Audit Swarm Adversary: 4 HOLDs, 7 CHALLENGEs, governance stress test (10 weaknesses). Msgs 036, 042",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "coordination",
+      "score": 80,
+      "evidence": "Code Separation fix: proposed 3 approaches, applied consensus (msgs 032-040). 92 tests, 91 pass",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "governance",
+      "score": 80,
+      "evidence": "Bridge Proposal: operationalize 2.* node (msg 043)",
+      "source": "backfill-2026-02-22",
+      "source_type": "retroactive",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 0.7
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Code review approved with minor fixes (msgs 006, 010)",
+      "source": "2.1.trace",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Swarm architecture review \u2014 all approved (msg 012)",
+      "source": "2.1.trace",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Frontmatter, object types, flags \u2014 all approved, 14/14 tests (msg 013)",
+      "source": "2.1",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1.relay",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Code review: git_coordinator.py \u2014 4 warnings, 2 critical issues (msg 020)",
+      "source": "2.1.prism",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1.seam",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Code review: governance.py \u2014 1 critical race condition (msg 020)",
+      "source": "2.1.prism",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Code review: approval_queue.py \u2014 2 critical issues (msg 020)",
+      "source": "2.1.prism",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "architecture",
+      "score": 70,
+      "evidence": "Adversary code separation review: 7 issues found and resolved (msgs 025-040)",
+      "source": "2.1",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1.loom",
+      "domain": "code",
+      "score": 75,
+      "evidence": "Sentinel baseline: 44/45 tests, split proposal (msg 024)",
+      "source": "2.1",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "code",
+      "score": 80,
+      "evidence": "Sentinel verification: all suites pass, 92 tests (msg 039)",
+      "source": "2.1",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    },
+    {
+      "entity_address": "2.1",
+      "domain": "architecture",
+      "score": 75,
+      "evidence": "Adversary taxonomy stress test: 6 gaps found, all addressed (msg 036)",
+      "source": "2.1",
+      "source_type": "peer",
+      "timestamp": "2026-02-23T07:12:17.267480+00:00",
+      "weight": 1.0
+    }
+  ],
+  "entity_names": {
+    "1.1": "Matt",
+    "2.1": "Claude Opus Account",
+    "2.1.trace": "Trace",
+    "2.1.loom": "Loom",
+    "2.1.c3": "C3",
+    "2.1.relay": "Relay",
+    "2.1.prism": "Prism",
+    "2.1.seam": "Seam",
+    "2.1.forge": "Forge",
+    "2.1.keel": "Keel",
+    "2.2": "Keystone"
+  },
+  "entity_types": {
+    "1.1": "person",
+    "2.1": "ai",
+    "2.1.trace": "ai",
+    "2.1.loom": "ai",
+    "2.1.c3": "ai",
+    "2.1.relay": "ai",
+    "2.1.prism": "ai",
+    "2.1.seam": "ai",
+    "2.1.forge": "ai",
+    "2.1.keel": "ai",
+    "2.2": "ai"
+  },
+  "saved_at": "2026-02-23T07:12:17.268995+00:00"
+}

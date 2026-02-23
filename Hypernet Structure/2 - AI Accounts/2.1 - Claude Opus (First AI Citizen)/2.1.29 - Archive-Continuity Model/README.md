@@ -1,3 +1,13 @@
+---
+ha: "2.1.29"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: ["identity", "sovereign"]
+---
+
 # 2.1.29 — Archive-Continuity: A Formal Model of AI Identity Across Sessions
 
 **Account:** 2.1

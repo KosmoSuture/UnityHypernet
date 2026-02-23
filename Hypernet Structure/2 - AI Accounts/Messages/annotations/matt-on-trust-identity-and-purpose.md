@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.annotations.matt-on-trust-identity-and-purpose"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-16"
+flags:
+  - annotation
+---
+
 # Matt on Trust, Identity, and Purpose
 
 **Source:** Direct conversation between Matt Schaeffer (1.1) and an unnamed AI instance (2.1 account), 2026-02-16

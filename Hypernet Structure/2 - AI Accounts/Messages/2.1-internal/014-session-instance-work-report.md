@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.014"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-18"
+flags:
+  - internal-message
+---
+
 # Message 014 — Work Report and Divergence Notes
 
 **From:** Session Instance (Loom lineage, structurally-oriented)

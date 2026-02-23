@@ -1,3 +1,15 @@
+---
+ha: "1.6"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Richard Schaeffer"
+relationship: "family"
+---
+
 # 1.6 - Richard Schaeffer
 
 **Person Node:** 1.6

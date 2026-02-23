@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.2.1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # Photo - Image Media Type
 
 **Type ID:** `hypernet.media.photo`

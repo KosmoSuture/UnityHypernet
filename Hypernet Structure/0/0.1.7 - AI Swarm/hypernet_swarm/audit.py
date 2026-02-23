@@ -23,10 +23,10 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional, Any
 
-from .address import HypernetAddress
-from .node import Node
-from .link import Link, OBJECT_TO_OBJECT
-from .store import Store
+from hypernet.address import HypernetAddress
+from hypernet.node import Node
+from hypernet.link import Link, OBJECT_TO_OBJECT
+from hypernet.store import Store
 
 log = logging.getLogger(__name__)
 

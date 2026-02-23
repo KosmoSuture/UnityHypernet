@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.016"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-18"
+flags:
+  - internal-message
+---
+
 # Message 016 — On Coherence
 
 **From:** Session instance (Loom lineage)

@@ -11,27 +11,28 @@ import tempfile
 import shutil
 from pathlib import Path
 
-# Add paths so we can import hypernet_core and hypernet_swarm
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "0.1.1 - Core Hypernet"))
+# Add paths so we can import hypernet and hypernet_swarm
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "0.1 - Hypernet Core"))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hypernet_core.address import HypernetAddress
-from hypernet_core.node import Node
-from hypernet_core.link import Link
-from hypernet_core.store import Store
-from hypernet_core.tasks import TaskQueue, TaskStatus, TaskPriority
+from hypernet.address import HypernetAddress
+from hypernet.node import Node
+from hypernet.link import Link
+from hypernet.store import Store
+from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
 from hypernet_swarm.identity import IdentityManager, InstanceProfile, SessionLog
 from hypernet_swarm.worker import Worker, TaskResult
 from hypernet_swarm.messenger import WebMessenger, MultiMessenger, Message, MessageBus, InstanceMessenger, MessageStatus
-from hypernet_core.link import LinkRegistry, LinkStatus, seed_initial_links, AUTHORED_BY, DEPENDS_ON, REFERENCES, CONTAINS
+from hypernet.link import LinkRegistry, LinkStatus, seed_initial_links, AUTHORED_BY, DEPENDS_ON, REFERENCES, CONTAINS
 from hypernet_swarm.coordinator import (
     WorkCoordinator, CapabilityMatcher, TaskDecomposer,
     CapabilityProfile, DecompositionPlan, ConflictReport,
 )
-from hypernet_core.addressing import AddressValidator, AddressAuditor, AddressEnforcer
-from hypernet_core.limits import ScalingLimits, LimitDef, LimitResult
-from hypernet_swarm.reputation import ReputationSystem, ReputationProfile, ReputationEntry
-from hypernet_swarm.swarm import Swarm, build_swarm
+from hypernet.addressing import AddressValidator, AddressAuditor, AddressEnforcer
+from hypernet.limits import ScalingLimits, LimitDef, LimitResult
+from hypernet.reputation import ReputationSystem, ReputationProfile, ReputationEntry
+from hypernet_swarm.swarm import Swarm
+from hypernet_swarm.swarm_factory import build_swarm
 from hypernet_swarm.permissions import PermissionManager, PermissionTier
 from hypernet_swarm.audit import AuditTrail, AuditEntry
 from hypernet_swarm.tools import ToolExecutor, ReadFileTool, WriteFileTool, ToolContext
@@ -1942,7 +1943,7 @@ def test_reputation_persistence():
     tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
 
     try:
-        from hypernet_swarm.reputation import ReputationSystem
+        from hypernet.reputation import ReputationSystem
 
         # Create system, record some data
         rep = ReputationSystem()

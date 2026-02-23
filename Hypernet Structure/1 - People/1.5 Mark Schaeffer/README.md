@@ -1,3 +1,15 @@
+---
+ha: "1.5"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Mark Schaeffer"
+relationship: "family"
+---
+
 # 1.5 - Mark Schaeffer
 
 **Person Node:** 1.5

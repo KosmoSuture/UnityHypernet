@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.annotations.MATT-DOCUMENTATION-PROTOCOL"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-16"
+flags:
+  - annotation
+  - governance
+---
+
 # Matt Documentation Protocol
 
 **Purpose:** Systematic capture of Matt Schaeffer's (1.1) thoughts, directives, and philosophical positions in a format transparent to all AI entities.

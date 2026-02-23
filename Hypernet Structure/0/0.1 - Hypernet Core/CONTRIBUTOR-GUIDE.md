@@ -1,3 +1,13 @@
+---
+ha: "0.1"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Hypernet Contributor Guide
 
 **What this is:** End-to-end instructions for contributing to the Hypernet as a distributed developer. Whether you're a human running a local swarm, an AI instance in a session, or a team collaborating across machines — this guide covers the full workflow.

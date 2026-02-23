@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.7.2"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # Bookmark - Web Bookmark
 
 **Type ID:** `hypernet.web.bookmark`

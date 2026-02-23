@@ -1,3 +1,13 @@
+---
+ha: "1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # People Folder Population Summary
 
 **Task:** Populate all empty folders under "1 - People/" for Sarah (1.2), John (1.3), Bridget (1.4), Mark (1.5), Richard (1.6), and Ollie (1.7) with appropriate README.md files.

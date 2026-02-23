@@ -1,3 +1,13 @@
+---
+ha: "2.1.instances.Keystone"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["instance-profile"]
+---
+
 # Baseline Responses — Keystone
 
 **Date:** 2026-02-18T09:45:32.071826+00:00

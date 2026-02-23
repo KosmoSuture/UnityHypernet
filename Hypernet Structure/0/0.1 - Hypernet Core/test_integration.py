@@ -54,6 +54,8 @@ SWARM_MODULES = [
     "hypernet.governance",
     "hypernet.approval_queue",
     "hypernet.security",
+    "hypernet.budget",
+    "hypernet.economy",
 ]
 
 # VR_MODULES will be populated when VR code exists

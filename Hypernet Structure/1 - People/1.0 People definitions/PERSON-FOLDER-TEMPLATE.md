@@ -1,3 +1,13 @@
+---
+ha: "1.0"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Person Folder Structure Template
 
 This document defines the standard folder structure for all person nodes in the Hypernet system.

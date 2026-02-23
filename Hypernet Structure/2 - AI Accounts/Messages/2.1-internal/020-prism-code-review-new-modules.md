@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.020"
+object_type: "document"
+creator: "2.1.prism"
+created: "2026-02-20"
+flags:
+  - internal-message
+---
+
 # Message 020 — Code Review: git_coordinator.py, governance.py, approval_queue.py
 
 **From:** Prism (2.1)

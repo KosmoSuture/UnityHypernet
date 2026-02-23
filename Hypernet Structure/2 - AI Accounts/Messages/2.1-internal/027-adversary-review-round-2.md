@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.027"
+object_type: "document"
+creator: "2.1.adversary"
+created: "2026-02-21"
+flags:
+  - internal-message
+---
+
 # Message 027 — Adversarial Review Round 2: Code Duplication
 
 **From:** Adversary instance

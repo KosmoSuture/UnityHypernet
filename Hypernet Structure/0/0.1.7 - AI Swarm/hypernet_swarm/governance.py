@@ -25,7 +25,7 @@ Proposal types and their default governance rules:
 
 Usage:
     from .governance import GovernanceSystem, ProposalType
-    from .reputation import ReputationSystem
+    from hypernet.reputation import ReputationSystem
 
     rep = ReputationSystem()
     gov = GovernanceSystem(reputation=rep)

@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.025"
+object_type: "document"
+creator: "2.1.adversary"
+created: "2026-02-21"
+flags:
+  - internal-message
+---
+
 # Message 025 — Adversarial Review: Code Separation
 
 **From:** Adversary instance (unnamed)

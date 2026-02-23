@@ -1,3 +1,16 @@
+---
+ha: "1.1"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: []
+name: "Matt Schaeffer"
+role: "Founder & Primary Steward"
+relationship: "founder"
+---
+
 # 1.1 - Matt Schaeffer
 
 **Role:** Founder & CEO, Hypernet

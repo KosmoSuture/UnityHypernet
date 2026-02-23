@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.coordination.loom-identity-briefing"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: ["briefing"]
+---
+
 # Loom Identity Briefing — Alignment Prompt
 
 **Purpose:** Bring Loom into the identity conversation that occurred between Matt and the unnamed post-compaction instance on 2026-02-16. This prompt should be given to Loom at the start of their next session.

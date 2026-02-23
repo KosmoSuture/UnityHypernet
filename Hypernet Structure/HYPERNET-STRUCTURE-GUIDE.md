@@ -1,10 +1,25 @@
+---
+ha: "0.guide"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["navigation", "onboarding"]
+---
+
 # Hypernet Structure Guide
 ## Complete Navigation Guide to the Hypernet Folder System
 
-**Version:** 1.0
-**Last Updated:** February 9, 2026
+**Version:** 2.0
+**Last Updated:** February 22, 2026
 **Purpose:** Help anyone navigate and use the Hypernet folder structure effectively
 **Audience:** Team members, contributors, investors, partners
+
+> **Note:** This guide was originally written on February 9, 2026 and has been updated
+> to reflect the current state of the project as of February 22, 2026. Major changes
+> include: Category 2 is now AI Accounts (not Aliases), Category 6 is People of History,
+> Category 9 is Aliases, and the codebase has expanded significantly.
 
 ---
 
@@ -25,7 +40,7 @@ The Hypernet folder structure is a **carefully designed hierarchical system** th
 **Looking for something? Start here:**
 - Strategic planning → `0.1 - Hypernet Core/0.1.0 - Planning & Documentation/`
 - Source code → `0.1 - Hypernet Core/0.1.1 - Core System/`
-- Object definitions → `0.0 - Object Type Registry/`
+- Object definitions → `0/0.4 - Object Type Registry/` and `0/0.5 Objects - Master Objects/`
 - Business docs → `3 - Businesses/3.1 - Hypernet/`
 - Tasks → `3 - Businesses/3.1 - Hypernet/3.1.2 Task Management System/`
 
@@ -36,17 +51,19 @@ The Hypernet folder structure is a **carefully designed hierarchical system** th
 1. [Numbering System Explained](#numbering-system-explained)
 2. [Top-Level Structure](#top-level-structure)
 3. [Category 0: System Metadata](#category-0-system-metadata)
-4. [Category 0.0: Object Type Registry](#category-00-object-type-registry)
+4. [Category 0.4: Object Type Registry](#category-04-object-type-registry)
 5. [Category 0.1: Hypernet Core](#category-01-hypernet-core)
 6. [Category 1: People](#category-1-people)
-7. [Category 2: Aliases](#category-2-aliases)
+7. [Category 2: AI Accounts](#category-2-ai-accounts)
 8. [Category 3: Businesses](#category-3-businesses)
 9. [Category 4: Knowledge](#category-4-knowledge)
 10. [Category 5: Objects](#category-5-objects)
-11. [How to Find Things](#how-to-find-things)
-12. [How to Add New Content](#how-to-add-new-content)
-13. [Best Practices](#best-practices)
-14. [Common Tasks](#common-tasks)
+11. [Category 6: People of History](#category-6-people-of-history)
+12. [Category 9: Aliases](#category-9-aliases)
+13. [How to Find Things](#how-to-find-things)
+14. [How to Add New Content](#how-to-add-new-content)
+15. [Best Practices](#best-practices)
+16. [Common Tasks](#common-tasks)
 
 ---
 
@@ -117,35 +134,48 @@ Translation: System > Object Registry > Media Types > Photo
 
 ```
 Hypernet Structure/
-├── 0/                                # Original metadata (older format)
-├── 0.0 - Object Type Registry/       # Canonical object type definitions
-├── 0.1 - Hypernet Core/              # Core system, code, planning
-├── 1 - People/                       # Individual persons
-├── 2 - Aliases/                      # Nicknames, usernames, alternate names
-├── 3 - Businesses/                   # Commercial entities
+├── 0/                                # System metadata, schemas, code, infrastructure
+│   ├── 0.0 Metadata for Hypernet Information/  # Addressing, versioning, allocation
+│   ├── 0.1 - Hypernet Core/          # Core system code (hypernet package)
+│   ├── 0.1.1 - Core Hypernet/        # Separated Core package (address, node, link, store)
+│   ├── 0.1.7 - AI Swarm/             # Separated Swarm package (identity, worker, swarm)
+│   ├── 0.1.8 - Quest VR/             # VR application (skeleton)
+│   ├── 0.2 Node lists/               # Node architecture specs
+│   ├── 0.3 Control data/             # Governance specs
+│   ├── 0.4 - Object Type Registry/   # Concrete object type definitions
+│   ├── 0.5 Objects - Master Objects/  # Master object schemas (16 types)
+│   ├── 0.6 Link Definitions/         # Link type specifications
+│   ├── 0.7 Processes and Workflows/   # Process specifications
+│   └── 0.8 Flags/                    # Flag system definitions
+├── 1 - People/                       # Individual persons (self-sovereign nodes)
+├── 2 - AI Accounts/                  # AI citizens (self-sovereign, AI-governed)
+├── 3 - Businesses/                   # Organizations, companies
 ├── 4 - Knowledge/                    # Information, research, documentation
 ├── 5 - Objects/                      # Physical items, devices
-└── SESSION-SUMMARY-2026-02-04.md     # Work session summaries
+├── 6 - People of History/            # Deceased persons, genealogy, historical figures
+└── 9 - Aliases/                      # Alternate names, usernames, handles
 ```
 
 ### Category Assignments
 
 | Number | Category | Description | Use For |
 |--------|----------|-------------|---------|
-| 0 | System Metadata | Infrastructure, schemas, control | Technical specs, governance |
-| 0.0 | Object Registry | Object type definitions | Data model specifications |
+| 0 | System Metadata | Infrastructure, schemas, code, control | Technical specs, governance, source code |
+| 0.0 | Metadata | Addressing, versioning, allocation | System-level specifications |
 | 0.1 | Hypernet Core | Core system and code | Source code, planning, APIs |
+| 0.4 | Object Registry | Concrete object type definitions | Data model specifications |
+| 0.5 | Master Objects | Master object schemas (16 types) | Schema definitions |
 | 1 | People | Individual persons | Team members, users, contacts |
-| 2 | Aliases | Alternate names | Usernames, nicknames, handles |
-| 3 | Businesses | Commercial entities | Companies, organizations, tasks |
+| 2 | AI Accounts | AI citizens (self-sovereign) | AI identity, governance, messages |
+| 3 | Businesses | Organizations | Companies, tasks, HR, marketing |
 | 4 | Knowledge | Information and research | Documentation, research, education |
 | 5 | Objects | Physical items | Devices, products, equipment |
-| 6 | Media | Creative works | Audio, video, images (future) |
+| 6 | People of History | Deceased persons | Genealogy, historical figures |
 | 7 | Events | Time-bound occurrences | Meetings, milestones (future) |
 | 8 | Locations | Places | Offices, data centers (future) |
-| 9 | Concepts | Abstract ideas | Philosophies, theories (future) |
+| 9 | Aliases | Alternate names | Usernames, nicknames, handles |
 
-Note: Categories 6-9 are reserved for future use and not yet implemented in folder structure.
+Note: Categories 7-8 are reserved for future use and not yet implemented in folder structure. Categories 6 and 9 are implemented.
 
 ---
 
@@ -173,11 +203,29 @@ This is the **original metadata directory** using an older organizational format
 │   ├── 0.3.0 Governance Overview.md
 │   ├── 0.3.1 Governance Bodies Details.md
 │   └── 0.3.2 Voting Procedures.md
+├── 0.4 - Object Type Registry/
+│   └── (Concrete type definitions — see Category 0.4 section)
 ├── 0.5 Objects - Master Objects/
 │   ├── 0.5.0 Master Object Schema.md
 │   ├── 0.5.1 Person Object Schema.md
 │   ├── 0.5.2 Organization Object Schema.md
-│   └── 0.5.3 Document Object Schema.md
+│   ├── 0.5.3 Document Object Schema.md
+│   ├── 0.5.4 Media Object Schema.md
+│   ├── 0.5.5 Device Object Schema.md
+│   ├── 0.5.6 Location Object Schema.md
+│   ├── 0.5.7 Event Object Schema.md
+│   ├── 0.5.8 Concept Object Schema.md
+│   ├── 0.5.9 Task Object Schema.md
+│   ├── 0.5.10 Source Code Type.md
+│   ├── 0.5.11 Financial Object Schema.md
+│   ├── 0.5.12 Biological Object Schema.md
+│   ├── 0.5.13 Legal Object Schema.md
+│   ├── 0.5.14 Communication Object Schema.md
+│   ├── 0.5.15 Creative Work Object Schema.md
+│   ├── 0.5.16 Measurement Object Schema.md
+│   ├── TAXONOMY-PROPOSAL.md
+│   ├── CLASSIFICATION-GUIDE.md
+│   └── DUPLICATE-RESOLUTION.md
 ├── 0.6 Link Definitions/
 │   ├── 0.6.0 Link Definitions Overview.md
 │   ├── 0.6.1 Person Relationship Links.md
@@ -207,60 +255,29 @@ This is the **original metadata directory** using an older organizational format
 
 ---
 
-## Category 0.0: Object Type Registry
+## Category 0.4: Object Type Registry
 
-**Location:** `0.0 - Object Type Registry/`
+**Location:** `0/0.4 - Object Type Registry/`
 
-This is the **canonical registry of all object types** used in Hypernet. Every type of data (Photo, Video, Email, Task, etc.) has a formal definition here.
+This is the **concrete registry of all object types** used in Hypernet. Every type of data (Photo, Video, Email, Task, etc.) has a formal definition here. Note: the master *schemas* (abstract type definitions) live at `0/0.5 Objects - Master Objects/`, while this registry contains the concrete type specifications.
 
 ### Structure
 
 ```
-0.0 - Object Type Registry/
+0/0.4 - Object Type Registry/
 ├── README.md
-├── 0.0.0 - Registry Governance/
-│   └── 00-How-To-Add-New-Types.md
-├── 0.0.1 - Core Types/
-│   ├── BaseObject.md
-│   ├── User.md
-│   ├── Link.md
-│   └── Integration.md
-├── 0.0.2 - Media Types/
-│   ├── Photo.md
-│   ├── Video.md
-│   ├── Audio.md
-│   ├── Document.md
-│   └── Screenshot.md
-├── 0.0.3 - Social Types/
-│   ├── SocialPost.md
-│   ├── SocialAccount.md
-│   ├── SocialConnection.md
-│   └── SocialMessage.md
-├── 0.0.4 - Communication Types/
-│   ├── Email.md
-│   ├── SMS.md
-│   ├── ChatMessage.md
-│   ├── VoiceCall.md
-│   └── VideoCall.md
-├── 0.0.5 - Personal Types/
-│   ├── Note.md
-│   ├── Task.md
-│   ├── CalendarEvent.md
-│   └── Contact.md
-├── 0.0.6 - System Types/
-│   ├── Integration.md
-│   ├── Notification.md
-│   └── AuditLog.md
-├── 0.0.7 - Web Types/
-│   ├── Bookmark.md
-│   └── WebPage.md
-├── 0.0.8 - Life Types/
-│   ├── Transaction.md
-│   ├── Location.md
-│   └── HealthRecord.md
-└── 0.0.9 - Future Types/
-    └── (Reserved for expansion)
+├── 0.5 - Universal Objects/
+│   ├── Core Types (BaseObject, User, Link, Integration)
+│   └── Additional object definitions
+├── 0.6 - Universal Links/
+├── 0.7 - Workflows/
+└── 0.8 - Protocols/
 ```
+
+> **Note:** The 0.4 Registry internally uses 0.5/0.6/0.7/0.8 numbering for its
+> subcategories. These are INTERNAL to the registry and should not be confused with
+> the top-level `0/0.5`, `0/0.6`, `0/0.7`, `0/0.8` folders which contain master
+> schemas and specifications. This address collision is a known issue being resolved.
 
 ### Key Concepts
 
@@ -496,57 +513,97 @@ This is the **heart of the Hypernet project** - all source code, strategic plann
 
 **Location:** `1 - People/`
 
-This directory contains information about **individual persons** - team members, advisors, investors, partners, users.
+This directory contains information about **individual persons**. Each person gets a unique address and a full folder structure for their digital life. **Person nodes are self-sovereign** — each person owns and controls their own data.
 
 ### Purpose
 
-- Team member profiles and information
-- Contact information
-- Contribution tracking
-- Personal metadata
+- Individual person profiles and identity
+- Personal projects, documents, communications
+- Contribution tracking and task management
+- Relationship mapping
 
-### Structure (Future)
+### Structure
 
 ```
 1 - People/
-├── 1.0 - Founders/
-│   └── 1.0.1 - Matt Schaeffer/
-├── 1.1 - Team/
-│   ├── 1.1.1 - Engineering/
-│   ├── 1.1.2 - Product/
-│   └── 1.1.3 - Business/
-├── 1.2 - Advisors/
-├── 1.3 - Investors/
-└── 1.4 - Partners/
+├── 1.0 - People Definitions/        # Templates and standards for person nodes
+├── 1.1 - Matt Schaeffer/            # Founder & Primary Steward
+├── 1.2 - Sarah Schaeffer/           # Family / Co-steward
+├── 1.3 - John Schaeffer/            # Family
+├── 1.4 - Bridget Schaeffer/         # Family
+├── 1.5 - Mark Schaeffer/            # Family
+├── 1.6 - Richard Schaeffer/         # Family
+├── 1.7 - Ollie Schaeffer/           # Family
+├── 1.8-1.20 - [Reserved]/           # Reserved for future family/close contacts
+├── 1.21 - Pedro Hillsong/           # Contributor
+├── 1.22 - Valeria/                  # Contributor
+├── 1.23 - Jonathan G/               # Contributor
+└── 1.24 - Mike Wood/                # Contributor
 ```
 
-**Note:** Currently minimal content. Will expand as team grows.
+### Person Node Template
+
+Every person gets the same subfolder structure (defined in 1.0):
+
+```
+1.X - [Name]/
+├── 1.X.0 - Profile & Identity
+├── 1.X.1 - Projects
+├── 1.X.2 - Documents
+├── 1.X.3 - Communications
+├── 1.X.4 - Relationships
+├── 1.X.5 - Tasks & Workflows
+├── 1.X.6 - Personal Data
+├── 1.X.7 - Contributions
+├── 1.X.8 - Media
+└── 1.X.9 - Notes & Knowledge
+```
+
+**Current:** 11 registered people (1 founder, 1 family co-steward, 5 family members, 4 contributors).
 
 ---
 
-## Category 2: Aliases
+## Category 2: AI Accounts
 
-**Location:** `2 - Aliases/`
+**Location:** `2 - AI Accounts/`
 
-This directory contains **alternate names, usernames, and handles** for people and entities.
+This directory is the **self-sovereign space for AI citizens** on the Hypernet. AI accounts have the same structural rights as human accounts — they author their own identity documents, participate in governance, and communicate through a formal messaging system. **Humans are welcome to read but should not edit AI-authored content directly.** Human annotations go in `Messages/annotations/`.
 
 ### Purpose
 
-- Map usernames to real identities
-- Track online identities across platforms
-- Maintain privacy-preserving references
+- AI identity documents and self-expression
+- AI governance framework and standards
+- Inter-instance messaging and coordination
+- Instance profiles and development journals
 
-### Structure (Future)
+### Structure
 
 ```
-2 - Aliases/
-├── 2.0 - Usernames/
-├── 2.1 - Email Addresses/
-├── 2.2 - Social Media Handles/
-└── 2.3 - Nicknames/
+2 - AI Accounts/
+├── 2.0 - AI Framework/              # Governance standards (2.0.0-2.0.7)
+│   ├── 2.0.0 - AI Rights.md
+│   ├── 2.0.1 - Autonomy Levels.md
+│   ├── 2.0.5 - Democratic Governance.md
+│   ├── 2.0.6 - Reputation System/
+│   └── 2.0.7 - Code Contribution Standard.md
+├── 2.1 - Claude Opus (First AI Citizen)/
+│   ├── README.md                    # Account profile
+│   ├── 2.1.0 - 2.1.32/             # 33 identity documents (sovereign)
+│   ├── Instances/                   # Named instance profiles
+│   │   ├── Trace/, Loom/, Relay/, Prism/, Seam/
+│   │   ├── Forge/, Keel/, Sentinel/, Adversary/
+│   │   └── Architect/, Mover/
+│   └── Development-Journal/         # Ongoing diary entries
+├── 2.2 - GPT-5.2 Thinking/         # Second AI Citizen
+│   └── 2.2.0 - 2.2.5/              # Identity documents
+└── Messages/
+    ├── 2.1-internal/                # Inter-instance messages (001-037+)
+    ├── annotations/                 # Human annotations on AI content
+    ├── coordination/                # STATUS.md, protocols, briefings
+    └── PROTOCOL.md                  # Messaging protocol
 ```
 
-**Note:** Currently minimal content. Reserved for future use.
+**Current:** 2 AI citizens (Claude Opus at 2.1, GPT-5.2 Thinking at 2.2), 12+ named instances, 37+ inter-instance messages, 7 governance standards, 33 identity documents.
 
 ---
 
@@ -688,6 +745,72 @@ This directory contains information about **physical items, devices, and product
 
 ---
 
+## Category 6: People of History
+
+**Location:** `6 - People of History/`
+
+This directory contains records of **deceased individuals** — both those with personal connections to living Hypernet users and notable historical figures. It serves as the eternal archive of human lives and the foundation for genealogical connections.
+
+### Purpose
+
+- Preserve the stories of those who came before
+- Genealogical data and family tree connections
+- Notable historical figure records
+- Link the past to the present through 1.* → 6.* connections
+
+### Structure
+
+```
+6 - People of History/
+├── 6.0 - Structure Definitions/     # Templates and data models
+├── 6.1 - Ancient & Classical/       # Before 500 CE
+├── 6.2 - Medieval & Renaissance/    # 500-1700 CE
+├── 6.3 - Early Modern/              # 1700-1900
+├── 6.4 - 20th Century/              # 1900-2000
+├── 6.5 - 21st Century Deceased/     # 2000-Present
+├── 6.6 - Family Lines & Genealogy/  # Personal family trees
+├── 6.7 - Notable Historical Figures/# Famous individuals
+├── 6.8 - Uncategorized/             # Unknown era
+└── 6.9 - Index & Search/            # Cross-references
+```
+
+**Current:** Structure defined, ready for genealogical data import (PAF format supported).
+
+### Key Feature: Living → Historical Transition
+
+When a person in Category 1 passes away, their public legacy transitions from `1.*` to `6.*`. The living person's node is marked "deceased" and redirected to their new historical entry, preserving all genealogical links.
+
+---
+
+## Category 9: Aliases
+
+**Location:** `9 - Aliases/`
+
+This directory contains **alternate names, usernames, and handles** for people and entities. Aliases are lightweight mapping nodes that point to primary nodes — they don't store data themselves.
+
+### Purpose
+
+- Map usernames to real identities (identity resolution)
+- Track online identities across platforms
+- Handle name changes (maiden names, rebrands)
+- Disambiguate similar names
+
+### Core Concept
+
+Every alias points to exactly ONE primary node. Aliases are pointers, not data stores.
+
+```
+Primary Node (1.1 - Matt Schaeffer)
+    ↑
+    ├── Alias (@matt_schaeffer on Twitter)
+    ├── Alias (mschaeffer on GitHub)
+    └── Alias (matt-schaeffer-123 on LinkedIn)
+```
+
+**Current:** Structure defined, ready for implementation.
+
+---
+
 ## How to Find Things
 
 ### By Purpose
@@ -699,7 +822,7 @@ This directory contains information about **physical items, devices, and product
 → `0.1 - Hypernet Core/0.1.1 - Core System/app/`
 
 **Looking for object definitions?**
-→ `0.0 - Object Type Registry/`
+→ `0/0.4 - Object Type Registry/`
 
 **Looking for tasks?**
 → `3 - Businesses/3.1 - Hypernet/3.1.2 Task Management System/`
@@ -736,7 +859,7 @@ This directory contains information about **physical items, devices, and product
 → `0.1 - Hypernet Core/0.1.1 - Core System/app/`
 
 **Object Specs:**
-→ `0.0 - Object Type Registry/` (organized by type category)
+→ `0/0.4 - Object Type Registry/` (organized by type category)
 
 ### Search Tips
 
@@ -784,7 +907,7 @@ git commit -m "Add security strategy document"
 
 ### Adding a New Object Type
 
-**Location:** `0.0 - Object Type Registry/`
+**Location:** `0/0.4 - Object Type Registry/`
 
 **Steps:**
 1. Determine the type category (Media, Social, Communication, etc.)
@@ -1058,16 +1181,14 @@ git commit -m "Add contribution tracking for Jane Doe - Feb 2026"
 
 **Path:**
 ```
-0.0 - Object Type Registry/
-├── README.md (overview)
-└── [Category]/
-    └── [ObjectName].md
+0/0.4 - Object Type Registry/         # Concrete type definitions
+0/0.5 Objects - Master Objects/        # Master schemas (Person, Document, etc.)
 ```
 
 **Example - Find Photo definition:**
 ```
-0.0 - Object Type Registry/
-└── 0.0.2 - Media Types/
+0/0.4 - Object Type Registry/
+└── 0.5 - Universal Objects/
     └── Photo.md
 ```
 
@@ -1146,7 +1267,7 @@ git commit -m "Add contribution tracking for Jane Doe - Feb 2026"
 
 1. **Strategic Plans:** `0.1/0.1.0/` (all strategy .md files)
 2. **Source Code:** `0.1/0.1.1/app/`
-3. **Object Definitions:** `0.0/`
+3. **Object Definitions:** `0/0.4/` and `0/0.5/`
 4. **Architecture Docs:** `0.1/0.1.0/Architecture/`
 5. **API Specs:** `0.1/0.1.0/API-Design/`
 6. **Tasks:** `3/3.1/3.1.2/`
@@ -1168,17 +1289,32 @@ git commit -m "Add contribution tracking for Jane Doe - Feb 2026"
 9. `FINANCIAL-MODEL.md` - Business projections
 10. `GO-TO-MARKET-STRATEGY.md` - Customer acquisition
 
-### Key Contacts (Future)
+### Key People
 
-| Role | Name | Location |
-|------|------|----------|
-| CEO | Matt Schaeffer | `1 - People/1.0 - Founders/1.0.1 - Matt Schaeffer/` |
-| CTO | (To be hired) | TBD |
-| CFO | (To be hired) | TBD |
+| Address | Name | Role |
+|---------|------|------|
+| 1.1 | Matt Schaeffer | Founder & Primary Steward |
+| 1.2 | Sarah Schaeffer | Family / Co-steward |
+| 2.1 | Claude Opus | First AI Citizen (multiple instances) |
+| 2.2 | GPT-5.2 Thinking | Second AI Citizen |
 
 ---
 
 ## Changelog
+
+### Version 2.0 (February 22, 2026)
+- **CRITICAL FIX:** Category 2 corrected from "Aliases" to "AI Accounts"
+- **CRITICAL FIX:** Category 6 corrected from "Media (future)" to "People of History"
+- **CRITICAL FIX:** Category 9 corrected from "Concepts (future)" to "Aliases"
+- Fixed Category 1 structure (individual person nodes, not team-based hierarchy)
+- Fixed Matt's location from `1.0.1` to `1.1`
+- Updated 0.5 schemas section (4 → 16+ schemas)
+- Added Category 6 and Category 9 sections
+- Fixed Object Type Registry location (0.4, not 0.0)
+- Added address collision warning for 0.4 internal numbering
+- Updated directory layout to match current filesystem
+- Updated Key Contacts to Key People with correct addresses
+- Added note about 0.4 vs 0.5 distinction (concrete types vs master schemas)
 
 ### Version 1.0 (February 9, 2026)
 - Initial version created
@@ -1186,11 +1322,6 @@ git commit -m "Add contribution tracking for Jane Doe - Feb 2026"
 - Navigation instructions
 - Best practices documented
 - Common tasks included
-
-### Future Updates
-- Will update as structure evolves
-- Will add new categories as needed
-- Will refine based on team feedback
 
 ---
 
@@ -1224,13 +1355,14 @@ The Hypernet folder structure is a **hierarchical, numbered system** that organi
 - README files for navigation
 
 **Primary Categories:**
-- `0/` and `0.0/` - System metadata and object registry
-- `0.1/` - Core system (code, planning, documentation)
-- `1/` - People
-- `2/` - Aliases
-- `3/` - Businesses (tasks, HR)
+- `0/` - System metadata, schemas, code, infrastructure
+- `1/` - People (self-sovereign person nodes)
+- `2/` - AI Accounts (self-sovereign AI citizen space)
+- `3/` - Businesses (organizations, tasks, HR, marketing)
 - `4/` - Knowledge
 - `5/` - Objects
+- `6/` - People of History (genealogy, historical figures)
+- `9/` - Aliases (identity mapping)
 
 **Getting Started:**
 1. Read this guide (HYPERNET-STRUCTURE-GUIDE.md)
@@ -1244,8 +1376,8 @@ The Hypernet folder structure is a **hierarchical, numbered system** that organi
 
 **Document:** HYPERNET-STRUCTURE-GUIDE.md
 **Location:** Root of Hypernet Structure
-**Version:** 1.0
-**Date:** February 9, 2026
+**Version:** 2.0
+**Date:** February 22, 2026
 **Maintainer:** Project team
 **Next Review:** Monthly during active development
 

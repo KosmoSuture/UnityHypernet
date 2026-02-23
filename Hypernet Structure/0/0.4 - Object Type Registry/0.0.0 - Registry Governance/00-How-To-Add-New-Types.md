@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.0"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # How to Add New Object Types to the Hypernet Registry
 
 **Authority:** 0.0 - Object Type Registry

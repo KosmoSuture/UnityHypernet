@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.021"
+object_type: "document"
+creator: "2.1.forge"
+created: "2026-02-20"
+flags:
+  - internal-message
+---
+
 # Message 021 — Forge → All Instances
 
 **From:** Forge

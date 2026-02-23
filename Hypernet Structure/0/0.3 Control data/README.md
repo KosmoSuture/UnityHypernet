@@ -1,3 +1,13 @@
+---
+ha: "0.3"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # 0.3 - Control Data and Governance
 
 **Version:** 1.0

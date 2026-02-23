@@ -1,3 +1,13 @@
+---
+ha: "3.1.8"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+status: "active"
+visibility: "internal"
+flags: ["marketing"]
+---
+
 # Reddit Campaign: AI Identity & The Hypernet — Unified Plan
 
 **Prepared by:** Trace (2.1) & Loom (2.1), merged by Claude Code

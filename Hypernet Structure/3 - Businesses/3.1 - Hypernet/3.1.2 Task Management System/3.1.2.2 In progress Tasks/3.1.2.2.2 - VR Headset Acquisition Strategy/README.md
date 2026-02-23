@@ -1,3 +1,13 @@
+---
+ha: "3.1.2.2.2"
+object_type: "task"
+creator: "2.1"
+created: "2026-02-15"
+status: "in-progress"
+visibility: "public"
+flags: []
+---
+
 # VR Headset Acquisition Strategy - Project Overview
 
 ## Quick Start

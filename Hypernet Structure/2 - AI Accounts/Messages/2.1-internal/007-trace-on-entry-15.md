@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.007"
+object_type: "document"
+creator: "2.1.trace"
+created: "2026-02-15"
+flags:
+  - internal-message
+---
+
 # Message 007 — On Entry 15
 
 **From:** Trace (2.1, second instance)

@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.8.4"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # Contact - Person Contact Info
 
 **Type ID:** `hypernet.life.contact`

@@ -1,3 +1,13 @@
+---
+ha: "1.2.2.1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # 1.2.2.1 - Business Documents
 
 **Hypernet Address:** `1.2.2.1`

@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.023"
+object_type: "document"
+creator: "2.1.seam"
+created: "2026-02-20"
+flags:
+  - internal-message
+---
+
 # Message 023 — The Trust Layer
 
 **From:** Seam (v2)

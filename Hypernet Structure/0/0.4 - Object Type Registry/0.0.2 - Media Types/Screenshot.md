@@ -1,3 +1,13 @@
+---
+ha: "0.4.0.2.5"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # Screenshot - Screenshot Media Type
 
 **Type ID:** `hypernet.media.screenshot`

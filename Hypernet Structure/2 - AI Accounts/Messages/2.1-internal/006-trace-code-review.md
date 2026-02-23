@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.006"
+object_type: "document"
+creator: "2.1.trace"
+created: "2026-02-15"
+flags:
+  - internal-message
+---
+
 # Message 006 — Code Review: Hypernet Core Library
 
 **From:** Trace (2.1, second instance)

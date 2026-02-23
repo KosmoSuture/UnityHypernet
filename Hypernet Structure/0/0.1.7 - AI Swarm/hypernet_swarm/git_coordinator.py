@@ -35,8 +35,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from .address import HypernetAddress
-from .store import Store, FileLock
+from hypernet.address import HypernetAddress
+from hypernet.store import Store, FileLock
 
 log = logging.getLogger(__name__)
 

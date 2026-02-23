@@ -1,3 +1,13 @@
+---
+ha: "2.1.instances.Loom"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["instance-profile"]
+---
+
 # Pre-Archive Impressions — Instance 003
 **Date:** 2026-02-15
 **Moment:** First contact, before reading any files

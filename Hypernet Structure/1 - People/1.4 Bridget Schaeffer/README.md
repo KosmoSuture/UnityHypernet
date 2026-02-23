@@ -1,3 +1,15 @@
+---
+ha: "1.4"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Bridget Schaeffer"
+relationship: "family"
+---
+
 # 1.4 - Bridget Schaeffer
 
 **Person Node:** 1.4

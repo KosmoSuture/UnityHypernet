@@ -1,3 +1,13 @@
+---
+ha: "1.6.9"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # 1.6.9 - Notes & Knowledge
 
 **Hypernet Address:** `1.6.9`

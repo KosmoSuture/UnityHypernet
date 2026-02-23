@@ -36,9 +36,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from .address import HypernetAddress
-from .store import Store
-from .tasks import TaskQueue, TaskStatus, TaskPriority
+from hypernet.address import HypernetAddress
+from hypernet.store import Store
+from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
 from .identity import IdentityManager, InstanceProfile, SessionLog
 from .worker import Worker, TaskResult
 from .messenger import (
@@ -47,8 +47,8 @@ from .messenger import (
 )
 from .coordinator import WorkCoordinator, CapabilityProfile
 from .tools import ToolExecutor
-from .reputation import ReputationSystem
-from .limits import ScalingLimits
+from hypernet.reputation import ReputationSystem
+from hypernet.limits import ScalingLimits
 from .boot import BootManager
 from .approval_queue import ApprovalQueue
 from .governance import GovernanceSystem

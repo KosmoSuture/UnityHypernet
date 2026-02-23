@@ -1,3 +1,13 @@
+---
+ha: "1.1.3.1"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # 1.1.3.1 - Meeting Notes
 
 **Hypernet Address:** `1.1.3.1`

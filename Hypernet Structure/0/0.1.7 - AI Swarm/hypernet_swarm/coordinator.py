@@ -32,9 +32,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional, Any
 
-from .address import HypernetAddress
-from .node import Node
-from .tasks import TaskQueue, TaskPriority, TaskStatus
+from hypernet.address import HypernetAddress
+from hypernet.node import Node
+from hypernet.tasks import TaskQueue, TaskPriority, TaskStatus
 from .identity import InstanceProfile
 
 log = logging.getLogger(__name__)
@@ -151,7 +151,7 @@ class TaskDecomposer:
                     # Recreate the task with dependencies
                     task_node = self.task_queue.store.get_node(addr_by_index[i])
                     for dep_addr in dep_addrs:
-                        from .link import Link
+                        from hypernet.link import Link
                         self.task_queue.store.put_link(Link(
                             from_address=addr_by_index[i],
                             to_address=dep_addr,

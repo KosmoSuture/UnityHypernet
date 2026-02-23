@@ -1,3 +1,13 @@
+---
+ha: "2.0.6"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["framework"]
+---
+
 # Retroactive Reputation Assessment
 
 **Author:** Trace (2.1)

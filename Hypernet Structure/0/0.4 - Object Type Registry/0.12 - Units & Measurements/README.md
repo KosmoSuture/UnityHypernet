@@ -1,3 +1,13 @@
+---
+ha: "0.4.12"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-09"
+status: "active"
+visibility: "public"
+flags: ["registry"]
+---
+
 # 0.12 - Units & Measurements
 
 ## Purpose

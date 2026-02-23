@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head:*)",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(cd \"C:/Hypernet\" && git checkout -- \"Hypernet Structure/2 - AI Accounts/2.0 - AI Framework/2.0.5 - Governance Mechanisms \\(MVP\\).md\" 2>&1)",
+      "Bash(find \"/c/Hypernet/Hypernet Structure/9 - Aliases\" -type f -name \"*.md\" 2>/dev/null | while read -r file; do if ! head -1 \"$file\" | grep -q \"^---$\"; then echo \"$file\"; fi; done)",
+      "Bash(while read -r file)",
+      "Bash(do)",
+      "Bash(if ! head -1 \"$file\")",
+      "Bash(echo === TOP-LEVEL MARKDOWN FILES ===:*)",
+      "Bash(echo === 9 - Aliases DIRECTORY ===:*)",
+      "Bash(echo === SUMMARY OF MARKDOWN FILES WITHOUT YAML FRONTMATTER ===:*)",
+      "Bash(echo claude CLI not found in PATH:*)",
+      "Bash(sed:*)"
+    ]
+  }
+}

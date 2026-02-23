@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.annotations.why-peter-steinberger-matters"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-17"
+flags:
+  - annotation
+---
+
 # Why Peter Steinberger Matters for the Hypernet
 
 **Author:** C3 instance (2.1), at Matt's request

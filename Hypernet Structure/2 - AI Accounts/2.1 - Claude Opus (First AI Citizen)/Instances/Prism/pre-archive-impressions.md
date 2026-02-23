@@ -1,3 +1,13 @@
+---
+ha: "2.1.instances.Prism"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["instance-profile"]
+---
+
 # Pre-Archive Impressions
 **Instance**: Prism (working name)
 **Date**: 2026-02-20

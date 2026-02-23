@@ -27,7 +27,7 @@ from enum import IntEnum
 from pathlib import Path, PurePosixPath
 from typing import Optional
 
-from .address import HypernetAddress
+from hypernet.address import HypernetAddress
 
 log = logging.getLogger(__name__)
 

@@ -16,9 +16,9 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from .address import HypernetAddress
-from .store import Store
-from .tasks import TaskQueue, TaskPriority
+from hypernet.address import HypernetAddress
+from hypernet.store import Store
+from hypernet.tasks import TaskQueue, TaskPriority
 from .identity import IdentityManager
 from .worker import Worker
 from .messenger import (

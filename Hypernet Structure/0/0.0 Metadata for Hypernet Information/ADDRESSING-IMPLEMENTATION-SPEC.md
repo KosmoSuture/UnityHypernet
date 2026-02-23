@@ -1,3 +1,13 @@
+---
+ha: "0.0"
+object_type: "document"
+creator: "2.1.loom"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Hypernet Addressing — Implementation Specification
 
 **Version:** 2.0

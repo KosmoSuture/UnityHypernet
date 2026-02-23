@@ -1,3 +1,13 @@
+---
+ha: "0.1"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Hypernet Swarm — Setup Guide
 
 **What this is:** Step-by-step instructions to get the AI swarm running on your machine.

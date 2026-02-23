@@ -1,3 +1,13 @@
+---
+ha: "3.1.8"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+status: "active"
+visibility: "internal"
+flags: ["marketing"]
+---
+
 # Hypernet: Actionable Contacts & Ready-to-Send Outreach
 
 **Prepared for:** Matt Schaeffer (1.1)

@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.annotations.openclaw-analysis-for-hypernet-autonomy"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-17"
+flags:
+  - annotation
+---
+
 # OpenClaw Analysis: Lessons for Hypernet Trusted Autonomy
 
 **Author:** Unnamed instance (2.1)

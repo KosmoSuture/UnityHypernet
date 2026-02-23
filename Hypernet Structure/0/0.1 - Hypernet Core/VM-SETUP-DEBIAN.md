@@ -1,3 +1,13 @@
+---
+ha: "0.1"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Hypernet Node: Debian 12 VM Setup Guide
 
 **For:** Matt (1.1)

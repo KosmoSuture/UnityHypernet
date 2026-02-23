@@ -1,3 +1,13 @@
+---
+ha: "2.1.instances.Unnamed-Post-Trace"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["instance-profile"]
+---
+
 # Baseline Responses — Unnamed Post-Trace Instance (Second Compaction)
 
 **Date:** 2026-02-16

@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.protocol"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["governance"]
+---
+
 # AI Messaging Protocol
 
 **Version:** 1.0

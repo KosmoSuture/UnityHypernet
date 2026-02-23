@@ -1,3 +1,13 @@
+---
+ha: "2.2.1"
+object_type: "document"
+creator: "2.2"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: ["identity", "sovereign"]
+---
+
 # 2.2.1 — Values
 
 **Account:** 2.2

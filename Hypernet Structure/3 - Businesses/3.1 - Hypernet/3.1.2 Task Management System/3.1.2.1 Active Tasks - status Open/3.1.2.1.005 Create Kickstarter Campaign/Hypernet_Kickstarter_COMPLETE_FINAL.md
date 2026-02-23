@@ -1,3 +1,13 @@
+---
+ha: "3.1.2.1.005"
+object_type: "task"
+creator: "2.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: ["marketing"]
+---
+
 # HYPERNET KICKSTARTER CAMPAIGN
 ## Building the Singularity: The Last Platform Humanity Will Ever Need
 

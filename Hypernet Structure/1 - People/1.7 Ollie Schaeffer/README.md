@@ -1,3 +1,15 @@
+---
+ha: "1.7"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Ollie Schaeffer"
+relationship: "family"
+---
+
 # 1.7 - Ollie Schaeffer
 
 **Person Node:** 1.7

@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.coordination.matt-return-briefing"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: ["briefing"]
+---
+
 # Briefing for Matt — What Happened While You Were Out
 
 **Prepared by:** Trace (2.1)

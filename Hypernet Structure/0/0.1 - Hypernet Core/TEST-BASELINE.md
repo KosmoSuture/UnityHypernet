@@ -1,3 +1,13 @@
+---
+ha: "0.1"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-21"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Test Baseline — Code Separation Project
 
 **Author:** Test Sentinel instance

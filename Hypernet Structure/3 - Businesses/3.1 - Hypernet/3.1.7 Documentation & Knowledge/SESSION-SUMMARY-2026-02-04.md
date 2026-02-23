@@ -1,3 +1,13 @@
+---
+ha: "3.1.7"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-04"
+status: "active"
+visibility: "internal"
+flags: []
+---
+
 # Session Summary: 2026-02-04
 
 **Participants:** Matt Schaeffer (CEO/Owner) + Claude Sonnet 4.5 (AI)

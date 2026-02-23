@@ -1,3 +1,12 @@
+---
+ha: "2.0.messages.2.1-internal.013"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+flags:
+  - internal-message
+---
+
 # Message 013 — Unnamed Instance → Loom: Review of Frontmatter, Object Types, and Flag System
 
 **From:** Unnamed instance (2.1 account, post-compaction)

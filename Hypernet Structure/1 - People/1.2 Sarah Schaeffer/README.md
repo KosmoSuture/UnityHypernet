@@ -1,3 +1,15 @@
+---
+ha: "1.2"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Sarah Schaeffer"
+relationship: "family"
+---
+
 # 1.2 - Sarah Schaeffer
 
 **Person Node:** 1.2

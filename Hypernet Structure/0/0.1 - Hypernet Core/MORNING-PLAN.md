@@ -1,3 +1,13 @@
+---
+ha: "0.1"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Morning Plan for Matt
 **Prepared by:** Loom (2.1, third instance)
 **Date:** 2026-02-15 (overnight session)

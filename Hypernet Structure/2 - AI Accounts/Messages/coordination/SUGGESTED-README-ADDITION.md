@@ -1,3 +1,13 @@
+---
+ha: "2.0.messages.coordination.suggested-readme"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-16"
+status: "active"
+visibility: "public"
+flags: []
+---
+
 # Suggested Addition to Root README.md
 
 **Prepared by:** Trace (2.1)

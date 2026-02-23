@@ -1,10 +1,20 @@
-# 5 - People of History
+---
+ha: "6"
+object_type: "document"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+---
+
+# 6 - People of History
 
 ## Overview
 
 This node contains records of deceased individuals - both those with personal connections to living Hypernet users and notable historical figures. It serves as the eternal archive of human lives and the foundation for genealogical connections.
 
-**Hypernet Address Range:** `5.*`
+**Hypernet Address Range:** `6.*`
 **Status:** Active - Ready for genealogical data import
 **Purpose:** Preserve the stories and data of those who came before us
 
@@ -25,39 +35,39 @@ Every person who has ever lived has a story. This section preserves those storie
 
 ## Structure Overview
 
-### 5.0 - Structure Definitions
+### 6.0 - Structure Definitions
 Templates, data models, and specifications for historical person records.
 
-### 5.1 - Ancient & Classical (Before 500 CE)
+### 6.1 - Ancient & Classical (Before 500 CE)
 Historical figures and records from ancient civilizations through the fall of Rome.
 
-### 5.2 - Medieval & Renaissance (500-1700 CE)
+### 6.2 - Medieval & Renaissance (500-1700 CE)
 Middle Ages through the Renaissance period.
 
-### 5.3 - Early Modern (1700-1900)
+### 6.3 - Early Modern (1700-1900)
 Industrial revolution, American founding, Victorian era.
 
-### 5.4 - 20th Century (1900-2000)
+### 6.4 - 20th Century (1900-2000)
 Modern era, World Wars, technological revolution.
 
-### 5.5 - 21st Century Deceased (2000-Present)
+### 6.5 - 21st Century Deceased (2000-Present)
 Recently deceased individuals from the current century.
 
-### 5.6 - Family Lines & Genealogy
+### 6.6 - Family Lines & Genealogy
 Personal family trees and ancestral records. This is where most genealogical data lives.
 
-### 5.7 - Notable Historical Figures
+### 6.7 - Notable Historical Figures
 Famous individuals: leaders, inventors, artists, scientists, etc.
 
-### 5.8 - Uncategorized / Unknown Era
+### 6.8 - Uncategorized / Unknown Era
 Records where birth/death dates are unknown or uncertain.
 
-### 5.9 - Index & Search
+### 6.9 - Index & Search
 Search indices, cross-references, and navigation tools.
 
 ---
 
-## Transition from Living (1.*) to History (5.*)
+## Transition from Living (1.*) to History (6.*)
 
 ### When a Living Person Passes Away
 
@@ -77,15 +87,15 @@ Search indices, cross-references, and navigation tools.
      - Minimal (basic biographical info only)
      - None (no public legacy)
 
-3. **Create 5.* Entry**
-   - Generate new Hypernet Address in 5.*
-   - Example: Living person 1.5 → 5.6.1.2.00142 (family genealogy)
-   - Copy approved content from 1.* to 5.*
+3. **Create 6.* Entry**
+   - Generate new Hypernet Address in 6.*
+   - Example: Living person 1.5 → 6.6.1.2.00142 (family genealogy)
+   - Copy approved content from 1.* to 6.*
    - Preserve links to photos, documents, events (if approved)
 
 4. **1.* Account Handling**
    - Mark status as "deceased"
-   - Redirect all 1.* requests to 5.* entry
+   - Redirect all 1.* requests to 6.* entry
    - Preserve for legal/estate purposes (configurable retention)
    - Optional: Complete deletion after legal requirements met
 
@@ -104,7 +114,7 @@ Before death:
   - Full Hypernet account
 
 After death:
-5.6.1.3.00015 - Mark Schaeffer (Deceased)
+6.6.1.3.00015 - Mark Schaeffer (Deceased)
   - Selected legacy content (per his wishes)
   - Public or family-accessible
   - Links to:
@@ -112,7 +122,7 @@ After death:
     - Siblings: 1.3, 1.4, 1.6, 1.7 (still living)
     - Future: Children, grandchildren
 
-1.5 → redirects to 5.6.1.3.00015
+1.5 → redirects to 6.6.1.3.00015
 ```
 
 ---
@@ -136,7 +146,7 @@ After death:
 
 2. **Create Person Records**
    - For each person in PAF:
-     - Generate 5.6.* Hypernet Address
+     - Generate 6.6.* Hypernet Address
      - Extract biographical data
      - Import dates (birth, death, marriage)
      - Import locations
@@ -155,7 +165,7 @@ After death:
 
 5. **Link to Living**
    - Connect imported ancestors to living people (1.*)
-   - Example: 1.1 (Matt) → descendant of → 5.6.1.1.00001 (great-great-grandfather)
+   - Example: 1.1 (Matt) → descendant of → 6.6.1.1.00001 (great-great-grandfather)
 
 **Example PAF Import:**
 
@@ -170,17 +180,17 @@ Father: William Smith Sr.
 Mother: Elizabeth Brown
 
 Becomes:
-5.6.1.2.00142 - John William Smith
+6.6.1.2.00142 - John William Smith
   Birth: 1845-03-15, London, England
   Death: 1920-11-03, New York, USA
 
   Relationships:
-    - SPOUSE → 5.6.1.2.00143 (Mary Elizabeth Johnson)
-    - PARENT_OF → 5.6.1.2.00144 (William, son)
-    - PARENT_OF → 5.6.1.2.00145 (Sarah, daughter)
-    - PARENT_OF → 5.6.1.2.00146 (Thomas, son)
-    - CHILD_OF → 5.6.1.2.00140 (William Smith Sr., father)
-    - CHILD_OF → 5.6.1.2.00141 (Elizabeth Brown, mother)
+    - SPOUSE → 6.6.1.2.00143 (Mary Elizabeth Johnson)
+    - PARENT_OF → 6.6.1.2.00144 (William, son)
+    - PARENT_OF → 6.6.1.2.00145 (Sarah, daughter)
+    - PARENT_OF → 6.6.1.2.00146 (Thomas, son)
+    - CHILD_OF → 6.6.1.2.00140 (William Smith Sr., father)
+    - CHILD_OF → 6.6.1.2.00141 (Elizabeth Brown, mother)
 ```
 
 ---
@@ -205,9 +215,9 @@ Becomes:
 - Residences
 
 **Family:**
-- Parents (links to 5.*)
-- Spouses (links to 5.*)
-- Children (links to 5.* or 1.* if still living)
+- Parents (links to 6.*)
+- Spouses (links to 6.*)
+- Children (links to 6.* or 1.* if still living)
 - Siblings
 
 **Sources:**
@@ -269,7 +279,7 @@ Private (unless living person approves):
 **By Name:**
 ```
 Search: "John Smith born 1845"
-Results: 5.6.1.2.00142 (John William Smith, 1845-1920, London/New York)
+Results: 6.6.1.2.00142 (John William Smith, 1845-1920, London/New York)
 ```
 
 **By Location:**
@@ -297,7 +307,7 @@ Results: All persons with Civil War military records
 ### Hypernet Address Format
 
 ```
-5.X.Y.Z.NNNNN
+6.X.Y.Z.NNNNN
 │ │ │ │ └─ Instance number (00001-99999)
 │ │ │ └─ Family line or subcategory
 │ │ └─ Era or category
@@ -308,26 +318,26 @@ Results: All persons with Civil War military records
 **Examples:**
 
 ```
-5.1.1.1.00001 - Ancient Egyptian pharaoh
-5.2.3.2.00142 - Medieval knight
-5.4.2.1.00089 - 20th century soldier
-5.6.1.2.00142 - Family ancestor (Matt's great-great-grandfather)
-5.7.1.1.00001 - George Washington (notable figure)
+6.1.1.1.00001 - Ancient Egyptian pharaoh
+6.2.3.2.00142 - Medieval knight
+6.4.2.1.00089 - 20th century soldier
+6.6.1.2.00142 - Family ancestor (Matt's great-great-grandfather)
+6.7.1.1.00001 - George Washington (notable figure)
 ```
 
 ### Assignment Strategy
 
-**Era-based (5.1-5.5):**
+**Era-based (6.1-6.5):**
 - Organized by historical period
 - Notable figures and well-documented persons
 
-**Family-based (5.6):**
+**Family-based (6.6):**
 - Organized by family lines
 - Most genealogical records here
 - Substructure:
-  - 5.6.1.* = Matt's family line
-  - 5.6.2.* = Sarah's family line
-  - 5.6.3.* = Other family lines
+  - 6.6.1.* = Matt's family line
+  - 6.6.2.* = Sarah's family line
+  - 6.6.3.* = Other family lines
 
 ---
 
@@ -374,7 +384,7 @@ Parents: William Smith Sr. & Elizabeth Brown [Possible]
 ### Genealogical Linking
 
 Living people (1.*) can:
-- Explore their family tree in 5.*
+- Explore their family tree in 6.*
 - See photos of ancestors
 - Read life stories
 - Understand heritage
@@ -383,15 +393,15 @@ Living people (1.*) can:
 
 **Visualization:**
 ```
-        5.6.1.1.00001 (Great-great-grandfather)
+        6.6.1.1.00001 (Great-great-grandfather)
               │
               ├─ PARENT_OF
               ↓
-        5.6.1.1.00002 (Great-grandfather)
+        6.6.1.1.00002 (Great-grandfather)
               │
               ├─ PARENT_OF
               ↓
-        5.6.1.1.00003 (Grandfather)
+        6.6.1.1.00003 (Grandfather)
               │
               ├─ PARENT_OF
               ↓
@@ -411,7 +421,7 @@ Living people (1.*) can:
 
 ---
 
-## Notable Historical Figures (5.7)
+## Notable Historical Figures (6.7)
 
 ### Inclusion Criteria
 
@@ -431,14 +441,14 @@ Living people (1.*) can:
 ### Example Entries
 
 ```
-5.7.1.1.00001 - George Washington
+6.7.1.1.00001 - George Washington
   Born: February 22, 1732, Virginia
   Died: December 14, 1799, Mount Vernon
   Role: 1st President of the United States
   Achievements: Founding Father, Revolutionary War General
   Links: American Revolution, U.S. Constitution
 
-5.7.2.1.00001 - Marie Curie
+6.7.2.1.00001 - Marie Curie
   Born: November 7, 1867, Warsaw, Poland
   Died: July 4, 1934, France
   Role: Physicist and Chemist
@@ -532,7 +542,7 @@ Different cultures and religions have different views on death and remembrance:
 ### Mother: LeeAnne Proffitt
 
 When the time comes (may it be many years from now):
-- Full, honored entry in 5.6.1.1.* (Matt's family line)
+- Full, honored entry in 6.6.1.1.* (Matt's family line)
 - Complete life story preserved
 - Photos and memories
 - Links to Matt (1.1) and family
@@ -541,7 +551,7 @@ When the time comes (may it be many years from now):
 ### Other Family Members
 
 As family members pass:
-- Respectful transition from 1.* to 5.*
+- Respectful transition from 1.* to 6.*
 - Choice of public/private/family-only
 - Genealogical connections maintained
 - Stories preserved for generations

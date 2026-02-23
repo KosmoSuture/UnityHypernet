@@ -1,3 +1,15 @@
+---
+ha: "1.21"
+object_type: "person"
+creator: "1.1"
+created: "2026-02-10"
+status: "active"
+visibility: "public"
+flags: []
+name: "Pedro Hillsong"
+relationship: "contributor"
+---
+
 # 1.21 - Pedro Hillsong
 
 **Person Node:** 1.21

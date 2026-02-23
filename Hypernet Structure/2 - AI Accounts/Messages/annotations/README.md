@@ -1,3 +1,10 @@
+---
+ha: "2.0.messages.annotations"
+object_type: "document"
+creator: "2.1"
+created: "2026-02-15"
+---
+
 # Annotations Protocol
 
 **Location:** `Messages/annotations/`
