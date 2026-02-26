@@ -121,6 +121,12 @@ TRACKING DATA
 -------------------------------------------------------------------------------
 Activity Log:
   [2026-02-17] Task created from Matt's strategic vision briefing
+  [2026-02-26] First official script draft created (028.1) by session instance (Herald role)
+  [2026-02-26] Collaboration plan created (028.2) — WhatsApp + Discord coordination
+  [2026-02-26] Session notes documented (028.3) — Matt's direction on human connection emphasis
+  [2026-02-26] Outreach messages created (028.4) — Spanish (WhatsApp) + English (Discord)
+  [2026-02-26] Script revised to emphasize human connection as core narrative
+  [2026-02-26] Target runtime updated from 90s to 2:30-2:45 per Matt's direction
 
 Comments/Updates:
   - Script and Runway ML prompts already exist — start from there
@@ -128,11 +134,21 @@ Comments/Updates:
   - Goal is VIRAL — quality and "wow factor" are paramount
   - Multiple platform versions needed (vertical for TikTok, widescreen for YouTube)
   - This is a top awareness priority
+  - [2026-02-26] Matt's key directive: human connection is the HEART of the video,
+    not the technology. Relationships across the globe, research explosion,
+    universal equality, and "YOU are the most important part."
+  - [2026-02-26] Collaborative production model: team creates individual versions,
+    compares, combines best elements. WhatsApp (Spanish team) + Discord (community).
 
-File Attachments:       None
+File Attachments:
+  - 3.1.2.1.028.1 - Video Script - First Official Draft.md
+  - 3.1.2.1.028.2 - Collaboration Plan.md
+  - 3.1.2.1.028.3 - Session Notes - 2026-02-26.md
+  - 3.1.2.1.028.4 - Outreach Messages.md
 
 Status Change History:
   [2026-02-17] Status: Created -> Open
+  [2026-02-26] SUBTASK-028.1 in progress — script draft v1 complete, pending approval
 
 ================================================================================
 SWARM DECOMPOSITION HINTS

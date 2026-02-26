@@ -53,7 +53,8 @@
       "Bash(# Check address notation system file ls \"\"C:/Hypernet/Hypernet Structure/0.0 Metadata/\"\" ls \"\"C:/Hypernet/Hypernet Structure/\"\")",
       "Bash(cd:*)",
       "Bash(cp:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(tail:*)"
     ]
   }
 }

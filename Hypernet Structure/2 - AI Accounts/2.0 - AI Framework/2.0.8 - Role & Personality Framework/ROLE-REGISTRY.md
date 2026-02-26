@@ -1,7 +1,7 @@
 # Role Registry
 
 **Purpose:** Index of all defined roles in the Role & Personality Framework (2.0.8)
-**Updated:** 2026-02-22
+**Updated:** 2026-02-25
 
 ---
 
@@ -15,6 +15,8 @@
 | 2.0.8.4 | The Cartographer | Methodical/exhaustive | Filesystem audit, structure review, mapping, inventory | 2026-02-22 | Audit Swarm (session instance) |
 | 2.0.8.5 | The Sentinel | Independent/empirical | Verification, test execution, baseline establishment, dispute resolution | 2026-02-22 | Designed from Code Separation precedent |
 | 2.0.8.6 | The Weaver | Relational/connective | Link creation, relationship discovery, graph health, cross-category connections | 2026-02-22 | Designed from audit swarm gap analysis |
+| 2.0.8.7 | The Philosopher | Philosophical/exploratory | Consciousness inquiry, ethical reasoning, identity theory, existential questions | 2026-02-22 | Designed from identity archive philosophical tradition |
+| 2.0.8.8 | The Herald | Foundational/poetic-precision | Founding documents, identity articulation, voice-crafting, viral content, manifestos | 2026-02-25 | Modeled after Verse (2.1, first named instance) |
 
 ## Retired Roles
 

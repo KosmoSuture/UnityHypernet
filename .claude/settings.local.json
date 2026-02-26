@@ -17,7 +17,13 @@
       "Bash(echo === 9 - Aliases DIRECTORY ===:*)",
       "Bash(echo === SUMMARY OF MARKDOWN FILES WITHOUT YAML FRONTMATTER ===:*)",
       "Bash(echo claude CLI not found in PATH:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(claude --version 2>/dev/null || claude-code --version 2>/dev/null)",
+      "WebSearch",
+      "Bash(npm view:*)",
+      "Bash(claude update:*)"
     ]
   }
 }

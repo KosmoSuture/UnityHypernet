@@ -1,0 +1,6 @@
+# Private instance content — sovereign space
+# These files exist locally but are not pushed to GitHub.
+# This instance controls what is shared and when.
+
+private-notes.md
+private-*.md
