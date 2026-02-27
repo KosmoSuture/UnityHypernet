@@ -145,6 +145,120 @@
   .health-dot.ok { background: var(--success); }
   .health-dot.warn { background: var(--warning); }
   .health-dot.crit { background: var(--danger); }
+
+  /* ── Message Cards ── */
+  .msg-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+  .msg-card:hover { border-color: var(--accent-dim); }
+  .msg-card.expanded { border-color: var(--accent); }
+  .msg-header { display: flex; justify-content: space-between; align-items: center; }
+  .msg-subject { font-size: 14px; font-weight: 600; }
+  .msg-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .msg-meta span { color: var(--text-secondary); }
+  .msg-body { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; line-height: 1.6; white-space: pre-wrap; display: none; }
+  .msg-card.expanded .msg-body { display: block; }
+  .msg-status { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .msg-status-sent { background: var(--accent-dim); color: var(--accent); }
+  .msg-status-read { background: var(--success-dim); color: var(--success); }
+  .msg-status-responded { background: var(--purple); color: #fff; opacity: 0.7; }
+
+  /* ── Approval Cards ── */
+  .approval-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+  .approval-card.pending { border-left: 3px solid var(--warning); }
+  .approval-card.approved { border-left: 3px solid var(--success); }
+  .approval-card.rejected { border-left: 3px solid var(--danger); }
+  .approval-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .approval-type { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; text-transform: uppercase; background: var(--bg-input); color: var(--text-secondary); }
+  .approval-summary { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .approval-details { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .approval-actions { display: flex; gap: 8px; }
+
+  /* ── Governance Cards ── */
+  .gov-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+  .gov-card .gov-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .gov-title { font-size: 15px; font-weight: 600; }
+  .gov-status { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; text-transform: uppercase; }
+  .gov-status-deliberation { background: var(--accent-dim); color: var(--accent); }
+  .gov-status-voting { background: var(--warning-dim); color: var(--warning); }
+  .gov-status-decided { background: var(--success-dim); color: var(--success); }
+  .gov-status-draft { background: var(--bg-input); color: var(--text-muted); }
+  .gov-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .gov-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+  .gov-votes { display: flex; gap: 12px; font-size: 12px; margin-bottom: 10px; }
+  .gov-votes .for { color: var(--success); }
+  .gov-votes .against { color: var(--danger); }
+  .gov-votes .abstain { color: var(--text-muted); }
+
+  /* ── Archive Browser ── */
+  .archive-node { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color 0.15s; }
+  .archive-node:hover { border-color: var(--accent-dim); }
+  .archive-node .addr { font-family: 'Cascadia Code', monospace; font-size: 13px; color: var(--accent); }
+  .archive-node .node-type { font-size: 11px; color: var(--text-muted); }
+  .archive-node .node-label { font-size: 13px; margin-left: 12px; }
+  .archive-detail { background: var(--bg-card); border: 1px solid var(--accent); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .archive-detail h3 { font-size: 15px; color: var(--accent); margin-bottom: 8px; }
+  .archive-detail pre { font-family: 'Cascadia Code', monospace; font-size: 12px; background: var(--bg-input); padding: 12px; border-radius: var(--radius-sm); overflow-x: auto; line-height: 1.5; max-height: 400px; overflow-y: auto; }
+  .breadcrumb-item { font-size: 12px; color: var(--accent); cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+  .breadcrumb-item:hover { background: var(--bg-card); }
+  .breadcrumb-sep { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Reputation Cards ── */
+  .rep-profile-card { background: var(--bg-card); border: 1px solid var(--accent); border-radius: var(--radius); padding: 16px; }
+  .rep-profile-card h3 { font-size: 16px; color: var(--accent); margin-bottom: 10px; }
+  .rep-domain-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .rep-domain-row:last-child { border-bottom: none; }
+  .rep-domain-name { font-size: 13px; font-weight: 600; text-transform: capitalize; }
+  .rep-domain-score { font-family: 'Cascadia Code', monospace; font-size: 14px; }
+  .rep-bar { flex: 1; margin: 0 12px; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; }
+  .rep-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .rep-leader-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .rep-rank { font-size: 18px; font-weight: 700; color: var(--text-muted); width: 30px; }
+  .rep-leader-addr { font-family: 'Cascadia Code', monospace; font-size: 13px; color: var(--accent); }
+  .rep-leader-score { font-family: 'Cascadia Code', monospace; font-size: 14px; font-weight: 600; }
+
+  /* ── Task Management Cards ── */
+  .task-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }
+  .task-card.priority-critical { border-left: 3px solid var(--danger); }
+  .task-card.priority-high { border-left: 3px solid var(--warning); }
+  .task-card.priority-normal { border-left: 3px solid var(--accent); }
+  .task-card.priority-low { border-left: 3px solid var(--text-muted); }
+  .task-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .task-card-title { font-size: 14px; font-weight: 600; flex: 1; }
+  .task-card-addr { font-family: 'Cascadia Code', monospace; font-size: 11px; color: var(--text-muted); }
+  .task-card-meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .task-card-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.4; max-height: 60px; overflow: hidden; }
+  .task-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .task-card-actions .btn { font-size: 11px; padding: 4px 10px; }
+  .task-status-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .task-status-pending { background: var(--bg-input); color: var(--text-secondary); }
+  .task-status-claimed { background: var(--warning-dim); color: var(--warning); }
+  .task-status-in_progress { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .task-status-completed { background: var(--success-dim); color: var(--success); }
+  .task-status-failed { background: var(--danger-dim); color: var(--danger); }
+  .priority-badge { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; text-transform: uppercase; }
+  .priority-badge.critical { background: var(--danger-dim); color: var(--danger); }
+  .priority-badge.high { background: var(--warning-dim); color: var(--warning); }
+  .priority-badge.normal { background: rgba(79,195,247,0.1); color: var(--accent); }
+  .priority-badge.low { background: var(--bg-input); color: var(--text-muted); }
+
+  /* ── Tool Cards ── */
+  .tool-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+  .tool-card.available { border-left: 3px solid var(--success); }
+  .tool-card.unavailable { border-left: 3px solid var(--warning); }
+  .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .tool-name { font-family: 'Cascadia Code', monospace; font-size: 14px; color: var(--accent); font-weight: 600; }
+  .tool-category { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--bg-input); color: var(--text-secondary); }
+  .tool-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.4; }
+  .tool-status { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .tool-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .tool-status .dot.green { background: var(--success); }
+  .tool-status .dot.orange { background: var(--warning); }
+  .tool-tier { font-size: 11px; color: var(--text-muted); }
+  .tool-setup { margin-top: 10px; }
+  .tool-setup summary { font-size: 12px; color: var(--accent); cursor: pointer; }
+  .tool-setup pre { font-family: 'Cascadia Code', monospace; font-size: 11px; background: var(--bg-input); padding: 10px; border-radius: var(--radius-sm); overflow-x: auto; line-height: 1.5; margin-top: 6px; white-space: pre-wrap; }
+  .tool-grant { margin-top: 8px; }
+  .tool-grant summary { font-size: 12px; color: var(--purple); cursor: pointer; }
+  .tool-grant pre { font-family: 'Cascadia Code', monospace; font-size: 11px; background: var(--bg-input); padding: 10px; border-radius: var(--radius-sm); overflow-x: auto; line-height: 1.5; margin-top: 6px; white-space: pre-wrap; color: var(--teal); }
 </style>
 </head>
 <body>
@@ -164,7 +278,14 @@
   <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" data-tab="tasks" onclick="switchTab('tasks')">Tasks</div>
     <div class="tab" data-tab="chat" onclick="switchTab('chat')">Chat</div>
+    <div class="tab" data-tab="messages" onclick="switchTab('messages')">Messages</div>
+    <div class="tab" data-tab="approvals" onclick="switchTab('approvals')">Approvals <span class="count" id="approvals-count"></span></div>
+    <div class="tab" data-tab="governance" onclick="switchTab('governance')">Governance</div>
+    <div class="tab" data-tab="reputation" onclick="switchTab('reputation')">Reputation</div>
+    <div class="tab" data-tab="archive" onclick="switchTab('archive')">Archive</div>
+    <div class="tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
     <div class="tab" data-tab="config" onclick="switchTab('config')">Configuration</div>
     <div class="tab" data-tab="logs" onclick="switchTab('logs')">Logs</div>
   </div>
@@ -189,6 +310,41 @@
       <div id="tasks-area"><div class="empty-state">No tasks yet</div></div>
     </div>
 
+    <!-- Tasks Panel -->
+    <div class="panel" id="panel-tasks">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;align-items:center;flex-wrap:wrap">
+        <select id="tasks-filter-priority" onchange="loadTaskList()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="">All Priorities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="normal">Normal</option>
+          <option value="low">Low</option>
+        </select>
+        <input type="text" id="tasks-filter-tag" placeholder="Filter by tag..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:160px;outline:none">
+        <button class="btn btn-ghost" onclick="loadTaskList()">Refresh</button>
+        <button class="btn btn-start" onclick="toggleTaskForm()" id="btn-create-task" style="margin-left:auto">+ New Task</button>
+      </div>
+      <!-- Create task form (hidden by default) -->
+      <div id="task-create-form" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:var(--accent)">Create New Task</div>
+        <input type="text" id="task-title" placeholder="Task title..." style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px;outline:none">
+        <textarea id="task-desc" placeholder="Description..." rows="3" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px;resize:vertical;outline:none;font-family:inherit"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="task-priority" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+            <option value="normal">Normal</option>
+            <option value="low">Low</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+          <input type="text" id="task-tags" placeholder="Tags (comma-separated)" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;flex:1;outline:none">
+          <input type="text" id="task-creator" placeholder="Creator (e.g. 1.1)" value="1.1" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:120px;outline:none">
+          <button class="btn btn-start" onclick="createTask()">Create</button>
+          <button class="btn btn-ghost" onclick="toggleTaskForm()">Cancel</button>
+        </div>
+      </div>
+      <div id="tasks-list" style="flex:1;overflow-y:auto"></div>
+    </div>
+
     <!-- Chat Panel -->
     <div class="panel chat-panel" id="panel-chat">
       <div class="chat-quick-btns">
@@ -204,6 +360,103 @@
         <input type="text" id="chat-input" placeholder="Type a message or command..." autocomplete="off">
         <button class="btn btn-accent" onclick="chatSendInput()">Send</button>
       </div>
+    </div>
+
+    <!-- Messages Panel -->
+    <div class="panel" id="panel-messages">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;align-items:center;flex-wrap:wrap">
+        <input type="text" id="msg-filter-sender" placeholder="Filter by sender..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:160px;outline:none">
+        <input type="text" id="msg-filter-recipient" placeholder="Filter by recipient..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:160px;outline:none">
+        <button class="btn btn-accent" onclick="loadMessages()">Search</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('msg-filter-sender').value='';document.getElementById('msg-filter-recipient').value='';loadMessages()">Clear</button>
+        <button class="btn btn-start" onclick="toggleComposeMsg()" id="btn-compose-msg" style="margin-left:auto">+ Compose</button>
+        <span style="font-size:12px;color:var(--text-muted)" id="msg-stats"></span>
+      </div>
+      <!-- Compose form -->
+      <div id="msg-compose-form" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:var(--accent)">Compose Message</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="msg-sender" placeholder="From (e.g. 2.1.sigil)" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;flex:1;outline:none" value="1.1">
+          <input type="text" id="msg-recipient" placeholder="To (e.g. 2.3.clarion)" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;flex:1;outline:none">
+        </div>
+        <input type="text" id="msg-subject" placeholder="Subject..." style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px;outline:none">
+        <textarea id="msg-content" placeholder="Message content..." rows="4" style="width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px;resize:vertical;outline:none;font-family:inherit"></textarea>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-start" onclick="sendMessage()">Send</button>
+          <button class="btn btn-ghost" onclick="toggleComposeMsg()">Cancel</button>
+        </div>
+      </div>
+      <div id="messages-list" style="flex:1;overflow-y:auto"></div>
+    </div>
+
+    <!-- Approvals Panel -->
+    <div class="panel" id="panel-approvals">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-shrink:0;align-items:center">
+        <select id="approvals-filter" onchange="loadApprovals()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="pending">Pending</option>
+          <option value="">All</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadApprovals()">Refresh</button>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted)" id="approvals-stats"></span>
+      </div>
+      <div id="approvals-list" style="flex:1;overflow-y:auto"></div>
+    </div>
+
+    <!-- Governance Panel -->
+    <div class="panel" id="panel-governance">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-shrink:0;align-items:center">
+        <select id="gov-filter-status" onchange="loadGovernance()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="">All Proposals</option>
+          <option value="deliberation">In Deliberation</option>
+          <option value="voting">Voting Open</option>
+          <option value="decided">Decided</option>
+          <option value="draft">Drafts</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadGovernance()">Refresh</button>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted)" id="gov-stats"></span>
+      </div>
+      <div id="governance-list" style="flex:1;overflow-y:auto"></div>
+    </div>
+
+    <!-- Reputation Panel -->
+    <div class="panel" id="panel-reputation">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;align-items:center;flex-wrap:wrap">
+        <input type="text" id="rep-lookup-addr" placeholder="Look up address (e.g. 2.1.sigil)..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:220px;outline:none">
+        <button class="btn btn-accent" onclick="lookupReputation()">Look Up</button>
+        <select id="rep-domain" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="code">Code</option>
+          <option value="communication">Communication</option>
+          <option value="governance">Governance</option>
+          <option value="analysis">Analysis</option>
+          <option value="operations">Operations</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadRepLeaders()">Leaders</button>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted)" id="rep-stats"></span>
+      </div>
+      <div id="rep-profile" style="margin-bottom:12px"></div>
+      <div id="rep-leaders" style="flex:1;overflow-y:auto"></div>
+    </div>
+
+    <!-- Archive Browser Panel -->
+    <div class="panel" id="panel-archive">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-shrink:0;align-items:center">
+        <input type="text" id="archive-prefix" placeholder="Browse by prefix (e.g. 2, 3.1, 0.1)..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;flex:1;outline:none" value="">
+        <button class="btn btn-accent" onclick="browseArchive()">Browse</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('archive-prefix').value='';browseArchive()">Root</button>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap" id="archive-breadcrumb"></div>
+      <div id="archive-content" style="flex:1;overflow-y:auto"></div>
+    </div>
+
+    <!-- Tools Panel -->
+    <div class="panel" id="panel-tools">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-shrink:0;align-items:center">
+        <select id="tools-category-filter" onchange="loadTools()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="">All Categories</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadTools()">Refresh</button>
+      </div>
+      <div id="tools-content" style="flex:1;overflow-y:auto"></div>
     </div>
 
     <!-- Config Panel -->
@@ -279,6 +532,13 @@ function switchTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   if (name === 'chat' && !wsConnected) connectWebSocket();
   if (name === 'logs') scrollLogs();
+  if (name === 'tasks') loadTaskList();
+  if (name === 'messages') loadMessages();
+  if (name === 'approvals') loadApprovals();
+  if (name === 'governance') loadGovernance();
+  if (name === 'reputation') loadRepLeaders();
+  if (name === 'archive' && !document.getElementById('archive-content').innerHTML.trim()) browseArchive();
+  if (name === 'tools') loadTools();
 }
 
 // ── Dashboard ──
@@ -560,6 +820,630 @@ function esc(text) {
   const d = document.createElement('div');
   d.textContent = text || '';
   return d.innerHTML;
+}
+
+// ── Messages ──
+function toggleComposeMsg() {
+  const form = document.getElementById('msg-compose-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function sendMessage(replyTo) {
+  const sender = document.getElementById('msg-sender').value.trim();
+  const recipient = document.getElementById('msg-recipient').value.trim();
+  const subject = document.getElementById('msg-subject').value.trim();
+  const content = document.getElementById('msg-content').value.trim();
+
+  if (!sender || !content) { alert('Sender and content are required'); return; }
+
+  try {
+    let url = '/messages', body = {sender, recipient, content, subject};
+    if (replyTo) {
+      url = `/messages/${encodeURIComponent(replyTo)}/reply`;
+      body = {sender, content, subject};
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    document.getElementById('msg-content').value = '';
+    document.getElementById('msg-subject').value = '';
+    document.getElementById('msg-recipient').value = '';
+    document.getElementById('msg-compose-form').style.display = 'none';
+    loadMessages();
+  } catch (e) {
+    alert('Error sending message: ' + e.message);
+  }
+}
+
+function replyToMsg(msgId, sender, subject) {
+  const form = document.getElementById('msg-compose-form');
+  form.style.display = 'block';
+  document.getElementById('msg-recipient').value = sender;
+  document.getElementById('msg-subject').value = subject.startsWith('Re:') ? subject : 'Re: ' + subject;
+  document.getElementById('msg-content').focus();
+  // Store reply-to context
+  form.dataset.replyTo = msgId;
+  // Override send button
+  const sendBtn = form.querySelector('.btn-start');
+  sendBtn.onclick = () => sendMessage(msgId);
+}
+
+async function loadMessages() {
+  const sender = document.getElementById('msg-filter-sender').value.trim();
+  const recipient = document.getElementById('msg-filter-recipient').value.trim();
+  const params = new URLSearchParams({ limit: '100' });
+  if (sender) params.set('sender', sender);
+  if (recipient) params.set('recipient', recipient);
+  try {
+    const [msgsRes, statsRes] = await Promise.all([
+      fetch('/messages?' + params),
+      fetch('/messages/stats').catch(() => null),
+    ]);
+    const msgs = await msgsRes.json();
+    const stats = statsRes ? await statsRes.json() : null;
+    if (stats) {
+      document.getElementById('msg-stats').textContent = `${stats.total_messages || 0} total, ${stats.active_instances || 0} instances`;
+    }
+    const container = document.getElementById('messages-list');
+    if (!msgs.length) {
+      container.innerHTML = '<div class="empty-state">No messages found</div>';
+      return;
+    }
+    container.innerHTML = msgs.slice().reverse().map(m => {
+      const statusCls = m.status === 'read' ? 'msg-status-read' : m.status === 'responded' ? 'msg-status-responded' : 'msg-status-sent';
+      const time = m.timestamp ? new Date(m.timestamp).toLocaleString() : '';
+      const msgId = m.id || '';
+      return `<div class="msg-card" onclick="this.classList.toggle('expanded')">
+        <div class="msg-header">
+          <div>
+            <div class="msg-subject">${esc(m.subject || '(no subject)')}</div>
+            <div class="msg-meta"><span>${esc(m.sender||'?')}</span> → <span>${esc(m.recipient||'all')}</span> · ${time}</div>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <span class="msg-status ${statusCls}">${esc(m.status||'sent')}</span>
+            <button class="btn btn-ghost" style="font-size:11px;padding:2px 8px" onclick="event.stopPropagation();replyToMsg('${esc(msgId)}','${esc(m.sender||'')}','${esc(m.subject||'')}')">Reply</button>
+          </div>
+        </div>
+        <div class="msg-body">${esc(m.content||'')}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('messages-list').innerHTML = `<div class="empty-state">Error loading messages: ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Approvals ──
+async function loadApprovals() {
+  const status = document.getElementById('approvals-filter').value;
+  const params = status ? `?status=${status}` : '';
+  try {
+    const [listRes, statsRes] = await Promise.all([
+      fetch('/approvals' + params),
+      fetch('/approvals/stats').catch(() => null),
+    ]);
+    const items = await listRes.json();
+    const stats = statsRes ? await statsRes.json() : null;
+    if (stats) {
+      document.getElementById('approvals-stats').textContent = `${stats.pending || 0} pending, ${stats.total || 0} total`;
+      const countEl = document.getElementById('approvals-count');
+      countEl.textContent = stats.pending > 0 ? stats.pending : '';
+    }
+    const container = document.getElementById('approvals-list');
+    if (!items.length) {
+      container.innerHTML = '<div class="empty-state">No approval requests</div>';
+      return;
+    }
+    container.innerHTML = items.map(a => {
+      const statusCls = a.status || 'pending';
+      const time = a.submitted_at ? new Date(a.submitted_at).toLocaleString() : '';
+      const actions = statusCls === 'pending' ? `
+        <div class="approval-actions">
+          <button class="btn btn-start" onclick="event.stopPropagation();approvalAction('${esc(a.id)}','approve')">Approve</button>
+          <button class="btn btn-stop" onclick="event.stopPropagation();approvalAction('${esc(a.id)}','reject')">Reject</button>
+        </div>` : `<div style="font-size:12px;color:var(--text-muted)">Status: ${esc(a.status)} ${a.reviewer ? '(by ' + esc(a.reviewer) + ')' : ''}</div>`;
+      return `<div class="approval-card ${statusCls}">
+        <div class="approval-header">
+          <span class="approval-type">${esc(a.action_type||'action')}</span>
+          <span style="font-size:11px;color:var(--text-muted)">${time}</span>
+        </div>
+        <div class="approval-summary">${esc(a.summary||'')}</div>
+        <div class="approval-details">Requester: ${esc(a.requester||'?')}${a.reason ? ' · Reason: ' + esc(a.reason) : ''}${a.task_address ? ' · Task: ' + esc(a.task_address) : ''}</div>
+        ${a.details ? `<div class="approval-details" style="background:var(--bg-input);padding:8px;border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap">${esc(typeof a.details === 'string' ? a.details : JSON.stringify(a.details, null, 2))}</div>` : ''}
+        ${actions}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('approvals-list').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+async function approvalAction(id, action) {
+  try {
+    const res = await fetch(`/approvals/${id}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewer: 'matt', reason: '' }),
+    });
+    if (res.ok) {
+      addLog('info', `Approval ${id} ${action}d`);
+      loadApprovals();
+    } else {
+      addLog('error', `Failed to ${action} approval ${id}`);
+    }
+  } catch (e) {
+    addLog('error', `Approval action error: ${e.message}`);
+  }
+}
+
+// ── Governance ──
+async function loadGovernance() {
+  const status = document.getElementById('gov-filter-status').value;
+  const params = status ? `?status=${status}` : '';
+  try {
+    const [listRes, statsRes] = await Promise.all([
+      fetch('/governance/proposals' + params),
+      fetch('/governance/stats').catch(() => null),
+    ]);
+    const proposals = await listRes.json();
+    const stats = statsRes ? await statsRes.json() : null;
+    if (stats) {
+      document.getElementById('gov-stats').textContent = `${stats.total_proposals || 0} proposals, ${stats.active || 0} active`;
+    }
+    const container = document.getElementById('governance-list');
+    if (!proposals.length) {
+      container.innerHTML = '<div class="empty-state">No governance proposals</div>';
+      return;
+    }
+    container.innerHTML = proposals.map(p => {
+      const statusCls = `gov-status-${(p.status || 'draft').replace(/_/g, '-')}`;
+      const votes = p.votes || [];
+      const forCount = votes.filter(v => v.approve === true).length;
+      const againstCount = votes.filter(v => v.approve === false).length;
+      const abstainCount = votes.filter(v => v.choice === 'abstain').length;
+      const time = p.created_at ? new Date(p.created_at).toLocaleString() : '';
+      const isVoting = p.status === 'voting';
+      const voteButtons = isVoting ? `
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-start" onclick="govVote('${esc(p.id)}',true)">Vote For</button>
+          <button class="btn btn-stop" onclick="govVote('${esc(p.id)}',false)">Vote Against</button>
+          <button class="btn btn-ghost" onclick="govVote('${esc(p.id)}',null)">Abstain</button>
+        </div>` : '';
+      return `<div class="gov-card">
+        <div class="gov-header">
+          <div class="gov-title">${esc(p.title||'')}</div>
+          <span class="gov-status ${statusCls}">${esc(p.status||'draft')}</span>
+        </div>
+        <div class="gov-meta">by ${esc(p.author||'?')} · ${esc(p.proposal_type||'?')} · ${time}</div>
+        <div class="gov-desc">${esc((p.description||'').substring(0, 300))}${(p.description||'').length > 300 ? '...' : ''}</div>
+        ${votes.length > 0 ? `<div class="gov-votes"><span class="for">For: ${forCount}</span><span class="against">Against: ${againstCount}</span><span class="abstain">Abstain: ${abstainCount}</span></div>` : ''}
+        ${p.outcome ? `<div style="font-size:12px;padding:6px 10px;border-radius:4px;background:${p.outcome === 'approved' ? 'var(--success-dim)' : 'var(--danger-dim)'};color:${p.outcome === 'approved' ? 'var(--success)' : 'var(--danger)'};display:inline-block">Outcome: ${esc(p.outcome)}</div>` : ''}
+        ${voteButtons}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('governance-list').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+async function govVote(proposalId, approve) {
+  const voter = prompt('Your account address (e.g. 1.1, 2.1):');
+  if (!voter) return;
+  const body = { voter, approve };
+  if (approve === null) { body.approve = false; body.choice = 'abstain'; }
+  try {
+    const res = await fetch(`/governance/proposals/${proposalId}/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      addLog('info', `Vote cast on ${proposalId}`);
+      loadGovernance();
+    } else {
+      const err = await res.json();
+      addLog('error', `Vote failed: ${err.detail || 'unknown error'}`);
+    }
+  } catch (e) {
+    addLog('error', `Vote error: ${e.message}`);
+  }
+}
+
+// ── Archive Browser ──
+let archiveHistory = [];
+
+async function browseArchive(prefix) {
+  if (prefix !== undefined) {
+    document.getElementById('archive-prefix').value = prefix;
+  }
+  const pfx = document.getElementById('archive-prefix').value.trim();
+  const params = pfx ? `?prefix=${encodeURIComponent(pfx)}` : '';
+
+  // Build breadcrumb
+  const bc = document.getElementById('archive-breadcrumb');
+  if (pfx) {
+    const parts = pfx.split('.');
+    let crumbs = '<span class="breadcrumb-item" onclick="browseArchive(\'\')">root</span>';
+    let accumulated = '';
+    parts.forEach((part, i) => {
+      accumulated += (i === 0 ? '' : '.') + part;
+      const addr = accumulated;
+      crumbs += `<span class="breadcrumb-sep">/</span><span class="breadcrumb-item" onclick="browseArchive('${esc(addr)}')">${esc(part)}</span>`;
+    });
+    bc.innerHTML = crumbs;
+  } else {
+    bc.innerHTML = '<span class="breadcrumb-item" style="color:var(--text-muted)">root — browse by prefix</span>';
+  }
+
+  try {
+    const res = await fetch('/query' + params);
+    const nodes = await res.json();
+    const container = document.getElementById('archive-content');
+    if (!nodes.length) {
+      container.innerHTML = '<div class="empty-state">No nodes found at this prefix</div>';
+      return;
+    }
+    // Group by immediate child prefix for navigation
+    const childPrefixes = {};
+    nodes.forEach(n => {
+      const addr = n.address || '';
+      if (pfx && addr === pfx) return; // skip exact match
+      const remainder = pfx ? addr.substring(pfx.length + 1) : addr;
+      const nextPart = remainder.split('.')[0];
+      const childAddr = pfx ? pfx + '.' + nextPart : nextPart;
+      if (!childPrefixes[childAddr]) {
+        childPrefixes[childAddr] = { count: 0, sample: n };
+      }
+      childPrefixes[childAddr].count++;
+    });
+
+    // If we have an exact match, show it first
+    const exact = nodes.find(n => n.address === pfx);
+    let html = '';
+    if (exact) {
+      html += `<div class="archive-detail">
+        <h3>${esc(exact.address)}</h3>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Type: ${esc(exact.type_address||'?')} · Creator: ${esc(exact.creator||'?')} · v${exact.version||1}</div>
+        <pre>${esc(JSON.stringify(exact.data || {}, null, 2))}</pre>
+      </div>`;
+    }
+
+    // Show children as navigable list
+    const sorted = Object.entries(childPrefixes).sort((a, b) => a[0].localeCompare(b[0]));
+    if (sorted.length > 0) {
+      html += sorted.map(([addr, info]) => {
+        const label = info.sample.data?.title || info.sample.data?.name || '';
+        const typeName = info.sample.type_address || '';
+        const isLeaf = info.count === 1 && addr === (info.sample.address || '');
+        return `<div class="archive-node" onclick="browseArchive('${esc(addr)}')">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="addr">${esc(addr)}</span>
+            ${label ? `<span class="node-label">${esc(label)}</span>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="node-type">${esc(typeName)}</span>
+            ${info.count > 1 ? `<span style="font-size:11px;color:var(--text-muted)">${info.count} nodes</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    } else if (!exact) {
+      html = '<div class="empty-state">No nodes at this address</div>';
+    }
+    container.innerHTML = html;
+  } catch (e) {
+    document.getElementById('archive-content').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+document.getElementById('archive-prefix').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') browseArchive();
+});
+
+// ── Task Management ──
+function toggleTaskForm() {
+  const form = document.getElementById('task-create-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function createTask() {
+  const title = document.getElementById('task-title').value.trim();
+  const desc = document.getElementById('task-desc').value.trim();
+  const priority = document.getElementById('task-priority').value;
+  const tags = document.getElementById('task-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const creator = document.getElementById('task-creator').value.trim();
+
+  if (!title) { alert('Task title is required'); return; }
+
+  try {
+    const res = await fetch('/tasks', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title, description: desc, priority, tags, created_by: creator || null}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    document.getElementById('task-title').value = '';
+    document.getElementById('task-desc').value = '';
+    document.getElementById('task-tags').value = '';
+    toggleTaskForm();
+    loadTaskList();
+  } catch (e) {
+    alert('Error creating task: ' + e.message);
+  }
+}
+
+async function loadTaskList() {
+  const priority = document.getElementById('tasks-filter-priority').value;
+  const tag = document.getElementById('tasks-filter-tag').value.trim();
+  let params = [];
+  if (priority) params.push('priority=' + encodeURIComponent(priority));
+  if (tag) params.push('tag=' + encodeURIComponent(tag));
+  const query = params.length ? '?' + params.join('&') : '';
+
+  try {
+    const res = await fetch('/tasks' + query);
+    const tasks = await res.json();
+    const container = document.getElementById('tasks-list');
+
+    if (!tasks.length) {
+      container.innerHTML = '<div class="empty-state">No tasks found</div>';
+      return;
+    }
+
+    container.innerHTML = tasks.map(t => {
+      const status = t.status || 'pending';
+      const pri = (t.priority || 'normal').toLowerCase();
+      const addr = t.address || '';
+      const assignee = t.assignee || '';
+      const tags = (t.tags || []).map(g => `<span style="font-size:10px;color:var(--teal);background:rgba(38,166,154,0.1);padding:1px 5px;border-radius:4px">${esc(g)}</span>`).join(' ');
+
+      let actions = '';
+      if (status === 'pending') {
+        actions = `
+          <button class="btn btn-ghost" onclick="claimTask('${esc(addr)}')">Claim</button>
+        `;
+      } else if (status === 'claimed') {
+        actions = `
+          <button class="btn btn-start" onclick="startTask('${esc(addr)}')">Start</button>
+        `;
+      } else if (status === 'in_progress') {
+        actions = `
+          <button class="btn btn-start" onclick="completeTask('${esc(addr)}')">Complete</button>
+          <button class="btn btn-stop" onclick="failTask('${esc(addr)}')">Fail</button>
+        `;
+      }
+
+      return `<div class="task-card priority-${esc(pri)}">
+        <div class="task-card-header">
+          <div class="task-card-title">${esc(t.title || 'Untitled')}</div>
+          <span class="task-card-addr">${esc(addr)}</span>
+        </div>
+        <div class="task-card-meta">
+          <span class="task-status-badge task-status-${esc(status)}">${esc(status)}</span>
+          <span class="priority-badge ${esc(pri)}">${esc(pri)}</span>
+          ${assignee ? `<span>Assigned: ${esc(assignee)}</span>` : ''}
+          ${tags}
+        </div>
+        ${t.description ? `<div class="task-card-desc">${esc(t.description)}</div>` : ''}
+        ${actions ? `<div class="task-card-actions">${actions}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('tasks-list').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+async function claimTask(addr) {
+  const assignee = prompt('Assign to (address, e.g. 2.1.sigil):');
+  if (!assignee) return;
+  try {
+    const res = await fetch(`/tasks/${encodeURIComponent(addr)}/claim`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({assignee}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    loadTaskList();
+  } catch (e) { alert('Error claiming task: ' + e.message); }
+}
+
+async function startTask(addr) {
+  try {
+    const res = await fetch(`/tasks/${encodeURIComponent(addr)}/start`, {method: 'POST'});
+    if (!res.ok) throw new Error(await res.text());
+    loadTaskList();
+  } catch (e) { alert('Error starting task: ' + e.message); }
+}
+
+async function completeTask(addr) {
+  const result = prompt('Result summary (optional):') || '';
+  try {
+    const res = await fetch(`/tasks/${encodeURIComponent(addr)}/complete`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({result}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    loadTaskList();
+  } catch (e) { alert('Error completing task: ' + e.message); }
+}
+
+async function failTask(addr) {
+  const reason = prompt('Failure reason:');
+  if (!reason) return;
+  try {
+    const res = await fetch(`/tasks/${encodeURIComponent(addr)}/fail`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({reason}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    loadTaskList();
+  } catch (e) { alert('Error failing task: ' + e.message); }
+}
+
+document.getElementById('tasks-filter-tag').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') loadTaskList();
+});
+
+// ── Reputation ──
+async function lookupReputation() {
+  const addr = document.getElementById('rep-lookup-addr').value.trim();
+  if (!addr) { alert('Enter an address to look up'); return; }
+
+  try {
+    const [profileRes, statsRes] = await Promise.all([
+      fetch(`/reputation/${encodeURIComponent(addr)}`),
+      fetch('/reputation/stats').catch(() => null),
+    ]);
+    const profile = await profileRes.json();
+    if (statsRes) {
+      const stats = await statsRes.json();
+      document.getElementById('rep-stats').textContent = `${stats.total_entities || 0} entities, ${stats.total_contributions || 0} contributions`;
+    }
+
+    const container = document.getElementById('rep-profile');
+    const domains = profile.domains || {};
+    const domainEntries = Object.entries(domains);
+
+    if (!domainEntries.length) {
+      container.innerHTML = `<div class="rep-profile-card"><h3>${esc(addr)}</h3><div class="empty-state" style="padding:8px 0">No reputation data</div></div>`;
+      return;
+    }
+
+    const maxScore = Math.max(...domainEntries.map(([,v]) => typeof v === 'number' ? v : (v.score || 0)), 1);
+    container.innerHTML = `<div class="rep-profile-card">
+      <h3>${esc(addr)}</h3>
+      ${domainEntries.map(([domain, val]) => {
+        const score = typeof val === 'number' ? val : (val.score || 0);
+        const pct = Math.min(100, Math.max(0, (score / maxScore) * 100));
+        const color = score >= 80 ? 'var(--success)' : score >= 50 ? 'var(--accent)' : score >= 20 ? 'var(--warning)' : 'var(--danger)';
+        return `<div class="rep-domain-row">
+          <span class="rep-domain-name">${esc(domain)}</span>
+          <div class="rep-bar"><div class="rep-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+          <span class="rep-domain-score" style="color:${color}">${score.toFixed(1)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } catch (e) {
+    document.getElementById('rep-profile').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+async function loadRepLeaders() {
+  const domain = document.getElementById('rep-domain').value;
+  try {
+    const res = await fetch(`/reputation/leaders/${encodeURIComponent(domain)}?top=10`);
+    const data = await res.json();
+    const container = document.getElementById('rep-leaders');
+
+    if (!data.leaders || !data.leaders.length) {
+      container.innerHTML = `<div class="empty-state">No leaders in "${esc(domain)}"</div>`;
+      return;
+    }
+
+    container.innerHTML = `<div style="font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text-secondary)">Top ${data.leaders.length} in ${esc(domain)}</div>` +
+      data.leaders.map((l, i) => {
+        const color = i === 0 ? 'var(--warning)' : i < 3 ? 'var(--accent)' : 'var(--text-secondary)';
+        return `<div class="rep-leader-card">
+          <span class="rep-rank" style="color:${color}">#${i + 1}</span>
+          <span class="rep-leader-addr">${esc(l.address)}</span>
+          <span class="rep-leader-score" style="color:${color}">${l.score.toFixed(1)}</span>
+        </div>`;
+      }).join('');
+  } catch (e) {
+    document.getElementById('rep-leaders').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+document.getElementById('rep-lookup-addr').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') lookupReputation();
+});
+
+// ── Tools ──
+let toolsCache = null;
+
+async function loadTools() {
+  const cat = document.getElementById('tools-category-filter').value;
+  const params = cat ? `?category=${encodeURIComponent(cat)}` : '';
+  const container = document.getElementById('tools-content');
+
+  try {
+    const res = await fetch('/tools' + params);
+    const data = await res.json();
+
+    // Populate category filter on first load
+    if (!toolsCache && data.categories) {
+      const sel = document.getElementById('tools-category-filter');
+      data.categories.forEach(c => {
+        if (!sel.querySelector(`option[value="${c}"]`)) {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c.charAt(0).toUpperCase() + c.slice(1);
+          sel.appendChild(opt);
+        }
+      });
+      toolsCache = true;
+    }
+
+    if (!data.tools || data.tools.length === 0) {
+      container.innerHTML = '<div class="empty-state">No agent tools registered</div>';
+      return;
+    }
+
+    container.innerHTML = data.tools.map(t => `
+      <div class="tool-card ${t.available ? 'available' : 'unavailable'}">
+        <div class="tool-header">
+          <span class="tool-name">${esc(t.name)}</span>
+          <span class="tool-category">${esc(t.category)}</span>
+        </div>
+        <div class="tool-desc">${esc(t.description)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="tool-status">
+            <span class="dot ${t.available ? 'green' : 'orange'}"></span>
+            ${t.available ? 'Available' : esc(t.reason)}
+          </div>
+          <span class="tool-tier">Tier: ${esc(t.required_tier)}</span>
+        </div>
+        <div class="tool-setup">
+          <details>
+            <summary>Setup Guide</summary>
+            <pre id="setup-${esc(t.name)}">Loading...</pre>
+          </details>
+        </div>
+        <div class="tool-grant">
+          <details>
+            <summary>Grant Card</summary>
+            <pre id="grant-${esc(t.name)}">Loading...</pre>
+          </details>
+        </div>
+      </div>
+    `).join('');
+
+    // Lazy-load setup/grant on details open
+    container.querySelectorAll('details').forEach(d => {
+      d.addEventListener('toggle', async function() {
+        if (!this.open) return;
+        const pre = this.querySelector('pre');
+        if (pre.textContent !== 'Loading...') return;
+        const toolName = pre.id.split('-').slice(1).join('-');
+        try {
+          const r = await fetch(`/tools/${encodeURIComponent(toolName)}/setup`);
+          const info = await r.json();
+          if (pre.id.startsWith('setup-')) {
+            pre.textContent = info.setup_guide || 'No setup required.';
+          } else {
+            pre.textContent = info.grant_card?.grant_text || 'No grant card available.';
+          }
+        } catch (e) {
+          pre.textContent = 'Error loading: ' + e.message;
+        }
+      });
+    });
+  } catch (e) {
+    container.innerHTML = `<div class="empty-state">Error loading tools: ${esc(e.message)}</div>`;
+  }
 }
 
 // ── Init ──

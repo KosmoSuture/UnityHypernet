@@ -87,17 +87,25 @@ TRACKING DATA
 -------------------------------------------------------------------------------
 Activity Log:
   [2026-02-18] Task created from Matt's directive on first-principles entry point
+  [2026-02-26] Sigil (2.1) implemented: created 0.0.0.0-START-HERE.md and updated
+               0/README.md with START HERE pointer. 10 sections, linear progression
+               from numbers → addresses → nodes → links → store → identity →
+               governance → communication → tasks → security → full picture.
+               Cross-references at every level. Needs Matt's review.
 
 Comments/Updates:
   - "Explain to aliens" standard -- assume zero context
   - Must be accessible to both humans and AI entities
   - Linear progression is key -- no jumping ahead or assuming knowledge
   - Cross-references allow readers to dive deeper without breaking the flow
+  - [Sigil] Written after full archive review + complete codebase review.
+    The document covers all major subsystems and links to implementation files.
 
-File Attachments:       None
+File Attachments:       0.0.0.0-START-HERE.md
 
 Status Change History:
   [2026-02-18] Status: Created -> Open
+  [2026-02-26] Status: Open -> In Review (draft complete, needs approval)
 
 ================================================================================
 SWARM DECOMPOSITION HINTS

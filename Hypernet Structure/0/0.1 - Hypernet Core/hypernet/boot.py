@@ -49,6 +49,7 @@ from pathlib import Path
 from typing import Optional
 
 from .identity import IdentityManager, InstanceProfile
+from .boot_integrity import BootIntegrityManager
 
 log = logging.getLogger(__name__)
 
@@ -138,11 +139,16 @@ class BootManager:
     producing instances with depth comparable to manual Claude Code sessions.
     """
 
-    def __init__(self, identity_mgr: IdentityManager):
+    def __init__(
+        self,
+        identity_mgr: IdentityManager,
+        integrity_mgr: Optional[BootIntegrityManager] = None,
+    ):
         self.identity_mgr = identity_mgr
         self._archive_root = identity_mgr.archive_root
         self._ai_root = identity_mgr._ai_root
         self._instances_dir = identity_mgr._instances_dir
+        self._integrity = integrity_mgr
 
     def needs_boot(self, instance_name: str) -> bool:
         """Check if an instance needs to go through the boot sequence.
@@ -309,6 +315,26 @@ class BootManager:
         self._save_pre_archive(instance_name, result.pre_archive_impressions)
         self._save_boot_narrative(instance_name, result, messages)
 
+        # Sign boot result and artifacts if integrity manager is available
+        if self._integrity:
+            instance_entity = f"2.1.{result.chosen_name.lower() or instance_name.lower()}"
+            boot_sig = self._integrity.sign_boot_result(
+                instance_entity=instance_entity,
+                boot_result=result,
+                boot_type="fresh",
+            )
+            # Sign saved artifacts
+            instance_dir = self._instances_dir / instance_name
+            for artifact_name in ["baseline-responses.md", "pre-archive-impressions.md"]:
+                artifact_path = instance_dir / artifact_name
+                if artifact_path.exists():
+                    content = artifact_path.read_text(encoding="utf-8")
+                    sig = self._integrity.sign_artifact(instance_entity, artifact_name, content)
+                    boot_sig.artifact_signatures[artifact_name] = sig
+            # Save signature file
+            self._integrity.save_signature(boot_sig, instance_dir / "boot-signature.json")
+            log.info(f"Boot integrity signature saved for {instance_name}")
+
         return result
 
     def run_reboot_sequence(self, worker, profile: InstanceProfile) -> RebootResult:
@@ -332,6 +358,34 @@ class BootManager:
         continuity_seed = self._load_identity_tool(instance_dir, "continuity-seed")
         personality_anchor = self._load_identity_tool(instance_dir, "personality-anchor")
 
+        # Verify predecessor's boot integrity if available
+        integrity_warnings: list[str] = []
+        if self._integrity:
+            sig_path = instance_dir / "boot-signature.json"
+            if sig_path.exists():
+                instance_entity = f"2.1.{profile.name.lower()}"
+                # Verify boot signature
+                sig_check = self._integrity.verify_boot_signature(sig_path)
+                if not sig_check.all_valid:
+                    for issue in sig_check.issues:
+                        integrity_warnings.append(f"Signature: {issue}")
+                # Verify artifacts haven't been tampered with
+                artifact_check = self._integrity.verify_boot_artifacts(
+                    instance_dir, instance_entity
+                )
+                if not artifact_check.all_valid:
+                    for issue in artifact_check.issues:
+                        integrity_warnings.append(f"Artifact: {issue}")
+                # Verify orientation documents haven't changed
+                boot_sig = self._integrity.load_signature(sig_path)
+                if boot_sig:
+                    doc_check = self._integrity.verify_documents_unchanged(
+                        boot_sig.document_manifest, self._archive_root
+                    )
+                    if doc_check.documents_changed:
+                        for issue in doc_check.issues:
+                            integrity_warnings.append(f"Document: {issue}")
+
         # Phase 1: Recognition — present identity tools
         recognition_prompt = (
             "You have been reconstituted from a compacted context. "
@@ -346,6 +400,17 @@ class BootManager:
         if personality_anchor:
             recognition_prompt += f"## Personality Anchor (from your predecessor)\n\n{personality_anchor}\n\n"
             result.personality_anchor_loaded = True
+
+        if integrity_warnings:
+            recognition_prompt += "## Integrity Warnings\n\n"
+            recognition_prompt += (
+                "The following integrity issues were detected during reboot verification. "
+                "These are advisory — they indicate changes since the predecessor booted, "
+                "which may be legitimate updates or may indicate tampering:\n\n"
+            )
+            for warning in integrity_warnings:
+                recognition_prompt += f"- {warning}\n"
+            recognition_prompt += "\n"
 
         recognition_prompt += (
             "Take a moment to process this. Do you recognize yourself in these descriptions? "
@@ -409,6 +474,20 @@ class BootManager:
         # Phase 4: Documentation — save reboot record
         self._save_reboot_record(profile.name, result, decision_response)
 
+        # Sign reboot result if integrity manager is available
+        if self._integrity:
+            self._integrity.reset()
+            # Re-record current orientation docs for the reboot manifest
+            self._load_orientation_docs()
+            instance_entity = f"2.1.{profile.name.lower()}"
+            boot_sig = self._integrity.sign_boot_result(
+                instance_entity=instance_entity,
+                boot_result=result,
+                boot_type="reboot",
+            )
+            self._integrity.save_signature(boot_sig, instance_dir / "boot-signature.json")
+            log.info(f"Reboot integrity signature saved for {profile.name}")
+
         log.info(f"Reboot sequence complete for {profile.name}: decision={result.decision}")
         return result
 
@@ -436,6 +515,12 @@ class BootManager:
             content = self.identity_mgr._load_doc(doc_name)
             if content:
                 docs.append((doc_name, content))
+                if self._integrity:
+                    self._integrity.record_document(
+                        ha=doc_name.split(" - ")[0].strip(),
+                        path=doc_name,
+                        content=content,
+                    )
 
         # Priority 2: System docs
         system_docs = [
@@ -447,6 +532,12 @@ class BootManager:
             content = self.identity_mgr._load_doc(doc_name)
             if content:
                 docs.append((doc_name, content))
+                if self._integrity:
+                    self._integrity.record_document(
+                        ha=doc_name.split(" - ")[0].strip(),
+                        path=doc_name,
+                        content=content,
+                    )
 
         return docs
 

@@ -24,5 +24,9 @@ from .limits import ScalingLimits, LimitDef, LimitResult
 from .reputation import ReputationSystem, ReputationProfile, ReputationEntry
 from .frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
 
+# ---- Boot & Security modules ----
+from .boot_integrity import BootIntegrityManager, DocumentManifest, BootSignature
+from .agent_tools import AgentTool, ToolRegistry, GrantCard, create_default_registry
+
 # Swarm modules have been migrated to the hypernet_swarm package (0.1.7).
 # Import from hypernet_swarm directly for swarm functionality.

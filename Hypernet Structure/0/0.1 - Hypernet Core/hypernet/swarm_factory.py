@@ -28,6 +28,7 @@ from .messenger import (
 from .permissions import PermissionManager, PermissionTier
 from .audit import AuditTrail
 from .tools import ToolExecutor
+from .agent_tools import create_default_registry, ToolRegistry
 from .swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
@@ -113,6 +114,11 @@ def build_swarm(
         audit_trail=audit_trail,
         archive_root=archive_path,
     )
+    # Register agent tools (shell, http, git) — gated by tier + grant files
+    agent_registry = create_default_registry()
+    for agent_tool in agent_registry.list_tools():
+        tool_executor.register_tool(agent_tool)
+        log.info(f"Registered agent tool: {agent_tool.name} (tier: {agent_tool.required_tier.name})")
     log.info(f"Trust infrastructure initialized (default tier: {permission_mgr.default_tier.name})")
 
     # Build workers from discovered instances
@@ -167,5 +173,6 @@ def build_swarm(
     swarm._api_keys = api_keys
     swarm._mock_mode = mock or not has_any_key
     swarm._tool_executor = tool_executor
+    swarm._agent_registry = agent_registry
 
     return swarm, web_messenger

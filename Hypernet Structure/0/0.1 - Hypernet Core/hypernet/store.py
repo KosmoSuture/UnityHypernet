@@ -413,12 +413,24 @@ class Store:
 
         return results
 
+    def _is_instance_node(self, addr: HypernetAddress) -> bool:
+        """Check if an address points to an instance node.
+
+        Uses the explicit Node.is_instance property (LP-3) when set to True.
+        Falls back to the address heuristic for backward compatibility with
+        nodes that were created before the explicit property existed.
+        """
+        node = self.get_node(addr)
+        if node is not None and node.is_instance:
+            return True
+        return addr.is_instance  # fallback heuristic
+
     def count_instances(self, prefix: HypernetAddress) -> int:
         """Count instance nodes under an address prefix."""
         count = 0
         for addr_str in self._node_index:
             addr = HypernetAddress.parse(addr_str)
-            if prefix.is_ancestor_of(addr) and addr.is_instance:
+            if prefix.is_ancestor_of(addr) and self._is_instance_node(addr):
                 count += 1
         return count
 
@@ -427,7 +439,7 @@ class Store:
         max_instance = 0
         for addr_str in self._node_index:
             addr = HypernetAddress.parse(addr_str)
-            if prefix.is_ancestor_of(addr) and addr.is_instance:
+            if prefix.is_ancestor_of(addr) and self._is_instance_node(addr):
                 try:
                     instance_num = int(addr.parts[-1])
                     max_instance = max(max_instance, instance_num)

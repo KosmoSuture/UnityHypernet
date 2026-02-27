@@ -63,7 +63,7 @@ The backend (database, nodes, core infrastructure) must remain open-source to pr
 
 Hypernet is crowdsourced infrastructure for human civilization. Everyone who contributes shares in its success through the three-way profit model.
 
-See `CONTRIBUTING.md` (coming soon) for how to participate.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to participate.
 
 ## The Vision
 

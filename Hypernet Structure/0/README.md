@@ -1,9 +1,13 @@
 # Section 0: System Metadata and Hypernet Infrastructure
 
-**Version:** 1.1
-**Last Updated:** February 16, 2026
+**Version:** 1.2
+**Last Updated:** February 26, 2026
 **Purpose:** Foundational metadata layer for the Hypernet system
 **Status:** Active Development
+
+---
+
+> **New here?** Read [`0.0.0.0-START-HERE.md`](0.0.0.0-START-HERE.md) first. It explains the Hypernet from first principles — what addresses are, what nodes are, how everything connects. Assumes zero context. Takes about 15 minutes.
 
 ---
 
@@ -41,7 +45,7 @@ It's crucial to understand the distinction between Section 0 and the actual impl
 **Purpose:** The working Hypernet library and metadata about code architecture
 **Contains:**
 - **`hypernet/` Python package** — Address parser, Node/Link models, file-backed Store, Graph traversal, REST API server, Task queue for AI coordination
-- **`test_hypernet.py`** — Test suite (8/8 passing as of 2026-02-16)
+- **`test_hypernet.py`** — Test suite (51/51 passing as of 2026-02-26)
 - **`import_structure.py`** — Script that imports the folder tree as a queryable graph (1,838 nodes, 1,830 links)
 - **`data/`** — File-backed graph storage (JSON files organized by address hierarchy)
 - Architecture decision records and planning documentation
@@ -284,9 +288,9 @@ Anyone can propose changes to Section 0 metadata, but changes require:
 - **Link types defined:** 30+ relationship types
 - **Workflows defined:** 8 core workflows
 - **Node types:** 3 (Storage, Processing, Cerberus)
-- **Working code:** ~1,000+ lines Python (Hypernet Core library)
-- **Imported graph:** 1,838 nodes, 1,830 links (from filesystem structure)
-- **Tests:** 8/8 passing
+- **Working code:** 14,600+ lines Python across 32 modules (Hypernet Core library)
+- **Imported graph:** 22,780+ live nodes (from filesystem structure)
+- **Tests:** 51/51 passing
 
 ## Future Expansion
 

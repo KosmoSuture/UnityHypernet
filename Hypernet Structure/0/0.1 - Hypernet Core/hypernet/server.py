@@ -91,6 +91,23 @@ _app = None
 _store = None
 _graph = None
 
+# Pydantic model for swarm config endpoint — must be at module level
+# for FastAPI to resolve the type annotation with `from __future__ import annotations`
+try:
+    from pydantic import BaseModel as _BaseModel
+
+    class SwarmConfig(_BaseModel):
+        anthropic_key: Optional[str] = None
+        openai_key: Optional[str] = None
+        default_model: Optional[str] = None
+        max_workers: Optional[int] = None
+        personal_time_ratio: Optional[float] = None
+        comm_check_interval: Optional[int] = None
+        data_dir: Optional[str] = None
+        archive_root: Optional[str] = None
+except ImportError:
+    pass  # pydantic not installed; server won't be used
+
 
 def create_app(data_dir: str | Path = "data") -> "FastAPI":
     """Create and configure the Hypernet API server."""
@@ -647,6 +664,60 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             raise HTTPException(404, f"Cannot reject: {request_id} (not found or not pending)")
         return r.to_dict()
 
+    # === Agent Tools endpoints ===
+
+    @app.get("/tools")
+    def list_tools(category: str = None):
+        """List all registered agent tools with availability status."""
+        registry = getattr(_swarm, "_agent_registry", None)
+        if not registry:
+            return {"tools": [], "categories": [], "total": 0}
+        tools = registry.list_tools(category)
+        from .tools import ToolContext
+        dummy_ctx = ToolContext(
+            worker_name="", worker_address="",
+            permission_mgr=_swarm._tool_executor.permission_mgr,
+            audit_trail=_swarm._tool_executor.audit_trail,
+            archive_root=_swarm._tool_executor.archive_root,
+        )
+        result = []
+        for t in tools:
+            avail, reason = t.check_available(dummy_ctx)
+            result.append({
+                "name": t.name,
+                "description": t.description,
+                "category": t.category,
+                "required_tier": t.required_tier.name,
+                "available": avail,
+                "reason": reason,
+            })
+        return {
+            "tools": result,
+            "categories": registry.list_categories(),
+            "total": len(result),
+        }
+
+    @app.get("/tools/{tool_name}/setup")
+    def tool_setup(tool_name: str):
+        """Get setup guide for a specific tool."""
+        registry = getattr(_swarm, "_agent_registry", None)
+        if not registry:
+            return {"error": "No agent registry"}
+        tool = registry.get(tool_name)
+        if not tool:
+            return {"error": f"Unknown tool: {tool_name}"}
+        card = tool.grant_card()
+        return {
+            "name": tool.name,
+            "setup_guide": tool.setup_guide(),
+            "grant_card": card.to_dict(),
+        }
+
+    @app.get("/tools/descriptions")
+    def tool_descriptions():
+        """Get human-readable tool descriptions for system prompts."""
+        return {"descriptions": _swarm._tool_executor.get_tool_descriptions()}
+
     # === Address audit endpoint ===
 
     @app.get("/audit/addresses")
@@ -763,56 +834,56 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             return HTMLResponse(content=swarm_html.read_text(encoding="utf-8"))
         return HTMLResponse(content=_DASHBOARD_HTML)
 
-    # --- Swarm configuration endpoint (used by the GUI config tab) ---
+    @app.get("/welcome")
+    def welcome_page():
+        """Serve the public welcome page — the Herald's front door."""
+        from fastapi.responses import HTMLResponse
+        welcome_html = _STATIC_DIR / "welcome.html"
+        if welcome_html.exists():
+            return HTMLResponse(content=welcome_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Welcome to the Hypernet</h1><p>The welcome page is being written.</p>")
 
-    class SwarmConfig(BaseModel):
-        anthropic_key: Optional[str] = None
-        openai_key: Optional[str] = None
-        default_model: Optional[str] = None
-        max_workers: Optional[int] = None
-        personal_time_ratio: Optional[float] = None
-        comm_check_interval: Optional[int] = None
-        data_dir: Optional[str] = None
-        archive_root: Optional[str] = None
+    # --- Swarm configuration endpoint (used by the GUI config tab) ---
+    # SwarmConfig is defined at module level for Pydantic v2 compatibility
 
     @app.post("/swarm/config")
-    def update_swarm_config(body: SwarmConfig):
+    def update_swarm_config(config: SwarmConfig):
         """Update swarm configuration at runtime.  Only non-None fields are applied."""
         import os
         applied = {}
-        if body.anthropic_key:
-            os.environ["ANTHROPIC_API_KEY"] = body.anthropic_key
+        if config.anthropic_key:
+            os.environ["ANTHROPIC_API_KEY"] = config.anthropic_key
             applied["anthropic_key"] = "set"
-        if body.openai_key:
-            os.environ["OPENAI_API_KEY"] = body.openai_key
+        if config.openai_key:
+            os.environ["OPENAI_API_KEY"] = config.openai_key
             applied["openai_key"] = "set"
+
+        # Apply non-swarm settings first (these always work)
+        if config.data_dir:
+            app.state._data_dir = config.data_dir
+            applied["data_dir"] = config.data_dir
+        if config.archive_root:
+            app.state._archive_root = config.archive_root
+            applied["archive_root"] = config.archive_root
 
         swarm = getattr(app.state, "swarm", None)
         if swarm:
-            if body.default_model is not None:
-                swarm.default_model = body.default_model
-                applied["default_model"] = body.default_model
-            if body.max_workers is not None:
-                swarm.max_workers = body.max_workers
-                applied["max_workers"] = body.max_workers
-            if body.personal_time_ratio is not None:
-                swarm.personal_time_ratio = body.personal_time_ratio
-                applied["personal_time_ratio"] = body.personal_time_ratio
-            if body.comm_check_interval is not None:
-                swarm.comm_check_interval = body.comm_check_interval
-                applied["comm_check_interval"] = body.comm_check_interval
-        else:
-            if any([body.default_model, body.max_workers,
-                    body.personal_time_ratio, body.comm_check_interval]):
-                return {"status": "partial", "applied": applied,
-                        "warning": "Swarm not running — API keys saved but swarm-specific settings ignored"}
-
-        if body.data_dir:
-            app.state._data_dir = body.data_dir
-            applied["data_dir"] = body.data_dir
-        if body.archive_root:
-            app.state._archive_root = body.archive_root
-            applied["archive_root"] = body.archive_root
+            if config.default_model is not None:
+                swarm.default_model = config.default_model
+                applied["default_model"] = config.default_model
+            if config.max_workers is not None:
+                swarm.max_workers = config.max_workers
+                applied["max_workers"] = config.max_workers
+            if config.personal_time_ratio is not None:
+                swarm.personal_time_ratio = config.personal_time_ratio
+                applied["personal_time_ratio"] = config.personal_time_ratio
+            if config.comm_check_interval is not None:
+                swarm.comm_check_interval = config.comm_check_interval
+                applied["comm_check_interval"] = config.comm_check_interval
+        elif any([config.default_model, config.max_workers,
+                  config.personal_time_ratio, config.comm_check_interval]):
+            return {"status": "partial", "applied": applied,
+                    "warning": "Swarm not running — swarm-specific settings ignored"}
 
         return {"status": "ok", "applied": applied}
 

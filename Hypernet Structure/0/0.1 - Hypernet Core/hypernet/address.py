@@ -143,7 +143,11 @@ class HypernetAddress:
 
     @property
     def is_instance(self) -> bool:
-        """True if the last node part looks like an instance number (zero-padded)."""
+        """Heuristic: True if the last node part looks like an instance number (zero-padded).
+
+        Prefer Node.is_instance (explicit property) when the node is available.
+        This address-level heuristic is a fallback for address-only operations.
+        """
         last = self.parts[-1]
         return last.isdigit() and len(last) >= 5
 

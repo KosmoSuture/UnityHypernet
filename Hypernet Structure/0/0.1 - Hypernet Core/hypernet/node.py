@@ -33,6 +33,7 @@ class Node:
     position_2d: Optional[dict[str, float]] = None   # {"x": 0.0, "y": 0.0}
     position_3d: Optional[dict[str, float]] = None   # {"x": 0.0, "y": 0.0, "z": 0.0}
     flags: list[str] = field(default_factory=list)    # Flag addresses from 0.8.*
+    is_instance: bool = False                          # Explicit instance marker (LP-3)
 
     @property
     def is_deleted(self) -> bool:
@@ -74,6 +75,7 @@ class Node:
             "position_2d": self.position_2d,
             "position_3d": self.position_3d,
             "flags": self.flags,
+            "is_instance": self.is_instance,
         }
 
     @classmethod
@@ -92,6 +94,7 @@ class Node:
             position_2d=d.get("position_2d"),
             position_3d=d.get("position_3d"),
             flags=d.get("flags", []),
+            is_instance=d.get("is_instance", False),
         )
 
     def __repr__(self) -> str:
