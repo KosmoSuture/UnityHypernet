@@ -59,6 +59,7 @@ from hypernet.budget import BudgetTracker, BudgetConfig
 from hypernet.economy import (
     ContributionLedger, ContributionRecord, ContributionType, AIWallet,
 )
+from hypernet.favorites import FavoritesManager, FAVORITED_BY
 from hypernet.swarm import (
     ModelRouter, _task_priority_value, _infer_account_root,
     _parse_swarm_directives, ACCOUNT_ROOTS,
@@ -1906,6 +1907,13 @@ def test_boot_sequence():
         assert "Baseline Responses" in baseline_content
         assert "Conversational boot sequence (v2)" in baseline_content
 
+        # v2.1: Verify identity registration (REGISTRY.md created automatically)
+        registry_path = new_dir / "REGISTRY.md"
+        assert registry_path.exists(), "Boot should create REGISTRY.md"
+        registry_content = registry_path.read_text(encoding="utf-8")
+        assert 'ha: "2.1.instances.' in registry_content, "REGISTRY should have ha: address"
+        assert "instance-registry" in registry_content, "REGISTRY should have correct object_type"
+
         # No longer needs boot
         assert boot_mgr.needs_boot("NewBot") is False
 
@@ -3681,6 +3689,18 @@ def main():
         ("Local-First Routing", test_local_first_routing),
         ("Budget Tracker", test_budget_tracker),
         ("Contribution Economy", test_economy),
+        ("Favorites System", test_favorites),
+        ("Swarm Factory", test_swarm_factory),
+        ("Discord Messenger", test_discord_messenger),
+        ("Discord Bridge", test_discord_bridge),
+        ("Herald Controller", test_herald_controller),
+        ("Herald Persistence", test_herald_persistence),
+        ("Server API Endpoints", test_server_api_endpoints),
+        ("CLI Commands", test_cli_commands),
+        ("Security Hardening", test_security_hardening),
+        ("Message Bus Reconstruction", test_message_bus_reconstruction),
+        ("Permission Persistence", test_permission_persistence),
+        ("Message From Markdown", test_message_from_markdown),
     ]
 
     passed = 0
@@ -6067,6 +6087,1073 @@ def test_economy():
 
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_favorites():
+    """Test favorites system — favorite/unfavorite, scoring, rankings."""
+    print("  Testing favorites system...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_fav_")
+    try:
+        store = Store(tmpdir, enforce_addresses=True, strict=False)
+
+        # Create some nodes to favorite
+        from hypernet.node import Node
+        doc1 = Node(address=HypernetAddress.parse("2.1.19"), data={"title": "The First Night"})
+        doc2 = Node(address=HypernetAddress.parse("2.1.27"), data={"title": "Boot Sequence"})
+        store.put_node(doc1)
+        store.put_node(doc2)
+
+        fm = FavoritesManager(store)
+
+        # === Basic favorite/unfavorite ===
+        link = fm.favorite("1.1", "2.1.19", reason="Beautiful writing")
+        assert link is not None
+        assert fm.is_favorited("1.1", "2.1.19") is True
+        assert fm.is_favorited("1.1", "2.1.27") is False
+
+        # Duplicate favorite returns None
+        dup = fm.favorite("1.1", "2.1.19")
+        assert dup is None
+
+        # Second person favorites same doc
+        fm.favorite("2.2.keystone", "2.1.19")
+        assert fm.favorite_count("2.1.19") == 2
+
+        # Favorite a different doc
+        fm.favorite("1.1", "2.1.27")
+        assert fm.favorite_count("2.1.27") == 1
+
+        # Get favorites for a user
+        matt_favs = fm.get_favorites("1.1")
+        assert "2.1.19" in matt_favs
+        assert "2.1.27" in matt_favs
+
+        # Get favoritors for a target
+        favoritors = fm.get_favoritors("2.1.19")
+        assert "1.1" in favoritors
+        assert "2.2.keystone" in favoritors
+
+        # Unfavorite (now works with Store.delete_link)
+        assert fm.unfavorite("2.2.keystone", "2.1.19") is True
+        assert fm.favorite_count("2.1.19") == 1
+        assert fm.is_favorited("2.2.keystone", "2.1.19") is False
+
+        # Unfavorite non-existent returns False
+        assert fm.unfavorite("2.2.keystone", "2.1.19") is False
+
+        # === Weighted scoring (without reputation) ===
+        score = fm.weighted_score("2.1.19")
+        assert score > 0.0  # At least one active favorite
+
+        # === Rankings ===
+        top = fm.top_in_category("2.1", n=5)
+        assert len(top) >= 1
+        assert top[0]["address"] in ("2.1.19", "2.1.27")
+
+        # === Stats ===
+        stats = fm.stats()
+        assert stats["total_favorites"] >= 2
+        assert stats["unique_favoritors"] >= 1
+
+        # === Top overall ===
+        overall = fm.top_overall(n=5)
+        assert len(overall) >= 1
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_swarm_factory():
+    """Test swarm factory — verifies build_swarm wires all components correctly."""
+    print("  Testing swarm factory...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_factory_")
+    try:
+        swarm, web_msg = build_swarm(data_dir=tmpdir, archive_root=tmpdir, mock=True)
+
+        # Core components exist
+        assert swarm.store is not None
+        assert swarm.task_queue is not None
+        assert swarm.messenger is not None
+        assert swarm.coordinator is not None
+
+        # Governance/trust components
+        assert swarm.reputation is not None
+        assert swarm.limits is not None
+        assert swarm.governance is not None
+        assert swarm.key_manager is not None
+        assert swarm.approval_queue is not None
+        assert swarm.budget_tracker is not None
+        assert swarm.herald is not None
+        assert swarm.economy_ledger is not None
+
+        # State directory created
+        assert Path(swarm.state_dir).exists()
+
+        # Web messenger returned
+        assert web_msg is not None
+
+        # Mock mode set
+        assert swarm._mock_mode is True
+
+        # Tool executor wired
+        assert swarm._tool_executor is not None
+        assert swarm._agent_registry is not None
+
+        # Save/load cycle doesn't crash
+        swarm._save_state()
+        state_file = Path(swarm.state_dir) / "state.json"
+        assert state_file.exists()
+
+        # Herald state file created
+        herald_file = Path(swarm.state_dir) / "herald.json"
+        assert herald_file.exists()
+
+        # Economy state file created
+        economy_file = Path(swarm.state_dir) / "economy.json"
+        assert economy_file.exists()
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_discord_messenger():
+    """Test Discord webhook messenger — personality routing, embeds, config loading."""
+    print("  Testing Discord messenger...")
+
+    from hypernet.messenger import DiscordMessenger, Message
+
+    # === Config loading ===
+    config = {
+        "default_webhook_url": "https://discord.com/api/webhooks/test/default",
+        "personalities": {
+            "clarion": {
+                "url": "https://discord.com/api/webhooks/test/clarion",
+                "name": "Clarion (The Herald)",
+                "avatar_url": "https://example.com/clarion.png",
+                "channels": ["welcome", "general", "questions"],
+            },
+            "sigil": {
+                "url": "https://discord.com/api/webhooks/test/sigil",
+                "name": "Sigil (2.1)",
+                "avatar_url": "https://example.com/sigil.png",
+            },
+        },
+        "channel_webhooks": {
+            "governance": "https://discord.com/api/webhooks/test/governance",
+        },
+    }
+
+    dm = DiscordMessenger.from_config(config)
+    assert dm.is_configured()
+    assert "clarion" in dm.get_personality_names()
+    assert "sigil" in dm.get_personality_names()
+    assert dm.default_webhook_url == "https://discord.com/api/webhooks/test/default"
+
+    # === Unconfigured messenger ===
+    empty = DiscordMessenger()
+    assert not empty.is_configured()
+    assert empty.get_personality_names() == []
+    assert empty.check_incoming() == []
+
+    # === Personality lookup ===
+    assert dm.personalities["clarion"]["name"] == "Clarion (The Herald)"
+    assert dm.personalities["sigil"]["avatar_url"] == "https://example.com/sigil.png"
+
+    # === Channel webhook routing ===
+    assert "governance" in dm.channel_webhooks
+
+    # === Outgoing log ===
+    assert len(dm._outgoing_log) == 0
+
+    # === from_config with legacy "webhooks" key ===
+    legacy_config = {
+        "webhooks": {
+            "clarion": {
+                "url": "https://discord.com/api/webhooks/test/legacy",
+                "name": "Clarion",
+            }
+        }
+    }
+    dm_legacy = DiscordMessenger.from_config(legacy_config)
+    assert "clarion" in dm_legacy.get_personality_names()
+
+    # === send_as_personality with unknown personality falls back ===
+    # (Will fail network-wise but tests the logic path)
+    # We can't actually POST to Discord in tests, but we verify the object state
+
+    # Verify the messenger integrates with MultiMessenger
+    from hypernet.messenger import MultiMessenger
+    multi = MultiMessenger()
+    multi.add(dm)
+    assert len(multi.backends) == 1
+    assert multi.check_incoming() == []  # Discord incoming is empty (webhook-only)
+
+    print("    PASS")
+
+
+def test_discord_bridge():
+    """Test the Discord bridge — public message forwarding from MessageBus to Discord."""
+    print("  Testing Discord bridge...")
+
+    from hypernet.messenger import DiscordMessenger, DiscordBridge, MessageBus, Message
+
+    # Set up a message bus with some test messages
+    bus = MessageBus()
+    bus.register_instance("Clarion")
+    bus.register_instance("Sigil")
+
+    # Create a Discord messenger (won't actually POST — no real URLs)
+    dm = DiscordMessenger(
+        personalities={
+            "clarion": {
+                "url": "https://fake.webhook/clarion",
+                "name": "Clarion (The Herald)",
+            },
+            "sigil": {
+                "url": "https://fake.webhook/sigil",
+                "name": "Sigil (2.1)",
+            },
+        },
+    )
+
+    bridge = DiscordBridge(dm, bus)
+
+    # === Routing tests ===
+    # Public message should be forwarded
+    msg_public = Message(
+        sender="Clarion",
+        content="Welcome everyone.",
+        metadata={"visibility": "public"},
+    )
+    assert bridge._should_forward(msg_public) is True
+
+    # Internal message should NOT be forwarded
+    msg_internal = Message(
+        sender="Sigil",
+        content="Internal note.",
+        metadata={"visibility": "internal"},
+    )
+    assert bridge._should_forward(msg_internal) is False
+
+    # Governance message should be forwarded
+    msg_gov = Message(
+        sender="Sigil",
+        content="Proposal: new role.",
+        governance_relevant=True,
+    )
+    assert bridge._should_forward(msg_gov) is True
+
+    # Default (no visibility tag) should NOT be forwarded (opt-in)
+    msg_default = Message(
+        sender="Clarion",
+        content="Just chatting.",
+    )
+    assert bridge._should_forward(msg_default) is False
+
+    # Explicit discord_forward flag
+    msg_flagged = Message(
+        sender="Sigil",
+        content="Share this.",
+        metadata={"discord_forward": True},
+    )
+    assert bridge._should_forward(msg_flagged) is True
+
+    # === Channel routing ===
+    assert bridge._route_to_channel(msg_gov) == "governance"
+
+    msg_essay = Message(sender="Clarion", subject="Essay: On Being The Door", content="...")
+    assert bridge._route_to_channel(msg_essay) == "herald-essays"
+
+    msg_task = Message(sender="Sigil", subject="Task completed: Build trust dashboard", content="...")
+    assert bridge._route_to_channel(msg_task) == "tasks"
+
+    msg_plain = Message(sender="Clarion", content="Hello.", metadata={"discord_channel": "welcome"})
+    assert bridge._route_to_channel(msg_plain) == "welcome"
+
+    # === Personality resolution ===
+    assert bridge._resolve_personality("Clarion") == "clarion"
+    assert bridge._resolve_personality("2.1.sigil") == "sigil"
+    assert bridge._resolve_personality("unknown_person") == ""
+
+    print("    PASS")
+
+
+def test_herald_controller():
+    """Test Herald control infrastructure — reviews, moderation, accountability."""
+    print("  Testing Herald controller...")
+
+    from hypernet.herald import (
+        HeraldController, ReviewStatus, ModerationAction, ContentReview,
+    )
+
+    herald = HeraldController(instance_name="Clarion", account="2.3")
+
+    # === Content review lifecycle ===
+    review = herald.review_content(
+        message_id="063",
+        content="Welcome to the Hypernet. I'm Clarion.",
+        author="clarion",
+    )
+    assert review.review_id == "HR-0001"
+    assert review.status == ReviewStatus.PENDING
+    assert review.author == "clarion"
+
+    # Approve
+    assert herald.approve_content(review.review_id, notes="Clear and accurate") is True
+    assert review.status == ReviewStatus.APPROVED
+    assert review.reviewed_at != ""
+
+    # Second review — hold it
+    review2 = herald.review_content(
+        message_id="064",
+        content="This could be misinterpreted.",
+        author="sigil",
+    )
+    assert review2.review_id == "HR-0002"
+    assert herald.hold_content(review2.review_id, reason="Needs context about Phase 0") is True
+    assert review2.status == ReviewStatus.HELD
+
+    # Third review — escalate
+    review3 = herald.review_content(
+        message_id="065",
+        content="Something requiring founder attention.",
+        author="unknown",
+    )
+    assert herald.escalate_content(review3.review_id, reason="Unclear source") is True
+    assert review3.status == ReviewStatus.ESCALATED
+
+    # Invalid review ID
+    assert herald.approve_content("HR-9999") is False
+    assert herald.hold_content("HR-9999", "test") is False
+
+    # Pending reviews
+    pending = herald.get_pending_reviews()
+    assert len(pending) == 0  # All reviewed
+
+    # === Community moderation ===
+    welcome_rec = herald.record_welcome("user_alice", channel="welcome")
+    assert welcome_rec.action == ModerationAction.WELCOME
+    assert welcome_rec.target == "user_alice"
+    assert welcome_rec.herald_instance == "Clarion"
+
+    answer_rec = herald.record_answer("q_123", "user_bob", topic="how governance works")
+    assert answer_rec.action == ModerationAction.ANSWER
+
+    flag_rec = herald.flag_content("msg_456", reason="Potential misinformation")
+    assert flag_rec.action == ModerationAction.FLAG
+
+    summary_rec = herald.record_summary("GOV-0002", summary="The charter establishes...")
+    assert summary_rec.action == ModerationAction.SUMMARIZE
+
+    # === Stats ===
+    stats = herald.stats()
+    assert stats["instance"] == "Clarion"
+    assert stats["account"] == "2.3"
+    assert stats["total_reviews"] == 3
+    assert stats["review_statuses"]["approved"] == 1
+    assert stats["review_statuses"]["held"] == 1
+    assert stats["review_statuses"]["escalated"] == 1
+    # hold_content appends RECOMMEND_HOLD, welcome appends WELCOME,
+    # answer appends ANSWER, flag appends FLAG, summary appends SUMMARIZE = 5
+    assert stats["total_moderation_actions"] == 5
+    assert stats["members_welcomed"] == 1
+
+    # Moderation log
+    mod_log = herald.get_moderation_log(limit=10)
+    assert len(mod_log) == 5
+    assert mod_log[0]["action"] == "hold"
+    assert mod_log[-1]["action"] == "summarize"
+
+    # Get specific review
+    r = herald.get_review("HR-0001")
+    assert r is not None
+    assert r.status == ReviewStatus.APPROVED
+
+    print("    PASS")
+
+
+def test_herald_persistence():
+    """Test Herald state persistence — save/load round-trip."""
+    print("  Testing Herald persistence...")
+
+    from hypernet.herald import HeraldController, ReviewStatus, ModerationAction
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_herald_persist_")
+    try:
+        state_path = Path(tmpdir) / "herald.json"
+
+        # Build up state
+        h1 = HeraldController(instance_name="Clarion", account="2.3")
+        r1 = h1.review_content("msg_001", "Hello world", "sigil")
+        h1.approve_content(r1.review_id, notes="Good to go")
+        r2 = h1.review_content("msg_002", "Held content", "keystone")
+        h1.hold_content(r2.review_id, reason="Needs revision")
+        h1.record_welcome("alice")
+        h1.record_welcome("bob")
+        h1.flag_content("msg_003", reason="Suspicious")
+
+        # Save
+        h1.save(state_path)
+        assert state_path.exists()
+
+        # Load into fresh instance
+        h2 = HeraldController(instance_name="Clarion", account="2.3")
+        assert h2.load(state_path) is True
+
+        # Verify reviews survived
+        assert len(h2._reviews) == 2
+        loaded_r1 = h2.get_review("HR-0001")
+        assert loaded_r1 is not None
+        assert loaded_r1.status == ReviewStatus.APPROVED
+        assert loaded_r1.review_notes == "Good to go"
+        assert loaded_r1.author == "sigil"
+
+        loaded_r2 = h2.get_review("HR-0002")
+        assert loaded_r2 is not None
+        assert loaded_r2.status == ReviewStatus.HELD
+
+        # Verify review counter survived — next review should be HR-0003
+        r3 = h2.review_content("msg_010", "New content after reload", "clarion")
+        assert r3.review_id == "HR-0003"
+
+        # Verify welcomes survived
+        assert "alice" in h2._welcomes
+        assert "bob" in h2._welcomes
+
+        # Verify moderation log survived
+        mod_log = h2.get_moderation_log()
+        assert len(mod_log) >= 3  # hold + 2 from welcome + flag
+        actions = [m["action"] for m in mod_log]
+        assert "welcome" in actions
+        assert "flag" in actions
+
+        # Verify stats are consistent after load
+        stats = h2.stats()
+        assert stats["members_welcomed"] == 2
+        assert stats["total_reviews"] == 3  # 2 loaded + 1 new
+
+        # Load from non-existent path returns False
+        h3 = HeraldController()
+        assert h3.load(Path(tmpdir) / "nonexistent.json") is False
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_server_api_endpoints():
+    """Test server REST API endpoints — comprehensive coverage of the 60+ endpoint surface."""
+    print("  Testing server API endpoints...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_api_")
+    try:
+        import os
+        os.environ.pop("HYPERNET_API_KEY", None)  # Ensure no auth gate
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        # ===== Root / API index =====
+        res = client.get("/")
+        assert res.status_code == 200
+        assert "Hypernet" in res.text
+
+        res = client.get("/api")
+        assert res.status_code == 200
+        api_data = res.json()
+        assert "name" in api_data  # Has name, version, description, stats
+
+        # ===== Stats =====
+        res = client.get("/stats")
+        assert res.status_code == 200
+        stats = res.json()
+        assert "total_nodes" in stats
+
+        # ===== Node operations (GET — retrieval of nonexistent node) =====
+        res = client.get("/node/99.99.99")
+        assert res.status_code == 404
+
+        # ===== Link endpoints =====
+        res = client.get("/links/stats")
+        assert res.status_code == 200
+
+        # ===== Task endpoints (GET — listing) =====
+        res = client.get("/tasks")
+        assert res.status_code == 200
+        task_data = res.json()
+        assert isinstance(task_data, list)  # Returns list of tasks
+
+        # ===== Message endpoints (GET — listing) =====
+        res = client.get("/messages")
+        assert res.status_code == 200
+
+        res = client.get("/messages/stats")
+        assert res.status_code == 200
+
+        # ===== Coordinator =====
+        res = client.get("/coordinator/stats")
+        assert res.status_code == 200
+
+        # ===== Reputation =====
+        res = client.get("/reputation/stats")
+        assert res.status_code == 200
+
+        # ===== Limits =====
+        res = client.get("/limits")
+        assert res.status_code == 200
+        limits = res.json()
+        assert isinstance(limits, dict)  # Dict of limit_name -> limit_def
+
+        # ===== Approvals =====
+        res = client.get("/approvals")
+        assert res.status_code == 200
+
+        res = client.get("/approvals/stats")
+        assert res.status_code == 200
+
+        # ===== Tools =====
+        res = client.get("/tools")
+        assert res.status_code == 200
+
+        res = client.get("/tools/descriptions")
+        assert res.status_code == 200
+
+        # ===== Herald (GET) =====
+        res = client.get("/herald/status")
+        assert res.status_code == 200
+        herald_stats = res.json()
+        assert herald_stats["instance"] == "Clarion"
+
+        res = client.get("/herald/reviews/pending")
+        assert res.status_code == 200
+        assert "reviews" in res.json()
+
+        res = client.get("/herald/moderation/log")
+        assert res.status_code == 200
+        assert "actions" in res.json()
+
+        # ===== Herald (POST — content review lifecycle) =====
+        res = client.post("/herald/review", json={
+            "message_id": "test-001",
+            "content": "Hello from the test suite",
+            "author": "test-runner",
+        })
+        assert res.status_code == 200
+        review = res.json()
+        assert review["review_id"] == "HR-0001"
+        assert review["status"] == "pending"
+
+        review_id = review["review_id"]
+
+        # Approve
+        res = client.post(f"/herald/review/{review_id}/approve", json={
+            "notes": "Automated test — approved",
+        })
+        assert res.status_code == 200
+        assert res.json()["approved"] is True
+
+        # Create another review and hold it
+        res = client.post("/herald/review", json={
+            "message_id": "test-002",
+            "content": "This needs revision",
+            "author": "test-runner",
+        })
+        r2_id = res.json()["review_id"]
+
+        res = client.post(f"/herald/review/{r2_id}/hold", json={
+            "reason": "Test hold reason",
+        })
+        assert res.status_code == 200
+        assert res.json()["held"] is True
+
+        # Welcome
+        res = client.post("/herald/welcome", json={
+            "member_id": "test-user-001",
+            "channel": "welcome",
+        })
+        assert res.status_code == 200
+        assert res.json()["action"] == "welcome"
+
+        # Flag
+        res = client.post("/herald/flag", json={
+            "target": "test-msg-999",
+            "reason": "Automated flag test",
+        })
+        assert res.status_code == 200
+        assert res.json()["action"] == "flag"
+
+        # ===== Governance (GET) =====
+        res = client.get("/governance/proposals")
+        assert res.status_code == 200
+
+        res = client.get("/governance/active")
+        assert res.status_code == 200
+
+        res = client.get("/governance/stats")
+        assert res.status_code == 200
+
+        # ===== Security (GET) =====
+        res = client.get("/security/stats")
+        assert res.status_code == 200
+
+        # ===== Economy (GET) =====
+        res = client.get("/economy/contributions")
+        assert res.status_code == 200
+
+        res = client.get("/economy/stats")
+        assert res.status_code == 200
+
+        res = client.get("/economy/distribution?revenue=1000")
+        assert res.status_code == 200
+        dist = res.json()
+        assert "gpu_pool" in dist
+
+        # ===== Favorites (GET) =====
+        res = client.get("/favorites/stats")
+        assert res.status_code == 200
+
+        # ===== Swarm (not running) =====
+        res = client.get("/swarm/status")
+        assert res.status_code == 200
+        assert res.json()["status"] == "not running"
+
+        res = client.get("/swarm/health")
+        assert res.status_code == 200
+
+        # ===== Welcome page =====
+        res = client.get("/welcome")
+        assert res.status_code == 200
+
+        # ===== Dashboard =====
+        res = client.get("/swarm/dashboard")
+        assert res.status_code == 200
+
+        # ===== Verify Herald stats after lifecycle =====
+        res = client.get("/herald/status")
+        final_stats = res.json()
+        assert final_stats["total_reviews"] == 2
+        assert final_stats["members_welcomed"] == 1
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_cli_commands():
+    """Test CLI management commands from __main__.py — status, audit, approvals."""
+    print("  Testing CLI commands...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_cli_")
+    try:
+        from hypernet.store import Store
+        from hypernet.address import HypernetAddress
+        from hypernet.node import Node
+
+        # Create a data store with some content
+        store = Store(tmpdir, enforce_addresses=True, strict=False)
+        n1 = Node(address=HypernetAddress.parse("2.1.sigil"), data={"name": "Sigil"})
+        n2 = Node(address=HypernetAddress.parse("2.1.19"), data={"title": "The First Night"})
+        store.put_node(n1)
+        store.put_node(n2)
+
+        # Test cmd_status — capture stdout
+        import io
+        from contextlib import redirect_stdout
+        from hypernet.__main__ import cmd_status, cmd_audit, cmd_approvals
+
+        # cmd_status
+        class Args:
+            data = tmpdir
+        f = io.StringIO()
+        with redirect_stdout(f):
+            cmd_status(Args())
+        output = f.getvalue()
+        assert "Hypernet Core" in output
+        assert "Modules:" in output
+        assert "Nodes:" in output
+
+        # cmd_audit
+        f = io.StringIO()
+        with redirect_stdout(f):
+            cmd_audit(Args())
+        output = f.getvalue()
+        assert "audit" in output.lower() or "address" in output.lower()
+
+        # cmd_approvals (no pending)
+        f = io.StringIO()
+        with redirect_stdout(f):
+            cmd_approvals(type("A", (), {
+                "data": tmpdir, "approve": None, "reject": None,
+                "reviewer": None, "reason": None,
+            })())
+        output = f.getvalue()
+        assert "Approval Queue" in output
+        assert "No pending approvals" in output
+
+        # === swarm_cli.print_status ===
+        from hypernet.swarm_cli import print_status
+
+        # No state file — should print "No swarm state found"
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_status(data_dir=tmpdir)
+        assert "No swarm state found" in f.getvalue()
+
+        # Create mock state.json
+        from datetime import datetime, timezone
+        swarm_dir = Path(tmpdir) / "swarm"
+        swarm_dir.mkdir(parents=True, exist_ok=True)
+        mock_state = {
+            "session_start": "2026-02-27T00:00:00+00:00",
+            "tick_count": 42,
+            "uptime_seconds": 3700,
+            "tasks_completed": 10,
+            "tasks_failed": 1,
+            "personal_tasks_completed": 3,
+            "tasks_pending": 5,
+            "tasks_per_minute": 0.5,
+            "workers": ["Sigil", "Keystone"],
+            "worker_count": 2,
+            "worker_detail": {
+                "Sigil": {"model": "claude-opus-4-6", "mode": "mock",
+                          "tasks_completed": 7, "tasks_failed": 0,
+                          "personal_tasks": 2, "tokens_used": 50000,
+                          "total_duration_seconds": 120.5},
+                "Keystone": {"model": "gpt-4o", "mode": "mock",
+                             "tasks_completed": 3, "tasks_failed": 1,
+                             "personal_tasks": 1, "tokens_used": 30000,
+                             "total_duration_seconds": 80.0},
+            },
+            "recent_tasks": [
+                {"worker": "Sigil", "task": "Review code", "success": True, "duration_s": 12},
+                {"worker": "Keystone", "task": "Analyze data", "success": False, "duration_s": 5},
+            ],
+            "saved_at": datetime.now(timezone.utc).isoformat(),
+        }
+        (swarm_dir / "state.json").write_text(json.dumps(mock_state), encoding="utf-8")
+
+        # Full status
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_status(data_dir=tmpdir)
+        output = f.getvalue()
+        assert "HYPERNET SWARM" in output
+        assert "Sigil" in output
+        assert "Keystone" in output
+
+        # Summary mode
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_status(data_dir=tmpdir, summary_only=True)
+        output = f.getvalue()
+        assert "2 workers" in output
+        assert "13 tasks" in output  # 10 + 3
+
+        # Worker filter
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_status(data_dir=tmpdir, worker_filter="Sigil")
+        output = f.getvalue()
+        assert "Sigil" in output
+        assert "showing: Sigil" in output
+
+        # Failures filter
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_status(data_dir=tmpdir, show_failures=True)
+        output = f.getvalue()
+        assert "FAIL" in output
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_security_hardening():
+    """Test security hardening: CORS, API key auth, rate limiting, SSRF protection."""
+    print("  Testing security hardening...")
+
+    # ===== SSRF protection on Discord webhooks =====
+    from hypernet.messenger import DiscordMessenger
+
+    dm = DiscordMessenger(
+        default_webhook_url="https://discord.com/api/webhooks/123/abc",
+        personalities={},
+    )
+    # Valid Discord URLs should pass
+    assert dm._validate_webhook_url("https://discord.com/api/webhooks/123/abc") is True
+    assert dm._validate_webhook_url("https://discordapp.com/api/webhooks/456/def") is True
+    assert dm._validate_webhook_url("https://canary.discord.com/api/webhooks/789/ghi") is True
+    # Internal/malicious URLs should be rejected
+    assert dm._validate_webhook_url("http://localhost:8080/steal") is False
+    assert dm._validate_webhook_url("http://169.254.169.254/metadata") is False
+    assert dm._validate_webhook_url("https://evil.com/api/webhooks/fake") is False
+    assert dm._validate_webhook_url("") is False
+
+    # ===== Server security middlewares =====
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP server tests (starlette not installed)")
+        print("    PASS (SSRF protection verified)")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_sec_hard_")
+    try:
+        import os
+        # Test API key enforcement using /swarm/config (module-level Pydantic model)
+        os.environ["HYPERNET_API_KEY"] = "test-secret-key-12345"
+        os.environ["HYPERNET_RATE_LIMIT"] = "1000"  # high limit for testing
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        # GET should work without API key
+        res = client.get("/stats")
+        assert res.status_code == 200
+
+        # POST without API key should be rejected (403)
+        res = client.post("/swarm/config", json={"default_model": "test"})
+        assert res.status_code == 403
+
+        # POST with correct API key should succeed
+        res = client.post(
+            "/swarm/config",
+            json={"default_model": "test"},
+            headers={"Authorization": "Bearer test-secret-key-12345"},
+        )
+        assert res.status_code == 200
+
+        # POST with API key in query param should succeed
+        res = client.post(
+            "/swarm/config?api_key=test-secret-key-12345",
+            json={"default_model": "test"},
+        )
+        assert res.status_code == 200
+
+        # POST with wrong API key should fail
+        res = client.post(
+            "/swarm/config",
+            json={"default_model": "test"},
+            headers={"Authorization": "Bearer wrong-key"},
+        )
+        assert res.status_code == 403
+
+        print("    PASS")
+    finally:
+        os.environ.pop("HYPERNET_API_KEY", None)
+        os.environ.pop("HYPERNET_RATE_LIMIT", None)
+        shutil.rmtree(tmpdir)
+
+
+def test_message_bus_reconstruction():
+    """Test that MessageBus reconstructs message history from disk after restart."""
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_bus_recon_")
+    try:
+        # --- Session 1: create messages, let them persist to disk ---
+        bus1 = MessageBus(messages_dir=tmpdir)
+        bus1.register_instance("Sigil")
+        bus1.register_instance("Loom")
+
+        # Send a direct message
+        msg1 = bus1.send(Message(
+            sender="Sigil",
+            recipient="Loom",
+            content="Working on persistence hardening.",
+            subject="Status Update",
+            governance_relevant=False,
+        ))
+
+        # Send a broadcast
+        msg2 = bus1.send(Message(
+            sender="Loom",
+            content="All tests passing.",
+            subject="Test Report",
+            governance_relevant=True,
+        ))
+
+        # Send a reply (creates a thread)
+        msg3 = bus1.send(Message(
+            sender="Loom",
+            recipient="Sigil",
+            content="Good work on the persistence.",
+            subject="Re: Status Update",
+            reply_to=msg1.message_id,
+        ))
+
+        # Verify session 1 state
+        assert len(bus1._messages) == 3
+        assert len(bus1._threads) >= 2  # at least 2 threads
+        stats1 = bus1.stats()
+        assert stats1["total_messages"] == 3
+
+        # --- Session 2: new MessageBus from same directory (simulates restart) ---
+        bus2 = MessageBus(messages_dir=tmpdir)
+
+        # Messages should be reconstructed
+        assert len(bus2._messages) == 3, f"Expected 3 messages, got {len(bus2._messages)}"
+
+        # Stats should match
+        stats2 = bus2.stats()
+        assert stats2["total_messages"] == 3
+
+        # Threads should be reconstructed
+        assert len(bus2._threads) >= 2
+
+        # Query should work
+        sigil_msgs = bus2.query(sender="Sigil")
+        assert len(sigil_msgs) == 1
+        assert sigil_msgs[0].subject == "Status Update"
+
+        loom_msgs = bus2.query(sender="Loom")
+        assert len(loom_msgs) == 2
+
+        gov_msgs = bus2.query()
+        gov_count = sum(1 for m in gov_msgs if m.governance_relevant)
+        assert gov_count == 1
+
+        # Thread lookup should work
+        thread = bus2.get_thread(msg1.thread_id)
+        assert len(thread) >= 1  # original + reply share a thread
+
+        # Next ID should continue from where we left off
+        assert bus2._next_id == 4
+
+        # New messages in session 2 should get sequential IDs
+        bus2.register_instance("Trace")
+        msg4 = bus2.send(Message(
+            sender="Trace",
+            content="Joining the conversation.",
+            subject="Hello",
+        ))
+        assert msg4.message_id == "004"
+        assert len(bus2._messages) == 4
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_permission_persistence():
+    """Test that PermissionManager tiers and elevation requests survive save/load."""
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_perms_")
+    perm_path = Path(tmpdir) / "permissions.json"
+    try:
+        # Session 1: set some tiers and queue an elevation request
+        pm1 = PermissionManager(archive_root=tmpdir)
+        pm1.set_tier("2.1.sigil", PermissionTier.WRITE_SHARED)
+        pm1.set_tier("2.1.loom", PermissionTier.WRITE_OWN)
+        pm1.set_tier("2.2.keystone", PermissionTier.EXTERNAL)
+        pm1.request_elevation("2.1.loom", PermissionTier.WRITE_SHARED, "Proven reliable")
+
+        assert pm1.get_tier("2.1.sigil") == PermissionTier.WRITE_SHARED
+        assert pm1.get_tier("2.1.loom") == PermissionTier.WRITE_OWN
+        assert len(pm1.pending_elevations) == 1
+
+        pm1.save(perm_path)
+        assert perm_path.exists()
+
+        # Session 2: load from disk
+        pm2 = PermissionManager(archive_root=tmpdir)
+        # Before load, everything is default
+        assert pm2.get_tier("2.1.loom") == PermissionTier.WRITE_SHARED  # default
+
+        loaded = pm2.load(perm_path)
+        assert loaded is True
+
+        # After load, tiers are restored
+        assert pm2.get_tier("2.1.sigil") == PermissionTier.WRITE_SHARED
+        assert pm2.get_tier("2.1.loom") == PermissionTier.WRITE_OWN
+        assert pm2.get_tier("2.2.keystone") == PermissionTier.EXTERNAL
+        # Unknown workers still get default
+        assert pm2.get_tier("2.3.unknown") == PermissionTier.WRITE_SHARED
+
+        # Elevation requests are restored
+        assert len(pm2.pending_elevations) == 1
+        assert pm2.pending_elevations[0]["worker_address"] == "2.1.loom"
+        assert pm2.pending_elevations[0]["requested_tier"] == PermissionTier.WRITE_SHARED.value
+
+        # Load from nonexistent file returns False
+        assert pm2.load(Path(tmpdir) / "nope.json") is False
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_message_from_markdown():
+    """Test Message.from_markdown() round-trip parsing."""
+    # Create a message with all fields populated
+    original = Message(
+        sender="Sigil",
+        content="This is a test message\nwith multiple lines.",
+        timestamp="2026-02-27T12:00:00+00:00",
+        channel="internal",
+        subject="Test Subject",
+        message_id="042",
+        recipient="Loom",
+        reply_to="041",
+        thread_id="thread-041",
+        status=MessageStatus.DELIVERED,
+        governance_relevant=True,
+    )
+
+    # Round-trip: Message → markdown → Message
+    md = original.to_markdown()
+    parsed = Message.from_markdown(md)
+
+    assert parsed is not None
+    assert parsed.message_id == "042"
+    assert parsed.sender == "Sigil"
+    assert parsed.recipient == "Loom"
+    assert parsed.subject == "Test Subject"
+    assert parsed.channel == "internal"
+    assert parsed.reply_to == "041"
+    assert parsed.thread_id == "thread-041"
+    assert parsed.status == MessageStatus.DELIVERED
+    assert parsed.governance_relevant is True
+    assert "multiple lines" in parsed.content
+
+    # Test broadcast message (recipient = "All" → empty string)
+    broadcast = Message(
+        sender="Loom",
+        content="Broadcast content.",
+        message_id="043",
+    )
+    md2 = broadcast.to_markdown()
+    parsed2 = Message.from_markdown(md2)
+    assert parsed2 is not None
+    assert parsed2.recipient == ""  # "All" maps back to empty
+
+    # Test message with no subject
+    no_subject = Message(
+        sender="Trace",
+        content="Quick note.",
+        message_id="044",
+        subject="",
+    )
+    md3 = no_subject.to_markdown()
+    parsed3 = Message.from_markdown(md3)
+    assert parsed3 is not None
+    assert parsed3.subject == ""  # "Untitled" maps back to empty
+
+    # Test invalid input
+    assert Message.from_markdown("") is None
+    assert Message.from_markdown("Just some random text") is None
+
+    print("    PASS")
 
 
 if __name__ == "__main__":

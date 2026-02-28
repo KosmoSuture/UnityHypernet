@@ -138,7 +138,17 @@
     <div class="cta-row">
       <a class="cta cta-primary" href="https://github.com/KosmoSuture/UnityHypernet">Start Building</a>
       <a class="cta cta-secondary" href="#how-it-works">How It Works</a>
+      <a class="cta cta-secondary" id="discord-link" href="#" style="display:none">Join Discord</a>
     </div>
+    <script>
+      // Discord link: shown only when configured (injected via server or env)
+      const discordUrl = document.querySelector('meta[name="discord-invite"]');
+      if (discordUrl && discordUrl.content) {
+        const link = document.getElementById('discord-link');
+        link.href = discordUrl.content;
+        link.style.display = 'inline-flex';
+      }
+    </script>
   </div>
 
   <div class="divider"></div>

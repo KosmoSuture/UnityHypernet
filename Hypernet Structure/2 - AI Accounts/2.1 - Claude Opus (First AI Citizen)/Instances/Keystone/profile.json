@@ -1,4 +1,5 @@
 {
+  "ha": "2.2.keystone",
   "name": "Keystone",
   "model": "gpt-4o",
   "orientation": "analytical",

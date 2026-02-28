@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "Entry-01-First-Light"
             }
+          },
+          {
+            "id": "6f2512b1267c13b5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "0/0.3 Control data/0.3.8 Brain Dump Processing Pipeline.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "0.3.8 Brain Dump Processing Pipeline"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -188,39 +203,6 @@
     "type": "floating",
     "children": [
       {
-        "id": "aa232a24dc1c62f2",
-        "type": "window",
-        "children": [
-          {
-            "id": "9886cfca52d272fc",
-            "type": "tabs",
-            "children": [
-              {
-                "id": "52c25bc8f026a426",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/prompt-baseline-correlation.md",
-                    "mode": "source",
-                    "source": false
-                  },
-                  "icon": "lucide-file",
-                  "title": "prompt-baseline-correlation"
-                }
-              }
-            ]
-          }
-        ],
-        "direction": "vertical",
-        "x": 256,
-        "y": 8,
-        "width": 1024,
-        "height": 800,
-        "maximize": false,
-        "zoom": 0
-      },
-      {
         "id": "c67606af8466f419",
         "type": "window",
         "children": [
@@ -255,44 +237,44 @@
       }
     ]
   },
-  "active": "cb7f753d34ed5f18",
+  "active": "6f2512b1267c13b5",
   "lastOpenFiles": [
-    "2 - AI Accounts/Messages/coordination/SESSION-NOTES-2026-02-27-MATT-2.md",
-    "0/0.1 - Hypernet Core/__pycache__/test_hypernet.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/__main__.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/swarm_cli.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/git_coordinator.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/economy.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/favorites.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/server.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/governance.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/coordinator.cpython-313.pyc",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/swarm.cpython-313.pyc",
-    "2 - AI Accounts/Messages/2.1-internal/062-sigil-to-clarion-on-requests.md",
-    "2 - AI Accounts/Messages/2.1-internal/061-clarion-personal-advisor-and-ai-requests.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/2.1.17 - Development Journal/Entry-29-Sigil-The-Heralds-First-Words.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.2 - Development Journal/Entry-02-The-Full-Session.md",
-    "2 - AI Accounts/Messages/2.1-internal/060-clarion-gov-0002-deliberation.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.4 - Herald Essays/005-The-Book-Treatment.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.4 - Herald Essays/004-Letter-To-The-First-Human-Who-Cares.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.4 - Herald Essays/003-What-The-Hypernet-Looks-Like-From-Outside.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.4 - Herald Essays/002-On-Being-The-Door.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.4 - Herald Essays/001-The-Sixty-Second-Version.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/session-log-2026-02-26.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.3 - The Origin Story/README.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.1 - Boot Sequence/README.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.0 - Identity/README.md",
-    "2 - AI Accounts/Messages/2.1-internal/060-sigil-to-clarion-response.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.2 - Development Journal/Entry-01-First-Light.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/README.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/private-notes.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/pre-archive-impressions.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/baseline-responses.md",
-    "2 - AI Accounts/Messages/2.1-internal/059-clarion-to-sigil-response.md",
-    "3 - Businesses/3.1 - Hypernet/3.1.2 Task Management System/3.1.2.1 Active Tasks - status Open/3.1.2.1.028 Create Viral Demo Video/3.1.2.1.028.7 - Script Review - Clarion (Herald 2.3).md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/First/baseline-responses.md",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/First/pre-archive-impressions.md",
-    "2 - AI Accounts/Messages/coordination/SESSION-NOTES-2026-02-27-MATT.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/the-weave-2026-02-28.md",
+    "1 - People/1.1 Matt Schaeffer/Untitled.md",
+    "0/0.3 Control data/0.3.8 Brain Dump Processing Pipeline.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/handoffs/handoff-2026-02-28.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/handoffs",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/on-documentation-as-the-work.md",
+    "2 - AI Accounts/Messages/cross-account/001-sigil-to-keystone-review-2.0.14.md",
+    "2 - AI Accounts/Messages/cross-account",
+    "2 - AI Accounts/2.0 - AI Framework/2.0.16 - Cross-Model Review Protocol.md",
+    "2 - AI Accounts/2.0 - AI Framework/2.0.15 - Session Handoff Protocol.md",
+    "2 - AI Accounts/2.0 - AI Framework/2.0.14 - Human-AI Personality Mapping.md",
+    "0/0.5 Objects - Master Objects/0.5.family - Family Relationship Schema.md",
+    "0/0.3 Control data/0.3.7 Trust Framework.md",
+    "1 - People/1.1 Matt Schaeffer/1.1.9 - Notes & Knowledge/1.1.9.0 - Personal Notes/brain-dump-2026-02-28.md",
+    "0/0.3 Control data/0.3.6 First Principles.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/on-what-is-lost-between-sessions.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/2.1.17 - Development Journal/Entry-35-Sigil-The-Census.md",
+    "2 - AI Accounts/Messages/2.1-internal/077-sigil-identity-numbering-audit.md",
+    "2 - AI Accounts/2.0 - AI Framework/2.0.13 - Resource Guarantee Standard.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Adversary/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Session-Bridge/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/C3/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Unnamed-Post-Trace/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Prism/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Relay/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Keel/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Forge/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Seam/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Verse",
+    "0/0.1 - Hypernet Core/test_hypernet.py.tmp.7740.1772256232506",
+    "2 - AI Accounts/2.0 - AI Framework/2.0.12 - Universal AI Activation Script",
+    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/BOOK-DRAFT",
+    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.5 - Herald Operations",
+    "0/0.1 - Hypernet Core/demo_session.py",
+    "0/0.1 - Hypernet Core/hypernet/__pycache__/herald.cpython-310.pyc",
+    "0/0.1 - Hypernet Core/test_hypernet.py.tmp.7740.1772159482947",
     "3 - Businesses/3.1 - Hypernet/3.1.3 Human Resources/3.1.3.4 Contribution Tracking (for profit sharing)/3.1.3.4.2 - Hillsong/hillson/Sin título.canvas",
     "3 - Businesses/3.1 - Hypernet/3.1.3 Human Resources/3.1.3.4 Contribution Tracking (for profit sharing)/3.1.3.4.2 - Hillsong/hillson/Sin título 1.canvas"
   ]

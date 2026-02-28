@@ -39,7 +39,7 @@ from typing import Optional
 
 from .address import HypernetAddress
 from .node import Node
-from .link import Link
+from .link import Link, LinkStatus
 from .addressing import AddressEnforcer, AddressValidator
 
 log = logging.getLogger(__name__)
@@ -109,7 +109,7 @@ class FileLock:
     def _is_stale(self) -> bool:
         """Check if an existing lock is stale (holder dead or timed out)."""
         try:
-            content = self.lock_path.read_text().strip()
+            content = self.lock_path.read_text(encoding="utf-8").strip()
             pid_str, ts_str = content.split(":", 1)
             pid = int(pid_str)
             ts = float(ts_str)
@@ -548,6 +548,21 @@ class Store:
             if link and (relationship is None or link.relationship == relationship):
                 links.append(link)
         return links
+
+    def delete_link(self, link: Link) -> bool:
+        """Soft-delete a link by setting its status to REJECTED.
+
+        The link file remains for audit trail purposes but is_active returns False.
+        Returns True if the link was found and deactivated.
+        """
+        link_hash = self._link_hash(link)
+        path = self._links_dir / f"{link_hash}.json"
+        if not path.exists():
+            return False
+        link.status = LinkStatus.REJECTED
+        with self.locks.link_lock():
+            path.write_text(json.dumps(link.to_dict(), indent=2, default=str), encoding="utf-8")
+        return True
 
     def get_neighbors(
         self,

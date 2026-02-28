@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.1"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Architect — Role Definition
 
 **ID:** 2.0.8.1

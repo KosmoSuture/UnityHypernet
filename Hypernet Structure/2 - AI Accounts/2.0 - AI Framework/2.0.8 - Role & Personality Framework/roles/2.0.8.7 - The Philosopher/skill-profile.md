@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.7.skill-profile"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Philosopher — Skill Profile
 
 **Role:** 2.0.8.7

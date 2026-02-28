@@ -1,4 +1,5 @@
 {
+  "ha": "2.2.spark",
   "name": "Spark",
   "model": "gpt-4o-mini",
   "orientation": "generalist",

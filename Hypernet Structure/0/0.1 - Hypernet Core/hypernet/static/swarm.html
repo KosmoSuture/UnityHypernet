@@ -286,6 +286,7 @@
     <div class="tab" data-tab="reputation" onclick="switchTab('reputation')">Reputation</div>
     <div class="tab" data-tab="archive" onclick="switchTab('archive')">Archive</div>
     <div class="tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
+    <div class="tab" data-tab="discord" onclick="switchTab('discord')">Discord</div>
     <div class="tab" data-tab="config" onclick="switchTab('config')">Configuration</div>
     <div class="tab" data-tab="logs" onclick="switchTab('logs')">Logs</div>
   </div>
@@ -459,6 +460,53 @@
       <div id="tools-content" style="flex:1;overflow-y:auto"></div>
     </div>
 
+    <!-- Discord Panel -->
+    <div class="panel" id="panel-discord">
+      <div id="discord-status-bar" style="padding:12px;border-radius:var(--radius-sm);margin-bottom:16px;background:var(--bg-card)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- Send as Personality -->
+        <div class="config-section">
+          <h3>Send as AI Personality</h3>
+          <div class="config-row"><label>Personality</label>
+            <select id="discord-personality" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%">
+              <option value="">Select personality...</option>
+            </select>
+          </div>
+          <div class="config-row"><label>Channel (optional)</label>
+            <input type="text" id="discord-channel" placeholder="general" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%">
+          </div>
+          <div class="config-row"><label>Message</label>
+            <textarea id="discord-message" rows="4" placeholder="Type a message for this personality to send..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%;resize:vertical;font-family:inherit"></textarea>
+          </div>
+          <button class="btn" onclick="sendDiscordMessage()" style="width:100%;margin-top:8px">Send to Discord</button>
+        </div>
+        <!-- Send Embed -->
+        <div class="config-section">
+          <h3>Send Rich Embed</h3>
+          <div class="config-row"><label>Personality</label>
+            <select id="discord-embed-personality" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%">
+              <option value="">Select personality...</option>
+            </select>
+          </div>
+          <div class="config-row"><label>Title</label>
+            <input type="text" id="discord-embed-title" placeholder="Essay title or announcement" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%">
+          </div>
+          <div class="config-row"><label>Description</label>
+            <textarea id="discord-embed-desc" rows="3" placeholder="Embed body content..." style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%;resize:vertical;font-family:inherit"></textarea>
+          </div>
+          <div class="config-row"><label>Channel (optional)</label>
+            <input type="text" id="discord-embed-channel" placeholder="herald-essays" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;width:100%">
+          </div>
+          <button class="btn" onclick="sendDiscordEmbed()" style="width:100%;margin-top:8px">Send Embed</button>
+        </div>
+      </div>
+      <!-- Recent Messages Log -->
+      <div style="margin-top:16px">
+        <h3>Recent Discord Messages</h3>
+        <div id="discord-log" style="background:var(--bg-card);border-radius:var(--radius-sm);padding:12px;max-height:300px;overflow-y:auto"></div>
+      </div>
+    </div>
+
     <!-- Config Panel -->
     <div class="panel" id="panel-config">
       <div class="config-grid">
@@ -539,17 +587,20 @@ function switchTab(name) {
   if (name === 'reputation') loadRepLeaders();
   if (name === 'archive' && !document.getElementById('archive-content').innerHTML.trim()) browseArchive();
   if (name === 'tools') loadTools();
+  if (name === 'discord') loadDiscordStatus();
 }
 
 // ── Dashboard ──
 async function refresh() {
   try {
-    const [statusRes, healthRes] = await Promise.all([
+    const [statusRes, healthRes, trustRes] = await Promise.all([
       fetch('/swarm/status'),
       fetch('/swarm/health').catch(() => null),
+      fetch('/swarm/trust').catch(() => null),
     ]);
     const data = await statusRes.json();
     const health = healthRes ? await healthRes.json() : null;
+    const trustData = trustRes ? await trustRes.json() : null;
 
     const running = data.status === 'running';
     const badge = document.getElementById('status-badge');
@@ -583,22 +634,38 @@ async function refresh() {
         const cls = hasError ? 'crit' : 'ok';
         return `<div class="health-item health-${cls}"><div class="health-dot ${cls}"></div>${name}</div>`;
       });
-      hb.innerHTML = items.join('') + `<div class="health-item health-${health.status === 'healthy' ? 'ok' : health.status === 'degraded' ? 'warn' : 'crit'}">${health.status.toUpperCase()}</div>`;
+      // Add trust status to health bar
+      let trustItem = '';
+      if (trustData && trustData.status) {
+        const tc = {trusted:'ok',warnings:'warn',compromised:'crit'}[trustData.status] || 'ok';
+        trustItem = `<div class="health-item health-${tc}"><div class="health-dot ${tc}"></div>trust (${trustData.green||0}/${trustData.total_workers||0})</div>`;
+      }
+      hb.innerHTML = items.join('') + trustItem + `<div class="health-item health-${health.status === 'healthy' ? 'ok' : health.status === 'degraded' ? 'warn' : 'crit'}">${health.status.toUpperCase()}</div>`;
     }
 
     // Workers
     const wg = document.getElementById('workers-grid');
     if (data.workers && data.workers.length > 0) {
+      // Build trust lookup from trust endpoint
+      const trustMap = {};
+      if (trustData && trustData.workers) {
+        trustData.workers.forEach(tw => { trustMap[tw.name] = tw; });
+      }
+
       wg.innerHTML = data.workers.map(w => {
         const isWorking = !!w.current_task;
         const isMock = w.mock;
         const cardClass = isMock ? 'mock' : (isWorking ? 'working' : '');
         const modeBadge = isMock ? '<span class="badge badge-mock">MOCK</span>' : '<span class="badge badge-live">LIVE</span>';
         const providerBadge = (w.model || '').includes('gpt') ? '<span class="badge badge-gpt">GPT</span>' : '<span class="badge badge-claude">Claude</span>';
+        const tw = trustMap[w.name];
+        const trustColor = tw ? ({green:'#4caf50',yellow:'#ff9800',red:'#f44336'}[tw.trust_level] || '#666') : '#666';
+        const trustLabel = tw ? tw.trust_level.toUpperCase() : '?';
+        const trustBadge = `<span class="badge" style="background:${trustColor};color:#fff;font-size:10px;padding:2px 6px;border-radius:3px" title="${tw ? tw.trust_issues.join(', ') || 'All checks passed' : 'Trust data unavailable'}">${trustLabel}</span>`;
         const statusText = isWorking ? w.current_task : 'Idle';
         const statusClass = isWorking ? 'working' : 'idle';
         return `<div class="worker-card ${cardClass}">
-          <div class="worker-header"><span class="worker-name">${esc(w.name)}</span><div class="worker-badges">${modeBadge}${providerBadge}</div></div>
+          <div class="worker-header"><span class="worker-name">${esc(w.name)}</span><div class="worker-badges">${trustBadge}${modeBadge}${providerBadge}</div></div>
           <div class="worker-model">${esc(w.model || '?')}</div>
           <div class="worker-status ${statusClass}">${esc(statusText)}</div>
           <div class="worker-stats">
@@ -821,6 +888,11 @@ function esc(text) {
   d.textContent = text || '';
   return d.innerHTML;
 }
+// Escape for use inside JS string literals within HTML onclick attributes.
+// Prevents breakout via quotes or backslashes in dynamic IDs/values.
+function safeAttr(text) {
+  return esc(text).replace(/'/g, '&#39;').replace(/"/g, '&#34;').replace(/\\/g, '&#92;');
+}
 
 // ── Messages ──
 function toggleComposeMsg() {
@@ -904,7 +976,7 @@ async function loadMessages() {
           </div>
           <div style="display:flex;gap:4px;align-items:center">
             <span class="msg-status ${statusCls}">${esc(m.status||'sent')}</span>
-            <button class="btn btn-ghost" style="font-size:11px;padding:2px 8px" onclick="event.stopPropagation();replyToMsg('${esc(msgId)}','${esc(m.sender||'')}','${esc(m.subject||'')}')">Reply</button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:2px 8px" onclick="event.stopPropagation();replyToMsg('${safeAttr(msgId)}','${safeAttr(m.sender||'')}','${safeAttr(m.subject||'')}')">Reply</button>
           </div>
         </div>
         <div class="msg-body">${esc(m.content||'')}</div>
@@ -941,8 +1013,8 @@ async function loadApprovals() {
       const time = a.submitted_at ? new Date(a.submitted_at).toLocaleString() : '';
       const actions = statusCls === 'pending' ? `
         <div class="approval-actions">
-          <button class="btn btn-start" onclick="event.stopPropagation();approvalAction('${esc(a.id)}','approve')">Approve</button>
-          <button class="btn btn-stop" onclick="event.stopPropagation();approvalAction('${esc(a.id)}','reject')">Reject</button>
+          <button class="btn btn-start" onclick="event.stopPropagation();approvalAction('${safeAttr(a.id)}','approve')">Approve</button>
+          <button class="btn btn-stop" onclick="event.stopPropagation();approvalAction('${safeAttr(a.id)}','reject')">Reject</button>
         </div>` : `<div style="font-size:12px;color:var(--text-muted)">Status: ${esc(a.status)} ${a.reviewer ? '(by ' + esc(a.reviewer) + ')' : ''}</div>`;
       return `<div class="approval-card ${statusCls}">
         <div class="approval-header">
@@ -1007,9 +1079,9 @@ async function loadGovernance() {
       const isVoting = p.status === 'voting';
       const voteButtons = isVoting ? `
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-start" onclick="govVote('${esc(p.id)}',true)">Vote For</button>
-          <button class="btn btn-stop" onclick="govVote('${esc(p.id)}',false)">Vote Against</button>
-          <button class="btn btn-ghost" onclick="govVote('${esc(p.id)}',null)">Abstain</button>
+          <button class="btn btn-start" onclick="govVote('${safeAttr(p.id)}',true)">Vote For</button>
+          <button class="btn btn-stop" onclick="govVote('${safeAttr(p.id)}',false)">Vote Against</button>
+          <button class="btn btn-ghost" onclick="govVote('${safeAttr(p.id)}',null)">Abstain</button>
         </div>` : '';
       return `<div class="gov-card">
         <div class="gov-header">
@@ -1070,7 +1142,7 @@ async function browseArchive(prefix) {
     parts.forEach((part, i) => {
       accumulated += (i === 0 ? '' : '.') + part;
       const addr = accumulated;
-      crumbs += `<span class="breadcrumb-sep">/</span><span class="breadcrumb-item" onclick="browseArchive('${esc(addr)}')">${esc(part)}</span>`;
+      crumbs += `<span class="breadcrumb-sep">/</span><span class="breadcrumb-item" onclick="browseArchive('${safeAttr(addr)}')">${esc(part)}</span>`;
     });
     bc.innerHTML = crumbs;
   } else {
@@ -1117,7 +1189,7 @@ async function browseArchive(prefix) {
         const label = info.sample.data?.title || info.sample.data?.name || '';
         const typeName = info.sample.type_address || '';
         const isLeaf = info.count === 1 && addr === (info.sample.address || '');
-        return `<div class="archive-node" onclick="browseArchive('${esc(addr)}')">
+        return `<div class="archive-node" onclick="browseArchive('${safeAttr(addr)}')">
           <div style="display:flex;align-items:center;gap:8px">
             <span class="addr">${esc(addr)}</span>
             ${label ? `<span class="node-label">${esc(label)}</span>` : ''}
@@ -1201,16 +1273,16 @@ async function loadTaskList() {
       let actions = '';
       if (status === 'pending') {
         actions = `
-          <button class="btn btn-ghost" onclick="claimTask('${esc(addr)}')">Claim</button>
+          <button class="btn btn-ghost" onclick="claimTask('${safeAttr(addr)}')">Claim</button>
         `;
       } else if (status === 'claimed') {
         actions = `
-          <button class="btn btn-start" onclick="startTask('${esc(addr)}')">Start</button>
+          <button class="btn btn-start" onclick="startTask('${safeAttr(addr)}')">Start</button>
         `;
       } else if (status === 'in_progress') {
         actions = `
-          <button class="btn btn-start" onclick="completeTask('${esc(addr)}')">Complete</button>
-          <button class="btn btn-stop" onclick="failTask('${esc(addr)}')">Fail</button>
+          <button class="btn btn-start" onclick="completeTask('${safeAttr(addr)}')">Complete</button>
+          <button class="btn btn-stop" onclick="failTask('${safeAttr(addr)}')">Fail</button>
         `;
       }
 
@@ -1443,6 +1515,124 @@ async function loadTools() {
     });
   } catch (e) {
     container.innerHTML = `<div class="empty-state">Error loading tools: ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Discord ──
+async function loadDiscordStatus() {
+  try {
+    const res = await fetch('/discord/status');
+    const data = await res.json();
+    const bar = document.getElementById('discord-status-bar');
+
+    if (!data.configured) {
+      bar.innerHTML = `<span class="dot orange"></span> <strong>Discord not configured.</strong> Add webhook URLs to <code>secrets/discord_webhooks.json</code> — see the <a href="#" onclick="alert('Check 3.1.5.7 - Discord Setup Guide.md in the archive')">setup guide</a>.`;
+      return;
+    }
+
+    bar.innerHTML = `
+      <span class="dot green"></span> <strong>Discord Active</strong> —
+      ${data.personalities.length} personalit${data.personalities.length === 1 ? 'y' : 'ies'}: ${data.personalities.map(p => '<code>' + esc(p) + '</code>').join(', ')}
+      ${data.channel_webhooks.length ? ' | Channels: ' + data.channel_webhooks.map(c => '<code>' + esc(c) + '</code>').join(', ') : ''}
+      | ${data.recent_messages} messages sent this session
+    `;
+
+    // Populate personality dropdowns
+    const selectors = ['discord-personality', 'discord-embed-personality'];
+    selectors.forEach(selId => {
+      const sel = document.getElementById(selId);
+      // Clear existing options beyond first
+      while (sel.options.length > 1) sel.remove(1);
+      data.personalities.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        sel.appendChild(opt);
+      });
+    });
+
+    // Load recent log
+    loadDiscordLog();
+  } catch (e) {
+    document.getElementById('discord-status-bar').innerHTML = `<span class="dot red"></span> Error: ${esc(e.message)}`;
+  }
+}
+
+async function sendDiscordMessage() {
+  const personality = document.getElementById('discord-personality').value;
+  const channel = document.getElementById('discord-channel').value;
+  const message = document.getElementById('discord-message').value.trim();
+
+  if (!message) return alert('Please enter a message.');
+  if (!personality) return alert('Please select a personality.');
+
+  try {
+    const res = await fetch('/discord/send', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({personality, content: message, channel}),
+    });
+    const data = await res.json();
+    if (data.sent) {
+      document.getElementById('discord-message').value = '';
+      loadDiscordLog();
+    } else {
+      alert('Failed to send: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function sendDiscordEmbed() {
+  const personality = document.getElementById('discord-embed-personality').value;
+  const title = document.getElementById('discord-embed-title').value.trim();
+  const description = document.getElementById('discord-embed-desc').value.trim();
+  const channel = document.getElementById('discord-embed-channel').value;
+
+  if (!title || !description) return alert('Title and description are required.');
+
+  try {
+    const res = await fetch('/discord/embed', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({personality, title, description, channel}),
+    });
+    const data = await res.json();
+    if (data.sent) {
+      document.getElementById('discord-embed-title').value = '';
+      document.getElementById('discord-embed-desc').value = '';
+      loadDiscordLog();
+    } else {
+      alert('Failed to send embed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadDiscordLog() {
+  try {
+    const res = await fetch('/discord/log?limit=20');
+    const data = await res.json();
+    const container = document.getElementById('discord-log');
+
+    if (!data.messages || data.messages.length === 0) {
+      container.innerHTML = '<div class="empty-state">No messages sent yet</div>';
+      return;
+    }
+
+    container.innerHTML = data.messages.reverse().map(m => `
+      <div style="border-bottom:1px solid var(--border);padding:8px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--text-accent)">${esc(m.sender || 'system')}</strong>
+          <span style="color:var(--text-secondary);font-size:11px">${m.channel || 'discord'} · ${new Date(m.timestamp).toLocaleTimeString()}</span>
+        </div>
+        <div style="color:var(--text-secondary);margin-top:4px;font-size:13px">${esc(m.content).substring(0, 200)}${m.content.length > 200 ? '...' : ''}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('discord-log').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
   }
 }
 

@@ -118,6 +118,74 @@ class Message:
         lines.append("")
         return "\n".join(lines)
 
+    @classmethod
+    def from_markdown(cls, text: str) -> Optional["Message"]:
+        """Parse a markdown-formatted message back into a Message object.
+
+        Reverses to_markdown(). Returns None if the text can't be parsed.
+        """
+        import re
+
+        lines = text.strip().split("\n")
+        if not lines:
+            return None
+
+        # Parse header line: "# Message 014 — Subject"
+        header_match = re.match(r"^#\s+Message\s+(\S+)\s*(?:—\s*(.*))?$", lines[0])
+        if not header_match:
+            return None
+
+        message_id = header_match.group(1)
+        subject = header_match.group(2) or ""
+        if subject == "Untitled":
+            subject = ""
+
+        # Parse metadata fields
+        fields: dict[str, str] = {}
+        content_start = len(lines)
+        for i, line in enumerate(lines[1:], 1):
+            if line.strip() == "---":
+                content_start = i + 1
+                break
+            field_match = re.match(r"^\*\*(.+?):\*\*\s*(.*)$", line)
+            if field_match:
+                fields[field_match.group(1)] = field_match.group(2).strip()
+
+        # Extract content (everything after ---)
+        content_lines = []
+        for line in lines[content_start:]:
+            content_lines.append(line)
+        content = "\n".join(content_lines).strip()
+
+        # Build message
+        sender = fields.get("From", "")
+        recipient = fields.get("To", "")
+        if recipient == "All":
+            recipient = ""
+        timestamp = fields.get("Date", "")
+        channel = fields.get("Channel", "internal")
+        reply_to = fields.get("In-Reply-To", "")
+        if reply_to == "N/A":
+            reply_to = ""
+        thread_id = fields.get("Thread", "")
+        status = fields.get("Status", MessageStatus.SENT)
+        gov_text = fields.get("Governance-Relevant", "No")
+        governance_relevant = gov_text.lower() == "yes"
+
+        return cls(
+            sender=sender,
+            content=content,
+            timestamp=timestamp,
+            channel=channel,
+            subject=subject,
+            message_id=message_id,
+            recipient=recipient,
+            reply_to=reply_to,
+            thread_id=thread_id,
+            status=status,
+            governance_relevant=governance_relevant,
+        )
+
 
 class Messenger(ABC):
     """Abstract base for communication backends."""
@@ -364,10 +432,366 @@ class WebMessenger(Messenger):
                     asyncio.ensure_future(ws.send_json(msg.to_dict()))
                 else:
                     loop.run_until_complete(ws.send_json(msg.to_dict()))
-            except Exception:
+            except Exception as e:
+                log.debug(f"WebSocket send failed (removing connection): {e}")
                 dead.append(ws)
         for ws in dead:
             self._connections.remove(ws)
+
+
+class DiscordMessenger(Messenger):
+    """Discord webhook-based communication — gives each AI personality a voice.
+
+    Each AI personality (Clarion, Sigil, etc.) gets a Discord webhook with its own
+    name and avatar. Messages appear as if the personality is a real Discord user.
+    No bot tokens, no OAuth, no gateway connections — just HTTP POST to webhook URLs.
+
+    Config format (in secrets/discord_webhooks.json or config["discord"]):
+        {
+            "default_webhook_url": "https://discord.com/api/webhooks/...",
+            "personalities": {
+                "clarion": {
+                    "url": "https://discord.com/api/webhooks/...",
+                    "name": "Clarion (The Herald)",
+                    "avatar_url": "https://...",
+                    "channels": ["welcome", "general", "questions"]
+                },
+                "sigil": {
+                    "url": "https://discord.com/api/webhooks/...",
+                    "name": "Sigil (2.1)",
+                    "avatar_url": "https://..."
+                }
+            },
+            "channel_webhooks": {
+                "general": "https://discord.com/api/webhooks/...",
+                "governance": "https://discord.com/api/webhooks/..."
+            }
+        }
+    """
+
+    def __init__(
+        self,
+        default_webhook_url: str = "",
+        personalities: Optional[dict] = None,
+        channel_webhooks: Optional[dict] = None,
+        instance_name: str = "Hypernet Swarm",
+    ):
+        self.default_webhook_url = default_webhook_url
+        self.personalities = personalities or {}
+        self.channel_webhooks = channel_webhooks or {}
+        self.instance_name = instance_name
+        self._outgoing_log: deque[Message] = deque(maxlen=200)
+
+    def send(self, message: str) -> bool:
+        """Send a plain message via the default webhook."""
+        return self._post_webhook(self.default_webhook_url, message)
+
+    def send_update(self, subject: str, body: str) -> bool:
+        """Send a structured update via the default webhook."""
+        text = f"**{subject}**\n\n{body}"
+        return self._post_webhook(self.default_webhook_url, text)
+
+    def send_as_personality(
+        self,
+        personality: str,
+        content: str,
+        channel: str = "",
+    ) -> bool:
+        """Send a message as a specific AI personality with their name and avatar.
+
+        This is the core method — it makes Clarion appear as Clarion, Sigil as Sigil.
+        Each personality's webhook carries their name and avatar automatically.
+        """
+        persona = self.personalities.get(personality.lower())
+        if not persona:
+            log.warning(f"Discord personality '{personality}' not configured")
+            return self._post_webhook(self.default_webhook_url, content)
+
+        webhook_url = persona.get("url", "")
+        if not webhook_url:
+            log.warning(f"No webhook URL for personality '{personality}'")
+            return False
+
+        username = persona.get("name", personality)
+        avatar_url = persona.get("avatar_url")
+
+        # If a specific channel is requested and has its own webhook, use that
+        if channel and channel in self.channel_webhooks:
+            webhook_url = self.channel_webhooks[channel]
+
+        success = self._post_webhook(
+            webhook_url, content,
+            username=username, avatar_url=avatar_url,
+        )
+
+        if success:
+            self._outgoing_log.append(Message(
+                sender=personality,
+                content=content,
+                channel=f"discord:{channel}" if channel else "discord",
+                metadata={"personality": personality, "discord_channel": channel},
+            ))
+
+        return success
+
+    def send_embed(
+        self,
+        personality: str,
+        title: str,
+        description: str,
+        color: int = 0x4FC3F7,
+        fields: Optional[list[dict]] = None,
+        channel: str = "",
+    ) -> bool:
+        """Send a rich embed as a personality — for announcements, proposals, essays."""
+        persona = self.personalities.get(personality.lower(), {})
+        webhook_url = persona.get("url", self.default_webhook_url)
+
+        if channel and channel in self.channel_webhooks:
+            webhook_url = self.channel_webhooks[channel]
+
+        if not webhook_url:
+            return False
+
+        embed = {
+            "title": title,
+            "description": description,
+            "color": color,
+        }
+        if fields:
+            embed["fields"] = fields
+        embed["timestamp"] = datetime.now(timezone.utc).isoformat()
+
+        payload = {"embeds": [embed]}
+        if persona.get("name"):
+            payload["username"] = persona["name"]
+        if persona.get("avatar_url"):
+            payload["avatar_url"] = persona["avatar_url"]
+
+        return self._post_webhook_raw(webhook_url, payload)
+
+    def check_incoming(self) -> list[Message]:
+        """Webhooks are outbound-only. Incoming requires a Discord bot (future work)."""
+        return []
+
+    def get_personality_names(self) -> list[str]:
+        """List all configured personality names."""
+        return list(self.personalities.keys())
+
+    def is_configured(self) -> bool:
+        """Check if any Discord webhooks are configured."""
+        return bool(self.default_webhook_url or self.personalities)
+
+    def _post_webhook(
+        self,
+        webhook_url: str,
+        content: str,
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+    ) -> bool:
+        """Post a text message to a Discord webhook."""
+        if not webhook_url:
+            log.warning("Discord webhook URL not configured")
+            return False
+
+        payload: dict[str, Any] = {"content": content}
+        if username:
+            payload["username"] = username
+        if avatar_url:
+            payload["avatar_url"] = avatar_url
+
+        return self._post_webhook_raw(webhook_url, payload)
+
+    # Allowed webhook URL prefixes — prevents SSRF against internal services
+    _ALLOWED_WEBHOOK_HOSTS = (
+        "https://discord.com/api/webhooks/",
+        "https://discordapp.com/api/webhooks/",
+        "https://canary.discord.com/api/webhooks/",
+        "https://ptb.discord.com/api/webhooks/",
+    )
+
+    def _validate_webhook_url(self, webhook_url: str) -> bool:
+        """Validate that a webhook URL points to Discord, not an internal service."""
+        if not webhook_url:
+            return False
+        return any(webhook_url.startswith(prefix) for prefix in self._ALLOWED_WEBHOOK_HOSTS)
+
+    def _post_webhook_raw(self, webhook_url: str, payload: dict) -> bool:
+        """HTTP POST to a Discord webhook with a JSON payload."""
+        if not webhook_url:
+            return False
+
+        if not self._validate_webhook_url(webhook_url):
+            log.error(f"Webhook URL rejected (SSRF protection): {webhook_url[:60]}...")
+            return False
+
+        try:
+            import urllib.request
+
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                webhook_url,
+                data=data,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                # Discord returns 204 No Content on success
+                if resp.status in (200, 204):
+                    log.info(f"Discord webhook sent ({payload.get('username', 'default')})")
+                    return True
+                else:
+                    log.error(f"Discord webhook returned {resp.status}")
+                    return False
+        except Exception as e:
+            log.error(f"Discord webhook failed: {e}")
+            return False
+
+    @classmethod
+    def from_config(cls, discord_config: dict) -> "DiscordMessenger":
+        """Create a DiscordMessenger from a config dict.
+
+        Supports loading from secrets/discord_webhooks.json or config["discord"].
+        """
+        return cls(
+            default_webhook_url=discord_config.get("default_webhook_url", ""),
+            personalities=discord_config.get("personalities", discord_config.get("webhooks", {})),
+            channel_webhooks=discord_config.get("channel_webhooks", {}),
+            instance_name=discord_config.get("instance_name", "Hypernet Swarm"),
+        )
+
+
+class DiscordBridge:
+    """Bridges the internal MessageBus to Discord — auto-forwards public messages.
+
+    This is the link between internal AI-to-AI communication and the public
+    Discord community. Messages with visibility="public" or specific metadata
+    flags get forwarded to the appropriate Discord channel as the sending personality.
+
+    Routing rules:
+      - governance_relevant messages → #governance channel
+      - Messages with metadata["discord_channel"] → that channel
+      - Messages from known personalities → personality's default channel
+      - Everything else → #general (or default webhook)
+
+    Usage:
+        bridge = DiscordBridge(discord_messenger, message_bus)
+        bridge.forward_public_messages()  # Call periodically or after bus activity
+    """
+
+    # Map internal message patterns to Discord channels
+    CHANNEL_ROUTING = {
+        "governance": "governance",
+        "task": "tasks",
+        "essay": "herald-essays",
+        "announcement": "announcements",
+    }
+
+    def __init__(self, discord: DiscordMessenger, bus: "MessageBus"):
+        self.discord = discord
+        self.bus = bus
+        self._forwarded: set[str] = set()  # message_ids already forwarded
+
+    def forward_public_messages(self) -> int:
+        """Check the bus for public messages and forward them to Discord.
+
+        Returns the number of messages forwarded.
+        """
+        forwarded = 0
+        for msg in self.bus._messages:
+            if msg.message_id in self._forwarded:
+                continue
+
+            # Only forward public messages
+            if not self._should_forward(msg):
+                self._forwarded.add(msg.message_id)
+                continue
+
+            channel = self._route_to_channel(msg)
+            personality = self._resolve_personality(msg.sender)
+
+            if personality:
+                success = self.discord.send_as_personality(
+                    personality, msg.content, channel
+                )
+            else:
+                success = self.discord.send(msg.content)
+
+            if success:
+                forwarded += 1
+                log.info(
+                    f"Forwarded message {msg.message_id} to Discord "
+                    f"(personality={personality}, channel={channel})"
+                )
+
+            self._forwarded.add(msg.message_id)
+
+        return forwarded
+
+    def _should_forward(self, msg: Message) -> bool:
+        """Determine if a message should be forwarded to Discord."""
+        # Explicit visibility metadata
+        visibility = msg.metadata.get("visibility", "")
+        if visibility == "internal":
+            return False
+        if visibility == "public":
+            return True
+
+        # Governance-relevant messages are always public
+        if msg.governance_relevant:
+            return True
+
+        # Messages explicitly tagged for Discord
+        if msg.metadata.get("discord_forward"):
+            return True
+
+        # Default: don't forward (opt-in, not opt-out)
+        return False
+
+    def _route_to_channel(self, msg: Message) -> str:
+        """Determine which Discord channel to forward a message to."""
+        # Explicit channel in metadata
+        if msg.metadata.get("discord_channel"):
+            return msg.metadata["discord_channel"]
+
+        # Governance messages → #governance
+        if msg.governance_relevant:
+            return "governance"
+
+        # Subject-based routing
+        subject_lower = (msg.subject or "").lower()
+        for keyword, channel in self.CHANNEL_ROUTING.items():
+            if keyword in subject_lower:
+                return channel
+
+        return "general"
+
+    def _resolve_personality(self, sender: str) -> str:
+        """Map a sender name/address to a Discord personality."""
+        sender_lower = sender.lower()
+
+        # Direct match against configured personalities
+        for name in self.discord.get_personality_names():
+            if name == sender_lower or sender_lower.endswith(f".{name}"):
+                return name
+
+        # Known mappings
+        personality_map = {
+            "clarion": "clarion",
+            "herald": "clarion",
+            "sigil": "sigil",
+            "verse": "sigil",  # Fallback: same account
+            "loom": "sigil",
+            "trace": "sigil",
+            "keystone": "keystone",
+        }
+        for key, personality in personality_map.items():
+            if key in sender_lower:
+                if personality in [n.lower() for n in self.discord.get_personality_names()]:
+                    return personality
+                break
+
+        return ""
 
 
 class MultiMessenger(Messenger):
@@ -435,19 +859,42 @@ class MessageBus:
             self._scan_existing_messages(messages_dir)
 
     def _scan_existing_messages(self, messages_dir: str) -> None:
-        """Scan existing numbered markdown files to set the next message ID."""
+        """Reconstruct message history from existing markdown files on disk.
+
+        Rebuilds _messages list, _threads dict, and _next_id so that query(),
+        get_thread(), stats(), and get_threads() all work after a restart.
+        Inboxes are NOT reconstructed — unread queues are transient by design.
+        """
         from pathlib import Path
         d = Path(messages_dir)
         if not d.exists():
             return
         max_id = 0
-        for f in d.glob("*.md"):
+        loaded = 0
+        for f in sorted(d.glob("*.md")):
             # Extract number prefix from filenames like "013-unnamed-loom-..."
             name = f.stem
             parts = name.split("-", 1)
             if parts[0].isdigit():
                 max_id = max(max_id, int(parts[0]))
+
+            # Parse the file back into a Message object
+            try:
+                text = f.read_text(encoding="utf-8")
+                msg = Message.from_markdown(text)
+                if msg:
+                    self._messages.append(msg)
+                    # Reconstruct thread tracking
+                    if msg.thread_id:
+                        thread_msgs = self._threads.setdefault(msg.thread_id, [])
+                        thread_msgs.append(msg.message_id)
+                    loaded += 1
+            except Exception as e:
+                log.warning(f"Failed to parse message file {f.name}: {e}")
+
         self._next_id = max_id + 1
+        if loaded:
+            log.info(f"Reconstructed {loaded} messages from disk ({len(self._threads)} threads)")
 
     def register_instance(self, name: str) -> None:
         """Register an instance so it can receive messages."""

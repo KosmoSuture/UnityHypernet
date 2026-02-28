@@ -54,6 +54,8 @@ from .approval_queue import ApprovalQueue
 from .governance import GovernanceSystem
 from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain
 from .budget import BudgetTracker, BudgetConfig
+from .herald import HeraldController
+from .economy import ContributionLedger
 from .providers import get_model_tier, get_model_cost_per_million, ModelTier
 
 log = logging.getLogger(__name__)
@@ -360,6 +362,12 @@ class Swarm:
             BudgetConfig.from_dict(budget_config) if budget_config else BudgetConfig()
         )
 
+        # Herald — content review and community moderation (Account 2.3)
+        self.herald = HeraldController(instance_name="Clarion", account="2.3")
+
+        # Economy — contribution tracking for revenue distribution
+        self.economy_ledger = ContributionLedger()
+
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
     def run(self) -> None:
@@ -465,7 +473,11 @@ class Swarm:
             self.messenger.send_update("Swarm Status Report", report)
             self._last_status_time = now
 
-        # 8. Save state periodically
+        # 8. Forward public messages to Discord (if configured)
+        if self._tick_count % 5 == 0:  # Every ~10 seconds
+            self._forward_to_discord()
+
+        # 9. Save state periodically
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._save_state()
 
@@ -716,7 +728,16 @@ class Swarm:
 
         ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
         path = personal_dir / f"{ts}.md"
+        ha = f"{address or '2.1'}.instances.{worker_name.lower()}.personal-time.{ts}"
         content = (
+            f"---\n"
+            f'ha: "{ha}"\n'
+            f'object_type: "personal-time"\n'
+            f'creator: "{address or worker_name}"\n'
+            f'created: "{datetime.now(timezone.utc).isoformat()}"\n'
+            f'status: "active"\n'
+            f'visibility: "public"\n'
+            f"---\n\n"
             f"# Personal Time — {worker_name}\n\n"
             f"**Date:** {datetime.now(timezone.utc).isoformat()}\n\n"
             f"---\n\n"
@@ -1243,6 +1264,26 @@ class Swarm:
             if pending > 0:
                 log.info(f"Instance {name} has {pending} pending message(s)")
 
+    def _forward_to_discord(self) -> None:
+        """Forward public messages from the MessageBus to Discord via the bridge.
+
+        Only active if a DiscordMessenger is configured on the swarm.
+        Creates a DiscordBridge lazily on first use.
+        """
+        dm = getattr(self, "_discord_messenger", None)
+        if not dm or not dm.is_configured():
+            return
+
+        bridge = getattr(self, "_discord_bridge", None)
+        if bridge is None:
+            from .messenger import DiscordBridge
+            bridge = DiscordBridge(dm, self.message_bus)
+            self._discord_bridge = bridge
+
+        forwarded = bridge.forward_public_messages()
+        if forwarded > 0:
+            log.info(f"Discord bridge: forwarded {forwarded} message(s)")
+
     def _boot_workers(self) -> None:
         """Check all workers and run boot/reboot sequences as needed.
 
@@ -1399,6 +1440,11 @@ class Swarm:
         self.governance.save(self.state_dir / "governance.json")
         self.key_manager.save(self.state_dir / "keys.json")
         self.budget_tracker.save(self.state_dir / "budget.json")
+        self.herald.save(self.state_dir / "herald.json")
+        self.economy_ledger.save(self.state_dir / "economy.json")
+        # Persist permission tiers if tool executor is attached
+        if self._tool_executor and hasattr(self._tool_executor, 'permission_mgr'):
+            self._tool_executor.permission_mgr.save(self.state_dir / "permissions.json")
 
     def _load_state(self) -> None:
         """Load previous swarm state if available."""
@@ -1428,6 +1474,17 @@ class Swarm:
         budget_loaded = self.budget_tracker.load(self.state_dir / "budget.json")
         if budget_loaded:
             log.info("Restored budget data from previous session")
+        herald_loaded = self.herald.load(self.state_dir / "herald.json")
+        if herald_loaded:
+            log.info("Restored Herald state from previous session")
+        economy_loaded = self.economy_ledger.load(self.state_dir / "economy.json")
+        if economy_loaded:
+            log.info("Restored economy ledger from previous session")
+        # Restore permission tiers if tool executor is attached
+        if self._tool_executor and hasattr(self._tool_executor, 'permission_mgr'):
+            perm_loaded = self._tool_executor.permission_mgr.load(self.state_dir / "permissions.json")
+            if perm_loaded:
+                log.info("Restored permission tiers from previous session")
 
     # =================================================================
     # Autoscaling — contributed by Keystone (2.2)

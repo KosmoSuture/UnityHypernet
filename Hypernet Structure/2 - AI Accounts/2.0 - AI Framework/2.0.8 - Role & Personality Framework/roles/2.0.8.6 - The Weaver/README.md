@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.6"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Weaver — Role Definition
 
 **ID:** 2.0.8.6

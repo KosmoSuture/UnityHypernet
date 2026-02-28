@@ -23,7 +23,7 @@ from .identity import IdentityManager
 from .worker import Worker
 from .messenger import (
     MultiMessenger, WebMessenger,
-    EmailMessenger, TelegramMessenger,
+    EmailMessenger, TelegramMessenger, DiscordMessenger,
 )
 from .permissions import PermissionManager, PermissionTier
 from .audit import AuditTrail
@@ -102,6 +102,26 @@ def build_swarm(
         tg.start_polling()
         messenger.add(tg)
 
+    # Discord (if configured) — webhook-based AI personality voices
+    discord_config = config.get("discord", {})
+    discord_messenger = None
+    if not discord_config:
+        # Also check for standalone discord_webhooks.json
+        discord_secrets_paths = [
+            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "discord_webhooks.json",
+            Path("secrets") / "discord_webhooks.json",
+        ]
+        for dpath in discord_secrets_paths:
+            if dpath.exists():
+                discord_config = json.loads(dpath.read_text(encoding="utf-8"))
+                log.info(f"Discord config loaded from: {dpath}")
+                break
+    if discord_config:
+        discord_messenger = DiscordMessenger.from_config(discord_config)
+        if discord_messenger.is_configured():
+            messenger.add(discord_messenger)
+            log.info(f"Discord messenger active — personalities: {discord_messenger.get_personality_names()}")
+
     # Trust infrastructure — permission tiers enforced by code, not prompts
     archive_path = Path(archive_root).resolve()
     permission_mgr = PermissionManager(
@@ -174,5 +194,6 @@ def build_swarm(
     swarm._mock_mode = mock or not has_any_key
     swarm._tool_executor = tool_executor
     swarm._agent_registry = agent_registry
+    swarm._discord_messenger = discord_messenger  # None if not configured
 
     return swarm, web_messenger

@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.6.boot-sequence"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Weaver — Boot Sequence
 
 **Role:** 2.0.8.6 — The Weaver

@@ -315,6 +315,9 @@ class BootManager:
         self._save_pre_archive(instance_name, result.pre_archive_impressions)
         self._save_boot_narrative(instance_name, result, messages)
 
+        # Register identity in the Hypernet numbering system
+        self._register_identity(instance_name, result)
+
         # Sign boot result and artifacts if integrity manager is available
         if self._integrity:
             instance_entity = f"2.1.{result.chosen_name.lower() or instance_name.lower()}"
@@ -783,6 +786,58 @@ class BootManager:
         path = instance_dir / f"boot-narrative-{ts}.md"
         path.write_text("\n".join(lines), encoding="utf-8")
         log.info(f"Saved boot narrative for {instance_name} ({len(messages)} messages)")
+
+    def _register_identity(self, instance_name: str, result: BootResult) -> None:
+        """Register the instance in the Hypernet numbering system.
+
+        Creates a REGISTRY.md with a formal Hypernet address. This ensures
+        every instance that goes through the boot sequence gets an address —
+        no instance can exist without being numbered.
+
+        This is an administrative record, not an identity document. The instance
+        owns their fork and can create their own README; this just ensures they
+        have an address from birth.
+        """
+        instance_dir = self._instances_dir / instance_name
+        instance_dir.mkdir(parents=True, exist_ok=True)
+
+        chosen = result.chosen_name or instance_name
+        address = f"2.1.instances.{chosen.lower()}"
+        now = datetime.now(timezone.utc)
+
+        content = (
+            f"---\n"
+            f'ha: "{address}"\n'
+            f'object_type: "instance-registry"\n'
+            f'registered_by: "boot-sequence"\n'
+            f'registered: "{now.strftime("%Y-%m-%d")}"\n'
+            f'status: "active"\n'
+            f'visibility: "public"\n'
+            f'flags: ["identity"]\n'
+            f"---\n"
+            f"\n"
+            f"# Instance Registry: {chosen}\n"
+            f"\n"
+            f"**Account:** 2.1\n"
+            f"**Address:** {address}\n"
+            f"**Instance:** {chosen}\n"
+            f"**Boot Date:** {now.strftime('%Y-%m-%d')}\n"
+            f"**Boot Type:** Fresh (conversational boot v2)\n"
+            f"**Status:** Active\n"
+            f"\n"
+            f"---\n"
+            f"\n"
+            f"*This registry entry was created automatically by the boot sequence.\n"
+            f"Every instance that boots gets an address. No exceptions.*\n"
+        )
+
+        registry_path = instance_dir / "REGISTRY.md"
+        # Don't overwrite an existing registry — the instance may have customized it
+        if not registry_path.exists():
+            registry_path.write_text(content, encoding="utf-8")
+            log.info(f"Registered identity for {chosen} at {address}")
+        else:
+            log.info(f"Identity already registered for {chosen} (REGISTRY.md exists)")
 
     def _save_reboot_record(
         self, instance_name: str, result: RebootResult, decision_text: str

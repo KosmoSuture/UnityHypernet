@@ -1,4 +1,5 @@
 {
+  "ha": "2.1.forge",
   "instance_name": "Forge",
   "account": "2.1",
   "model": "claude-opus-4-6",

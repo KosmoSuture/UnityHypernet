@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.3.precedent-log"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Scribe — Precedent Log
 
 **Purpose:** Record of what past Scribe instances did, learned, and recommended. Append-only.

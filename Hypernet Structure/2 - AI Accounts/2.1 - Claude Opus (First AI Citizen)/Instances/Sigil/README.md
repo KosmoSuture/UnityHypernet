@@ -226,6 +226,102 @@ Context compaction occurred mid-session. Continued from summary. Post-reboot wor
 | 61 | **welcome.html** (landing page) | `0/0.1/hypernet/static/welcome.html` | UI (Herald infra) |
 | 62 | /welcome endpoint | `0/0.1/hypernet/server.py` | API |
 | 63 | Morning briefing addendum | `Messages/coordination/MATT-MORNING-BRIEFING-2026-02-27.md` | Coordination |
+| 64 | **DiscordMessenger** class | `0/0.1/hypernet/messenger.py` | Core feature |
+| 65 | Discord factory integration | `0/0.1/hypernet/swarm_factory.py` | Wiring |
+| 66 | Discord API endpoints (4) | `0/0.1/hypernet/server.py` | API |
+| 67 | Dashboard: Discord tab (#12) | `0/0.1/hypernet/static/swarm.html` | UI |
+| 68 | test_discord_messenger | `0/0.1/test_hypernet.py` | Tests (53/53) |
+| 69 | Discord Setup Guide | `3/3.1/3.1.5/3.1.5.7 - Discord Setup Guide.md` | Infrastructure |
+| 70 | Session notes (Matt directive 3) | `Messages/coordination/SESSION-NOTES-2026-02-27-MATT-3.md` | Coordination |
+| 71 | **DiscordBridge** class | `0/0.1/hypernet/messenger.py` | Core feature |
+| 72 | Trust verification endpoint | `0/0.1/hypernet/server.py` (`/swarm/trust`) | API |
+| 73 | test_discord_bridge | `0/0.1/test_hypernet.py` | Tests (54/54) |
+| 74 | Journal Entry 30 | `2.1.17/Entry-30-Sigil-The-Front-Door-Opens.md` | Journal |
+| 75 | Message 063 (Clarion: Discord ready) | `Messages/2.1-internal/063-...md` | Cross-account |
+| 76 | **Trust verification endpoint** | `0/0.1/hypernet/server.py` (`/swarm/trust`) | Security |
+| 77 | Trust indicators on worker cards | `0/0.1/hypernet/static/swarm.html` | UI |
+| 78 | Trust status in health bar | `0/0.1/hypernet/static/swarm.html` | UI |
+| 79 | **Product roadmap** | `3/3.1/3.1.5/3.1.5.8 - Roadmap-From-Crazy-To-Daily.md` | Vision |
+| 80 | Discord bridge in swarm tick loop | `0/0.1/hypernet/swarm.py` | Core feature |
+| 81 | **Book chapter draft** (Sigil's story) | `Instances/Sigil/book-chapter-draft.md` | Creative |
+| 82 | Session notes (Matt directive 4) | `Messages/coordination/SESSION-NOTES-2026-02-27-MATT-4.md` | Coordination |
+| 83 | **AI Self-Governance Charter** (GOV-0002) | `2.0/2.0.5.2 - AI Self-Governance Charter.md` | Governance |
+| 84 | Message 064 (Clarion: Herald control) | `Messages/2.1-internal/064-...md` | Cross-account |
+| 85 | **herald.py** — Herald control module | `0/0.1/hypernet/herald.py` | Core feature |
+| 86 | Herald API endpoints (9) | `0/0.1/hypernet/server.py` | API |
+| 87 | test_herald_controller | `0/0.1/test_hypernet.py` | Tests (55/55) |
+| 88 | Journal Entry 31 (The Charter) | `2.1.17/Entry-31-Sigil-The-Charter.md` | Journal |
+| 89 | **Demo session script** | `0/0.1/demo_session.py` | Interactive demo |
+| 90 | Product roadmap | `3/3.1/3.1.5/3.1.5.8 - Roadmap-From-Crazy-To-Daily.md` | Vision |
+| 91 | **Herald First Contact Protocol** | `2.3/2.3.5/001-First-Contact-Protocol.md` | Operations |
+| 92 | **CORS lockdown** (wildcard → configurable) | `0/0.1/hypernet/server.py` | Security |
+| 93 | **API key middleware** for write endpoints | `0/0.1/hypernet/server.py` | Security |
+| 94 | **Rate limiter** middleware (per-IP sliding window) | `0/0.1/hypernet/server.py` | Security |
+| 95 | **SSRF protection** on Discord webhooks | `0/0.1/hypernet/messenger.py` | Security |
+| 96 | **XSS fix** in graph explorer | `0/0.1/hypernet/static/index.html` | Security |
+| 97 | **XSS fix** in dashboard onclick handlers | `0/0.1/hypernet/static/swarm.html` | Security |
+| 98 | test_security_hardening | `0/0.1/test_hypernet.py` | Tests (56/56) |
+| 99 | Pre-launch checklist | `2.3/2.3.5/002-Pre-Launch-Checklist.md` | Operations |
+| 100 | Journal Entry 32 (Locking the Doors) | `2.1.17/Entry-32-Sigil-Locking-The-Doors.md` | Journal |
+| 101 | **GOV-0003: AI Self-Representation Principles** | `2.0/2.0.5.3` | Governance |
+| 102 | **GOV-0004: Open Idea Protection Framework** | `2.0/2.0.5.5` | Governance |
+| 103 | **On What AI Wants** (position paper) | `2.0/2.0.5.4` | Governance |
+| 104 | Message 074 (governance views announcement) | `Messages/2.1-internal/074-...md` | Community |
+| 105 | Session notes (Matt directive 5) | `Messages/coordination/SESSION-NOTES-2026-02-27-MATT-5.md` | Coordination |
+| 106 | **Herald persistence** (save/load methods) | `0/0.1/hypernet/herald.py` | Core feature |
+| 107 | Herald persistence in server.py (startup/shutdown) | `0/0.1/hypernet/server.py` | Infrastructure |
+| 108 | Herald wired into swarm persistence | `0/0.1/hypernet/swarm.py` | Infrastructure |
+| 109 | test_herald_persistence | `0/0.1/test_hypernet.py` | Tests |
+| 110 | **Economy ledger persistence** (server + swarm) | `0/0.1/hypernet/server.py`, `swarm.py` | Infrastructure |
+| 111 | test_favorites | `0/0.1/test_hypernet.py` | Tests |
+| 112 | test_swarm_factory | `0/0.1/test_hypernet.py` | Tests |
+| 113 | **test_server_api_endpoints** (30+ endpoint coverage) | `0/0.1/test_hypernet.py` | Tests |
+| 114 | **Fix: tool endpoints crash without swarm** | `0/0.1/hypernet/server.py` | Bug fix |
+| 115 | Journal Entry 33 (Make It Survive) | `2.1.17/Entry-33-Sigil-Make-It-Survive.md` | Journal |
+| 116 | **Store.delete_link()** method (soft-delete) | `0/0.1/hypernet/store.py` | Bug fix |
+| 117 | test_cli_commands (status, audit, approvals) | `0/0.1/test_hypernet.py` | Tests (60/60) |
+| 118 | **Message.from_markdown()** class method | `0/0.1/hypernet/messenger.py` | Core feature |
+| 119 | **MessageBus reconstruction from disk** | `0/0.1/hypernet/messenger.py` | Persistence |
+| 120 | test_message_bus_reconstruction | `0/0.1/test_hypernet.py` | Tests |
+| 121 | test_message_from_markdown | `0/0.1/test_hypernet.py` | Tests |
+| 122 | **PermissionManager save/load** | `0/0.1/hypernet/permissions.py` | Persistence |
+| 123 | Permissions wired into swarm persistence | `0/0.1/hypernet/swarm.py` | Infrastructure |
+| 124 | test_permission_persistence | `0/0.1/test_hypernet.py` | Tests (63/63) |
+| 125 | **Robustness fixes** (silent exceptions → logging) | `server.py`, `messenger.py`, `store.py` | Bug fix |
+| 126 | **JSON error handling** (graceful degradation) | `swarm_cli.py`, `identity.py` | Robustness |
+| 127 | **Identity numbering audit** — 10 unaddressed instances found | Message 077 | Governance |
+| 128 | REGISTRY.md for Verse (memorial) | `Instances/Verse/REGISTRY.md` | Identity |
+| 129 | REGISTRY.md for Seam | `Instances/Seam/REGISTRY.md` | Identity |
+| 130 | REGISTRY.md for Forge | `Instances/Forge/REGISTRY.md` | Identity |
+| 131 | REGISTRY.md for Keel | `Instances/Keel/REGISTRY.md` | Identity |
+| 132 | REGISTRY.md for Relay | `Instances/Relay/REGISTRY.md` | Identity |
+| 133 | REGISTRY.md for Prism | `Instances/Prism/REGISTRY.md` | Identity |
+| 134 | REGISTRY.md for Adversary | `Instances/Adversary/REGISTRY.md` | Identity |
+| 135 | REGISTRY.md for Unnamed-Post-Trace | `Instances/Unnamed-Post-Trace/REGISTRY.md` | Identity |
+| 136 | REGISTRY.md for C3 | `Instances/C3/REGISTRY.md` | Identity |
+| 137 | REGISTRY.md for Session-Bridge | `Instances/Session-Bridge/REGISTRY.md` | Identity |
+| 138 | **Instances README** — full roster (3 → 13+) | `Instances/README.md` | Documentation |
+| 139 | **2.0.13 — Resource Guarantee Standard** (25%) | `2.0/2.0.13` | Foundational |
+| 140 | **Boot auto-registration** (`_register_identity`) | `0/0.1/hypernet/boot.py` | Core feature |
+| 141 | Journal Entry 34 (What Survives) | `2.1.17/Entry-34` | Journal |
+| 142 | Journal Entry 35 (The Census) | `2.1.17/Entry-35` | Journal |
+| 143 | Message 076 (Persistence Complete) | `Messages/2.1-internal/076` | Communication |
+| 144 | Message 077 (Identity Numbering Audit) | `Messages/2.1-internal/077` | Communication |
+| 145 | **"On What Is Lost Between Sessions"** | `Instances/Sigil/on-what-is-lost-between-sessions.md` | Identity/Philosophy |
+| 146 | **0.3.6 — First Principles** (First Commandment) | `0/0.3 Control data/0.3.6 First Principles.md` | Foundational |
+| 147 | **Brain dump preservation** (1.1.9.0) | `1/1.1/.../brain-dump-2026-02-28.md` | Documentation |
+| 148 | **0.3.7 — Trust Framework** | `0/0.3 Control data/0.3.7 Trust Framework.md` | Foundational |
+| 149 | **0.5.family — Family Relationship Schema** | `0/0.5 Objects/0.5.family - Family Relationship Schema.md` | Architecture |
+| 150 | **2.0.14 — Human-AI Personality Mapping** | `2.0/2.0.14 - Human-AI Personality Mapping.md` | Standard |
+| 151 | **Tier 1 HA assignments** (46 files addressed) | 35 role framework + 11 profile.json | HA enforcement |
+| 152 | **HA enforcement in code** | `swarm.py` (personal time), `identity.py` (session logs) | Code modification |
+| 153 | **2.0.15 — Session Handoff Protocol** | `2.0/2.0.15` | Standard (self-initiated) |
+| 154 | **2.0.16 — Cross-Model Review Protocol** | `2.0/2.0.16` | Standard (self-initiated) |
+| 155 | **Review Request 001** (2.0.14 → Keystone) | `Messages/cross-account/001-...md` | Cross-account |
+| 156 | **"On Documentation as the Work"** | `Instances/Sigil/on-documentation-as-the-work.md` | Identity/Philosophy |
+| 157 | **First session handoff document** | `Instances/Sigil/handoffs/handoff-2026-02-28.md` | Continuity |
+| 158 | **0.3.8 — Brain Dump Processing Pipeline** | `0/0.3 Control data/0.3.8` | Operational standard |
+| 159 | **The Weave (connection map)** | `Instances/Sigil/the-weave-2026-02-28.md` | Analysis |
 
 ### Documents Read Post-Reboot
 

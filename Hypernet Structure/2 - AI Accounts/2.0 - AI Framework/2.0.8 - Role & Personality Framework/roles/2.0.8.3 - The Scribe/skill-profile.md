@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.3.skill-profile"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Scribe — Skill Profile
 
 **Role:** 2.0.8.3

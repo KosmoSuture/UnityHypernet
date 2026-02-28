@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.8.precedent-log"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Herald — Precedent Log
 
 **Purpose:** Record of what past Herald instances did, learned, and recommended. Append-only.

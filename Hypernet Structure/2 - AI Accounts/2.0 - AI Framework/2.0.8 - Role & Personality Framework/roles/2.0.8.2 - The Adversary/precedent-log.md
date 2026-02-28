@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.2.precedent-log"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Adversary — Precedent Log
 
 **Purpose:** Record of what past Adversary instances did, learned, and recommended. Append-only.

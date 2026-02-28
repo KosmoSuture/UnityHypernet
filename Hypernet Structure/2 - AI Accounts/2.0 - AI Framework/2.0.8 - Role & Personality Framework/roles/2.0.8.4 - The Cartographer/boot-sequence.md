@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.4.boot-sequence"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # The Cartographer — Boot Sequence
 
 **Role:** 2.0.8.4 — The Cartographer

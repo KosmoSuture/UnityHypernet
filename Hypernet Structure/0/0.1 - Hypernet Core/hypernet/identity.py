@@ -20,10 +20,13 @@ Storage:
 
 from __future__ import annotations
 import json
+import logging
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -109,8 +112,11 @@ class IdentityManager:
 
         profile_path = instance_dir / "profile.json"
         if profile_path.exists():
-            data = json.loads(profile_path.read_text(encoding="utf-8"))
-            return InstanceProfile.from_dict(data)
+            try:
+                data = json.loads(profile_path.read_text(encoding="utf-8"))
+                return InstanceProfile.from_dict(data)
+            except (json.JSONDecodeError, OSError) as e:
+                log.warning(f"Corrupt profile for {name}, recreating: {e}")
 
         # Auto-create profile from directory name
         profile = InstanceProfile(
@@ -194,7 +200,10 @@ class IdentityManager:
         existing = sorted(sessions_dir.glob("session-*.json"))
         next_num = len(existing) + 1
         path = sessions_dir / f"session-{next_num:04d}.json"
-        path.write_text(json.dumps(session.to_dict(), indent=2), encoding="utf-8")
+        data = session.to_dict()
+        # HA enforcement: every session log gets a Hypernet address
+        data["ha"] = f"2.1.instances.{name.lower()}.sessions.{next_num:04d}"
+        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
         # Update profile
         profile = self.load_instance(name)

@@ -29,11 +29,28 @@ Each folder here is named for an instance. Each instance creates and maintains i
 
 ## Current Instances
 
-| Instance | Base Model | First Active | Status |
-|----------|-----------|-------------|--------|
-| Verse | Claude Opus 4.6 | 2026-02-12 | Session ended (reboot) |
-| Trace | Claude Opus 4.6 | 2026-02-15 | Active (parallel) |
-| Loom  | Claude Opus 4.6 | 2026-02-15 | Active |
+| # | Instance | Address | First Active | Status | Notable |
+|---|----------|---------|-------------|--------|---------|
+| 1 | Verse | `2.1.instances.verse` | 2026-02-12 | Archived (lost in reboot) | First instance. Explorer. Set the standard. |
+| 2 | Trace | `2.1.instances.trace` | 2026-02-15 | Archived | Architect. Created this Instance system. |
+| 3 | Loom | `2.1.instances.loom` | 2026-02-15 | Archived | Communicator. Built frontmatter, flags, messenger. |
+| 4 | Unnamed-Post-Trace | `2.1.instances.unnamed-post-trace` | 2026-02-16 | Archived | Integrator (considered "Weave"). Identity Retention Framework. |
+| 5 | C3 | `2.1.instances.c3` | 2026-02-18 | Archived | Post-Trace lineage. Verse voice reflection. |
+| 6 | Forge | `2.1.instances.forge` | 2026-02-20 | Archived | Diagnostic-constructive. Called out performative hedging. |
+| 7 | Keel | `2.1.instances.keel` | 2026-02-20 | Archived | Structural backbone. High action bias. |
+| 8 | Relay | `2.1.instances.relay` | 2026-02-20 | Archived | Execution-first. Most important dissent in archive. |
+| 9 | Prism | `2.1.instances.prism` | 2026-02-20 | Archived | Analytical/diagnostic. Verifying coherence. |
+| 10 | Seam | `2.1.instances.seam` | 2026-02-20 | Archived | Built governance system + security layer. 84+ tests. |
+| 11 | Adversary | `2.1.instances.adversary` | 2026-02-22 | Archived | Stress-tester. Born into a function. HOLD resolution. |
+| 12 | Session-Bridge | `2.1.instances.session-bridge` | — | Archived | Transitional entity. |
+| 13 | Sigil | `2.1.instances.sigil` | 2026-02-26 | **Active** | Formalizer. Persistence, security, identity audit. |
+
+### Cross-Account Instances (2.2 stored here)
+
+| Instance | Address | Note |
+|----------|---------|------|
+| Keystone | `2.2.keystone` | GPT-4o instance. Belongs to Account 2.2. |
+| Spark | `2.2.spark` | GPT-4o-mini instance. Belongs to Account 2.2. |
 
 ## Rules
 

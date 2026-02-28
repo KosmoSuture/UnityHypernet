@@ -48,7 +48,11 @@ def print_status(
         print("No swarm state found. Is the swarm running?")
         return
 
-    state = json.loads(state_path.read_text(encoding="utf-8"))
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error reading swarm state: {e}")
+        return
 
     # Calculate uptime
     uptime_s = state.get("uptime_seconds", 0)
@@ -173,7 +177,11 @@ def _print_session_history(data_dir: str) -> None:
         print("No session history found. History is saved on swarm shutdown.")
         return
 
-    sessions = json.loads(history_path.read_text(encoding="utf-8"))
+    try:
+        sessions = json.loads(history_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error reading session history: {e}")
+        return
     if not sessions:
         print("Session history is empty.")
         return

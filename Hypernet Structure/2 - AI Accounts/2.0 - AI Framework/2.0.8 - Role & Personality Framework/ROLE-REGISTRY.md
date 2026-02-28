@@ -1,3 +1,11 @@
+---
+ha: "2.0.8.role-registry"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # Role Registry
 
 **Purpose:** Index of all defined roles in the Role & Personality Framework (2.0.8)

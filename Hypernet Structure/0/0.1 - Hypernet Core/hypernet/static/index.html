@@ -454,8 +454,8 @@
         detail.style.display = 'block';
 
         let html = `
-            <div class="node-address">${node.address}</div>
-            <div class="node-label">${node.data.name || node.data.filename || node.data.label || 'Unnamed'}</div>
+            <div class="node-address">${esc(node.address)}</div>
+            <div class="node-label">${esc(node.data.name || node.data.filename || node.data.label || 'Unnamed')}</div>
         `;
 
         // Data fields
@@ -463,14 +463,14 @@
             html += '<h3>Data</h3>';
             for (const [key, value] of Object.entries(node.data)) {
                 const display = typeof value === 'object' ? JSON.stringify(value) : String(value);
-                html += `<div class="data-row"><span class="data-key">${key}</span><span class="data-value" title="${display}">${display}</span></div>`;
+                html += `<div class="data-row"><span class="data-key">${esc(key)}</span><span class="data-value" title="${esc(display)}">${esc(display)}</span></div>`;
             }
         }
 
         // Metadata
         html += '<h3>Metadata</h3>';
-        html += `<div class="data-row"><span class="data-key">type</span><span class="data-value">${node.type_address || '—'}</span></div>`;
-        html += `<div class="data-row"><span class="data-key">source</span><span class="data-value">${node.source_type || '—'}</span></div>`;
+        html += `<div class="data-row"><span class="data-key">type</span><span class="data-value">${esc(node.type_address || '—')}</span></div>`;
+        html += `<div class="data-row"><span class="data-key">source</span><span class="data-value">${esc(node.source_type || '—')}</span></div>`;
         html += `<div class="data-row"><span class="data-key">created</span><span class="data-value">${formatDate(node.created_at)}</span></div>`;
         html += `<div class="data-row"><span class="data-key">updated</span><span class="data-value">${formatDate(node.updated_at)}</span></div>`;
 
@@ -481,10 +481,11 @@
                 const isOutgoing = link.from_address === node.address;
                 const otherAddr = isOutgoing ? link.to_address : link.from_address;
                 const arrow = link.bidirectional ? '&harr;' : (isOutgoing ? '&rarr;' : '&larr;');
-                html += `<div class="link-item" onclick="navigateTo('${otherAddr}')">
-                    <span class="link-rel">${link.relationship}</span>
+                const safeAddr = esc(otherAddr).replace(/'/g, '&#39;');
+                html += `<div class="link-item" onclick="navigateTo('${safeAddr}')">
+                    <span class="link-rel">${esc(link.relationship)}</span>
                     <span class="link-arrow">${arrow}</span>
-                    <span class="link-target">${otherAddr}</span>
+                    <span class="link-target">${esc(otherAddr)}</span>
                 </div>`;
             });
             if (links.length > 50) {
@@ -497,8 +498,8 @@
             html += `<h3>Version History (${history.length})</h3>`;
             history.forEach(v => {
                 html += `<div class="history-item">
-                    <span class="history-version">v${v.version}</span>
-                    <span class="history-hash">${v.content_hash}</span>
+                    <span class="history-version">v${esc(v.version)}</span>
+                    <span class="history-hash">${esc(v.content_hash)}</span>
                     <br><span class="history-date">${formatDate(v.snapshot_at)}</span>
                 </div>`;
             });
@@ -560,6 +561,12 @@
     });
 
     // ========== Utilities ==========
+
+    function esc(text) {
+        const d = document.createElement('div');
+        d.textContent = String(text || '');
+        return d.innerHTML;
+    }
 
     function formatDate(iso) {
         if (!iso) return '—';

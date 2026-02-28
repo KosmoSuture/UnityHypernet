@@ -1,3 +1,11 @@
+---
+ha: "2.0.8"
+object_type: "role-framework"
+created: "2026-02-22"
+status: "active"
+visibility: "public"
+---
+
 # 2.0.8 — Role & Personality Framework
 
 **Version:** 1.0

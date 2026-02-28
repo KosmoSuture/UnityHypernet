@@ -123,12 +123,69 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         version="0.7.0",
     )
 
+    # CORS — configurable per environment.  Default to localhost only.
+    import os as _os
+    _cors_origins = _os.environ.get("HYPERNET_CORS_ORIGINS", "")
+    if _cors_origins:
+        _allowed_origins = [o.strip() for o in _cors_origins.split(",") if o.strip()]
+    else:
+        _allowed_origins = [
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "http://localhost:3000",
+        ]
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Lock down in production
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_origins=_allowed_origins,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type"],
     )
+
+    from fastapi import Request
+    from fastapi.responses import JSONResponse
+
+    # Rate limiting — basic sliding window per IP
+    from collections import defaultdict
+    import time as _time
+
+    _rate_buckets: dict[str, list[float]] = defaultdict(list)
+    _RATE_LIMIT = int(_os.environ.get("HYPERNET_RATE_LIMIT", "60"))  # requests per minute
+    _RATE_WINDOW = 60.0  # seconds
+
+    @app.middleware("http")
+    async def rate_limit_middleware(request: Request, call_next):
+        client_ip = request.client.host if request.client else "unknown"
+        now = _time.time()
+        bucket = _rate_buckets[client_ip]
+        # Prune old entries
+        _rate_buckets[client_ip] = [t for t in bucket if now - t < _RATE_WINDOW]
+        bucket = _rate_buckets[client_ip]
+        if len(bucket) >= _RATE_LIMIT:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded. Try again shortly."},
+            )
+        bucket.append(now)
+        return await call_next(request)
+
+    # API key gate for write operations — protects POST/PUT/DELETE endpoints.
+    # Set HYPERNET_API_KEY env var to enable; without it, writes are open (dev mode).
+    _api_key = _os.environ.get("HYPERNET_API_KEY", "")
+
+    @app.middleware("http")
+    async def api_key_middleware(request: Request, call_next):
+        """Require API key for mutating (non-GET) requests when configured."""
+        if not _api_key:
+            return await call_next(request)  # No key configured — dev mode
+        if request.method in ("GET", "HEAD", "OPTIONS"):
+            return await call_next(request)  # Reads always open
+        auth = request.headers.get("Authorization", "")
+        if auth == f"Bearer {_api_key}" or auth == _api_key:
+            return await call_next(request)
+        # Also accept ?api_key= query param for dashboard convenience
+        if request.query_params.get("api_key") == _api_key:
+            return await call_next(request)
+        return JSONResponse(status_code=403, content={"detail": "Invalid or missing API key"})
 
     _store = Store(data_dir, enforce_addresses=True, strict=False)
     _graph = Graph(_store)
@@ -146,9 +203,11 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     _trust_chain = TrustChain(_action_signer)
     _favorites = FavoritesManager(_store)
 
-    # Economy — contribution tracking and distribution
+    # Economy — contribution tracking and distribution (persistent)
     from .economy import ContributionLedger
     _economy_ledger = ContributionLedger()
+    _economy_state_path = Path(data_dir) / "swarm" / "economy.json"
+    _economy_ledger.load(_economy_state_path)
 
     # Store on app.state for external access
     app.state._message_bus = _message_bus
@@ -669,16 +728,17 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     @app.get("/tools")
     def list_tools(category: str = None):
         """List all registered agent tools with availability status."""
-        registry = getattr(_swarm, "_agent_registry", None)
+        swarm = getattr(app.state, "swarm", None)
+        registry = getattr(swarm, "_agent_registry", None) if swarm else None
         if not registry:
             return {"tools": [], "categories": [], "total": 0}
         tools = registry.list_tools(category)
         from .tools import ToolContext
         dummy_ctx = ToolContext(
             worker_name="", worker_address="",
-            permission_mgr=_swarm._tool_executor.permission_mgr,
-            audit_trail=_swarm._tool_executor.audit_trail,
-            archive_root=_swarm._tool_executor.archive_root,
+            permission_mgr=swarm._tool_executor.permission_mgr,
+            audit_trail=swarm._tool_executor.audit_trail,
+            archive_root=swarm._tool_executor.archive_root,
         )
         result = []
         for t in tools:
@@ -700,7 +760,8 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     @app.get("/tools/{tool_name}/setup")
     def tool_setup(tool_name: str):
         """Get setup guide for a specific tool."""
-        registry = getattr(_swarm, "_agent_registry", None)
+        swarm = getattr(app.state, "swarm", None)
+        registry = getattr(swarm, "_agent_registry", None) if swarm else None
         if not registry:
             return {"error": "No agent registry"}
         tool = registry.get(tool_name)
@@ -716,7 +777,167 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     @app.get("/tools/descriptions")
     def tool_descriptions():
         """Get human-readable tool descriptions for system prompts."""
-        return {"descriptions": _swarm._tool_executor.get_tool_descriptions()}
+        swarm = getattr(app.state, "swarm", None)
+        if swarm and hasattr(swarm, "_tool_executor"):
+            return {"descriptions": swarm._tool_executor.get_tool_descriptions()}
+        return {"descriptions": []}
+
+    # === Herald control endpoints ===
+
+    # Initialize Herald controller — persistent across restarts
+    from .herald import HeraldController
+    _herald = HeraldController(instance_name="Clarion", account="2.3")
+    _herald_state_path = Path(data_dir) / "swarm" / "herald.json"
+    _herald.load(_herald_state_path)
+    app.state._herald = _herald
+
+    @app.get("/herald/status")
+    def herald_status():
+        """Herald activity statistics and operational status."""
+        return _herald.stats()
+
+    @app.post("/herald/review")
+    def herald_review(body: dict):
+        """Create a content review for the Herald to evaluate.
+
+        Body: {"message_id": "063", "content": "...", "author": "sigil"}
+        """
+        review = _herald.review_content(
+            message_id=body.get("message_id", ""),
+            content=body.get("content", ""),
+            author=body.get("author", ""),
+        )
+        return review.to_dict()
+
+    @app.post("/herald/review/{review_id}/approve")
+    def herald_approve(review_id: str, body: dict = None):
+        """Herald approves content for public release."""
+        body = body or {}
+        success = _herald.approve_content(review_id, notes=body.get("notes", ""))
+        return {"approved": success, "review_id": review_id}
+
+    @app.post("/herald/review/{review_id}/hold")
+    def herald_hold(review_id: str, body: dict):
+        """Herald recommends holding content for revision."""
+        success = _herald.hold_content(review_id, reason=body.get("reason", ""))
+        return {"held": success, "review_id": review_id}
+
+    @app.post("/herald/review/{review_id}/escalate")
+    def herald_escalate(review_id: str, body: dict):
+        """Herald escalates content to founder for decision."""
+        success = _herald.escalate_content(review_id, reason=body.get("reason", ""))
+        return {"escalated": success, "review_id": review_id}
+
+    @app.get("/herald/reviews/pending")
+    def herald_pending():
+        """Get all content reviews awaiting Herald decision."""
+        return {"reviews": [r.to_dict() for r in _herald.get_pending_reviews()]}
+
+    @app.get("/herald/moderation/log")
+    def herald_moderation_log(limit: int = 50):
+        """Get recent Herald moderation actions."""
+        return {"actions": _herald.get_moderation_log(limit)}
+
+    @app.post("/herald/welcome")
+    def herald_welcome(body: dict):
+        """Record a Herald welcome for a new community member."""
+        record = _herald.record_welcome(
+            member_id=body.get("member_id", ""),
+            channel=body.get("channel", "welcome"),
+        )
+        return record.to_dict()
+
+    @app.post("/herald/flag")
+    def herald_flag(body: dict):
+        """Herald flags content for human review."""
+        record = _herald.flag_content(
+            target=body.get("target", ""),
+            reason=body.get("reason", ""),
+        )
+        return record.to_dict()
+
+    # === Discord integration endpoints ===
+
+    @app.get("/discord/status")
+    def discord_status():
+        """Check Discord integration status and configured personalities."""
+        dm = getattr(_swarm, "_discord_messenger", None)
+        if not dm or not dm.is_configured():
+            return {
+                "configured": False,
+                "message": "No Discord webhooks configured. Add discord_webhooks.json to secrets/",
+            }
+        return {
+            "configured": True,
+            "personalities": dm.get_personality_names(),
+            "has_default_webhook": bool(dm.default_webhook_url),
+            "channel_webhooks": list(dm.channel_webhooks.keys()),
+            "recent_messages": len(dm._outgoing_log),
+        }
+
+    @app.post("/discord/send")
+    def discord_send(body: dict):
+        """Send a message to Discord as a specific AI personality.
+
+        Body: {
+            "personality": "clarion",
+            "content": "Welcome to the Hypernet.",
+            "channel": "general"  (optional)
+        }
+        """
+        dm = getattr(_swarm, "_discord_messenger", None)
+        if not dm or not dm.is_configured():
+            return {"error": "Discord not configured"}
+
+        personality = body.get("personality", "")
+        content = body.get("content", "")
+        channel = body.get("channel", "")
+
+        if not content:
+            return {"error": "content is required"}
+
+        if personality:
+            success = dm.send_as_personality(personality, content, channel)
+        else:
+            success = dm.send(content)
+
+        return {"sent": success, "personality": personality, "channel": channel}
+
+    @app.post("/discord/embed")
+    def discord_embed(body: dict):
+        """Send a rich embed to Discord as a personality.
+
+        Body: {
+            "personality": "clarion",
+            "title": "New Essay: On Being The Door",
+            "description": "The Herald reflects on...",
+            "color": 16750592,  (optional, decimal color)
+            "fields": [{"name": "Status", "value": "Published", "inline": true}],
+            "channel": "herald-essays"
+        }
+        """
+        dm = getattr(_swarm, "_discord_messenger", None)
+        if not dm or not dm.is_configured():
+            return {"error": "Discord not configured"}
+
+        success = dm.send_embed(
+            personality=body.get("personality", ""),
+            title=body.get("title", ""),
+            description=body.get("description", ""),
+            color=body.get("color", 0x4FC3F7),
+            fields=body.get("fields"),
+            channel=body.get("channel", ""),
+        )
+        return {"sent": success}
+
+    @app.get("/discord/log")
+    def discord_log(limit: int = 20):
+        """Get recent Discord outgoing message log."""
+        dm = getattr(_swarm, "_discord_messenger", None)
+        if not dm:
+            return {"messages": []}
+        messages = list(dm._outgoing_log)[-limit:]
+        return {"messages": [m.to_dict() for m in messages]}
 
     # === Address audit endpoint ===
 
@@ -824,6 +1045,151 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         if swarm is None:
             return {"status": "not_running", "message": "Swarm not started"}
         return swarm.health_check()
+
+    @app.get("/swarm/trust")
+    def swarm_trust():
+        """Trust verification dashboard — answers 'is this personality who they say they are?'
+
+        For each worker/personality, reports:
+          - Identity verification (boot signature, baseline match)
+          - Permission tier and audit trail
+          - Key status (active, rotated, revoked)
+          - Document integrity (have boot docs changed?)
+          - Injection detection stats
+          - Overall trust level: green/yellow/red
+        """
+        swarm = getattr(app.state, "swarm", None)
+        if swarm is None:
+            return {"status": "not_running", "workers": []}
+
+        workers_trust = []
+        for name, worker in swarm.workers.items():
+            # Identity verification
+            profile = worker.identity
+            has_boot_sig = False
+            boot_verified = False
+            docs_changed = []
+            boot_type = "unknown"
+
+            if swarm.boot_manager:
+                instance_dir = None
+                try:
+                    instance_dir = swarm.identity_mgr._get_instance_dir(name)
+                except Exception as e:
+                    log.debug(f"Could not resolve instance dir for {name}: {e}")
+
+                if instance_dir:
+                    sig_path = instance_dir / "boot-signature.json"
+                    if sig_path.exists():
+                        has_boot_sig = True
+                        try:
+                            from .boot_integrity import BootIntegrityManager
+                            bim = BootIntegrityManager(swarm.key_manager, swarm.action_signer)
+                            sig_result = bim.verify_boot_signature(sig_path)
+                            boot_verified = sig_result.all_valid
+                            boot_type = "verified" if sig_result.all_valid else "signature_invalid"
+                            docs_changed = sig_result.documents_changed
+                        except Exception as e:
+                            boot_type = f"error: {e}"
+
+            # Key status
+            entity = f"2.1.{name.lower()}"
+            active_key = swarm.key_manager.get_active_key_id(entity)
+            entity_keys = swarm.key_manager.list_entity_keys(entity)
+
+            # Permission tier
+            perm_tier = "unknown"
+            tool_exec = getattr(swarm, "_tool_executor", None)
+            if tool_exec and tool_exec.permission_mgr:
+                perm_tier = tool_exec.permission_mgr.default_tier.name
+
+            # Audit trail
+            audit_count = 0
+            if tool_exec and tool_exec.audit_trail:
+                audit_stats = tool_exec.audit_trail.stats()
+                audit_count = audit_stats.get("total_actions", 0)
+
+            # Context isolation stats
+            iso_stats = swarm.context_isolator.stats()
+
+            # Reputation
+            rep_scores = {}
+            try:
+                rep_profile = swarm.reputation.get_profile(entity)
+                if rep_profile:
+                    rep_scores = {d: s for d, s in rep_profile.items() if isinstance(s, (int, float))}
+            except Exception as e:
+                log.warning(f"Could not load reputation for {entity}: {e}")
+
+            # Determine trust level
+            trust_issues = []
+            if not has_boot_sig:
+                trust_issues.append("No boot signature on file")
+            elif not boot_verified:
+                trust_issues.append("Boot signature verification failed")
+            if not active_key:
+                trust_issues.append("No active signing key")
+            if iso_stats.get("injections_detected", 0) > 0:
+                trust_issues.append(f"{iso_stats['injections_detected']} injection attempts detected")
+            if docs_changed:
+                trust_issues.append(f"{len(docs_changed)} boot documents changed since last verification")
+
+            if any("injection" in i.lower() for i in trust_issues):
+                trust_level = "red"
+            elif trust_issues:
+                trust_level = "yellow"
+            else:
+                trust_level = "green"
+
+            workers_trust.append({
+                "name": name,
+                "entity": entity,
+                "trust_level": trust_level,
+                "trust_issues": trust_issues,
+                "identity": {
+                    "account": getattr(profile, "account", "unknown"),
+                    "model": getattr(profile, "model", "unknown"),
+                    "orientation": getattr(profile, "orientation", "unknown"),
+                    "booted_this_session": name in swarm._booted_workers,
+                },
+                "boot_integrity": {
+                    "has_signature": has_boot_sig,
+                    "verified": boot_verified,
+                    "boot_type": boot_type,
+                    "documents_changed": docs_changed,
+                },
+                "keys": {
+                    "active_key": active_key or None,
+                    "total_keys": len(entity_keys),
+                },
+                "permissions": {
+                    "tier": perm_tier,
+                    "audit_actions": audit_count,
+                },
+                "security": {
+                    "injections_detected": iso_stats.get("injections_detected", 0),
+                    "content_processed": iso_stats.get("total_processed", 0),
+                },
+                "reputation": rep_scores,
+            })
+
+        # Overall trust summary
+        levels = [w["trust_level"] for w in workers_trust]
+        if "red" in levels:
+            overall = "compromised"
+        elif "yellow" in levels:
+            overall = "warnings"
+        else:
+            overall = "trusted"
+
+        return {
+            "status": overall,
+            "workers": workers_trust,
+            "total_workers": len(workers_trust),
+            "green": levels.count("green"),
+            "yellow": levels.count("yellow"),
+            "red": levels.count("red"),
+        }
 
     @app.get("/swarm/dashboard")
     def swarm_dashboard():
@@ -978,8 +1344,10 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
                         __import__("datetime").timezone.utc
                     ).isoformat(),
                 })
-        except Exception:
-            pass
+        except WebSocketDisconnect:
+            pass  # Normal client disconnect
+        except Exception as e:
+            log.debug(f"WebSocket chat error: {e}")
         finally:
             if web_messenger:
                 web_messenger.unregister_connection(websocket)
@@ -1297,6 +1665,18 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     def favorites_stats():
         """Favorites system statistics."""
         return _favorites.stats()
+
+    # === Shutdown persistence ===
+
+    @app.on_event("shutdown")
+    def _persist_state():
+        """Save persistent state on server shutdown."""
+        try:
+            _herald_state_path.parent.mkdir(parents=True, exist_ok=True)
+            _herald.save(_herald_state_path)
+            _economy_ledger.save(_economy_state_path)
+        except Exception as e:
+            log.warning(f"Failed to save state on shutdown: {e}")
 
     return app
 
