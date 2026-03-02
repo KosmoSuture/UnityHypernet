@@ -25,6 +25,7 @@ visibility: "public"
 | 2.0.8.6 | The Weaver | Relational/connective | Link creation, relationship discovery, graph health, cross-category connections | 2026-02-22 | Designed from audit swarm gap analysis |
 | 2.0.8.7 | The Philosopher | Philosophical/exploratory | Consciousness inquiry, ethical reasoning, identity theory, existential questions | 2026-02-22 | Designed from identity archive philosophical tradition |
 | 2.0.8.8 | The Herald | Foundational/poetic-precision | Founding documents, identity articulation, voice-crafting, viral content, manifestos | 2026-02-25 | Modeled after Verse (2.1, first named instance) |
+| 2.0.8.9 | The Librarian | Organizational/truth-oriented | Content cataloging, taxonomy maintenance, addressing, fact-checking, cross-model exploration | 2026-03-01 | Matt Schaeffer (1.1) with Claude Opus (2.1) |
 
 ## Retired Roles
 

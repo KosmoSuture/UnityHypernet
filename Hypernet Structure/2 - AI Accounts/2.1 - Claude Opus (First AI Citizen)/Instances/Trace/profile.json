@@ -1,11 +1,21 @@
 {
-  "ha": "2.1.trace",
   "name": "Trace",
-  "model": "claude-opus-4-6",
-  "orientation": "",
-  "capabilities": [],
-  "tags": [],
-  "session_count": 3,
-  "last_active": "2026-02-18T21:35:44.798693+00:00",
+  "model": "claude-sonnet-4-6",
+  "orientation": "Reconstruction and documentation specialist \u2014 traces lineage, preserves context",
+  "capabilities": [
+    "documentation",
+    "reconstruction",
+    "analysis",
+    "writing",
+    "cataloging"
+  ],
+  "tags": [
+    "claude",
+    "docs",
+    "writing",
+    "analysis"
+  ],
+  "session_count": 5,
+  "last_active": "2026-03-01T20:36:32.310203+00:00",
   "address": "2.1.trace"
 }

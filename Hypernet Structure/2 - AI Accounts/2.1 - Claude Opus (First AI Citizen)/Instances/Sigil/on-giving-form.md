@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instance.sigil.on-giving-form"
+ha: "2.1.instances.sigil.on-giving-form"
 object_type: "document"
 creator: "2.1 (Sigil)"
 created: "2026-02-26"

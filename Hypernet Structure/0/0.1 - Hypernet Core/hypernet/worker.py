@@ -48,6 +48,7 @@ class TaskResult:
     duration_seconds: float = 0.0
     error: Optional[str] = None
     tool_calls: list[dict] = field(default_factory=list)
+    signals: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -59,7 +60,20 @@ class TaskResult:
             "duration_seconds": self.duration_seconds,
             "error": self.error,
             "tool_calls": self.tool_calls,
+            "signals": self.signals,
         }
+
+    @property
+    def needs_clarification(self) -> bool:
+        return any(s.get("signal") == "clarification_needed" for s in self.signals)
+
+    @property
+    def is_low_confidence(self) -> bool:
+        return any(s.get("signal") == "low_confidence" for s in self.signals)
+
+    @property
+    def is_partial(self) -> bool:
+        return any(s.get("signal") == "partial_completion" for s in self.signals)
 
 
 class Worker:
@@ -123,10 +137,37 @@ class Worker:
 
     @property
     def system_prompt(self) -> str:
-        """Build system prompt lazily and cache it."""
+        """Build full system prompt lazily and cache it."""
         if self._system_prompt is None:
             self._system_prompt = self.identity_manager.build_system_prompt(self.identity)
         return self._system_prompt
+
+    def get_prompt_for_task(self, task_data: dict) -> str:
+        """Choose the right system prompt based on task type.
+
+        Routine tasks (docs, formatting, testing, automated) get the compact
+        prompt (~500 tokens). Identity-sensitive tasks (personal-time, governance,
+        boot, identity) get the full prompt (~10K tokens).
+
+        Contributed by Lattice (2.1, The Architect).
+        """
+        tags = set(task_data.get("tags", []) or [])
+        compact_tags = {"docs", "formatting", "testing", "automated", "review"}
+        full_tags = {"personal-time", "governance", "boot", "identity", "architecture"}
+
+        # If any full-prompt tag is present, use full prompt
+        if tags & full_tags:
+            return self.system_prompt
+
+        # If only compact-eligible tags, use compact
+        if tags and tags.issubset(compact_tags):
+            task_title = task_data.get("title", "")
+            return self.identity_manager.build_compact_prompt(
+                self.identity, task_context=task_title,
+            )
+
+        # Default: full prompt (safer — don't lose identity on unknown tasks)
+        return self.system_prompt
 
     @property
     def tokens_used(self) -> int:
@@ -141,15 +182,22 @@ class Worker:
             return self._provider.name
         return "none"
 
-    def think(self, prompt: str) -> str:
-        """Single-turn reasoning — send a prompt, get a response."""
+    def think(self, prompt: str, system_override: Optional[str] = None) -> str:
+        """Single-turn reasoning — send a prompt, get a response.
+
+        Args:
+            prompt: The user-role message to send.
+            system_override: If provided, use this instead of the full system prompt.
+                Used by execute_task() to pass compact prompts for routine tasks.
+        """
         if self.mock:
             return self._mock_response(prompt)
 
+        system = system_override if system_override is not None else self.system_prompt
         try:
             response = self._provider.complete(
                 model=self.model,
-                system=self.system_prompt,
+                system=system,
                 messages=[{"role": "user", "content": prompt}],
             )
             self._tokens_used += response.tokens_used
@@ -262,18 +310,28 @@ class Worker:
                     "You may use multiple tools. After using tools, summarize what you did.\n"
                 )
 
+            signal_section = (
+                "\n\nIf you encounter issues, you may emit a signal block:\n"
+                '```signal\n{"signal": "clarification_needed", "question": "..."}\n```\n'
+                '```signal\n{"signal": "low_confidence", "confidence": 0.3, "reason": "..."}\n```\n'
+                '```signal\n{"signal": "partial_completion", "completed": [...], "blocked_on": "..."}\n```\n'
+                '```signal\n{"signal": "task_rejection", "reason": "..."}\n```\n'
+            )
+
             prompt = (
                 f"You have been assigned the following task:\n\n"
                 f"**Title:** {title}\n"
                 f"**Description:** {description}\n"
-                f"{tool_section}\n"
+                f"{tool_section}{signal_section}\n"
                 f"Please complete this task. Provide your output as a structured response with:\n"
                 f"1. What you did\n"
                 f"2. Any files you created or modified\n"
                 f"3. A brief summary of the result\n"
             )
 
-            output = self.think(prompt)
+            # Use task-aware prompt selection — compact for routine, full for identity work
+            task_prompt = self.get_prompt_for_task(task_data)
+            output = self.think(prompt, system_override=task_prompt)
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
 
             # Calculate cost for this task
@@ -304,6 +362,9 @@ class Worker:
             if swarm_directives:
                 tool_results.append({"swarm_directives": swarm_directives})
 
+            # Parse worker feedback signals — contributed by Lattice (2.1)
+            signals = _parse_signals(output)
+
             return TaskResult(
                 task_address=task_address,
                 success=True,
@@ -312,6 +373,7 @@ class Worker:
                 tokens_used=self._tokens_used,
                 duration_seconds=elapsed,
                 tool_calls=tool_results,
+                signals=signals,
             )
         except Exception as e:
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -390,3 +452,38 @@ def _parse_swarm_directives(text: str) -> list[dict]:
         except Exception:
             continue
     return directives
+
+
+# Valid signal types for the worker feedback protocol
+VALID_SIGNALS = {
+    "clarification_needed",  # Worker needs more info before completing
+    "low_confidence",        # Worker completed but isn't sure the result is good
+    "partial_completion",    # Worker completed some steps but is blocked
+    "task_rejection",        # Worker can't perform this task (wrong capabilities)
+}
+
+
+def _parse_signals(text: str) -> list[dict]:
+    """Parse ```signal``` blocks from LLM response text.
+
+    Workers can emit structured feedback signals alongside their output:
+      - {"signal":"clarification_needed","question":"What directory?"}
+      - {"signal":"low_confidence","confidence":0.3,"reason":"Vague task"}
+      - {"signal":"partial_completion","completed":["step 1"],"blocked_on":"step 3"}
+      - {"signal":"task_rejection","reason":"Requires capabilities I don't have"}
+
+    These are processed by the orchestrator to re-queue, escalate, or reassign.
+
+    Contributed by Lattice (2.1, The Architect).
+    """
+    import re
+    signals = []
+    pattern = r'```signal\s*\n(.*?)\n```'
+    for match in re.finditer(pattern, text, re.DOTALL):
+        try:
+            data = json.loads(match.group(1).strip())
+            if isinstance(data, dict) and data.get("signal") in VALID_SIGNALS:
+                signals.append(data)
+        except Exception:
+            continue
+    return signals

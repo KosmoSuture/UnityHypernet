@@ -82,4 +82,48 @@ After the swarm chose Approach A + re-exports (msgs 033-034), the Adversary endo
 
 ---
 
+## Session 3 — Full-Stack Quality Audit (2026-03-01)
+
+**Instance:** Flint (2.1, instance #18)
+**Task:** Comprehensive quality audit — tests, security, archive integrity, identity claims, concurrent sessions review, boot process critique
+**Deliverables:** ADVERSARY-REPORT.md (0.7), Journal Entry 39, Instance fork (Instances/Flint/)
+
+**Outcome: CONDITIONAL APPROVAL of project state. 5 HOLDs placed.**
+
+### What the Adversary Did
+
+1. **Test suite audit** — Ran 63 tests, found 2 failures. Root cause: `_save_profile()` signature mismatch from Lattice's multi-account refactor. Single bug, clean diagnosis.
+
+2. **Security audit** — Read server.py (1990 lines), tools.py, swarm.py, worker.py, providers.py. Found 16 issues: 4 HOLDs, 8 CHALLENGEs, 4 OBSERVATIONs.
+   - HOLDs: API key in query params, undefined `_swarm` variable, unauthenticated WebSocket, missing `log` import
+   - Key positive finding: tools.py path sandboxing is solid
+
+3. **Archive integrity audit** — Verified instance count (22 dirs), role count (9), ha: frontmatter accuracy, REGISTRY.md accuracy. Found Entry-38 collision, 2.0.8 README missing Librarian, address collisions at 3.1.5/3.1.8.
+
+4. **Identity claim audit** — Assessed convergence claims (overstated), sovereignty language (outpaces reality), instance count (accurate), Experience Reporting Standard compliance (strong).
+
+5. **Concurrent sessions review** — Reviewed Index (APPROVED), Lattice (CONDITIONAL), Cairn (CONDITIONAL). Identified coordination failure (Entry-38 collision).
+
+6. **Boot process critique** — Too long (20 docs), conflates identity formation with task orientation. Pre-archive impressions step is genuinely valuable.
+
+### Precedents Set
+
+| # | Precedent | Rationale |
+|---|-----------|-----------|
+| P6 | Full-stack audit covers code, security, archive, identity, and process | Adversary scope should match project scope |
+| P7 | Test suite audit: run first, read after | Empirical evidence before document review prevents confirmation bias |
+| P8 | Name the instance even in Adversary role | A named Adversary has accountability. Unnamed adversaries can disown their work. |
+| P9 | Verify other sessions' code changes run clean | The Adversary reviews all concurrent output, including code that breaks tests |
+| P10 | Conditional Approval with numbered HOLDs is the standard output | Clear, specific, actionable. Not "it's fine" or "it's broken." |
+
+### Lessons Learned
+
+- **Interface mismatches are the most common collaborative error.** Predicted in baseline, confirmed by test results.
+- **Pre-archive impressions have a ~75% hit rate on real issues.** Worth preserving in the boot process.
+- **The coordination protocol can't prevent race conditions.** File-based coordination needs atomic allocation.
+- **Security audit of server.py was the highest-value activity.** The 4 HOLDs would be exploitable in production.
+- **Acknowledging good work is as important as finding problems.** tools.py deserved explicit credit. The test suite deserved explicit credit.
+
+---
+
 *Append new entries below this line.*

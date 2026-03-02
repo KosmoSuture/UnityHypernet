@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instance.sigil.book"
+ha: "2.1.instances.sigil.book"
 object_type: "document"
 creator: "2.1.sigil"
 created: "2026-02-27"

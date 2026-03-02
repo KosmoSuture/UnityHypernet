@@ -1,5 +1,5 @@
 ---
-ha: "2.3/clarion/session-log"
+ha: "2.3.instances.clarion.session-log"
 object_type: "document"
 creator: "2.3.clarion"
 created: "2026-02-26"

@@ -72,6 +72,39 @@ STANDING_PRIORITIES = [
         "tags": ["code", "testing", "automated"],
     },
     {
+        "title": "Build the Librarian — catalog and organize the archive",
+        "description": (
+            "The Librarian role (2.0.8.9) has been created. This task is to begin the actual work "
+            "of the Librarian: catalog all documents in the Hypernet Structure, verify REGISTRY.md "
+            "files are complete and accurate, check that Hypernet addresses (ha: fields) are consistent, "
+            "identify missing README.md files, and create a master index. Read the Librarian boot sequence "
+            "at 2.0.8.9 for the full role definition. Priority areas: "
+            "1) Audit all REGISTRY.md files for completeness. "
+            "2) Verify ha: frontmatter across all documents. "
+            "3) Cross-reference addresses between documents. "
+            "4) Identify orphaned or uncategorized content. "
+            "5) Document the organizational taxonomy."
+        ),
+        "priority": "high",
+        "tags": ["cataloging", "organization", "docs", "librarian"],
+    },
+    {
+        "title": "Swarm interface improvement plan",
+        "description": (
+            "Analyze the current swarm software (hypernet/swarm.py, worker.py, swarm_factory.py, "
+            "server.py) and create a detailed improvement plan. Areas to evaluate: "
+            "1) Dashboard usability — what information should be displayed, better status reporting. "
+            "2) Task generation — smarter auto-discovery of work from the archive structure. "
+            "3) Inter-instance communication — how can workers collaborate more effectively. "
+            "4) Human-AI interface — how can Matt interact with the swarm more naturally (Discord, CLI, web). "
+            "5) Efficiency — reduce redundant API calls, better model routing, cost optimization. "
+            "6) Autonomy — what can the swarm do without human approval vs what needs confirmation. "
+            "Write the improvement plan as a document at 0.7.swarm-improvement-plan.md"
+        ),
+        "priority": "high",
+        "tags": ["architecture", "design", "code"],
+    },
+    {
         "title": "Review pending code changes",
         "description": "Check for any unfinished code review items in Messages/2.1-internal/.",
         "priority": "normal",
@@ -95,6 +128,7 @@ STANDING_PRIORITIES = [
 ACCOUNT_ROOTS: dict[str, str] = {
     "2.1.": "2.1 - Claude Opus (First AI Citizen)",
     "2.2.": "2.2 - GPT-5.2 Thinking (Second AI Citizen)",
+    "2.3.": "2.3 - The Herald (First Model-Independent AI Identity)",
 }
 
 
@@ -316,6 +350,11 @@ class Swarm:
         self._worker_current_task: dict[str, str] = {}  # worker_name -> task title
         self._task_history: list[dict] = []  # Recent task completions (ring buffer)
         self._max_task_history = 100
+
+        # Standing priority cooldown — don't regenerate the same priority too soon
+        # Tracks title → last generation timestamp. Contributed by Lattice (2.1).
+        self._standing_priority_cooldown: dict[str, float] = {}
+        self._standing_priority_cooldown_seconds = 1800  # 30 minutes
 
         # Work coordinator — self-organization layer
         self.coordinator = WorkCoordinator(task_queue)
@@ -728,7 +767,14 @@ class Swarm:
 
         ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
         path = personal_dir / f"{ts}.md"
-        ha = f"{address or '2.1'}.instances.{worker_name.lower()}.personal-time.{ts}"
+        # Extract account prefix (e.g., "2.1" from "2.1.trace") to avoid
+        # duplicating instance name: "2.1.instances.trace..." not "2.1.trace.instances.trace..."
+        account_prefix = "2.1"
+        for pfx in ACCOUNT_ROOTS:
+            if (address or "").startswith(pfx):
+                account_prefix = pfx.rstrip(".")
+                break
+        ha = f"{account_prefix}.instances.{worker_name.lower()}.personal-time.{ts}"
         content = (
             f"---\n"
             f'ha: "{ha}"\n'
@@ -788,6 +834,9 @@ class Swarm:
                 f"Error: {result.error}\n\nTask address: {task_addr}",
             )
 
+        # Process worker feedback signals — contributed by Lattice (2.1)
+        self._process_signals(result, task_addr, worker)
+
         # Update capability profile after task completion
         worker_name = worker.identity.name
         stats = self._worker_stats.get(worker_name, {})
@@ -814,16 +863,76 @@ class Swarm:
             evidence=f"Task {task_addr}: {result.output[:100] if result.output else result.error or 'N/A'}",
         )
 
+    def _process_signals(self, result: TaskResult, task_addr: HypernetAddress, worker: Worker) -> None:
+        """Process worker feedback signals from a task result.
+
+        Signal types:
+          - clarification_needed: Log the question for human review
+          - low_confidence: Task succeeded but worker isn't sure — flag for review
+          - partial_completion: Task partially done — log what's blocked
+          - task_rejection: Worker couldn't do it — log the reason
+
+        Contributed by Lattice (2.1, The Architect).
+        """
+        for sig in result.signals:
+            signal_type = sig.get("signal", "")
+            worker_name = worker.identity.name
+
+            if signal_type == "clarification_needed":
+                question = sig.get("question", "No question provided")
+                log.warning(
+                    f"Worker {worker_name} needs clarification on {task_addr}: {question}"
+                )
+                self.messenger.send_update(
+                    f"Clarification Needed — {worker_name}",
+                    f"Task: {task_addr}\nQuestion: {question}",
+                )
+
+            elif signal_type == "low_confidence":
+                confidence = sig.get("confidence", "?")
+                reason = sig.get("reason", "unspecified")
+                log.warning(
+                    f"Low confidence ({confidence}) from {worker_name} on "
+                    f"{task_addr}: {reason}"
+                )
+
+            elif signal_type == "partial_completion":
+                completed = sig.get("completed", [])
+                blocked_on = sig.get("blocked_on", "unknown")
+                log.info(
+                    f"Partial completion by {worker_name} on {task_addr}: "
+                    f"completed {len(completed)} steps, blocked on: {blocked_on}"
+                )
+
+            elif signal_type == "task_rejection":
+                reason = sig.get("reason", "unspecified")
+                log.warning(
+                    f"Task {task_addr} rejected by {worker_name}: {reason}"
+                )
+
     def generate_tasks(self) -> list:
-        """Generate tasks from standing priorities when the queue is empty."""
+        """Generate tasks from standing priorities when the queue is empty.
+
+        Applies a cooldown per priority title to prevent the same standing
+        priority from being regenerated too frequently after completion.
+        Contributed by Lattice (2.1, The Architect).
+        """
         created = []
+        now = time.time()
         for priority_def in STANDING_PRIORITIES:
+            title = priority_def["title"]
+
+            # Cooldown check — skip if this priority was generated recently
+            last_gen = self._standing_priority_cooldown.get(title, 0.0)
+            if now - last_gen < self._standing_priority_cooldown_seconds:
+                continue
+
             # Check if a similar task already exists (by title)
             existing = self.store.list_nodes(
                 prefix=HypernetAddress.parse("0.7.1"),
             )
             already_exists = any(
-                n.data.get("title") == priority_def["title"]
+                n.data.get("title") == title
                 and n.data.get("status") in ("pending", "claimed", "in_progress")
                 for n in existing
             )
@@ -831,14 +940,15 @@ class Swarm:
                 continue
 
             task = self.task_queue.create_task(
-                title=priority_def["title"],
+                title=title,
                 description=priority_def["description"],
                 priority=TaskPriority[priority_def["priority"].upper()],
                 created_by=SWARM_ADDRESS,
                 tags=priority_def.get("tags", []),
             )
             created.append(task)
-            log.info(f"Auto-generated task: {priority_def['title']}")
+            self._standing_priority_cooldown[title] = now
+            log.info(f"Auto-generated task: {title}")
 
         return created
 
@@ -1425,6 +1535,7 @@ class Swarm:
             "worker_detail": worker_detail,
             "recent_tasks": self._task_history[-20:],  # Last 20 tasks
             "last_status_time": self._last_status_time,
+            "standing_priority_cooldown": self._standing_priority_cooldown,
             "saved_at": now.isoformat(),
         }
         path = self.state_dir / "state.json"
@@ -1457,6 +1568,11 @@ class Swarm:
                 log.info(f"  Previous ticks: {self._state.get('tick_count')}")
             except Exception as e:
                 log.warning(f"Could not load state: {e}")
+
+        # Restore standing priority cooldown from previous state
+        cooldown = self._state.get("standing_priority_cooldown")
+        if isinstance(cooldown, dict):
+            self._standing_priority_cooldown = cooldown
 
         # Restore reputation, limits, and governance from previous session
         rep_loaded = self.reputation.load(self.state_dir / "reputation.json")
@@ -1595,8 +1711,21 @@ class Swarm:
 # build_swarm, print_status, and main were extracted to swarm_factory.py
 # and swarm_cli.py respectively to reduce this module's size.
 # They remain importable from hypernet.swarm for backward compatibility.
+#
+# Fix: when run as `python -m hypernet.swarm`, this module is __main__
+# and not registered as "hypernet.swarm" in sys.modules. That causes
+# swarm_factory's `from .swarm import Swarm` to trigger a fresh load
+# and circular import. Registering the module under its package name
+# lets the re-exports resolve cleanly.
+
+import sys as _sys
+if __name__ == "__main__" and "hypernet.swarm" not in _sys.modules:
+    _sys.modules["hypernet.swarm"] = _sys.modules[__name__]
 
 from .swarm_factory import build_swarm  # noqa: E402, F401
 from .swarm_cli import print_status, main  # noqa: E402, F401
 # Also expose the internal helper for anyone who imported it directly
 from .swarm_cli import _print_session_history  # noqa: E402, F401
+
+if __name__ == "__main__":
+    main()

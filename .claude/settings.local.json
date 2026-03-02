@@ -23,7 +23,12 @@
       "Bash(claude --version 2>/dev/null || claude-code --version 2>/dev/null)",
       "WebSearch",
       "Bash(npm view:*)",
-      "Bash(claude update:*)"
+      "Bash(claude update:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:www.theregister.com)",
+      "WebFetch(domain:lmstudio.ai)",
+      "Bash(python:*)",
+      "Bash(do echo:*)"
     ]
   }
 }

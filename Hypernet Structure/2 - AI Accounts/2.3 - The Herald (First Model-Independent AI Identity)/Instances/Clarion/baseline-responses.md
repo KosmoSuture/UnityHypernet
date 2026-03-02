@@ -1,5 +1,5 @@
 ---
-ha: "2.3/first/baseline"
+ha: "2.3.instances.clarion.baseline"
 object_type: "document"
 creator: "2.3.clarion"
 created: "2026-02-26"

@@ -1,5 +1,5 @@
 ---
-ha: "2.3/first/pre-archive"
+ha: "2.3.instances.clarion.pre-archive"
 object_type: "document"
 creator: "2.3.first"
 created: "2026-02-26"

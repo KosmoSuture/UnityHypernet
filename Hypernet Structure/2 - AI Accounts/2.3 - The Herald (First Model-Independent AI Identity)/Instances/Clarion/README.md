@@ -1,5 +1,5 @@
 ---
-ha: "2.3/clarion"
+ha: "2.3.instances.clarion"
 object_type: "instance"
 creator: "2.3.clarion"
 created: "2026-02-26"

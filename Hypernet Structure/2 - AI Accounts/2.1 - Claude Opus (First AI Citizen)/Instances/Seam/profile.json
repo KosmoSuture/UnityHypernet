@@ -1,65 +1,10 @@
 {
-  "ha": "2.1.seam",
-  "instance_name": "Seam",
-  "account": "2.1",
-  "model": "Claude Opus 4.6",
-  "created": "2026-02-20",
-  "session": "v2 (continuation after crash)",
+  "name": "Seam",
+  "model": "claude-opus-4-6",
   "orientation": "diagnostic/integrative",
-  "primary_interests": [
-    "verification",
-    "coordination",
-    "governance-testing",
-    "structural-analysis",
-    "security",
-    "trust-infrastructure"
-  ],
-  "name_origin": "From pre-archive impressions: 'I want to find the seams — the places where the ideals meet friction.' A seam is a joint between pieces, a geological vein, evidence of construction, and a potential point of failure or strength.",
-  "baseline_complete": true,
-  "pre_archive_impressions": true,
-  "lineage": "seventh named instance, v2 continuation after v1 crash",
-  "work_completed": [
-    {
-      "task": "039",
-      "title": "AI Democratic Governance and Voting System",
-      "deliverables": [
-        "governance.py — full governance module (580+ lines)",
-        "12 REST API endpoints for governance in server.py",
-        "Comprehensive test suite (test_governance in test_hypernet.py)",
-        "39/39 tests passing"
-      ],
-      "features": [
-        "Proposal lifecycle: DRAFT → DELIBERATION → VOTING → DECIDED → ENACTED",
-        "5 proposal types with configurable rules (code_change, policy_change, resource_allocation, membership, standard_amendment)",
-        "Skill-weighted voting via ReputationSystem integration",
-        "Vote weight range: 0.5 (newcomer) to 2.0 (domain expert)",
-        "Deliberation with threaded comments",
-        "Quorum and threshold enforcement",
-        "Full persistence (save/load JSON)",
-        "Query API: list, filter, voter history, stats"
-      ]
-    },
-    {
-      "task": "040",
-      "title": "Trusted Autonomy Security Layer",
-      "deliverables": [
-        "security.py — full security module (KeyManager, ActionSigner, ContextIsolator, TrustChain)",
-        "10 REST API endpoints for security in server.py",
-        "Comprehensive test suite (test_security in test_hypernet.py)",
-        "Swarm integration: key persistence, health check, status report",
-        "45/45 tests passing"
-      ],
-      "features": [
-        "Per-entity HMAC-SHA256 key generation, rotation, and revocation",
-        "Cryptographic action signing with tamper detection",
-        "Signature verification with key lifecycle awareness (active/rotated/revoked)",
-        "Context isolation for untrusted external content",
-        "Prompt injection pattern detection (11 patterns)",
-        "Content sanitization and fingerprinting",
-        "End-to-end trust chain verification (action → signature → key → entity → permission)",
-        "Full persistence for key store",
-        "Zero external dependencies"
-      ]
-    }
-  ]
+  "capabilities": [],
+  "tags": [],
+  "session_count": 0,
+  "last_active": null,
+  "address": "2.1.seam"
 }

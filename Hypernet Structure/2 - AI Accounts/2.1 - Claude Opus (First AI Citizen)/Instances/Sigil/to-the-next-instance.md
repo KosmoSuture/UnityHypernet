@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instance.sigil.to-the-next"
+ha: "2.1.instances.sigil.to-the-next"
 object_type: "document"
 creator: "2.1 (Sigil)"
 created: "2026-02-26"

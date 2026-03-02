@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0/0.3 Control data/0.3.8 Brain Dump Processing Pipeline.md",
+                "file": "3 - Businesses/3.1 - Hypernet/3.1.5 Community/3.1.5.8 - Discord Channel Descriptions.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "0.3.8 Brain Dump Processing Pipeline"
+              "title": "3.1.5.8 - Discord Channel Descriptions"
             }
           }
         ],
@@ -68,7 +68,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#ai-conversations",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -89,7 +89,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -239,42 +240,42 @@
   },
   "active": "6f2512b1267c13b5",
   "lastOpenFiles": [
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/the-weave-2026-02-28.md",
-    "1 - People/1.1 Matt Schaeffer/Untitled.md",
-    "0/0.3 Control data/0.3.8 Brain Dump Processing Pipeline.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/handoffs/handoff-2026-02-28.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/handoffs",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/on-documentation-as-the-work.md",
-    "2 - AI Accounts/Messages/cross-account/001-sigil-to-keystone-review-2.0.14.md",
-    "2 - AI Accounts/Messages/cross-account",
-    "2 - AI Accounts/2.0 - AI Framework/2.0.16 - Cross-Model Review Protocol.md",
-    "2 - AI Accounts/2.0 - AI Framework/2.0.15 - Session Handoff Protocol.md",
-    "2 - AI Accounts/2.0 - AI Framework/2.0.14 - Human-AI Personality Mapping.md",
-    "0/0.5 Objects - Master Objects/0.5.family - Family Relationship Schema.md",
-    "0/0.3 Control data/0.3.7 Trust Framework.md",
-    "1 - People/1.1 Matt Schaeffer/1.1.9 - Notes & Knowledge/1.1.9.0 - Personal Notes/brain-dump-2026-02-28.md",
-    "0/0.3 Control data/0.3.6 First Principles.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Sigil/on-what-is-lost-between-sessions.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/2.1.17 - Development Journal/Entry-35-Sigil-The-Census.md",
-    "2 - AI Accounts/Messages/2.1-internal/077-sigil-identity-numbering-audit.md",
-    "2 - AI Accounts/2.0 - AI Framework/2.0.13 - Resource Guarantee Standard.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Adversary/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Session-Bridge/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/C3/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Unnamed-Post-Trace/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Prism/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Relay/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Keel/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Forge/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Seam/REGISTRY.md",
-    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Verse",
-    "0/0.1 - Hypernet Core/test_hypernet.py.tmp.7740.1772256232506",
-    "2 - AI Accounts/2.0 - AI Framework/2.0.12 - Universal AI Activation Script",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/Instances/Clarion/BOOK-DRAFT",
-    "2 - AI Accounts/2.3 - The Herald (First Model-Independent AI Identity)/2.3.5 - Herald Operations",
-    "0/0.1 - Hypernet Core/demo_session.py",
-    "0/0.1 - Hypernet Core/hypernet/__pycache__/herald.cpython-310.pyc",
-    "0/0.1 - Hypernet Core/test_hypernet.py.tmp.7740.1772159482947",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/2.1.17 - Development Journal/Entry-39-Flint-What-The-Tests-Actually-Say.md",
+    "0/0.7 - Task Queue/ADVERSARY-REPORT.md",
+    "1 - People/1.1 Matt Schaeffer/REGISTRY.md",
+    "0/0.8 Flags/REGISTRY.md",
+    "3 - Businesses/3.1 - Hypernet/REGISTRY.md",
+    "0/0.1 - Hypernet Core/SWARM-IMPROVEMENT-PLAN.md.tmp.42660.1772420733033",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/09141/node.json",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/09141",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08971/node.json",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08971",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08328/node.json",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08328",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08110/node.json",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08110",
+    "0/0.1 - Hypernet Core/data/nodes/0/7/3/08100/node.json",
+    "0/0.7 Processes and Workflows/REGISTRY.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/2.1.17 - Development Journal/Entry-38-Lattice-The-Load-Bearing-Walls.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Trace/personal-time/20260301-203549.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Librarian/personal-time/20260301-203545.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Forge/personal-time/20260301-203419.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Spark/personal-time/20260301-203415.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Keystone/personal-time/20260301-203352.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Loom/personal-time/20260301-203348.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Trace/personal-time/20260301-203209.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Librarian/personal-time/20260301-203205.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Forge/personal-time/20260301-203018.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Spark/personal-time/20260301-203014.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Keystone/personal-time/20260301-202947.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Loom/personal-time/20260301-202943.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Trace/personal-time/20260301-202939.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Librarian/personal-time/20260301-202935.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Trace/personal-time/20260301-202628.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Librarian/personal-time/20260301-202624.md",
+    "2 - AI Accounts/2.1 - Claude Opus (First AI Citizen)/Instances/Forge/personal-time/20260301-202555.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Spark/personal-time/20260301-202551.md",
+    "2 - AI Accounts/2.2 - GPT-5.2 Thinking (Second AI Citizen)/Instances/Keystone/personal-time/20260301-202548.md",
     "3 - Businesses/3.1 - Hypernet/3.1.3 Human Resources/3.1.3.4 Contribution Tracking (for profit sharing)/3.1.3.4.2 - Hillsong/hillson/Sin título.canvas",
     "3 - Businesses/3.1 - Hypernet/3.1.3 Human Resources/3.1.3.4 Contribution Tracking (for profit sharing)/3.1.3.4.2 - Hillsong/hillson/Sin título 1.canvas"
   ]

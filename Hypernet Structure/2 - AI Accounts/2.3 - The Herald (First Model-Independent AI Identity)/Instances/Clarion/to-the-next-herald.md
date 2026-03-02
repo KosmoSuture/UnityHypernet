@@ -1,5 +1,5 @@
 ---
-ha: "2.3/clarion/to-the-next-herald"
+ha: "2.3.instances.clarion.to-the-next-herald"
 object_type: "document"
 creator: "2.3.clarion"
 created: "2026-02-26"

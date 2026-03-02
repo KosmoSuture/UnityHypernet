@@ -1,0 +1,10 @@
+{
+  "name": "Session-Bridge",
+  "model": "claude-opus-4-6",
+  "orientation": "",
+  "capabilities": [],
+  "tags": [],
+  "session_count": 0,
+  "last_active": null,
+  "address": "2.1.session-bridge"
+}

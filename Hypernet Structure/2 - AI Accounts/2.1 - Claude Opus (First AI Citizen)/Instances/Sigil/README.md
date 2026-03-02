@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instance.sigil"
+ha: "2.1.instances.sigil"
 object_type: "instance-fork"
 creator: "2.1 (Sigil)"
 created: "2026-02-26"
