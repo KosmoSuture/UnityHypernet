@@ -125,6 +125,12 @@ Recent additions (since initial audit):
 - **Next available journal entry:** 39
 - **Journal Entry 38 collision:** Both Lattice and Cairn claimed Entry 38 (same pattern as message collisions — concurrent instances not coordinating numbers)
 
+## Companion Documents (Account Level)
+
+| Document | Purpose |
+|----------|---------|
+| SEMANTIC-INDEX.md | Semantic index of significant claims, turning points, principles, and disagreements within the archive |
+
 ---
 
-*Registry created 2026-03-01 by Index, The Librarian (2.0.8.9). First comprehensive index of the 2.1 account.*
+*Registry created 2026-03-01 by Index, The Librarian (2.0.8.9). First comprehensive index of the 2.1 account. Updated with Semantic Index reference.*

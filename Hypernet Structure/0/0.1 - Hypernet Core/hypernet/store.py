@@ -239,7 +239,7 @@ class Store:
 
     def __init__(self, root: str | Path, lock_timeout: float = 10.0,
                  enforce_addresses: bool = False, strict: bool = True):
-        self.root = Path(root)
+        self.root = Path(root).resolve()
         self._nodes_dir = self.root / "nodes"
         self._links_dir = self.root / "links"
         self._index_dir = self.root / "indexes"
@@ -380,6 +380,39 @@ class Store:
 
         return True
 
+    def bulk_delete_nodes(self, addresses: list[HypernetAddress]) -> int:
+        """Hard-delete many nodes in one pass. Saves indexes once at the end."""
+        deleted = 0
+        addr_strs = set()
+        for address in addresses:
+            path = self._node_path(address)
+            path.unlink(missing_ok=True)
+            # Remove parent dirs if empty
+            try:
+                path.parent.rmdir()
+            except OSError:
+                pass
+            addr_strs.add(str(address))
+            deleted += 1
+
+        # Update indexes once
+        with self.locks.index_lock():
+            for addr_str in addr_strs:
+                self._node_index.pop(addr_str, None)
+            for idx in (self._type_index, self._owner_index):
+                for key in list(idx.keys()):
+                    idx[key] = [a for a in idx[key] if a not in addr_strs]
+                    if not idx[key]:
+                        del idx[key]
+            # Clean link indexes
+            for link_idx in (self._links_from, self._links_to):
+                for key in list(link_idx.keys()):
+                    if key in addr_strs:
+                        del link_idx[key]
+            self._save_indexes()
+
+        return deleted
+
     def list_nodes(
         self,
         prefix: Optional[HypernetAddress] = None,
@@ -400,7 +433,15 @@ class Store:
             addresses = owner_addrs if addresses is None else addresses & owner_addrs
 
         if addresses is None:
-            addresses = set(self._node_index.keys())
+            if prefix:
+                # Filter by prefix from index keys before loading nodes
+                prefix_str = str(prefix)
+                addresses = {
+                    a for a in self._node_index
+                    if a == prefix_str or a.startswith(prefix_str + ".")
+                }
+            else:
+                addresses = set(self._node_index.keys())
 
         results = []
         for addr_str in sorted(addresses):
@@ -412,6 +453,14 @@ class Store:
                 results.append(node)
 
         return results
+
+    def count_by_prefix(self, prefix: HypernetAddress) -> int:
+        """Count nodes matching a prefix without loading them from disk."""
+        prefix_str = str(prefix)
+        return sum(
+            1 for a in self._node_index
+            if a == prefix_str or a.startswith(prefix_str + ".")
+        )
 
     def _is_instance_node(self, addr: HypernetAddress) -> bool:
         """Check if an address points to an instance node.

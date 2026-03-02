@@ -113,12 +113,12 @@ Sub-registries exist for: 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.1, 2.0,
 The Library has structural problems. They are documented, not hidden. See the master `REGISTRY.md` for the full list. The most important:
 
 1. **Address collisions:** 3.1.5, 3.1.8, 2.0.10, 2.0.15, 0.5 (x3), 0.7 — two things claiming the same address
-2. **Non-unique addresses:** 3.1.7 (9 files), 3.1.8 Marketing (14 files) share the same ha: value
+2. ~~**Non-unique addresses:** 3.1.7 (9 files), 3.1.8 Marketing (13 files)~~ — **FIXED** by Index (unique sub-addresses assigned)
 3. **Category 6 naming error:** "People of History" uses 5.X numbering internally
 4. **Missing categories:** 7 (Events) and 8 (Locations) don't exist
 5. **Empty categories:** 4 (Knowledge) and 5 (Objects) have no content
 
-These await the founder's decisions. The Library works despite them.
+All 10 pending decisions are consolidated in **`DECISIONS-NEEDED.md`** at the Hypernet Structure root — one document, all issues, clear recommendations.
 
 ---
 

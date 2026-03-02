@@ -280,6 +280,17 @@ class TaskQueue:
 
         return available
 
+    def count_pending(self) -> int:
+        """Count pending tasks without loading all nodes from disk."""
+        prefix_str = str(TASK_PREFIX)
+        count = 0
+        for addr_str in self.store._node_index:
+            if addr_str == prefix_str or addr_str.startswith(prefix_str + "."):
+                node = self.store.get_node(HypernetAddress.parse(addr_str))
+                if node and not node.is_deleted and node.data.get("status") == TaskStatus.PENDING.value:
+                    count += 1
+        return count
+
     def get_tasks_for(self, assignee: HypernetAddress) -> list[Node]:
         """Get all tasks assigned to a specific AI instance."""
         all_tasks = self.store.list_nodes(prefix=TASK_PREFIX)
@@ -310,3 +321,27 @@ class TaskQueue:
                 dependent.data["status"] = TaskStatus.PENDING.value
                 dependent.update_data()
                 self.store.put_node(dependent)
+
+    def prune_completed(self, keep: int = 50) -> int:
+        """Hard-delete completed/failed tasks, keeping the most recent `keep`.
+
+        Returns count of pruned tasks.
+        """
+        all_tasks = self.store.list_nodes(prefix=TASK_PREFIX, include_deleted=True)
+        # Separate terminal tasks from active ones
+        terminal = [
+            t for t in all_tasks
+            if t.data.get("status") in (
+                TaskStatus.COMPLETED.value, TaskStatus.FAILED.value,
+            ) or t.is_deleted
+        ]
+        # Sort by completed_at or updated_at descending (newest first)
+        terminal.sort(
+            key=lambda t: t.data.get("completed_at", t.updated_at or ""),
+            reverse=True,
+        )
+        # Keep the most recent ones, prune the rest
+        to_prune = terminal[keep:]
+        if not to_prune:
+            return 0
+        return self.store.bulk_delete_nodes([t.address for t in to_prune])

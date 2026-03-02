@@ -1,5 +1,5 @@
 ---
-ha: "3.1.7"
+ha: "3.1.7.10"
 object_type: "document"
 creator: "2.1"
 created: "2026-02-04"

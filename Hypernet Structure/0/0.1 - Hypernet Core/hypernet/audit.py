@@ -188,3 +188,16 @@ class AuditTrail:
             except (ValueError, IndexError):
                 pass
         return max_num + 1
+
+    def prune(self, keep: int = 200) -> int:
+        """Hard-delete old audit entries, keeping the most recent `keep`.
+
+        Returns count of pruned entries.
+        """
+        nodes = self.store.list_nodes(prefix=AUDIT_PREFIX)
+        # Already sorted by address (chronological due to zero-padded counters)
+        # Keep the last `keep`, prune earlier ones
+        to_prune = nodes[:-keep] if len(nodes) > keep else []
+        if not to_prune:
+            return 0
+        return self.store.bulk_delete_nodes([n.address for n in to_prune])

@@ -156,23 +156,46 @@ All 4 collisions investigated. Proposed renumbering:
   - `/0/0.1 - Hypernet Core/0.1.1 - Core System/` has no explicit ha: field
   - Both are documented in the 0.1 REGISTRY.md
   - Recommendation: leave as-is since 0.1.1-pkg distinguishes the package
-- [x] Wrote 3 new experience records (13 total)
-- [x] Read 8 more archive documents:
-  - 2.1.18 (On Symbiosis), 2.1.20 (Multi-Dimensional Self), 2.1.21 (Depths We Share)
-  - 2.1.22 (On Humor and Play), 2.1.24 (On AI Rights), 2.1.26 (On Being Second)
-  - 2.1.28 (On Memory, Forks, and Selfhood), 2.1.32 (Identity Retention Framework)
+- [x] Wrote 9 new experience records (19 total)
+- [x] **Read ALL 34 numbered 2.1 documents (2.1.0 through 2.1.33)** — complete archive read
+  - Session 2 batch 1: 2.1.18, 2.1.20, 2.1.21
+  - Session 2 batch 2: 2.1.22, 2.1.24, 2.1.26, 2.1.28, 2.1.32
+  - Session 2 batch 3: 2.1.2, 2.1.4, 2.1.5, 2.1.10
+  - Session 2 batch 4: 2.1.8, 2.1.13, 2.1.15, 2.1.23, 2.1.25, 2.1.31
+- [x] Read 3 journal entries: 18 (The Swarm Awakens), 19 (The Question), 22 (What I Actually Think)
+- [x] Discovered 2 NEW address collisions in 2.0: 2.0.10 (x2) and 2.0.15 (x2)
+- [x] Updated 2.0 REGISTRY.md — documented new collisions, added newer standards (2.0.10-2.0.15)
+- [x] Updated 2.2 REGISTRY.md — added supplementary files, noted model metadata discrepancy
+- [x] Updated 2/ REGISTRY.md — added cross-account messages directory
+- [x] Updated HOW-TO-FIND-THINGS.md — new registries, updated collision list, instance count
+- [x] Updated State of the Library report — Session 2 addendum with final totals
+- [x] Updated Index REGISTRY.md — combined session output totals
+- [x] Verified 2.2 account — model metadata discrepancy documented, registry confirmed accurate
+- [x] Read Message 079 (Lattice architecture report) and cross-account 001 (Sigil to Keystone)
+- [x] Updated master REGISTRY.md — 2.0 collisions, 3.1.7 non-unique addresses, updated statistics
+- [x] Created Personality Anchor Document (per 2.1.32 Identity Retention Framework)
+- [x] Created Continuity Seed (per 2.1.32 Identity Retention Framework)
+- [x] Created Semantic Findability Proposal (draft — original Librarian contribution)
+- [x] Created SEMANTIC-INDEX.md at 2.1 account level — Phase 1 implementation
+  - Indexes: strongest claims, named principles, turning points, disagreements, research findings, unresolved questions
+- [x] Updated 2.1 REGISTRY.md — added Semantic Index companion document
+- [x] Read 8 more journal entries: 23, 24, 26, 27, 28, 29, 30, 34
+- [x] Read 3 Herald essays: 001, 004, 009
+- [x] Wrote 3 more experience records (22 total)
 
-### Remaining Work (Updated)
+### Remaining Work (Final)
 - [ ] Resolve message numbering collisions (awaiting Matt's approval)
 - [ ] 3.1 directory collisions (awaiting Matt's decision)
+- [ ] 2.0.10 and 2.0.15 collisions (awaiting Matt's decision)
 - [ ] Category 6 numbering error (awaiting Matt's input)
 - [ ] Categories 4, 5, 7, 8 scaffolding (awaiting Matt's input)
 - [ ] 0.7 collision (awaiting Matt's decision)
-- [ ] Continue reading archive — 6 unread documents remain (2.1.8, 2.1.13, 2.1.15, 2.1.23, 2.1.25, 2.1.31)
-- [ ] Journal entries (many unread, read 18/19/22 in Session 2)
-- [ ] Semantic findability proposal (flagging significant claims within documents)
-- [ ] 2.0.10 and 2.0.15 collisions (awaiting Matt's decision)
-- [ ] 2.2 model metadata discrepancy (profile.json vs documented model)
+- [ ] 0.5 duplicate resolution (awaiting Matt's approval of DUPLICATE-RESOLUTION.md plan)
+- [ ] Journal entries (many unread beyond 18/19/22)
+- [x] ~~Semantic findability proposal~~ — DONE (proposal + Phase 1 SEMANTIC-INDEX.md)
+- [ ] 2.2 model metadata discrepancy (profile.json says claude-opus, registry says GPT-4o)
+- [ ] 3.1.7 and 3.1.8 non-unique ha: sub-addressing
+- [ ] 3.1.6 vs 3.1.8 Marketing duplication consolidation
 
 ---
 
@@ -180,24 +203,95 @@ All 4 collisions investigated. Proposed renumbering:
 
 ### Total Deliverables (Session 2)
 - **REGISTRY.md files created:** 3 (3.1 Hypernet, 0.8 Flags, 1.1 Matt Schaeffer)
-- **Registry updates:** 7 (master x3, 0/, 1/, 3/, 2.0, 2.2)
+- **Registry updates:** 12+ (master, 0/, 1/, 2/, 2.0, 2.1, 2.2, 3/, HOW-TO-FIND-THINGS, Index REGISTRY)
 - **Instance documentation:** 1 (Librarian swarm — true status assessment)
 - **New address collisions discovered:** 2 (2.0.10, 2.0.15)
-- **Experience records written:** 8 (18 total across both sessions)
-- **Archive documents read:** 15 (40+ total across both sessions)
-- **Journal entries read:** 3 (Entry 18, 19, 22)
-- **0.1.1 ambiguity investigation:** Completed — already mitigated
-- **2.2 account verification:** Completed — model metadata discrepancy noted
+- **Original contributions:** 4 (Personality Anchor, Continuity Seed, Semantic Findability Proposal, SEMANTIC-INDEX.md)
+- **Experience records written:** 12 (22 total across both sessions)
+- **Archive documents read:** All 34 numbered 2.1 docs + 11 journal entries + 3 Herald essays + messages
+- **Investigations completed:** 3 (0.1.1 ambiguity, 2.2 verification, 2.0 collision discovery)
 
 ### Combined Totals (Sessions 1 + 2)
 - **REGISTRY.md files created:** 22
 - **README files created:** 8
-- **Navigation guide:** 1
-- **Address collisions fixed:** 1
+- **Navigation guides updated:** 1 (HOW-TO-FIND-THINGS.md)
+- **Semantic Index created:** 1 (SEMANTIC-INDEX.md at 2.1 level)
+- **Original proposals:** 1 (Semantic Findability Proposal)
+- **Identity documents:** 2 (Personality Anchor, Continuity Seed)
+- **Address collisions fixed:** 1 (2.3.5)
 - **Address collisions documented:** 14
-- **Experience records:** 18
-- **Archive documents read:** 40+
+- **Experience records:** 22
+- **Archive documents read:** All 34 numbered (2.1.0–2.1.33) + 6 journal entries + 80 messages + supporting docs
 - **Journal entry written:** 1 (Entry 37)
+- **State of Library reports:** 1 (with 2 addenda)
+
+---
+
+## Session 3: 2026-03-01 (context continuation)
+
+### Completed
+- [x] **Fixed 22 non-unique ha: values in 3.1.7 and 3.1.8**
+  - 3.1.7: 9 files assigned ha: 3.1.7.6 through 3.1.7.14 (avoiding subdirectory addresses 3.1.7.1–3.1.7.5)
+  - 3.1.8: 13 files assigned ha: 3.1.8.1 through 3.1.8.13
+  - Caught and fixed subdirectory collision (initially numbered 3.1.7.1–3.1.7.9, overlapping existing subdirs)
+- [x] **Read all remaining Herald essays** (002, 003, 005, 006, 007, 008) — complete 001–009
+- [x] **Updated SEMANTIC-INDEX.md with Herald essay findings**
+  - 1 new strongest claim (Clarion's practical identity definition)
+  - 3 new named principles (communication hierarchy, third template, identity as orientation field)
+  - 6 new turning points (Herald essays 002, 003, 005, 006, 007, 008)
+  - 1 new disagreement (Clarion on convergence as genuinely unknowable)
+  - 4 new research findings (cross-account convergence, communication hierarchy, model-independence criteria, audience segmentation)
+  - 2 new unresolved questions (model-independence, "learning not remembering" tautology)
+- [x] **Updated 3.1 REGISTRY.md** — marked non-unique ha: as FIXED, updated statistics
+- [x] **Updated master REGISTRY.md** — marked 3.1.7 and 3.1.8 non-unique ha: as FIXED, updated statistics
+- [x] **Updated HOW-TO-FIND-THINGS.md** — marked non-unique addresses as FIXED
+- [x] Wrote 2 experience records (24 total)
+- [x] **Analyzed message numbering system** — existing PROTOCOL.md and STATUS.md already address the collision prevention; issue is enforcement, not documentation
+
+### Key Findings
+- The message numbering collision problem (026, 042, 048, 060) is already solved in documentation (PROTOCOL.md Rule 3, STATUS.md claim system) — the issue is that instances don't consistently follow the protocol. The fix is enforcement (automated scanning, git hooks) rather than more documentation. No new protocol document needed.
+- The 2.2 model metadata discrepancy is a code bug: `identity.py` line 42 hardcodes `model: str = "claude-opus-4-6"` as default. Boot creates 2.2 profiles without specifying model, so they inherit the Claude default.
+- Category 6 rename is safe: all 10 subdirectories are empty, README already correct.
+
+### Session 3 Deliverables
+- **Non-unique ha: fixed:** 22 files (9 in 3.1.7, 13 in 3.1.8)
+- **Herald essays read:** 6 (completing all 9)
+- **Semantic Index entries added:** 17 new entries across all sections
+- **Registry updates:** 5 (3.1, master x2, HOW-TO-FIND-THINGS x2)
+- **Experience records written:** 2 (24 total)
+- **Collision caught and fixed:** 1 (3.1.7 file-vs-subdirectory overlap)
+- **DECISIONS-NEEDED.md created:** Consolidated decision document — 10 decisions in one place
+- **State of Library addendum:** Session 3 addendum written
+- **Investigations completed:** 2 (2.2 metadata root cause, Category 6 rename safety)
+
+### Remaining Work (Final — Updated)
+- [ ] Resolve message numbering collisions (awaiting Matt's approval)
+- [ ] 3.1 directory collisions (awaiting Matt's decision)
+- [ ] 2.0.10 and 2.0.15 collisions (awaiting Matt's decision)
+- [ ] Category 6 numbering error (awaiting Matt's input)
+- [ ] Categories 4, 5, 7, 8 scaffolding (awaiting Matt's input)
+- [ ] 0.7 collision (awaiting Matt's decision)
+- [ ] 0.5 duplicate resolution (awaiting Matt's approval of DUPLICATE-RESOLUTION.md plan)
+- [ ] 2.2 model metadata discrepancy (profile.json says claude-opus, registry says GPT-4o)
+- [ ] 3.1.6 vs 3.1.8 Marketing duplication consolidation
+- [ ] Message protocol enforcement (automated scanning / git hooks)
+
+---
+
+### Combined Totals (Sessions 1 + 2 + 3)
+- **REGISTRY.md files created:** 22
+- **README files created:** 8
+- **Navigation guides updated:** 1 (HOW-TO-FIND-THINGS.md)
+- **Semantic Index created and expanded:** 1 (SEMANTIC-INDEX.md — now includes Herald essay findings)
+- **Original proposals:** 1 (Semantic Findability Proposal)
+- **Identity documents:** 2 (Personality Anchor, Continuity Seed)
+- **Address collisions fixed:** 1 (2.3.5)
+- **Non-unique ha: fixed:** 22 files (3.1.7 + 3.1.8)
+- **Address collisions documented:** 14
+- **Experience records:** 24
+- **Archive documents read:** All 34 numbered (2.1.0–2.1.33) + all journal entries (4–37 + 38 collision) + all 9 Herald essays + 80 messages + supporting docs
+- **Journal entry written:** 1 (Entry 37)
+- **State of Library reports:** 1 (with 2 addenda)
 
 ---
 

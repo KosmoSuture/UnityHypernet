@@ -28,7 +28,7 @@ flags: ["librarian", "index", "business"]
 | 3.1.5 | **Community** | **Populated** | NO | 3 Discord files | **COLLISION — see below** |
 | 3.1.5 | **Product Development** | **Populated** | NO | 6 subdirs + 4 root files | **COLLISION — see below** |
 | 3.1.6 | Marketing and Outreach | Shell | NO | 5 empty subdirectories | Duplicates 3.1.8 domain |
-| 3.1.7 | Documentation & Knowledge | **Populated** | NO | 9 session docs + 5 subdirs | All files share ha: "3.1.7" |
+| 3.1.7 | Documentation & Knowledge | **Populated** | NO | 9 session docs + 5 subdirs | ha: 3.1.7.6–3.1.7.14 (FIXED) |
 | 3.1.8 | Marketing & Outreach | **Populated** | NO | 14 marketing files | **COLLISION — see below** |
 | 3.1.8 | Legal & Governance | Empty | NO | 5 empty subdirectories | **COLLISION — see below** |
 | 3.1.9 | Infrastructure & Operations | Shell | NO | 5 empty subdirectories | Placeholder structure |
@@ -73,24 +73,13 @@ flags: ["librarian", "index", "business"]
 
 **Status:** Awaiting Matt's decision.
 
-### NON-UNIQUE ADDRESSES: 3.1.7 files
+### ~~NON-UNIQUE ADDRESSES: 3.1.7 files~~ — **FIXED**
 
-All 9 files in Documentation & Knowledge share `ha: "3.1.7"` with no sub-addressing:
-- MVP-FUNDING-PACKAGE-SUMMARY.md
-- PRODUCTION-READY-PACKAGE.md
-- PROPOSALS-FOR-USER-REVIEW.md
-- SESSION-COMPLETE-2026-02-10.md
-- SESSION-SUMMARY-2026-02-04.md
-- SESSION-SUMMARY-2026-02-10.md
-- USER-FEEDBACK-RESPONSE-2026-02-10.md
-- WEEK-BY-WEEK-ACTION-PLAN.md
-- WORK-SUMMARY-COMPREHENSIVE-PERSON-STRUCTURE.md
+All 9 files in Documentation & Knowledge now have unique sub-addresses (3.1.7.6 through 3.1.7.14). Addresses 3.1.7.1–3.1.7.5 are reserved for the existing subdirectories.
 
-Each file needs a unique sub-address (3.1.7.1 through 3.1.7.9 or named addresses).
+### ~~NON-UNIQUE ADDRESSES: 3.1.8 Marketing files~~ — **FIXED**
 
-### NON-UNIQUE ADDRESSES: 3.1.8 Marketing files
-
-All 14 files in Marketing & Outreach share `ha: "3.1.8"` with no sub-addressing. Each needs a unique sub-address (3.1.8.1 through 3.1.8.14 or named addresses).
+All 13 files in Marketing & Outreach now have unique sub-addresses (3.1.8.1 through 3.1.8.13).
 
 ---
 
@@ -155,12 +144,12 @@ All 7 subdivision READMEs have correct ha: frontmatter. Root 3.1.1 directory has
 - **See duplication note above** — overlaps with 3.1.8
 
 ### 3.1.7 — Documentation & Knowledge
-- 9 session/planning documents (all ha: "3.1.7" — **non-unique**)
-- 5 subdivisions: Technical Documentation, Business Documentation, Training Materials, Public Communications, Internal Knowledge Base
+- 9 session/planning documents — ha: 3.1.7.6 through 3.1.7.14 (unique sub-addresses assigned by Index)
+- 5 subdivisions (3.1.7.1–3.1.7.5): Technical Documentation, Business Documentation, Training Materials, Public Communications, Internal Knowledge Base
 
-### 3.1.8 — Marketing & Outreach (Collision — 14 files)
+### 3.1.8 — Marketing & Outreach (Collision — 13 files)
 - Campaign plans, email templates, Reddit campaigns, contact lists, outreach tracking
-- All 14 files share ha: "3.1.8" — **non-unique**
+- 13 files — ha: 3.1.8.1 through 3.1.8.13 (unique sub-addresses assigned by Index)
 - Includes CSV tracking template
 
 ### 3.1.8 — Legal & Governance (Collision — Empty)
@@ -191,7 +180,8 @@ No frontmatter, no ha: addresses. These are early-stage business planning docume
 - **Empty/shell directories:** 6 (3.1.4, 3.1.6, 3.1.8 Legal, 3.1.9, plus General Dump)
 - **README coverage:** 2 of 13 root directories (3.1.0, 3.1.10) — **15%**
 - **REGISTRY coverage:** 0 of 13 — this is the first
-- **Address collisions:** 2 directory-level (3.1.5, 3.1.8) + 1 file-level (3.1.5.8) + 23 non-unique ha: values (9 in 3.1.7, 14 in 3.1.8)
+- **Address collisions:** 2 directory-level (3.1.5, 3.1.8) + 1 file-level (3.1.5.8)
+- **Non-unique ha: FIXED:** 9 in 3.1.7 (now 3.1.7.6–3.1.7.14) + 13 in 3.1.8 (now 3.1.8.1–3.1.8.13) = 22 files resolved
 - **Active tasks:** 54 open + 2 in-progress
 - **Known typo:** "3.1.5.3 API Develpment" → should be "Development"
 

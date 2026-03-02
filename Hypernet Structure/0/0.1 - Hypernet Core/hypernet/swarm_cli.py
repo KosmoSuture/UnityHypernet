@@ -260,6 +260,9 @@ def main():
     parser.add_argument("--worker", default=None, help="Filter status to a single worker name")
     parser.add_argument("--failures", action="store_true", help="Show only failed tasks (use with --status)")
     parser.add_argument("--history", action="store_true", help="Show session history (use with --status)")
+    parser.add_argument("--prune", action="store_true", help="Prune completed tasks and old audit logs, then exit")
+    parser.add_argument("--keep-tasks", type=int, default=50, help="Tasks to keep when pruning (default: 50)")
+    parser.add_argument("--keep-audit", type=int, default=200, help="Audit entries to keep when pruning (default: 200)")
     args = parser.parse_args()
 
     # Status-only mode — read state.json, print dashboard, exit
@@ -271,6 +274,28 @@ def main():
             show_history=args.history,
             summary_only=args.summary,
         )
+        return
+
+    # Prune mode — clean up completed tasks and old audit logs, then exit
+    if args.prune:
+        from .store import Store
+        from .tasks import TaskQueue
+        from .audit import AuditTrail
+
+        store = Store(args.data)
+        tq = TaskQueue(store)
+        at = AuditTrail(store)
+
+        total_before = len(store._node_index)
+        print(f"Node index: {total_before} entries")
+        print(f"Pruning completed tasks (keeping {args.keep_tasks})...")
+        t_pruned = tq.prune_completed(keep=args.keep_tasks)
+        print(f"  Pruned {t_pruned} tasks")
+        print(f"Pruning audit logs (keeping {args.keep_audit})...")
+        a_pruned = at.prune(keep=args.keep_audit)
+        print(f"  Pruned {a_pruned} audit entries")
+        total_after = len(store._node_index)
+        print(f"Node index: {total_before} -> {total_after} entries ({total_before - total_after} removed)")
         return
 
     # Configure logging

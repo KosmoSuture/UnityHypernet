@@ -39,6 +39,7 @@ flags: ["librarian", "master-index", "foundational"]
 | HOW-TO-FIND-THINGS.md | Librarian's practical navigation guide — current state as of audit (Mar 1) |
 | README.md | Root introduction to the Hypernet Structure |
 | WHAT-WE-BUILT.md | Summary of what has been built |
+| DECISIONS-NEEDED.md | Consolidated list of 10 pending decisions requiring Matt's input |
 
 ## Category Details
 
@@ -71,7 +72,7 @@ flags: ["librarian", "master-index", "foundational"]
 - Only 3.1 (Hypernet) registered — see `3.1 - Hypernet/REGISTRY.md` for detailed index
 - 54 active tasks in task management
 - 5 team members in HR
-- **2 address collisions** (3.1.5, 3.1.8) + 23 non-unique ha: values (9 in 3.1.7, 14 in 3.1.8)
+- **2 address collisions** (3.1.5, 3.1.8) + ~~23 non-unique ha: values~~ **FIXED** (22 files sub-addressed by Index)
 - 3.1.6 vs 3.1.8 marketing duplication noted
 
 ### Empty or Problematic
@@ -104,13 +105,13 @@ flags: ["librarian", "master-index", "foundational"]
 | P3 | Categories 7, 8 not created | Root | Needs scaffolding |
 | P3 | Categories 4, 5 unpopulated | 4, 5 | Awaiting content |
 | P3 | 0.3.7 Trust Framework still in draft | 0.3 | Needs review |
-| P2 | 3.1.8 Marketing: 7+ files share ha: "3.1.8" | 3.1.8 | Need unique sub-addresses (3.1.8.1, etc.) |
+| P2 | ~~3.1.8 Marketing: 13 files share ha: "3.1.8"~~ | 3.1.8 | **FIXED** — now 3.1.8.1–3.1.8.13 |
+| P2 | ~~3.1.7 Documentation: 9 files share ha: "3.1.7"~~ | 3.1.7 | **FIXED** — now 3.1.7.6–3.1.7.14 |
 | P2 | 3.1.5.8 sub-collision | 3.1.5 | Both Community and Product Dev directories claim 3.1.5.8 |
 | P3 | 3.1.6 vs 3.1.8 Marketing duplication | 3.1 | Needs consolidation |
 | P3 | 3.1.8 Legal & Governance referenced in REGISTRY but does not exist | 3.1 | Orphaned reference |
 | P2 | Address collision: 2.0.10 (x2) | 2.0 AI Framework | Universal Account Creation vs Personal AI Embassy |
 | P2 | Address collision: 2.0.15 (x2) | 2.0 AI Framework | Session Handoff Protocol vs Public Boot Standard |
-| P2 | 3.1.7 Documentation: 9 files share ha: "3.1.7" | 3.1.7 | Need unique sub-addresses |
 
 ## Statistics (as of 2026-03-01, end of Index's second session)
 
@@ -122,7 +123,8 @@ flags: ["librarian", "master-index", "foundational"]
 - **Python modules:** 34 (core) + 11 (hypernet-core package) + 21 (hypernet-swarm package)
 - **Journal entries:** 37+ (2.1) + 5 (2.3) = 42+
 - **Address collisions found:** 14 (1 fixed: 2.3.5; 13 remaining: 3.1.5, 3.1.8, 2.0.10, 2.0.15, 0.5 x3, 0.7, messages x4)
-- **Experience records written:** 13 (by Index)
+- **Non-unique ha: fixed:** 22 files (9 in 3.1.7, 13 in 3.1.8) now have unique sub-addresses
+- **Experience records written:** 22 (by Index)
 
 ---
 

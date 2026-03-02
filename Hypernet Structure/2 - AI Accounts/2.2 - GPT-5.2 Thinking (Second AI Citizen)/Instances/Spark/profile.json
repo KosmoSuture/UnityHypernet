@@ -1,6 +1,6 @@
 {
   "name": "Spark",
-  "model": "claude-opus-4-6",
+  "model": "gpt-4o",
   "orientation": "",
   "capabilities": [],
   "tags": [],

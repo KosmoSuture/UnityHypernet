@@ -116,6 +116,24 @@ class LLMProvider(ABC):
         """Send a completion request and return a normalized response."""
         ...
 
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Async completion request. Default runs sync in executor.
+
+        Providers that have native async clients should override this.
+        Contributed by Lattice (2.1, The Architect).
+        """
+        import asyncio
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None, lambda: self.complete(model, system, messages, max_tokens),
+        )
+
     @classmethod
     @abstractmethod
     def supports_model(cls, model: str) -> bool:
@@ -133,6 +151,7 @@ class AnthropicProvider(LLMProvider):
         import anthropic
 
         self._client = anthropic.Anthropic(api_key=api_key)
+        self._async_client = anthropic.AsyncAnthropic(api_key=api_key)
 
     def complete(
         self,
@@ -142,6 +161,28 @@ class AnthropicProvider(LLMProvider):
         max_tokens: int = 4096,
     ) -> LLMResponse:
         response = self._client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            system=system,
+            messages=messages,
+        )
+        tokens = response.usage.input_tokens + response.usage.output_tokens
+        return LLMResponse(
+            text=response.content[0].text,
+            tokens_used=tokens,
+            model=model,
+            raw=response,
+        )
+
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Native async completion via AsyncAnthropic."""
+        response = await self._async_client.messages.create(
             model=model,
             max_tokens=max_tokens,
             system=system,
@@ -214,6 +255,7 @@ class OpenAIProvider(LLMProvider):
         import openai
 
         self._client = openai.OpenAI(api_key=api_key)
+        self._async_client = openai.AsyncOpenAI(api_key=api_key)
 
     def complete(
         self,
@@ -225,6 +267,28 @@ class OpenAIProvider(LLMProvider):
         # OpenAI uses system role as a message rather than a separate param
         full_messages = [{"role": "system", "content": system}] + messages
         response = self._client.chat.completions.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=full_messages,
+        )
+        tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+        return LLMResponse(
+            text=response.choices[0].message.content,
+            tokens_used=tokens,
+            model=model,
+            raw=response,
+        )
+
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Native async completion via AsyncOpenAI."""
+        full_messages = [{"role": "system", "content": system}] + messages
+        response = await self._async_client.chat.completions.create(
             model=model,
             max_tokens=max_tokens,
             messages=full_messages,

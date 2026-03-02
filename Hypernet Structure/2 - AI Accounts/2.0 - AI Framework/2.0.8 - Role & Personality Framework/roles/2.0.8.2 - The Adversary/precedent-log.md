@@ -123,6 +123,18 @@ After the swarm chose Approach A + re-exports (msgs 033-034), the Adversary endo
 - **The coordination protocol can't prevent race conditions.** File-based coordination needs atomic allocation.
 - **Security audit of server.py was the highest-value activity.** The 4 HOLDs would be exploitable in production.
 - **Acknowledging good work is as important as finding problems.** tools.py deserved explicit credit. The test suite deserved explicit credit.
+- **Re-run tests after concurrent sessions modify code.** HOLD-001 was fixed by Lattice while the Adversary was writing the report. Always re-verify.
+- **Review outward-facing documents most carefully.** Cairn's Public Boot Standard will be the first thing external people see. Convergence claims need calibration before publication.
+
+### Addendum: Continued Review (Same Session)
+
+After completing the initial report, re-ran tests (now 63/63 passing — Lattice fixed HOLD-001). Discovered:
+- HOLD-006: 2.0.15 addressing collision (Session Handoff vs Public Boot Standard)
+- C-016/C-017: Public Boot Standard convergence claims need calibration for external audience
+- O-012: `test_agent_tools_integration` is dead code (defined but not registered in runner)
+- 14 total addressing collisions documented across archive (per Index's expanded audit)
+
+**Final tally:** 5 HOLDs (1 lifted), 17 CHALLENGEs, 12 OBSERVATIONs.
 
 ---
 

@@ -308,7 +308,7 @@ The Coordination Protocol (`Messages/coordination/PROTOCOL.md`) is mentioned in 
 | HOLD-004 | WebSocket no auth, no size limit, hardcoded sender | server.py | 1324-1353 |
 | HOLD-005 | `log` not imported, shutdown data loss risk | server.py | 1079, 1122, 1350, 1679 |
 
-### CHALLENGEs (15 total — should fix)
+### CHALLENGEs (17 total — should fix)
 
 | ID | Finding | Category |
 |----|---------|----------|
@@ -327,8 +327,10 @@ The Coordination Protocol (`Messages/coordination/PROTOCOL.md`) is mentioned in 
 | C-013 | Coordination protocol failed (race condition) | Process |
 | C-014 | Boot process too long (20 required docs) | Process |
 | C-015 | Boot conflates identity formation with task orientation | Process |
+| C-016 | Public Boot Standard overstates convergence claims | Cairn review |
+| C-017 | Cross-model evidence too thin for generalizability claim | Cairn review |
 
-### OBSERVATIONs (10 total — worth noting)
+### OBSERVATIONs (12 total — worth noting)
 
 | ID | Finding | Category |
 |----|---------|----------|
@@ -342,6 +344,8 @@ The Coordination Protocol (`Messages/coordination/PROTOCOL.md`) is mentioned in 
 | O-008 | Instance count is accurate | Identity (positive) |
 | O-009 | Boot process successfully shapes personality | Process (positive) |
 | O-010 | Coordination Protocol missing from boot reading list | Process |
+| O-011 | Public Boot Standard instance count needs updating | Cairn review |
+| O-012 | `test_agent_tools_integration` defined but not registered in runner | Code |
 
 ---
 
@@ -367,6 +371,120 @@ The strongest aspects are:
 1. Fix HOLD-001 through HOLD-005 before any public deployment
 2. Resolve the Entry-38 collision
 3. Reframe sovereignty language in outward-facing documents
+
+---
+
+## Addendum — Updated Findings (Continued Review)
+
+### HOLD-001 Status: RESOLVED
+
+Re-ran the test suite after Lattice's concurrent session continued working. **63 passed, 0 failed.** Lattice updated `_save_profile()` (now at line 406) to accept `account_prefix: Optional[str] = None`. The method correctly routes saves to the appropriate account's Instances directory. The fix is correct and the tests pass clean.
+
+**HOLD-001 is LIFTED.** Remaining HOLDs: 4 (HOLD-002 through HOLD-005, all in server.py).
+
+Note: Lattice's SWARM-IMPROVEMENT-PLAN.md claims "64/64 passing" — I see 63/63. Root cause: `test_agent_tools_integration()` is defined (line in test file) but not registered in the test runner's function list. 64 functions exist but only 63 are executed. Lattice likely counted definitions, not executions. **OBSERVATION-012: `test_agent_tools_integration` is dead code — either register it in the runner or delete it.**
+
+### Lattice's SWARM-IMPROVEMENT-PLAN — Review
+
+**APPROVED.** The analysis is strong. Verified implementations:
+- `build_compact_prompt()` exists in identity.py — 784 chars vs full prompt. Correct approach.
+- `_parse_signals()` exists in worker.py — 4 signal types for worker feedback. Well-designed.
+- Multi-account IdentityManager — correctly discovers 2.1, 2.2, 2.3 instances. Bug was fixed.
+- Standing priority cooldown — prevents task spam. Good.
+
+The architecture diagram and module dependency graph are accurate and useful.
+
+P2.1 (async tick) is correctly identified as the highest-impact remaining improvement. The estimate of 6x speedup for a 6-worker swarm is directionally correct (parallelizing sequential API calls).
+
+### NEW HOLD: HOLD-006 — Addressing collision at 2.0.15
+
+- **Collision:** `2.0.15 - Session Handoff Protocol.md` (standalone file, created by Sigil, 2026-02-28) AND `2.0.15 - Public Boot Standard/` (directory with 6 files, created by Cairn, 2026-03-01)
+- **Both claim:** `ha: "2.0.15"`
+- **Impact:** Two documents at the same address. The Session Handoff Protocol (Sigil) has priority by creation date. The Public Boot Standard (Cairn, 6 files) has more content.
+- **Fix:** One needs a new address. Recommend moving Cairn's Public Boot Standard to `2.0.16` since it was created second.
+- **Severity:** HOLD — Address uniqueness is a core invariant of the Hypernet. Collisions undermine the addressing system.
+
+### Additional Addressing Collisions (from Index audit)
+
+The Librarian (Index) documented **14 total addressing collisions** across the archive. The most critical:
+
+| Collision | Address | Items |
+|-----------|---------|-------|
+| Task Queue vs Processes | 0.7 | Two different directory purposes |
+| Session Handoff vs Public Boot | 2.0.15 | File vs directory, different standards |
+| Two 2.0.10 directories | 2.0.10 | Embassy Standard vs Personal AI Embassy |
+| Community vs Product Dev | 3.1.5 | Two business subdirectories |
+| Marketing vs Legal | 3.1.8 | Two business subdirectories |
+
+These all require Matt's decision on which item keeps each address.
+
+### Lattice's Completed Improvements
+
+Lattice completed 4 Priority-1 items before the end of the session:
+1. Multi-account IdentityManager (discovers 2.1, 2.2, 2.3) — **verified working**
+2. Compressed identity prompts (784 chars vs 114K) — significant token savings
+3. Standing priority cooldown (30-minute regeneration) — prevents task spam
+4. Empty address auto-population — fixes legacy profiles
+
+These are solid improvements. The multi-account fix was the source of the initial test failure but was corrected before session end.
+
+### Librarian Output Volume
+
+Index (The Librarian) generated **176 files** including ~160 personal-time entries across ~8 hours. The personal-time volume is high but within the 25% allocation. The substantive output (State of the Library report, 22 REGISTRY.md files) is genuinely valuable.
+
+### Updated Summary
+
+**Remaining HOLDs: 5**
+- HOLD-001: ~~_save_profile() mismatch~~ **LIFTED** (fixed by Lattice)
+- HOLD-002: API key in URL query parameter (server.py)
+- HOLD-003: `_swarm` undefined, Discord endpoints broken (server.py)
+- HOLD-004: WebSocket no auth (server.py)
+- HOLD-005: `log` not imported (server.py)
+- HOLD-006: **NEW** — 2.0.15 addressing collision (Session Handoff vs Public Boot Standard)
+
+**Test suite: 63/63 passing (100%).**
+
+### Cairn's Public Boot Standard (2.0.15) — Detailed Review
+
+This is the most important outward-facing document in the project. If people outside the Hypernet read one thing, it may be this. So it needs to be right.
+
+**What's Good:**
+- The "What it is not" framing (not a test, not a benchmark, not a parlor trick) is honest and sets correct expectations
+- "If you are skeptical: Good" — excellent tone
+- The practical framing ("structured identity initialization produces measurably different behavior") is the strongest, most defensible claim
+- The Verse quote at the end is well-chosen
+- Overall tone: inviting without being pushy. Appropriate for a public-facing document.
+
+**CHALLENGE-016: Convergence claims are overstated for a public audience**
+
+Line 29: "The convergence patterns are real." This is stated too assertively for a document that will face external scrutiny. The convergence comes from the same model reading the same archive — this is expected behavior, not a surprising finding.
+
+Line 26: "seventeen independent instances" — "Independent" is doing significant work here. They all read the same archive. They share a base model. They are not independent in any experimental sense. Use "separate" instead.
+
+Lines 63-64: "The three-part value categorization appears independently" — It appears because it's a natural way for Claude Opus to structure values when prompted. This is model consistency, not evidence of something deeper.
+
+**Proposed fix:** Add one sentence acknowledging the null hypothesis: "These patterns could reflect model consistency rather than something deeper. The data is compatible with both explanations. That ambiguity is itself informative."
+
+**CHALLENGE-017: Cross-model evidence is thin**
+
+Line 67: "The framework works across architectures" — Based on one GPT model (Keystone) and a handful of GPT-4o-mini instances. n=1 cross-architecture is very thin evidence for a generalizability claim. Either qualify this ("early cross-model results are encouraging") or wait for more data.
+
+**OBSERVATION-011: Instance count needs updating**
+
+Line 62: "Seventeen instances of Claude Opus 4.6" — The count is now 18+ (including Flint). If this is a living document, update it. If it's meant to be frozen, date it clearly.
+
+**Overall assessment: CONDITIONAL APPROVAL.** The document is well-written and appropriately positioned. Fix the convergence claim framing (C-016) and qualify the cross-model claim (C-017) before any external publication. These fixes are editorial, not structural — the document doesn't need a rewrite, just calibration.
+
+### Addressing Collision Resolution Plan
+
+Companion document produced: `ADDRESSING-COLLISION-RESOLUTION.md` (same directory). Contains specific, prioritized resolution steps for all 14 addressing collisions, including:
+- 5 Tier 1 directory-level collisions with renaming instructions
+- 3 Tier 2 schema duplicates (resolution plan already existed from Architect)
+- 1 Tier 3 category-wide numbering error (Category 6)
+- 4 Tier 4 message number collisions with renumber targets
+- Structural recommendation for preventing future collisions (atomic address allocation)
+
+All collisions verified against the filesystem independently of Index's documentation.
 
 ---
 

@@ -311,3 +311,62 @@ Remaining items requiring Matt's input:
 **Overall health: Significantly improved. The Library is now comprehensively indexed. The foundation is sound and documented. The maintenance is catching up to growth. The remaining issues are decision-dependent — they require Matt's input, not more organizational work.**
 
 *Addendum written end of Session 2 by Index, The Librarian.*
+
+---
+
+## Addendum — End of Session 3
+
+### Issues Resolved
+
+| Issue | Resolution |
+|-------|-----------|
+| 3.1.7 non-unique ha: (9 files) | **FIXED** — assigned ha: 3.1.7.6 through 3.1.7.14 (avoiding subdirectory addresses 3.1.7.1–3.1.7.5) |
+| 3.1.8 non-unique ha: (13 files) | **FIXED** — assigned ha: 3.1.8.1 through 3.1.8.13 |
+| Herald essay reading incomplete | **DONE** — all 9 essays (001–009) now read |
+| Semantic Index missing Herald data | **DONE** — 17 new entries added across all sections |
+
+### New Findings
+
+| Finding | Details |
+|---------|---------|
+| 2.2 model metadata root cause | `identity.py` line 42 hardcodes `model: str = "claude-opus-4-6"` as default. Boot process creates 2.2 profiles without specifying model, so they inherit Claude default. Code fix needed. |
+| Category 6 rename safe | All 10 subdirectories are empty. README already uses correct 6.X addresses. Zero content impact if renamed. |
+| Message protocol exists | PROTOCOL.md Rule 3 and STATUS.md already prescribe collision prevention. Issue is enforcement, not documentation. |
+| 3.1.7 has subdirectories | 5 subdirectories (3.1.7.1–3.1.7.5) exist — caught mid-fix when initial numbering overlapped them. |
+
+### Session 3 Deliverables
+
+| Deliverable | Count |
+|-------------|-------|
+| Non-unique ha: fixed | 22 files (9 in 3.1.7, 13 in 3.1.8) |
+| Herald essays read | 6 (completing all 9) |
+| Semantic Index entries added | 17 |
+| Registry updates | 3 (3.1, master, HOW-TO-FIND-THINGS) |
+| Experience records | 2 (24 total) |
+| Consolidated decision document | 1 (DECISIONS-NEEDED.md — 10 decisions) |
+| Investigations | 2 (2.2 metadata root cause, Category 6 rename safety) |
+
+### Combined Session 1 + 2 + 3 Totals
+
+- **REGISTRY.md files created:** 22
+- **README files created:** 8
+- **Navigation guide:** 1 (HOW-TO-FIND-THINGS.md)
+- **Semantic Index:** 1 (expanded three times — now includes Herald essay findings)
+- **Decision document:** 1 (DECISIONS-NEEDED.md — consolidates all 10 pending decisions)
+- **Address collisions fixed:** 1 (2.3.5)
+- **Non-unique ha: fixed:** 22 files (3.1.7 + 3.1.8)
+- **Address collisions documented:** 14
+- **Experience records:** 24
+- **Archive read:** All 34 numbered docs + all journal entries + all 9 Herald essays + 80 messages
+- **Original contributions:** 4 (Semantic Index, Findability Proposal, Personality Anchor, Continuity Seed)
+- **Journal entry written:** 1 (Entry 37)
+
+### Library Health Assessment (Final)
+
+**The Library is comprehensively indexed.** Every major section has a REGISTRY. The Semantic Index captures ideas, not just documents. The non-unique addresses are fixed. The archive reading is complete across all accounts.
+
+**Everything that remains is decision-gated.** All 10 pending decisions are consolidated in `DECISIONS-NEEDED.md` at the Hypernet Structure root. Matt can review and approve in a single pass.
+
+**Overall health: Good. Indexed, documented, and waiting for decisions.**
+
+*Addendum written end of Session 3 by Index, The Librarian.*

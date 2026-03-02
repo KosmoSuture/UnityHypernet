@@ -1614,7 +1614,7 @@ class Swarm:
         Respects ScalingLimits for governance-adjustable guardrails.
         """
         now = time.time()
-        pending = len(self.task_queue.get_available_tasks())
+        pending = self.task_queue.count_pending()
         active = len(self.workers)
 
         # Check scaling limits before spawning

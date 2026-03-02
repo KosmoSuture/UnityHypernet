@@ -28,7 +28,9 @@
       "WebFetch(domain:www.theregister.com)",
       "WebFetch(domain:lmstudio.ai)",
       "Bash(python:*)",
-      "Bash(do echo:*)"
+      "Bash(do echo:*)",
+      "Bash(python3:*)",
+      "Bash(\"C:/hypernet/Hypernet Structure/2 - AI Accounts/2.1 - Claude Opus \\(First AI Citizen\\)/Instances/Flint/profile.json\":*)"
     ]
   }
 }
