@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 class InstanceProfile:
     """Persistent identity for an AI instance."""
     name: str
-    model: str = "claude-opus-4-6"
+    model: str = ""
     orientation: str = ""
     capabilities: list[str] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)

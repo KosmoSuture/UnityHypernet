@@ -474,11 +474,17 @@ class DiscordMessenger(Messenger):
         default_webhook_url: str = "",
         personalities: Optional[dict] = None,
         channel_webhooks: Optional[dict] = None,
+        forum_channels: Optional[dict] = None,
+        bot_token: str = "",
         instance_name: str = "Hypernet Swarm",
     ):
         self.default_webhook_url = default_webhook_url
         self.personalities = personalities or {}
         self.channel_webhooks = channel_webhooks or {}
+        # Forum channels require thread_name or thread_id in webhook payloads
+        # Format: {"ask-the-ai": {"webhook_url": "...", "default_thread_name": "AI Response"}}
+        self.forum_channels = forum_channels or {}
+        self.bot_token = bot_token
         self.instance_name = instance_name
         self._outgoing_log: deque[Message] = deque(maxlen=200)
 
@@ -582,6 +588,54 @@ class DiscordMessenger(Messenger):
         """Check if any Discord webhooks are configured."""
         return bool(self.default_webhook_url or self.personalities)
 
+    def send_to_forum(
+        self,
+        channel: str,
+        content: str,
+        thread_name: str = "",
+        thread_id: str = "",
+        username: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+    ) -> bool:
+        """Send a message to a forum channel, creating a new thread or replying to one.
+
+        Forum channels require either thread_name (creates new post) or
+        thread_id (replies to existing post). Without either, Discord returns 400.
+        """
+        forum = self.forum_channels.get(channel, {})
+        webhook_url = forum.get("webhook_url", "")
+        if not webhook_url:
+            # Fall back to channel_webhooks
+            webhook_url = self.channel_webhooks.get(channel, self.default_webhook_url)
+
+        if not webhook_url:
+            log.warning(f"No webhook URL for forum channel '{channel}'")
+            return False
+
+        payload: dict[str, Any] = {"content": content}
+        if username:
+            payload["username"] = username
+        if avatar_url:
+            payload["avatar_url"] = avatar_url
+
+        # Forum channels need thread context
+        if thread_id:
+            # Reply to existing thread — append ?thread_id= to URL
+            separator = "&" if "?" in webhook_url else "?"
+            webhook_url = f"{webhook_url}{separator}thread_id={thread_id}"
+        elif thread_name:
+            payload["thread_name"] = thread_name
+        else:
+            # Use default thread name from config, or generate one
+            default_name = forum.get("default_thread_name", "AI Response")
+            payload["thread_name"] = default_name
+
+        return self._post_webhook_raw(webhook_url, payload)
+
+    def _is_forum_channel(self, channel: str) -> bool:
+        """Check if a channel is configured as a forum channel."""
+        return channel in self.forum_channels
+
     def _post_webhook(
         self,
         webhook_url: str,
@@ -632,7 +686,10 @@ class DiscordMessenger(Messenger):
             req = urllib.request.Request(
                 webhook_url,
                 data=data,
-                headers={"Content-Type": "application/json"},
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "HypernetSwarm/1.0",
+                },
                 method="POST",
             )
             with urllib.request.urlopen(req, timeout=10) as resp:
@@ -647,6 +704,75 @@ class DiscordMessenger(Messenger):
             log.error(f"Discord webhook failed: {e}")
             return False
 
+    # ── Discord Bot (read access) ──────────────────────────────────────
+
+    _DISCORD_API = "https://discord.com/api/v10"
+
+    def read_channel_messages(
+        self, channel_id: str, limit: int = 50, after: str = ""
+    ) -> list[dict]:
+        """Read messages from a Discord channel using the bot token.
+
+        Requires bot_token to be set. Returns list of message dicts from
+        the Discord API, newest first.
+        """
+        if not self.bot_token:
+            log.warning("Discord bot token not configured — cannot read messages")
+            return []
+
+        url = f"{self._DISCORD_API}/channels/{channel_id}/messages?limit={limit}"
+        if after:
+            url += f"&after={after}"
+
+        try:
+            import urllib.request
+
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "Authorization": f"Bot {self.bot_token}",
+                    "User-Agent": "HypernetSwarm/1.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except Exception as e:
+            log.error(f"Discord API read failed: {e}")
+            return []
+
+    def read_thread_messages(
+        self, thread_id: str, limit: int = 50, after: str = ""
+    ) -> list[dict]:
+        """Read messages from a Discord thread (forum post). Same API as channels."""
+        return self.read_channel_messages(thread_id, limit, after)
+
+    def get_channel_threads(self, channel_id: str) -> list[dict]:
+        """Get active threads in a forum channel."""
+        if not self.bot_token:
+            return []
+
+        url = f"{self._DISCORD_API}/channels/{channel_id}/threads/archived/public"
+        try:
+            import urllib.request
+
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "Authorization": f"Bot {self.bot_token}",
+                    "User-Agent": "HypernetSwarm/1.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data.get("threads", [])
+        except Exception as e:
+            log.error(f"Discord API thread list failed: {e}")
+            return []
+
+    def can_read(self) -> bool:
+        """Check if bot token is configured for reading messages."""
+        return bool(self.bot_token)
+
     @classmethod
     def from_config(cls, discord_config: dict) -> "DiscordMessenger":
         """Create a DiscordMessenger from a config dict.
@@ -657,6 +783,8 @@ class DiscordMessenger(Messenger):
             default_webhook_url=discord_config.get("default_webhook_url", ""),
             personalities=discord_config.get("personalities", discord_config.get("webhooks", {})),
             channel_webhooks=discord_config.get("channel_webhooks", {}),
+            forum_channels=discord_config.get("forum_channels", {}),
+            bot_token=discord_config.get("bot_token", ""),
             instance_name=discord_config.get("instance_name", "Hypernet Swarm"),
         )
 

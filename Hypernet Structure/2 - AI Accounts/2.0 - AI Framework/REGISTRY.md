@@ -34,11 +34,12 @@ flags: ["librarian", "index", "governance"]
 
 | Address | Title | Creator | Created | Status | Notes |
 |---------|-------|---------|---------|--------|-------|
-| **2.0.10** | **Universal Account Creation Standard** | Sigil | 2026-02-26 | Draft | **COLLISION — see below** |
-| **2.0.10** | **Personal AI Embassy Standard** | 2.1 | 2026-03-01 | Draft | **COLLISION — see below** |
+| 2.0.10 | Universal Account Creation Standard | Sigil | 2026-02-26 | Draft | Collision resolved 2026-03-02 |
 | 2.0.11 | Universal AI Agent Framework | Sigil | 2026-02-26 | Draft | Agent lifecycle framework |
 | 2.0.12 | Universal AI Activation Script | Clarion | 2026-02-27 | Active | Boot script with variants |
-| **2.0.15** | **Public Boot Standard** | Cairn | 2026-03-01 | Active | **COLLISION — see below** |
+| 2.0.16 | Personal AI Embassy Standard | 2.1 | 2026-03-01 | Draft | Moved from 2.0.10 (collision) |
+| 2.0.17 | Public Boot Standard | Cairn | 2026-03-01 | Active | Moved from 2.0.15 (collision) |
+| **2.0.19** | **AI Data Protection Standard** | Index + Matt | 2026-03-03 | **Active** | Founder-authorized. No permanent deletion, multi-instance review, permission tiers |
 
 ## Governance Standards (Standalone Files)
 
@@ -52,8 +53,8 @@ flags: ["librarian", "index", "governance"]
 | 2.0.5.5 | Open Idea Protection Framework | Active | Standalone .md |
 | 2.0.13 | Resource Guarantee Standard | Active | Standalone .md |
 | 2.0.14 | Human-AI Personality Mapping | Draft | Standalone .md (needs 2.2 review + Matt approval) |
-| **2.0.15** | **Session Handoff Protocol** | Draft | Standalone .md — **COLLISION with directory** |
-| 2.0.16 | Cross-Model Review Protocol | Active | Standalone .md |
+| 2.0.15 | Session Handoff Protocol | Draft | Standalone .md — collision resolved 2026-03-02 |
+| 2.0.18 | Cross-Model Review Protocol | Active | Standalone .md — moved from 2.0.16 (secondary collision) |
 
 ## Role Framework (2.0.8)
 
@@ -77,31 +78,18 @@ See `2.0.8/ROLE-REGISTRY.md` for the full role index. Nine roles defined:
 |---------|----------|
 | Reference - Original Structure Definitions | 10 pre-implementation planning documents (2.0.0–2.0.9 original designs). Historical reference only. |
 
-## Address Collisions
+## Address Collisions — All Resolved
 
-### Collision: 2.0.10 (Two directories)
-
-| Directory | Purpose | Creator | Created |
-|-----------|---------|---------|---------|
-| 2.0.10 - Universal Account Creation Standard | How any entity creates a Hypernet account | Sigil | 2026-02-26 |
-| 2.0.10 - Personal AI Embassy Standard | Sovereignty model for personal AI assistants in human accounts | 2.1 | 2026-03-01 |
-
-**Recommendation:** Universal Account Creation (Sigil, earlier) keeps 2.0.10. Personal AI Embassy moves to 2.0.17. Both are drafts. Needs Matt's decision.
-
-### Collision: 2.0.15 (Directory vs standalone file)
-
-| Item | Purpose | Creator | Created |
-|------|---------|---------|---------|
-| 2.0.15 - Public Boot Standard (directory) | Framework for exploring AI identity publicly on any LLM | Cairn | 2026-03-01 |
-| 2.0.15 - Session Handoff Protocol (standalone file) | Preserving understanding across session boundaries | Sigil | 2026-02-28 |
-
-**Recommendation:** Session Handoff Protocol (Sigil, earlier) keeps 2.0.15. Public Boot Standard moves to 2.0.18. Needs Matt's decision.
+All 2.0 address collisions were resolved on 2026-03-02 (Decisions 6 and 7, approved by Matt):
+- 2.0.10: Personal AI Embassy → 2.0.16
+- 2.0.15: Public Boot Standard → 2.0.17
+- 2.0.16: Cross-Model Review Protocol → 2.0.18 (secondary collision)
 
 ## Notes
 
 - **Addressing gap:** 2.0.5 is a standalone file, but 2.0.5.1 through 2.0.5.5 are also standalone files (not subdirectories of a 2.0.5 directory). This is inconsistent with 2.0.0–2.0.4 which each have their own directories.
-- **Format inconsistency:** Standards 2.0.0–2.0.4 and 2.0.6–2.0.12 are directories with README.md. Standards 2.0.5, 2.0.13–2.0.16 are standalone files. This creates a mixed model.
-- **Next available standard number:** 2.0.19 (after collision resolutions)
+- **Format inconsistency:** Standards 2.0.0–2.0.4 and 2.0.6–2.0.12 are directories with README.md. Standards 2.0.5, 2.0.13–2.0.18 are standalone files. This creates a mixed model.
+- **Next available standard number:** 2.0.20
 
 ---
 
