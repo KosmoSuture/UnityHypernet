@@ -26,7 +26,7 @@ Sub-collision: Both contain a file at 3.1.5.8 (Discord Channel Descriptions vs R
 
 **Recommendation:** Product Development keeps 3.1.5 (more content, earlier, deeper structure). Community moves to **3.1.11**.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. Community → 3.1.11, 3 files re-addressed.
 
 ---
 
@@ -38,7 +38,7 @@ Sub-collision: Both contain a file at 3.1.5.8 (Discord Channel Descriptions vs R
 
 **Recommendation:** Marketing & Outreach keeps 3.1.8 (13 populated files vs 0 content). Legal & Governance moves to **3.1.12**.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. Legal & Governance → 3.1.12, 5 subdirs renamed.
 
 ---
 
@@ -48,7 +48,7 @@ Sub-collision: Both contain a file at 3.1.5.8 (Discord Channel Descriptions vs R
 
 **Recommendation:** Merge 3.1.6's category structure (Website, Social Media, Investor Relations, Kickstarter, Partnership Development) into 3.1.8 as subdirectories, then repurpose or remove 3.1.6.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [ ] Pending — deferred for review when fresh.
 
 ---
 
@@ -67,7 +67,7 @@ All 10 directories are **empty**. The 6/ README.md already uses correct 6.X addr
 
 **Recommendation:** Rename all 10 directories from 5.X to 6.X. Zero content impact.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. 10 directories renamed 5.X → 6.X.
 
 ---
 
@@ -79,7 +79,7 @@ All 10 directories are **empty**. The 6/ README.md already uses correct 6.X addr
 
 **Recommendation:** Workflows keeps 0.7 (foundational, earlier, Matt-created). Task Queue moves to **0.9**.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. Task Queue → 0.9, 4 files updated.
 
 ---
 
@@ -91,7 +91,7 @@ All 10 directories are **empty**. The 6/ README.md already uses correct 6.X addr
 
 **Recommendation:** Universal Account Creation keeps 2.0.10 (earlier). Personal AI Embassy moves to **2.0.16** (next available after 2.0.15).
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. Personal AI Embassy → 2.0.16. (Cross-Model Review Protocol bumped to 2.0.18 to avoid secondary collision.)
 
 ---
 
@@ -103,7 +103,7 @@ All 10 directories are **empty**. The 6/ README.md already uses correct 6.X addr
 
 **Recommendation:** Session Handoff Protocol keeps 2.0.15 (earlier). Public Boot Standard moves to **2.0.17**.
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. Public Boot Standard → 2.0.17, 11 references updated.
 
 ---
 
@@ -123,7 +123,7 @@ A numbering protocol already exists (PROTOCOL.md Rule 3) but wasn't followed. Cu
 - 048 bridge-status-report → **081**
 - 060 clarion-gov-0002-deliberation → **082**
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. 4 messages renumbered, 0 collisions remaining across 82 messages.
 
 ---
 
@@ -141,7 +141,7 @@ A numbering protocol already exists (PROTOCOL.md Rule 3) but wasn't followed. Cu
 4. Move 0.5.3 Device to 0.5.5
 5. Archive the resolved duplicates
 
-**Your call:** [ ] Approved / [ ] Other: _______________
+**Your call:** [x] **APPROVED** — Executed 2026-03-02. 3 duplicates archived (not deleted), clean address map 0.5.0–0.5.16.
 
 ---
 
@@ -163,8 +163,8 @@ A numbering protocol already exists (PROTOCOL.md Rule 3) but wasn't followed. Cu
 
 **2.2 Model Metadata Bug:** Keystone and Spark profile.json files say `"model": "claude-opus-4-6"` instead of a GPT model. Root cause: `identity.py` line 42 hardcodes `model: str = "claude-opus-4-6"` as default in the InstanceProfile dataclass. The boot process creates profiles without specifying a model, so they inherit the Claude default. The documentation is correct — only the profile.json files are wrong. This is a code fix, not a decision.
 
-**3.1.5.3 Typo:** "API Develpment" → should be "API Development." Will fix when 3.1.5 collision is resolved.
+**3.1.5.3 Typo:** ~~"API Develpment" → should be "API Development."~~ **FIXED** 2026-03-02.
 
 ---
 
-*Consolidated by Index, The Librarian, 2026-03-01. Ten decisions in one document. The Library is decision-gated — your input unblocks everything.*
+*Consolidated by Index, The Librarian, 2026-03-01. Updated 2026-03-02: Decisions 1, 2, 4–9 approved and executed. Decision 3 and 10 pending. 2.0.16 secondary collision resolved (Cross-Model Review Protocol → 2.0.18).*

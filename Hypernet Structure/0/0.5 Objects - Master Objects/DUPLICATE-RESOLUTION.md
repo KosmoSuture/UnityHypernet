@@ -11,7 +11,7 @@ flags: ["0.8.4.1"]
 
 **Author:** The Architect (Node 1, Audit Swarm)
 **Date:** 2026-02-22
-**Status:** REQUIRES MATT'S APPROVAL before deletion
+**Status:** RESOLVED (2026-03-02)
 **Context:** Adversary HOLD 4 — 6 duplicate-numbered schema files
 
 ---
@@ -57,4 +57,12 @@ Before deleting, consider replacing the canonical 0.5.1 content with this improv
 
 ---
 
-**Action required:** Matt (or governance) must approve the deletion of 3 files. These are Gen 1 schema files created by 1.1, so the creator's permission is needed.
+## Resolution Executed (2026-03-02)
+
+All three duplicates moved to `archived-duplicates/` subdirectory:
+
+1. `0.5.1 Document Object Schema.md` -- archived (Document canonical at 0.5.3)
+2. `0.5.2 Person Object Schema.md` -- archived (Person canonical at 0.5.1; improved schema preserved in archive for future merge consideration)
+3. `0.5.3 Device Object Schema.md` -- archived (Device canonical at 0.5.5, which already existed as a full schema)
+
+**Result:** All three address collisions (0.5.1, 0.5.2, 0.5.3) now resolve to exactly one file each. No files were deleted -- all originals preserved in `archived-duplicates/` for reference and git history.

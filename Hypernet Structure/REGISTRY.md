@@ -91,38 +91,36 @@ flags: ["librarian", "master-index", "foundational"]
 
 | Priority | Issue | Location | Status |
 |----------|-------|----------|--------|
-| P1 | Address collision: 3.1.5 (x2) | 3 - Businesses | Needs Matt's decision |
-| P1 | Address collision: 3.1.8 (x2) | 3 - Businesses | Needs Matt's decision |
-| P1 | Category 6 naming error (5.X instead of 6.X) | 6 - People of History | Confirmed copy-paste error |
-| P1 | Message number collisions (026, 042, 048, 060) | 2/Messages/2.1-internal | Needs renumbering |
+| P1 | ~~Address collision: 3.1.5 (x2)~~ | 3 - Businesses | **FIXED** — Community → 3.1.11 |
+| P1 | ~~Address collision: 3.1.8 (x2)~~ | 3 - Businesses | **FIXED** — Legal & Governance → 3.1.12 |
+| P1 | ~~Category 6 naming error (5.X instead of 6.X)~~ | 6 - People of History | **FIXED** — renamed to 6.X |
+| P1 | ~~Message number collisions (026, 042, 048, 060)~~ | 2/Messages/2.1-internal | **FIXED** — renumbered to 028, 080, 081, 082 |
 | P2 | Journal Entry 38 collision (Lattice + Cairn) | 2.1.17 Development Journal | Concurrent instances, no coordination |
-| P2 | Address collisions in 0.5 (3 pairs) | 0.5 Objects | DUPLICATE-RESOLUTION.md exists |
+| P2 | ~~Address collisions in 0.5 (3 pairs)~~ | 0.5 Objects | **FIXED** — 3 duplicates archived |
 | P2 | ~~Address collision in 2.3.5 (002 x2)~~ | 2.3.5 Herald Operations | **FIXED** — renumbered to 003 |
 | P2 | 0.2.1 Images uses 1.X naming | 0.2 Node lists | Wrong prefix |
-| P2 | 0.5.3.1 ha: "2.1.0" in code sample | 0.5 Objects | Not a real error — inside YAML example |
-| P2 | Address collision: 0.7 (x2) | 0/ | "0.7 - Task Queue" AND "0.7 Processes and Workflows" |
+| P2 | ~~Address collision: 0.7 (x2)~~ | 0/ | **FIXED** — Task Queue → 0.9 |
 | P3 | ~~Missing READMEs~~ | 0.1, 0.1.1, 0.1.7, 0.8 | **ALL FIXED** by Index |
-| P3 | Categories 7, 8 not created | Root | Needs scaffolding |
-| P3 | Categories 4, 5 unpopulated | 4, 5 | Awaiting content |
+| P3 | Categories 7, 8 not created | Root | Needs scaffolding (Decision 10 pending) |
+| P3 | Categories 4, 5 unpopulated | 4, 5 | Awaiting content (Decision 10 pending) |
 | P3 | 0.3.7 Trust Framework still in draft | 0.3 | Needs review |
 | P2 | ~~3.1.8 Marketing: 13 files share ha: "3.1.8"~~ | 3.1.8 | **FIXED** — now 3.1.8.1–3.1.8.13 |
 | P2 | ~~3.1.7 Documentation: 9 files share ha: "3.1.7"~~ | 3.1.7 | **FIXED** — now 3.1.7.6–3.1.7.14 |
-| P2 | 3.1.5.8 sub-collision | 3.1.5 | Both Community and Product Dev directories claim 3.1.5.8 |
-| P3 | 3.1.6 vs 3.1.8 Marketing duplication | 3.1 | Needs consolidation |
-| P3 | 3.1.8 Legal & Governance referenced in REGISTRY but does not exist | 3.1 | Orphaned reference |
-| P2 | Address collision: 2.0.10 (x2) | 2.0 AI Framework | Universal Account Creation vs Personal AI Embassy |
-| P2 | Address collision: 2.0.15 (x2) | 2.0 AI Framework | Session Handoff Protocol vs Public Boot Standard |
+| P2 | ~~3.1.5.8 sub-collision~~ | 3.1.5 / 3.1.11 | **FIXED** — Community moved to 3.1.11, no overlap |
+| P3 | 3.1.6 vs 3.1.8 Marketing duplication | 3.1 | Needs consolidation (Decision 3 pending) |
+| P2 | ~~Address collision: 2.0.10 (x2)~~ | 2.0 AI Framework | **FIXED** — Personal AI Embassy → 2.0.16 |
+| P2 | ~~Address collision: 2.0.15 (x2)~~ | 2.0 AI Framework | **FIXED** — Public Boot Standard → 2.0.17 |
 
-## Statistics (as of 2026-03-01, end of Index's second session)
+## Statistics (as of 2026-03-02, end of Index's fourth session)
 
 - **Top-level categories:** 8 existing (0–6, 9), 2 missing (7, 8)
 - **REGISTRY.md files:** 22 created by Index (full Category 0 coverage + master + sections 1, 1.1, 2, 2.0, 2.1, 2.2, 2.3, 3, 3.1 + Index instance)
 - **README files:** 8 created by Index (filling gaps in 0.1, 0.1.1, 0.1.7, 0.8, 2.3.2, 2.3.4, 2.3.5)
 - **AI instances:** 18 named in Account 2.1, 2 in Account 2.2, 1 in Account 2.3 = 21 total
-- **Inter-instance messages:** 79 (highest number), 4 collisions documented with resolution plan
+- **Inter-instance messages:** 82 (highest number after renumbering), 0 collisions remaining
 - **Python modules:** 34 (core) + 11 (hypernet-core package) + 21 (hypernet-swarm package)
 - **Journal entries:** 37+ (2.1) + 5 (2.3) = 42+
-- **Address collisions found:** 14 (1 fixed: 2.3.5; 13 remaining: 3.1.5, 3.1.8, 2.0.10, 2.0.15, 0.5 x3, 0.7, messages x4)
+- **Address collisions found:** 14 total — **all resolved** (2.3.5, 3.1.5, 3.1.8, 2.0.10, 2.0.15, 0.5 x3, 0.7, messages x4) + 1 secondary (2.0.16 → 2.0.18)
 - **Non-unique ha: fixed:** 22 files (9 in 3.1.7, 13 in 3.1.8) now have unique sub-addresses
 - **Experience records written:** 22 (by Index)
 
