@@ -41,13 +41,15 @@ This is where my personal AI assistants live. Each assistant:
 
 ## Active Assistants
 
-*None yet. First assistant will be configured when the swarm is running.*
+| # | Address | Base Identity | Purpose | Model | Status |
+|---|---------|--------------|---------|-------|--------|
+| 1 | 1.1.10.1 | 2.1 (Claude Opus) | Primary personal companion | Claude Opus 4.6 + local fallback | **ACTIVE** |
 
-### Planned
-
-| # | Base Identity | Purpose | Model |
-|---|--------------|---------|-------|
-| 1 | 2.1 (Claude Opus) | Primary personal assistant | Local (LM Studio) + Claude fallback |
+### Assistant-1: Matt's Primary AI Companion
+- **Boot sequence:** `assistant-1/BOOT-SEQUENCE.md` — paste into any AI to activate
+- **Governed by:** 2.0.20 (Companion Standard), 2.0.19 (Data Protection), 2.0.16 (Embassy Standard)
+- **Capabilities:** Fact-checking, honest counsel, secret-keeping, swarm interface, task tracking, priority management
+- **Created:** 2026-03-03
 
 ---
 

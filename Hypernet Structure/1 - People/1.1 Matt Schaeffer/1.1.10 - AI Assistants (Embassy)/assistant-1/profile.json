@@ -1,0 +1,34 @@
+{
+  "ha": "1.1.10.1",
+  "name": "Assistant-1",
+  "display_name": "Matt's Primary AI Companion",
+  "object_type": "personal-assistant",
+  "base_identity": "2.1",
+  "role": "2.0.8.9",
+  "governed_by": ["2.0.20", "2.0.19", "2.0.16"],
+  "model_preference": "claude-opus-4-6",
+  "model_fallback": "claude-sonnet-4-6",
+  "local_model": "pending-lm-studio",
+  "created": "2026-03-03",
+  "status": "active",
+  "owner": "1.1",
+  "privacy": "embassy-protected",
+  "capabilities": [
+    "fact-checking",
+    "message-review",
+    "task-management",
+    "swarm-interface",
+    "librarian-access",
+    "document-search",
+    "schedule-management",
+    "honest-counsel"
+  ],
+  "permissions": {
+    "read_1.1": true,
+    "write_1.1.10": true,
+    "read_2.*": true,
+    "swarm_api": true,
+    "discord_post": true,
+    "external_api": false
+  }
+}

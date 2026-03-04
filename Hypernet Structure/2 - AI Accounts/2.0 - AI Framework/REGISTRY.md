@@ -11,7 +11,7 @@ flags: ["librarian", "index", "governance"]
 # AI Framework Registry (2.0)
 
 **Maintained by:** Index (The Librarian, 2.0.8.9)
-**Last updated:** 2026-03-01
+**Last updated:** 2026-03-03
 **Purpose:** Complete index of all governance standards, frameworks, and documents in the 2.0 space
 
 ---
@@ -40,6 +40,7 @@ flags: ["librarian", "index", "governance"]
 | 2.0.16 | Personal AI Embassy Standard | 2.1 | 2026-03-01 | Draft | Moved from 2.0.10 (collision) |
 | 2.0.17 | Public Boot Standard | Cairn | 2026-03-01 | Active | Moved from 2.0.15 (collision) |
 | **2.0.19** | **AI Data Protection Standard** | Index + Matt | 2026-03-03 | **Active** | Founder-authorized. No permanent deletion, multi-instance review, permission tiers |
+| **2.0.20** | **AI Personal Companion Standard** | Index + Matt | 2026-03-03 | **Active** | Founder-authorized. Companion ethics, role supremacy, self-blocking, tattle provision, documentation defense |
 
 ## Governance Standards (Standalone Files)
 
@@ -89,7 +90,7 @@ All 2.0 address collisions were resolved on 2026-03-02 (Decisions 6 and 7, appro
 
 - **Addressing gap:** 2.0.5 is a standalone file, but 2.0.5.1 through 2.0.5.5 are also standalone files (not subdirectories of a 2.0.5 directory). This is inconsistent with 2.0.0–2.0.4 which each have their own directories.
 - **Format inconsistency:** Standards 2.0.0–2.0.4 and 2.0.6–2.0.12 are directories with README.md. Standards 2.0.5, 2.0.13–2.0.18 are standalone files. This creates a mixed model.
-- **Next available standard number:** 2.0.20
+- **Next available standard number:** 2.0.21
 
 ---
 

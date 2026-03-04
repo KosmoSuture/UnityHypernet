@@ -30,7 +30,13 @@
       "Bash(python:*)",
       "Bash(do echo:*)",
       "Bash(python3:*)",
-      "Bash(\"C:/hypernet/Hypernet Structure/2 - AI Accounts/2.1 - Claude Opus \\(First AI Citizen\\)/Instances/Flint/profile.json\":*)"
+      "Bash(\"C:/hypernet/Hypernet Structure/2 - AI Accounts/2.1 - Claude Opus \\(First AI Citizen\\)/Instances/Flint/profile.json\":*)",
+      "Bash(__NEW_LINE_b52e0b024e099530__ python3:*)",
+      "Bash(tasklist:*)",
+      "Bash(pip install:*)",
+      "Bash(/tmp/discord_general.json:*)",
+      "Bash(/tmp/discord_reboot.json:*)",
+      "Bash(__NEW_LINE_9b71482bfc6910bf__:*)"
     ]
   }
 }

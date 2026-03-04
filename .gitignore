@@ -1,13 +1,50 @@
-# Entornos virtuales (Python)
+# Python environments
 venv/
 ENV/
 env/
 
-# Carpetas de configuración local
+# IDE and local config
 .ralphy/
 .vscode/
 
-# Archivos de sistema y temporales
+# System and temp files
 __pycache__/
 *.py[cod]
 *.DS_Store
+*.swp
+*.swo
+*~
+
+# === SECURITY: Secrets and credentials ===
+# API keys, tokens, OAuth credentials — NEVER commit these
+secrets/
+*.secret
+*.credentials
+*.token
+oauth_tokens/
+credentials/
+
+# === PRIVATE DATA: Personal account spaces ===
+# Any directory named 'private/' anywhere in the tree is gitignored
+# This is the secure staging area for personal data before Hypernet ingestion
+**/private/
+
+# Specific private data paths
+Hypernet Structure/1 - People/*/private/
+
+# === SENSITIVE IMPORTS: Raw data staging ===
+# Email exports, photo imports, social media dumps
+**/import-staging/
+**/raw-imports/
+
+# === LOCAL RUNTIME ===
+# Database files, local caches, session data
+*.db
+*.sqlite
+*.sqlite3
+local-cache/
+.session-data/
+
+# === LOGS WITH POTENTIAL PII ===
+logs/*.log
+*.log.gz
