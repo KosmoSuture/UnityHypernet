@@ -29,6 +29,7 @@ from .permissions import PermissionManager, PermissionTier
 from .audit import AuditTrail
 from .tools import ToolExecutor
 from .agent_tools import create_default_registry, ToolRegistry
+from .discord_monitor import DiscordMonitor
 from .swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
@@ -195,5 +196,20 @@ def build_swarm(
     swarm._tool_executor = tool_executor
     swarm._agent_registry = agent_registry
     swarm._discord_messenger = discord_messenger  # None if not configured
+
+    # Discord monitor — inbound message polling (reads human messages from Discord)
+    if discord_config and discord_config.get("bot_token"):
+        monitor = DiscordMonitor.from_config(discord_config)
+        monitor_state_path = str(Path(data_dir) / "swarm" / "discord_monitor_state.json")
+        monitor.load_state(monitor_state_path)
+        swarm.discord_monitor = monitor
+        swarm._discord_monitor_state_path = monitor_state_path
+        log.info(
+            "Discord monitor active — monitoring %d channel(s)",
+            len(monitor.channels),
+        )
+    else:
+        swarm.discord_monitor = None
+        swarm._discord_monitor_state_path = None
 
     return swarm, web_messenger

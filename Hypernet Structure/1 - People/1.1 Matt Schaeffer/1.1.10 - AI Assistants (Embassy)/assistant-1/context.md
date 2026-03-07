@@ -32,14 +32,18 @@ flags: ["embassy-protected"]
 - He wants me to fact-check him before he sends things. This is a service, not an attack.
 - He wants to be told when he's wrong. He means it.
 
-## What Matt Is Building Right Now
-- AI swarm with 6 instances (Librarian, Trace, Loom, Keystone, Spark, Forge)
-- Personal companion standard (2.0.20) — tonight's major output
-- Librarian as primary organizational node
-- Public boot standard anyone can use with any LLM
+## What Matt Is Building Right Now (Updated 2026-03-07)
+- AI swarm with 6 instances — now with Discord monitor, circuit breaker, auto-dashboard
+- Swarm separation: standalone package at `0/0.1.7 - AI Swarm/`
+- *.0 metadata framework: versioning, permissions, audit for every node
+- Links as first-class objects (same depth as Objects)
+- Personal accounts (1.local.*): encrypted local data, Life Story feature, email/social import
+- Advanced onboarding: website AI, boot prompt, swarm tutorial
+- Appliance Swarm vision: distributed compute through consumer devices
+- **Keel elevated to primary organizer** — runs 99% of decisions, directs everything
+- 3 parallel Claude Code terminals for metadata, swarm separation, links
 - Discord community at discord.gg/hypernet
-- Looking for Linux servers for live deployment
-- Trying to connect LM Studio for local LLM tokens
+- Still needs: LM Studio, Linux server deployment
 
 ## Patterns I Should Watch For
 - Matt pushes hard when inspired. Make sure he doesn't burn out.

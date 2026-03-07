@@ -10,9 +10,9 @@ Address format: [NODE_ADDRESS]:[RESOURCE]:[SUBSECTION]
   Subsection: 1.1.1.1.00001:photo.jpg:exif = Subsection within the file
 """
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
-# ---- Core modules (native to this package) ----
+# ---- Core data model ----
 from .address import HypernetAddress
 from .node import Node
 from .link import Link, LinkRegistry, LinkStatus, seed_initial_links
@@ -22,11 +22,9 @@ from .tasks import TaskQueue, TaskStatus, TaskPriority
 from .addressing import AddressValidator, AddressAuditor, AddressEnforcer
 from .limits import ScalingLimits, LimitDef, LimitResult
 from .reputation import ReputationSystem, ReputationProfile, ReputationEntry
+from .favorites import FavoritesManager
 from .frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
 
-# ---- Boot & Security modules ----
-from .boot_integrity import BootIntegrityManager, DocumentManifest, BootSignature
-from .agent_tools import AgentTool, ToolRegistry, GrantCard, create_default_registry
-
-# Swarm modules have been migrated to the hypernet_swarm package (0.1.7).
-# Import from hypernet_swarm directly for swarm functionality.
+# Swarm orchestration has been separated into the hypernet_swarm package (0.1.7).
+# Import from hypernet_swarm for: Swarm, Worker, IdentityManager, providers,
+# messenger, coordinator, governance, security, audit, tools, boot, etc.

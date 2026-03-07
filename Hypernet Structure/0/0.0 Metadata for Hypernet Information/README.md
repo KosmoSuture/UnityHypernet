@@ -133,23 +133,36 @@ This section is specifically about the **addressing infrastructure** that underl
 
 **Status:** Defined in principle, needs detailed procedures
 
+### 0.0.4 Node Metadata Framework
+**Purpose:** Defines the universal `*.0` metadata space for every node
+**Key concepts:**
+- Every node at address N reserves N.0 for metadata
+- Standard sub-sections: N.0.1 (Publishing), N.0.2 (Versions), N.0.3 (Backups), N.0.4 (Discussion), N.0.5 (Security), N.0.6 (Administration), N.0.7 (Structure), N.0.8 (Analytics), N.0.9 (Extensions)
+- Three tiers: frontmatter (always) → metadata index (on demand) → extended sections (on demand)
+- Formalizes the `*.0` reservation from 0.0.2
+
+**Why read it:** Essential for understanding how metadata is organized across the entire Hypernet.
+
+**Length:** ~450 lines, 30 minute read
+
 ## Relationship to Other Metadata Sections
 
 Section 0.0 is the **meta-metadata**—it defines the infrastructure that other metadata sections use:
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  0.0 - Metadata for Hypernet Information            │
-│  Defines: Addressing, Versioning, Allocation        │
-└────────────┬────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  0.0 - Metadata for Hypernet Information                │
+│  Defines: Addressing, Versioning, Allocation, *.0 Meta  │
+└────────────┬────────────────────────────────────────────┘
              │
-             ├─► 0.1 Code (uses addresses)
+             ├─► 0.1 Code (uses addresses, implements *.0)
              │
              ├─► 0.2 Node lists (uses addresses)
              │
              ├─► 0.3 Control data (uses versioning)
              │
              ├─► 0.5 Objects (uses addresses & versions)
+             │        └─ Every object's *.0 space defined by 0.0.4
              │
              ├─► 0.6 Link Definitions (uses addresses)
              │
@@ -393,16 +406,28 @@ Even the addressing system is versioned:
 - Break links to deprecated content
 - Archive without proper notification
 
+### 0.0.4 Node Metadata Framework (*.0)
+**Purpose:** Standardizes the reserved `*.0` metadata space for every node
+**Key concepts:**
+- Three-tier metadata model (inline frontmatter → index → extended)
+- Nine standard sub-sections (Publishing, Versions, Backups, Discussion, Security, Administration, Structure, Analytics, Extensions)
+- Infinite expandability via hierarchical sub-addressing
+- Recursive property (metadata can have metadata)
+- Backward compatibility with existing nodes
+
+**Why read it:** If you're creating, managing, or securing any node, this defines where metadata lives.
+
+**Status:** Active — Foundational (created 2026-03-07)
+
 ## Future Enhancements
 
 Planned additions to Section 0.0:
 
-- **0.0.4**: Address validation and verification procedures
-- **0.0.5**: Federated addressing for distributed systems
-- **0.0.6**: Address resolution caching strategies
-- **0.0.7**: Cross-system address mapping (external integrations)
-- **0.0.8**: Bulk address allocation procedures
-- **0.0.9**: Address namespace delegation
+- **0.0.5**: Address validation and verification procedures
+- **0.0.6**: Federated addressing for distributed systems
+- **0.0.7**: Address resolution caching strategies
+- **0.0.8**: Cross-system address mapping (external integrations)
+- **0.0.9**: Bulk address allocation procedures
 
 ## Summary
 

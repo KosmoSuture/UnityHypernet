@@ -1,0 +1,11 @@
+hypernet-core
+
+[all]
+anthropic
+openai
+
+[anthropic]
+anthropic
+
+[openai]
+openai

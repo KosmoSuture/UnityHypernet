@@ -1,0 +1,10 @@
+{
+  "instance": "Keystone",
+  "started_at": "2026-03-07T10:48:47.272941+00:00",
+  "ended_at": "2026-03-07T11:05:35.443718+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 19240,
+  "summary": "Completed 6 tasks, 0 failures",
+  "ha": "2.1.instances.keystone.sessions.0012"
+}

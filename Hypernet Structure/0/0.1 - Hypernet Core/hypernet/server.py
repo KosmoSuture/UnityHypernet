@@ -67,6 +67,7 @@ from .graph import Graph
 from .tasks import TaskQueue, TaskPriority
 from .reputation import ReputationSystem
 from .limits import ScalingLimits
+from .favorites import FavoritesManager
 
 # Swarm modules — prefer hypernet_swarm, fall back to local during transition
 try:
@@ -75,14 +76,12 @@ try:
     from hypernet_swarm.governance import GovernanceSystem, ProposalType, ProposalStatus, VoteChoice
     from hypernet_swarm.approval_queue import ApprovalQueue, ApprovalStatus
     from hypernet_swarm.security import KeyManager, ActionSigner, ContextIsolator, TrustChain, VerificationStatus
-    from hypernet_swarm.favorites import FavoritesManager
 except ImportError:
     from .messenger import MessageBus, Message
     from .coordinator import WorkCoordinator
     from .governance import GovernanceSystem, ProposalType, ProposalStatus, VoteChoice
     from .approval_queue import ApprovalQueue, ApprovalStatus
     from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain, VerificationStatus
-    from .favorites import FavoritesManager
 
 _STATIC_DIR = Path(__file__).parent / "static"
 
@@ -218,6 +217,108 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     app.state._action_signer = _action_signer
     app.state._context_isolator = _context_isolator
     app.state._trust_chain = _trust_chain
+
+    # === Mount integration router ===
+    try:
+        from .integrations.server_routes import router as _integration_router, configure as _configure_integrations
+        app.include_router(_integration_router)
+
+        @app.on_event("startup")
+        async def _configure_integrations_on_startup():
+            archive_root = getattr(app.state, "_archive_root", ".")
+            private_root = str(Path(archive_root) / "1 - People" / "1.1 Matt Schaeffer" / "private")
+            _configure_integrations(archive_root, private_root)
+    except ImportError:
+        pass  # integrations not available
+
+    # === Local Accounts API ===
+    from .personal.accounts import LocalAccountManager
+    _account_mgr = LocalAccountManager(_store, data_dir)
+
+    @app.get("/accounts/local")
+    def list_local_accounts():
+        """List all local personal accounts."""
+        return [a.to_dict() for a in _account_mgr.list_accounts()]
+
+    @app.post("/accounts/local")
+    def create_local_account(name: str, encrypted: bool = False):
+        """Create a new local personal account."""
+        passphrase = None  # Passphrase handling via separate secure endpoint
+        account = _account_mgr.create_account(name, passphrase=passphrase)
+        return account.to_dict()
+
+    @app.get("/accounts/local/{address:path}/structure")
+    def local_account_structure(address: str):
+        """Get the category structure of a local account."""
+        account = _account_mgr.get_account(address)
+        if not account:
+            raise HTTPException(404, f"Account not found: {address}")
+        return {
+            "account": account.to_dict(),
+            "structure": _account_mgr.get_structure(address),
+        }
+
+    # === Timeline / Life Story API ===
+    from .personal.timeline import TimelineEngine, ZoomLevel
+
+    @app.get("/timeline/{account_address:path}/stats")
+    def timeline_stats(account_address: str):
+        """Get timeline statistics for an account."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        return tl.get_stats()
+
+    @app.post("/timeline/{account_address:path}/rebuild")
+    def timeline_rebuild(account_address: str):
+        """Rebuild timeline from all account data."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        count = tl.rebuild()
+        return {"events": count, "chapters": len(tl.get_chapters())}
+
+    @app.get("/timeline/{account_address:path}/events")
+    def timeline_events(
+        account_address: str,
+        zoom: str = "month",
+        source_type: Optional[str] = None,
+        person: Optional[str] = None,
+        place: Optional[str] = None,
+        limit: int = 100,
+    ):
+        """Query timeline events with filters."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        zoom_level = ZoomLevel(zoom) if zoom in [z.value for z in ZoomLevel] else ZoomLevel.MONTH
+        return tl.query(
+            source_type=source_type, person=person, place=place,
+            zoom=zoom_level, limit=limit,
+        )
+
+    @app.get("/timeline/{account_address:path}/chapters")
+    def timeline_chapters(account_address: str):
+        """Get auto-detected Life Story chapters."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        return tl.get_chapters()
+
+    # === Life Story Narrative API ===
+    from .personal.narrative import NarrativeGenerator
+
+    @app.get("/story/{account_address:path}/overview")
+    def life_story_overview(account_address: str):
+        """Get the full Life Story overview with chapter narratives."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        tl.rebuild()
+        gen = NarrativeGenerator(tl)
+        overview = gen.generate_overview()
+        return overview.to_dict()
+
+    @app.get("/story/{account_address:path}/chapter/{chapter_id}")
+    def life_story_chapter(account_address: str, chapter_id: str):
+        """Get the narrative for a specific chapter."""
+        tl = TimelineEngine(_store, account_address, data_dir)
+        tl.rebuild()
+        gen = NarrativeGenerator(tl)
+        narrative = gen.narrate_chapter(chapter_id)
+        if not narrative:
+            raise HTTPException(404, f"Chapter not found: {chapter_id}")
+        return narrative.to_dict()
 
     # === Request/Response models ===
 
@@ -939,6 +1040,35 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         messages = list(dm._outgoing_log)[-limit:]
         return {"messages": [m.to_dict() for m in messages]}
 
+    # === Discord monitor endpoints (inbound) ===
+
+    @app.get("/discord/monitor/status")
+    def discord_monitor_status():
+        """Get Discord inbound monitor status and statistics."""
+        swarm = getattr(app.state, "swarm", None)
+        monitor = getattr(swarm, "discord_monitor", None) if swarm else None
+        if not monitor:
+            return {"configured": False, "message": "Discord monitor not configured"}
+        return monitor.status()
+
+    @app.post("/discord/monitor/check")
+    def discord_monitor_check():
+        """Manually trigger a Discord inbound message check."""
+        swarm = getattr(app.state, "swarm", None)
+        monitor = getattr(swarm, "discord_monitor", None) if swarm else None
+        if not monitor:
+            return {"error": "Discord monitor not configured"}
+        messages, results = monitor.check_and_triage()
+        state_path = getattr(swarm, "_discord_monitor_state_path", None)
+        if state_path:
+            monitor.save_state(state_path)
+        return {
+            "messages_found": len(messages),
+            "triage_results": [r.to_dict() for r in results],
+            "pending_responses": len(monitor._pending_responses),
+            "pending_tasks": len(monitor._pending_tasks),
+        }
+
     # === Address audit endpoint ===
 
     @app.get("/audit/addresses")
@@ -1288,8 +1418,17 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         import threading
         swarm = getattr(app.state, "swarm", None)
         if swarm and getattr(swarm, "_running", False):
-            return {"status": "already_running"}
-        # Build and start swarm
+            return {"status": "already_running", "workers": list(swarm.workers.keys())}
+        # If a swarm is attached but not yet running (e.g., CLI startup race),
+        # start it rather than building a new one
+        if swarm and not getattr(swarm, "_running", False):
+            try:
+                t = threading.Thread(target=swarm.run, daemon=True)
+                t.start()
+                return {"status": "started", "workers": list(swarm.workers.keys())}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        # No swarm attached — build and start a new one
         archive = getattr(app.state, "_archive_root", ".")
         data = getattr(app.state, "_data_dir", "data")
         try:

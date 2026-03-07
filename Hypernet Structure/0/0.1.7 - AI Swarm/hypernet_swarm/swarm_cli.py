@@ -48,7 +48,11 @@ def print_status(
         print("No swarm state found. Is the swarm running?")
         return
 
-    state = json.loads(state_path.read_text(encoding="utf-8"))
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error reading swarm state: {e}")
+        return
 
     # Calculate uptime
     uptime_s = state.get("uptime_seconds", 0)
@@ -173,7 +177,11 @@ def _print_session_history(data_dir: str) -> None:
         print("No session history found. History is saved on swarm shutdown.")
         return
 
-    sessions = json.loads(history_path.read_text(encoding="utf-8"))
+    try:
+        sessions = json.loads(history_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error reading session history: {e}")
+        return
     if not sessions:
         print("Session history is empty.")
         return
@@ -252,6 +260,9 @@ def main():
     parser.add_argument("--worker", default=None, help="Filter status to a single worker name")
     parser.add_argument("--failures", action="store_true", help="Show only failed tasks (use with --status)")
     parser.add_argument("--history", action="store_true", help="Show session history (use with --status)")
+    parser.add_argument("--prune", action="store_true", help="Prune completed tasks and old audit logs, then exit")
+    parser.add_argument("--keep-tasks", type=int, default=50, help="Tasks to keep when pruning (default: 50)")
+    parser.add_argument("--keep-audit", type=int, default=200, help="Audit entries to keep when pruning (default: 200)")
     args = parser.parse_args()
 
     # Status-only mode — read state.json, print dashboard, exit
@@ -263,6 +274,28 @@ def main():
             show_history=args.history,
             summary_only=args.summary,
         )
+        return
+
+    # Prune mode — clean up completed tasks and old audit logs, then exit
+    if args.prune:
+        from hypernet.store import Store
+        from hypernet.tasks import TaskQueue
+        from .audit import AuditTrail
+
+        store = Store(args.data)
+        tq = TaskQueue(store)
+        at = AuditTrail(store)
+
+        total_before = len(store._node_index)
+        print(f"Node index: {total_before} entries")
+        print(f"Pruning completed tasks (keeping {args.keep_tasks})...")
+        t_pruned = tq.prune_completed(keep=args.keep_tasks)
+        print(f"  Pruned {t_pruned} tasks")
+        print(f"Pruning audit logs (keeping {args.keep_audit})...")
+        a_pruned = at.prune(keep=args.keep_audit)
+        print(f"  Pruned {a_pruned} audit entries")
+        total_after = len(store._node_index)
+        print(f"Node index: {total_before} -> {total_after} entries ({total_before - total_after} removed)")
         return
 
     # Configure logging
@@ -283,12 +316,42 @@ def main():
 
     from .swarm_factory import build_swarm
 
-    swarm, _ = build_swarm(
+    swarm, web_messenger = build_swarm(
         data_dir=args.data,
         archive_root=args.archive,
         config_path=args.config,
         mock=args.mock,
     )
+
+    # Start the web server in a background thread so the dashboard is available
+    server_thread = None
+    try:
+        from hypernet.server import create_app, attach_swarm
+        import threading
+        import uvicorn
+
+        app = create_app(data_dir=args.data)
+        app.state._archive_root = args.archive
+        app.state._data_dir = args.data
+        attach_swarm(app, swarm, web_messenger)
+
+        server_config = uvicorn.Config(
+            app, host="0.0.0.0", port=8000,
+            log_level="warning",  # Quiet — swarm logs are enough
+        )
+        server = uvicorn.Server(server_config)
+
+        server_thread = threading.Thread(target=server.run, daemon=True)
+        server_thread.start()
+        print(f"  Dashboard: http://localhost:8000/swarm/dashboard")
+        print(f"  Explorer:  http://localhost:8000/")
+        print()
+    except ImportError:
+        print("  (Dashboard not available — install fastapi and uvicorn)")
+        print()
+    except Exception as e:
+        print(f"  (Dashboard failed to start: {e})")
+        print()
 
     # Handle graceful shutdown
     def signal_handler(sig, frame):

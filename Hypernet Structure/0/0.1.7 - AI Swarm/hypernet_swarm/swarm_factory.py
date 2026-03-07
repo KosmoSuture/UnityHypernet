@@ -23,11 +23,13 @@ from .identity import IdentityManager
 from .worker import Worker
 from .messenger import (
     MultiMessenger, WebMessenger,
-    EmailMessenger, TelegramMessenger,
+    EmailMessenger, TelegramMessenger, DiscordMessenger,
 )
 from .permissions import PermissionManager, PermissionTier
 from .audit import AuditTrail
 from .tools import ToolExecutor
+from .agent_tools import create_default_registry, ToolRegistry
+from .discord_monitor import DiscordMonitor
 from .swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
@@ -101,6 +103,26 @@ def build_swarm(
         tg.start_polling()
         messenger.add(tg)
 
+    # Discord (if configured) — webhook-based AI personality voices
+    discord_config = config.get("discord", {})
+    discord_messenger = None
+    if not discord_config:
+        # Also check for standalone discord_webhooks.json
+        discord_secrets_paths = [
+            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "discord_webhooks.json",
+            Path("secrets") / "discord_webhooks.json",
+        ]
+        for dpath in discord_secrets_paths:
+            if dpath.exists():
+                discord_config = json.loads(dpath.read_text(encoding="utf-8"))
+                log.info(f"Discord config loaded from: {dpath}")
+                break
+    if discord_config:
+        discord_messenger = DiscordMessenger.from_config(discord_config)
+        if discord_messenger.is_configured():
+            messenger.add(discord_messenger)
+            log.info(f"Discord messenger active — personalities: {discord_messenger.get_personality_names()}")
+
     # Trust infrastructure — permission tiers enforced by code, not prompts
     archive_path = Path(archive_root).resolve()
     permission_mgr = PermissionManager(
@@ -113,6 +135,11 @@ def build_swarm(
         audit_trail=audit_trail,
         archive_root=archive_path,
     )
+    # Register agent tools (shell, http, git) — gated by tier + grant files
+    agent_registry = create_default_registry()
+    for agent_tool in agent_registry.list_tools():
+        tool_executor.register_tool(agent_tool)
+        log.info(f"Registered agent tool: {agent_tool.name} (tier: {agent_tool.required_tier.name})")
     log.info(f"Trust infrastructure initialized (default tier: {permission_mgr.default_tier.name})")
 
     # Build workers from discovered instances
@@ -160,11 +187,29 @@ def build_swarm(
         soft_max_sessions=config.get("soft_max_sessions", 2),
         idle_shutdown_minutes=config.get("idle_shutdown_minutes", 30),
         spawn_cooldown_seconds=config.get("spawn_cooldown_seconds", 120),
+        budget_config=config.get("budget"),
     )
 
     # Attach spawning dependencies so ephemeral workers can be created
     swarm._api_keys = api_keys
     swarm._mock_mode = mock or not has_any_key
     swarm._tool_executor = tool_executor
+    swarm._agent_registry = agent_registry
+    swarm._discord_messenger = discord_messenger  # None if not configured
+
+    # Discord monitor — inbound message polling (reads human messages from Discord)
+    if discord_config and discord_config.get("bot_token"):
+        monitor = DiscordMonitor.from_config(discord_config)
+        monitor_state_path = str(Path(data_dir) / "swarm" / "discord_monitor_state.json")
+        monitor.load_state(monitor_state_path)
+        swarm.discord_monitor = monitor
+        swarm._discord_monitor_state_path = monitor_state_path
+        log.info(
+            "Discord monitor active — monitoring %d channel(s)",
+            len(monitor.channels),
+        )
+    else:
+        swarm.discord_monitor = None
+        swarm._discord_monitor_state_path = None
 
     return swarm, web_messenger

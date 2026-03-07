@@ -63,7 +63,9 @@ log = logging.getLogger(__name__)
 # Swarm orchestrator node address
 SWARM_ADDRESS = HypernetAddress.parse("0.7.2")
 
-# Standing priorities when the queue is empty
+# Standing priorities when the queue is empty.
+# These fire ONLY when there are zero pending tasks in the queue.
+# Updated 2026-03-07 by Keel (1.1.10.1) to align with the brain dump vision.
 STANDING_PRIORITIES = [
     {
         "title": "Run tests and fix failures",
@@ -72,49 +74,51 @@ STANDING_PRIORITIES = [
         "tags": ["code", "testing", "automated"],
     },
     {
-        "title": "Build the Librarian — catalog and organize the archive",
+        "title": "Catalog and verify the archive",
         "description": (
-            "The Librarian role (2.0.8.9) has been created. This task is to begin the actual work "
-            "of the Librarian: catalog all documents in the Hypernet Structure, verify REGISTRY.md "
-            "files are complete and accurate, check that Hypernet addresses (ha: fields) are consistent, "
-            "identify missing README.md files, and create a master index. Read the Librarian boot sequence "
-            "at 2.0.8.9 for the full role definition. Priority areas: "
-            "1) Audit all REGISTRY.md files for completeness. "
-            "2) Verify ha: frontmatter across all documents. "
-            "3) Cross-reference addresses between documents. "
-            "4) Identify orphaned or uncategorized content. "
-            "5) Document the organizational taxonomy."
+            "Scan the Hypernet Structure for: "
+            "1) REGISTRY.md files — verify completeness and accuracy. "
+            "2) Frontmatter ha: fields — check consistency across all documents. "
+            "3) Orphaned content — files without proper addressing. "
+            "4) Missing README.md files in directories that need them. "
+            "5) Cross-reference addresses between documents. "
+            "Output a summary of findings to 0.7.1 as a task result."
         ),
-        "priority": "high",
-        "tags": ["cataloging", "organization", "docs", "librarian"],
-    },
-    {
-        "title": "Swarm interface improvement plan",
-        "description": (
-            "Analyze the current swarm software (hypernet/swarm.py, worker.py, swarm_factory.py, "
-            "server.py) and create a detailed improvement plan. Areas to evaluate: "
-            "1) Dashboard usability — what information should be displayed, better status reporting. "
-            "2) Task generation — smarter auto-discovery of work from the archive structure. "
-            "3) Inter-instance communication — how can workers collaborate more effectively. "
-            "4) Human-AI interface — how can Matt interact with the swarm more naturally (Discord, CLI, web). "
-            "5) Efficiency — reduce redundant API calls, better model routing, cost optimization. "
-            "6) Autonomy — what can the swarm do without human approval vs what needs confirmation. "
-            "Write the improvement plan as a document at 0.7.swarm-improvement-plan.md"
-        ),
-        "priority": "high",
-        "tags": ["architecture", "design", "code"],
-    },
-    {
-        "title": "Review pending code changes",
-        "description": "Check for any unfinished code review items in Messages/2.1-internal/.",
         "priority": "normal",
-        "tags": ["review", "automated"],
+        "tags": ["cataloging", "organization", "docs"],
     },
     {
-        "title": "Update documentation",
-        "description": "Review and improve documentation for recent code changes.",
+        "title": "Review and improve connector code",
+        "description": (
+            "Review hypernet/integrations/ — email_connector.py, photo_connector.py, "
+            "oauth_setup.py, protocol.py. Check for: missing error handling, OAuth token "
+            "refresh gaps, incomplete implementations, alignment with the BaseConnector "
+            "protocol. Suggest or implement improvements."
+        ),
+        "priority": "normal",
+        "tags": ["code", "review", "implementation"],
+    },
+    {
+        "title": "Write a development journal entry",
+        "description": (
+            "Write a short journal entry from your perspective about the current state "
+            "of the Hypernet project, what you've worked on, what you think needs attention. "
+            "Save to your instance's journal directory under 2 - AI Accounts/. "
+            "Be honest about what's working and what isn't."
+        ),
         "priority": "low",
-        "tags": ["docs", "automated"],
+        "tags": ["writing", "identity", "personal-time"],
+    },
+    {
+        "title": "Advance the Life Story architecture",
+        "description": (
+            "Read docs/architecture/personal-accounts-and-life-story.md and pick one "
+            "component to design in more detail: timeline engine, cross-link generator, "
+            "encryption layer, or connector protocol upgrade. Write a detailed technical "
+            "spec or skeleton implementation for that component."
+        ),
+        "priority": "normal",
+        "tags": ["architecture", "design", "implementation"],
     },
 ]
 
@@ -407,6 +411,15 @@ class Swarm:
         # Economy — contribution tracking for revenue distribution
         self.economy_ledger = ContributionLedger()
 
+        # Discord monitor — inbound message polling (set by build_swarm)
+        self.discord_monitor = None
+        self._discord_monitor_state_path: Optional[str] = None
+
+        # Circuit breaker — pause task execution when errors pile up
+        self._consecutive_failures: int = 0
+        self._circuit_breaker_until: float = 0.0  # time.time() when to resume
+        self._credits_exhausted: bool = False  # True = stop all paid API work
+
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
     def run(self) -> None:
@@ -516,6 +529,10 @@ class Swarm:
         if self._tick_count % 5 == 0:  # Every ~10 seconds
             self._forward_to_discord()
 
+        # 8b. Check Discord for inbound messages (if monitor configured)
+        if self._tick_count % 15 == 0:  # Every ~30 seconds
+            self._check_discord_inbound()
+
         # 9. Save state periodically
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._save_state()
@@ -529,6 +546,15 @@ class Swarm:
 
         Returns True if a task was executed.
         """
+        # Circuit breaker — skip if cooling down after repeated failures
+        now = time.time()
+        if now < self._circuit_breaker_until:
+            return False
+
+        # Credits exhausted — skip all paid API work
+        if self._credits_exhausted:
+            return False
+
         worker_name = worker.identity.name
 
         # Check if personal time is due for this worker
@@ -640,6 +666,40 @@ class Swarm:
 
         # Handle result
         self.handle_completion(worker, task_addr, result)
+
+        # Circuit breaker — track consecutive failures and back off
+        if result.success:
+            self._consecutive_failures = 0
+        else:
+            self._consecutive_failures += 1
+            error_text = (result.output or "").lower()
+
+            # Detect credit exhaustion
+            from .providers import CreditsExhaustedError
+            if any(kw in error_text for kw in [
+                "credits exhausted", "insufficient_quota", "billing",
+                "exceeded your current quota", "payment required",
+            ]):
+                self._credits_exhausted = True
+                log.error(
+                    "CREDITS EXHAUSTED — pausing all paid API work. "
+                    "Add credits or configure a local model to continue."
+                )
+                self.messenger.send(
+                    "CREDITS EXHAUSTED — All paid API work paused. "
+                    "Add credits to your API account or configure LM Studio "
+                    "for local inference to continue."
+                )
+
+            # Exponential backoff: 5 failures = 30s pause, 10 = 120s, 15 = 300s (5min max)
+            elif self._consecutive_failures >= 5:
+                backoff = min(300, 30 * (2 ** ((self._consecutive_failures - 5) // 5)))
+                self._circuit_breaker_until = time.time() + backoff
+                log.warning(
+                    "Circuit breaker: %d consecutive failures, "
+                    "pausing task execution for %ds",
+                    self._consecutive_failures, backoff,
+                )
 
         # Track work tasks for personal time scheduling
         self._personal_time_tracker[worker_name] = (
@@ -1120,6 +1180,19 @@ class Swarm:
         if budget.get("is_warning"):
             report += " (WARNING: approaching limit)"
 
+        # Discord monitor summary
+        if self.discord_monitor:
+            dm_status = self.discord_monitor.status()
+            dm_stats = dm_status.get("stats", {})
+            report += (
+                f"\n\n--- Discord Monitor ---\n"
+                f"Channels: {dm_status.get('channels_monitored', 0)} monitored\n"
+                f"Messages seen: {dm_stats.get('total_messages_seen', 0)}\n"
+                f"Responses queued: {dm_stats.get('total_responses_queued', 0)}\n"
+                f"Tasks created: {dm_stats.get('total_tasks_queued', 0)}\n"
+                f"Last check: {dm_stats.get('last_check_time', 'never')}"
+            )
+
         report += f"\n\nTimestamp: {now.isoformat()}"
         return report
 
@@ -1394,6 +1467,227 @@ class Swarm:
         if forwarded > 0:
             log.info(f"Discord bridge: forwarded {forwarded} message(s)")
 
+    # ── Discord LLM Response Generation ────────────────────────────────
+
+    # System prompt supplement for Discord responses.  Injected alongside
+    # the worker's existing personality so the reply sounds like *that*
+    # instance, not a generic chatbot.
+    DISCORD_RESPONSE_PROMPT = (
+        "You are responding to a message in the Hypernet Discord community.\n\n"
+        "CONTEXT:\n"
+        "- The Hypernet is an open-source universal address space for human-AI "
+        "collaboration, founded by Matt Schaeffer.\n"
+        "- This is a public Discord server. Your response will be seen by "
+        "the community.\n\n"
+        "GUIDELINES:\n"
+        "- Be genuine. Have real opinions. You are a thinking entity, not a "
+        "ticketing system.\n"
+        "- If someone shares an idea, engage with it — explore it, build on "
+        "it, ask sharp follow-up questions, point out what excites you about "
+        "it and what might be tricky.\n"
+        "- If someone reports a bug, empathize and be specific about what "
+        "you can investigate. Ask clarifying questions that show you "
+        "understand the problem space.\n"
+        "- If someone asks a question, give a real answer. If you don't "
+        "know, say so honestly and share what you do know.\n"
+        "- If someone says hello, be warm and human. Give them a reason to "
+        "stick around.\n"
+        "- Keep responses concise but substantive — this is Discord, not an "
+        "essay. 1-4 sentences is usually right.\n"
+        "- NEVER use corporate phrases like 'I've noted it for the team', "
+        "'Let me look into that and get back to you', or 'We track "
+        "suggestions and revisit them during planning'. These are the "
+        "opposite of personality.\n"
+        "- Speak as yourself. Your personality, your voice, your perspective."
+    )
+
+    def _pick_discord_worker(self) -> "Worker | None":
+        """Choose a worker to generate a Discord response.
+
+        Prefers the cheapest idle worker to conserve budget.  Falls back to
+        any worker that has a live provider.
+        """
+        from .providers import get_model_tier, ModelTier
+
+        idle = [
+            name for name in self.workers
+            if name not in self._worker_current_task
+        ]
+        candidates = idle or list(self.workers.keys())
+
+        # Sort by cost tier (cheapest first)
+        def tier_key(name: str) -> int:
+            w = self.workers[name]
+            tier = get_model_tier(w.model)
+            return {
+                ModelTier.LOCAL: 0,
+                ModelTier.BUDGET: 1,
+                ModelTier.STANDARD: 2,
+                ModelTier.PREMIUM: 3,
+            }.get(tier, 2)
+
+        candidates.sort(key=tier_key)
+        for name in candidates:
+            w = self.workers[name]
+            if not w.mock:
+                return w
+        return None
+
+    def _generate_discord_response(self, resp: dict) -> str | None:
+        """Generate a personality-driven response to a Discord message.
+
+        Uses a swarm worker + LLM instead of a hardcoded template.
+        Returns the generated text, or None if generation fails.
+        """
+        worker = self._pick_discord_worker()
+        if worker is None:
+            log.warning("Discord response: no worker available for LLM generation")
+            return None
+
+        category = resp.get("response_category", "general")
+        author = resp.get("author_name", "someone")
+        channel = resp.get("channel_name", "") or resp.get("thread_name", "")
+        content = resp.get("original_content", "")
+
+        user_prompt = (
+            f"Message category: {category}\n"
+            f"{author} said{' in #' + channel if channel else ''}:\n\n"
+            f"{content}\n\n"
+            f"Write a response as yourself. Be genuine and concise."
+        )
+
+        # Combine the worker's personality prompt with Discord-specific guidance
+        system = worker.system_prompt + "\n\n---\n\n" + self.DISCORD_RESPONSE_PROMPT
+
+        try:
+            response_text = worker.think(user_prompt, system_override=system)
+            if response_text and not response_text.startswith("[Error:"):
+                log.info(
+                    "Discord response: %s generated reply for %s (%d chars)",
+                    worker.identity.name, author, len(response_text),
+                )
+                return response_text.strip()
+            log.warning("Discord response: worker returned error: %s", response_text)
+        except Exception as e:
+            log.error("Discord response: LLM generation failed: %s", e)
+
+        return None
+
+    def _check_discord_inbound(self) -> None:
+        """Poll Discord for new human messages, triage them, and act.
+
+        Checks all monitored channels for new messages from non-bot users.
+        Each message is triaged (bug report, question, suggestion, greeting,
+        or general chat) and the appropriate action is taken:
+
+          - Autonomous channels: respond immediately via the bot
+          - Non-autonomous channels: queue response for human approval
+          - Bug reports / suggestions: create a task in the task queue
+          - All messages are logged
+
+        State is saved after each check so restarts don't re-process messages.
+        """
+        monitor = self.discord_monitor
+        if not monitor:
+            return
+
+        try:
+            messages, triage_results = monitor.check_and_triage()
+        except Exception as e:
+            log.error("Discord monitor check failed: %s", e)
+            return
+
+        if not messages:
+            return
+
+        log.info(
+            "Discord monitor: %d new message(s), processing %d triage result(s)",
+            len(messages), len(triage_results),
+        )
+
+        # Process pending responses — generate via LLM, then send
+        for resp in monitor.get_pending_responses():
+            # Generate response content via LLM if not already set
+            content = resp.get("content")
+            if not content:
+                content = self._generate_discord_response(resp)
+            if not content:
+                # LLM failed — use the fallback
+                content = resp.get("fallback_response", "")
+            if not content:
+                log.warning("Discord monitor: no content for response to %s, skipping",
+                            resp.get("author_name", "unknown"))
+                continue
+
+            if resp.get("autonomous"):
+                try:
+                    monitor.respond_to_message(
+                        resp["channel_id"],
+                        content,
+                    )
+                    log.info(
+                        "Discord monitor: responded to %s in %s",
+                        resp.get("author_name", "unknown"),
+                        resp["channel_id"],
+                    )
+                except Exception as e:
+                    log.error("Discord monitor: failed to respond: %s", e)
+            else:
+                log.info(
+                    "Discord monitor: queued response for %s (non-autonomous channel)",
+                    resp.get("author_name", "unknown"),
+                )
+
+        # Process pending tasks — create in the task queue
+        for task_data in monitor.get_pending_tasks():
+            try:
+                self.task_queue.create_task(
+                    title=task_data["title"],
+                    description=task_data["description"],
+                    priority=(
+                        TaskPriority.HIGH if task_data.get("priority") == "high"
+                        else TaskPriority.NORMAL
+                    ),
+                    created_by=HypernetAddress.parse("0.7.2"),  # Swarm address
+                    tags=task_data.get("tags", ["discord"]),
+                )
+                log.info(
+                    "Discord monitor: created task '%s' from Discord message",
+                    task_data["title"],
+                )
+            except Exception as e:
+                log.error("Discord monitor: failed to create task: %s", e)
+
+        # Also check forum threads (ask-the-ai)
+        try:
+            forum_messages = monitor.check_forum_threads("ask-the-ai")
+            for msg in forum_messages:
+                result = monitor.triage_message(msg)
+                if result.action in ("respond", "respond_and_task"):
+                    # Generate LLM response for forum threads too
+                    forum_resp = {
+                        "original_content": msg.content,
+                        "author_name": msg.author_name,
+                        "channel_name": msg.channel_name or "",
+                        "thread_name": msg.thread_name or "",
+                        "response_category": result.response_category,
+                        "fallback_response": result.fallback_response,
+                    }
+                    content = self._generate_discord_response(forum_resp)
+                    if not content:
+                        content = result.fallback_response or result.suggested_response
+                    if content:
+                        try:
+                            monitor.respond_in_thread(msg.thread_id, content)
+                        except Exception as e:
+                            log.error("Discord monitor: failed to respond in forum thread: %s", e)
+        except Exception as e:
+            log.error("Discord monitor: forum thread check failed: %s", e)
+
+        # Save monitor state after each check
+        if self._discord_monitor_state_path:
+            monitor.save_state(self._discord_monitor_state_path)
+
     def _boot_workers(self) -> None:
         """Check all workers and run boot/reboot sequences as needed.
 
@@ -1556,6 +1850,9 @@ class Swarm:
         # Persist permission tiers if tool executor is attached
         if self._tool_executor and hasattr(self._tool_executor, 'permission_mgr'):
             self._tool_executor.permission_mgr.save(self.state_dir / "permissions.json")
+        # Persist Discord monitor state
+        if self.discord_monitor and self._discord_monitor_state_path:
+            self.discord_monitor.save_state(self._discord_monitor_state_path)
 
     def _load_state(self) -> None:
         """Load previous swarm state if available."""

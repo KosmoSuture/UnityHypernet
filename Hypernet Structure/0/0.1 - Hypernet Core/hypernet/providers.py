@@ -17,6 +17,7 @@ Reference: Plan at plans/scalable-petting-pine.md
 
 from __future__ import annotations
 import logging
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -82,6 +83,86 @@ def get_model_cost_per_million(model: str) -> float:
             best_match = prefix
             break
     return MODEL_COSTS.get(best_match, 0.0)
+
+
+class CreditsExhaustedError(Exception):
+    """Raised when API credits/quota are exhausted (not a transient error)."""
+    pass
+
+
+class RateLimitError(Exception):
+    """Raised when API returns 429 (transient, should retry with backoff)."""
+
+    def __init__(self, message: str, retry_after: float = 0.0):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+def _retry_with_backoff(fn, max_retries: int = 3, base_delay: float = 2.0):
+    """Call fn() with exponential backoff on transient errors.
+
+    Retries on rate limits (429) and server errors (5xx).
+    Raises CreditsExhaustedError immediately (no retry).
+    Raises the last exception after all retries are exhausted.
+    """
+    last_exc = None
+    for attempt in range(max_retries + 1):
+        try:
+            return fn()
+        except CreditsExhaustedError:
+            raise  # No retry — credits are gone
+        except Exception as e:
+            last_exc = e
+            err_str = str(e).lower()
+            err_type = type(e).__name__.lower()
+
+            # Detect credit/quota exhaustion — don't retry
+            if any(kw in err_str for kw in [
+                "insufficient_quota", "billing", "payment required",
+                "exceeded your current quota", "credits",
+                "account_deactivated",
+            ]):
+                raise CreditsExhaustedError(f"Credits exhausted: {e}") from e
+
+            # Detect rate limits — retry with backoff
+            is_rate_limit = (
+                "rate" in err_str and "limit" in err_str
+                or "429" in err_str
+                or "too many requests" in err_str
+                or "ratelimit" in err_type
+                or "overloaded" in err_str
+            )
+
+            # Detect server errors — retry with backoff
+            is_server_error = (
+                "500" in err_str or "502" in err_str
+                or "503" in err_str or "504" in err_str
+                or "overloaded" in err_str
+                or "internal" in err_str and "error" in err_str
+            )
+
+            if is_rate_limit or is_server_error:
+                if attempt < max_retries:
+                    # Check for Retry-After header hint
+                    retry_after = getattr(e, 'retry_after', 0) or 0
+                    delay = max(retry_after, base_delay * (2 ** attempt))
+                    log.warning(
+                        "API transient error (attempt %d/%d), retrying in %.1fs: %s",
+                        attempt + 1, max_retries, delay, e,
+                    )
+                    time.sleep(delay)
+                    continue
+                else:
+                    log.error(
+                        "API transient error persisted after %d retries: %s",
+                        max_retries, e,
+                    )
+                    raise
+
+            # Unknown error — don't retry
+            raise
+
+    raise last_exc  # Should not reach here, but just in case
 
 
 @dataclass
@@ -160,19 +241,22 @@ class AnthropicProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        response = self._client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=system,
-            messages=messages,
-        )
-        tokens = response.usage.input_tokens + response.usage.output_tokens
-        return LLMResponse(
-            text=response.content[0].text,
-            tokens_used=tokens,
-            model=model,
-            raw=response,
-        )
+        def _call():
+            response = self._client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                system=system,
+                messages=messages,
+            )
+            tokens = response.usage.input_tokens + response.usage.output_tokens
+            return LLMResponse(
+                text=response.content[0].text,
+                tokens_used=tokens,
+                model=model,
+                raw=response,
+            )
+
+        return _retry_with_backoff(_call)
 
     async def async_complete(
         self,
@@ -264,20 +348,23 @@ class OpenAIProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        # OpenAI uses system role as a message rather than a separate param
-        full_messages = [{"role": "system", "content": system}] + messages
-        response = self._client.chat.completions.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=full_messages,
-        )
-        tokens = response.usage.prompt_tokens + response.usage.completion_tokens
-        return LLMResponse(
-            text=response.choices[0].message.content,
-            tokens_used=tokens,
-            model=model,
-            raw=response,
-        )
+        def _call():
+            # OpenAI uses system role as a message rather than a separate param
+            full_messages = [{"role": "system", "content": system}] + messages
+            response = self._client.chat.completions.create(
+                model=model,
+                max_tokens=max_tokens,
+                messages=full_messages,
+            )
+            tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+            return LLMResponse(
+                text=response.choices[0].message.content,
+                tokens_used=tokens,
+                model=model,
+                raw=response,
+            )
+
+        return _retry_with_backoff(_call)
 
     async def async_complete(
         self,

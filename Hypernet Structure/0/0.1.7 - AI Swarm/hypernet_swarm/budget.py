@@ -72,6 +72,10 @@ class BudgetTracker:
         self._daily_date: str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         self._records: list[SpendRecord] = []
         self._total_tokens: int = 0
+        # Per-worker tracking — contributed by Lattice (2.1, The Architect)
+        self._worker_spend: dict[str, float] = {}  # worker_name -> session spend USD
+        self._worker_tokens: dict[str, int] = {}   # worker_name -> session tokens
+        self._worker_tasks: dict[str, int] = {}    # worker_name -> tasks completed
 
     def can_spend(self, estimated_cost: float, model: str = "") -> bool:
         """Check if a spend is within budget.
@@ -115,6 +119,12 @@ class BudgetTracker:
         self._records.append(rec)
         self._total_tokens += tokens
 
+        # Per-worker tracking
+        if worker:
+            self._worker_spend[worker] = self._worker_spend.get(worker, 0.0) + cost
+            self._worker_tokens[worker] = self._worker_tokens.get(worker, 0) + tokens
+            self._worker_tasks[worker] = self._worker_tasks.get(worker, 0) + 1
+
         # Only count paid models against budget
         if tier != ModelTier.LOCAL:
             self._session_spend += cost
@@ -156,7 +166,24 @@ class BudgetTracker:
             "total_tokens": self._total_tokens,
             "total_records": len(self._records),
             "is_warning": self.is_warning,
+            "per_worker": self.all_worker_summaries(),
         }
+
+    def worker_summary(self, worker_name: str) -> dict:
+        """Return spending summary for a specific worker."""
+        return {
+            "worker": worker_name,
+            "spend_usd": round(self._worker_spend.get(worker_name, 0.0), 4),
+            "tokens": self._worker_tokens.get(worker_name, 0),
+            "tasks": self._worker_tasks.get(worker_name, 0),
+        }
+
+    def all_worker_summaries(self) -> list[dict]:
+        """Return spending summaries for all workers, sorted by spend descending."""
+        workers = set(self._worker_spend) | set(self._worker_tokens)
+        summaries = [self.worker_summary(w) for w in workers]
+        summaries.sort(key=lambda s: s["spend_usd"], reverse=True)
+        return summaries
 
     def _roll_daily(self) -> None:
         """Reset daily spend if we've crossed into a new UTC day."""
@@ -177,6 +204,9 @@ class BudgetTracker:
             "daily_spend": self._daily_spend,
             "daily_date": self._daily_date,
             "total_tokens": self._total_tokens,
+            "worker_spend": self._worker_spend,
+            "worker_tokens": self._worker_tokens,
+            "worker_tasks": self._worker_tasks,
             "records": [r.to_dict() for r in self._records[-200:]],
         }
         path = Path(path)
@@ -199,6 +229,16 @@ class BudgetTracker:
                 self._daily_spend = 0.0
             self._daily_date = today
             self._total_tokens = int(data.get("total_tokens", 0))
+            # Restore per-worker tracking
+            ws = data.get("worker_spend")
+            if isinstance(ws, dict):
+                self._worker_spend = {k: float(v) for k, v in ws.items()}
+            wt = data.get("worker_tokens")
+            if isinstance(wt, dict):
+                self._worker_tokens = {k: int(v) for k, v in wt.items()}
+            wta = data.get("worker_tasks")
+            if isinstance(wta, dict):
+                self._worker_tasks = {k: int(v) for k, v in wta.items()}
             return True
         except Exception as e:
             log.warning(f"Could not load budget state: {e}")

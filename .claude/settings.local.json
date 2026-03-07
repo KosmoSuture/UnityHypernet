@@ -36,7 +36,14 @@
       "Bash(pip install:*)",
       "Bash(/tmp/discord_general.json:*)",
       "Bash(/tmp/discord_reboot.json:*)",
-      "Bash(__NEW_LINE_9b71482bfc6910bf__:*)"
+      "Bash(__NEW_LINE_9b71482bfc6910bf__:*)",
+      "Bash(for f in boot.py boot_integrity.py herald.py governance.py security.py economy.py git_coordinator.py)",
+      "Read(//c/Hypernet/Hypernet Structure/0/0.1 - Hypernet Core/hypernet/**)",
+      "Bash(done)",
+      "Bash(for f in swarm.py swarm_cli.py swarm_factory.py worker.py providers.py identity.py messenger.py coordinator.py discord_monitor.py budget.py permissions.py audit.py tools.py agent_tools.py)",
+      "Bash(curl:*)",
+      "Bash(grep \"\"status\"\":*)",
+      "Bash(# Check latest swarm status again after a couple minutes\ncurl -s http://localhost:8000/swarm/status 2>/dev/null | python3 -c \"\nimport sys,json\nd=json.load\\(sys.stdin\\)\nprint\\(f'Uptime: {d[\\\\\"status\\\\\"]} | Ticks: {d[\\\\\"tick_count\\\\\"]}'\\)\nprint\\(f'Tasks done: {d[\\\\\"tasks_completed\\\\\"]} | Failed: {d[\\\\\"tasks_failed\\\\\"]} | Pending: {d[\\\\\"coordinator\\\\\"][\\\\\"available_tasks\\\\\"]}'\\)\nprint\\(\\)\nfor w in d['workers']:\n    task = w.get\\('current_task'\\) or 'idle'\n    if isinstance\\(task, dict\\): task = task.get\\('title', str\\(task\\)\\)[:60]\n    print\\(f'  {w[\\\\\"name\\\\\"]:12} done={w[\\\\\"tasks_completed\\\\\"]} | {task}'\\)\nprint\\(\\)\n# Check recent tasks for token/cost info\nrecent = d.get\\('recent_tasks',[]\\)\nif recent:\n    print\\('Last 5 tasks:'\\)\n    for t in recent[-5:]:\n        print\\(f'  [{\\\\\"OK\\\\\" if t[\\\\\"success\\\\\"] else \\\\\"FAIL\\\\\"}] {t[\\\\\"worker\\\\\"]}: {t[\\\\\"task\\\\\"][:50]} | {t[\\\\\"duration_s\\\\\"]:.1f}s | \\\\${t[\\\\\"cost_usd\\\\\"]:.4f} | tokens={t[\\\\\"tokens\\\\\"]}'\\)\n# Budget line\nfor line in d['report'].split\\(chr\\(10\\)\\):\n    if 'Session:' in line or 'Daily:' in line:\n        print\\(line.strip\\(\\)\\)\n\" 2>/dev/null)"
     ]
   }
 }

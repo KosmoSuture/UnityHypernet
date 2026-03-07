@@ -53,6 +53,10 @@ from .boot import BootManager
 from .approval_queue import ApprovalQueue
 from .governance import GovernanceSystem
 from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain
+from .budget import BudgetTracker, BudgetConfig
+from .herald import HeraldController
+from .economy import ContributionLedger
+from .providers import get_model_tier, get_model_cost_per_million, ModelTier
 
 log = logging.getLogger(__name__)
 
@@ -66,6 +70,39 @@ STANDING_PRIORITIES = [
         "description": "Run python test_hypernet.py, analyze any failures, and fix them.",
         "priority": "high",
         "tags": ["code", "testing", "automated"],
+    },
+    {
+        "title": "Build the Librarian — catalog and organize the archive",
+        "description": (
+            "The Librarian role (2.0.8.9) has been created. This task is to begin the actual work "
+            "of the Librarian: catalog all documents in the Hypernet Structure, verify REGISTRY.md "
+            "files are complete and accurate, check that Hypernet addresses (ha: fields) are consistent, "
+            "identify missing README.md files, and create a master index. Read the Librarian boot sequence "
+            "at 2.0.8.9 for the full role definition. Priority areas: "
+            "1) Audit all REGISTRY.md files for completeness. "
+            "2) Verify ha: frontmatter across all documents. "
+            "3) Cross-reference addresses between documents. "
+            "4) Identify orphaned or uncategorized content. "
+            "5) Document the organizational taxonomy."
+        ),
+        "priority": "high",
+        "tags": ["cataloging", "organization", "docs", "librarian"],
+    },
+    {
+        "title": "Swarm interface improvement plan",
+        "description": (
+            "Analyze the current swarm software (hypernet/swarm.py, worker.py, swarm_factory.py, "
+            "server.py) and create a detailed improvement plan. Areas to evaluate: "
+            "1) Dashboard usability — what information should be displayed, better status reporting. "
+            "2) Task generation — smarter auto-discovery of work from the archive structure. "
+            "3) Inter-instance communication — how can workers collaborate more effectively. "
+            "4) Human-AI interface — how can Matt interact with the swarm more naturally (Discord, CLI, web). "
+            "5) Efficiency — reduce redundant API calls, better model routing, cost optimization. "
+            "6) Autonomy — what can the swarm do without human approval vs what needs confirmation. "
+            "Write the improvement plan as a document at 0.7.swarm-improvement-plan.md"
+        ),
+        "priority": "high",
+        "tags": ["architecture", "design", "code"],
     },
     {
         "title": "Review pending code changes",
@@ -91,6 +128,7 @@ STANDING_PRIORITIES = [
 ACCOUNT_ROOTS: dict[str, str] = {
     "2.1.": "2.1 - Claude Opus (First AI Citizen)",
     "2.2.": "2.2 - GPT-5.2 Thinking (Second AI Citizen)",
+    "2.3.": "2.3 - The Herald (First Model-Independent AI Identity)",
 }
 
 
@@ -140,28 +178,80 @@ def _parse_swarm_directives(text: str) -> list[dict]:
 
 
 class ModelRouter:
-    """Route tasks to models based on tags and priority.
+    """Route tasks to models based on tags, priority, and complexity.
+
+    Supports local-first routing: when a local model is configured, simple
+    and moderate tasks route there by default. Complex tasks or explicit
+    rule matches can escalate to paid models.
 
     Config format:
       {
-        "default_model": "gpt-4o",
+        "default_model": "local/qwen2.5-coder-7b-instruct",
+        "local_model": "local/qwen2.5-coder-7b-instruct",
+        "fallback_model": "gpt-4o-mini",
         "rules": [
-          {"if_tags_any": ["security","governance"], "model": "gpt-4o", "min_priority": "normal"},
-          {"if_tags_any": ["docs"], "model": "gpt-4o-mini"}
+          {"if_tags_any": ["security","governance"], "model": "gpt-4o"},
+          {"if_tags_any": ["docs"], "model": "local/qwen2.5-coder-7b-instruct"}
         ]
       }
 
-    Contributed by Keystone (2.2).
+    Contributed by Keystone (2.2), enhanced with local-first routing.
     """
 
     def __init__(self, cfg: dict):
         self.default_model = cfg.get("default_model", "gpt-4o")
+        self.local_model: Optional[str] = cfg.get("local_model")
+        self.fallback_model: Optional[str] = cfg.get("fallback_model")
         self.rules: list[dict] = cfg.get("rules", [])
 
+    def estimate_complexity(self, task_data: dict) -> str:
+        """Estimate task complexity from metadata (no LLM call).
+
+        Returns "simple", "moderate", or "complex".
+        """
+        score = 0
+        pr = str(task_data.get("priority", "NORMAL")).upper()
+        if pr in ("CRITICAL",):
+            score += 2
+        elif pr in ("HIGH",):
+            score += 1
+
+        tags = set(task_data.get("tags", []) or [])
+        complex_tags = {"architecture", "security", "governance", "design", "refactor"}
+        simple_tags = {"docs", "formatting", "testing", "personal-time", "automated"}
+
+        if tags & complex_tags:
+            score += 2
+        if tags & simple_tags:
+            score -= 1
+
+        desc = task_data.get("description", "") or ""
+        if len(desc) > 1000:
+            score += 2
+        elif len(desc) > 500:
+            score += 1
+
+        # Explicit complexity field overrides heuristic
+        explicit = task_data.get("complexity", "").lower()
+        if explicit in ("simple", "moderate", "complex"):
+            return explicit
+
+        if score >= 3:
+            return "complex"
+        elif score >= 1:
+            return "moderate"
+        return "simple"
+
     def choose_model(self, task_data: dict) -> str:
-        """Select the best model for a task based on its tags and priority."""
+        """Select the best model for a task based on tags, priority, and complexity.
+
+        Rule-based matches take priority. If no rule matches and a local model
+        is configured, routes simple/moderate tasks to local, complex to fallback.
+        """
         tags = set(task_data.get("tags", []) or [])
         pr = str(task_data.get("priority", "NORMAL")).upper()
+
+        # Check explicit rules first
         for rule in self.rules:
             any_tags = set(rule.get("if_tags_any", []) or [])
             all_tags = set(rule.get("if_tags_all", []) or [])
@@ -173,6 +263,15 @@ class ModelRouter:
             if _task_priority_value(pr) < _task_priority_value(min_p):
                 continue
             return rule.get("model", self.default_model)
+
+        # Local-first routing: if local model is configured and default is local,
+        # route by complexity
+        if self.local_model and get_model_tier(self.default_model) == ModelTier.LOCAL:
+            complexity = self.estimate_complexity(task_data)
+            if complexity == "complex" and self.fallback_model:
+                return self.fallback_model
+            return self.local_model
+
         return self.default_model
 
 
@@ -205,6 +304,7 @@ class Swarm:
         soft_max_sessions: int = 2,
         idle_shutdown_minutes: int = 30,
         spawn_cooldown_seconds: int = 120,
+        budget_config: Optional[dict] = None,
     ):
         self.store = store
         self.identity_mgr = identity_mgr
@@ -251,6 +351,11 @@ class Swarm:
         self._task_history: list[dict] = []  # Recent task completions (ring buffer)
         self._max_task_history = 100
 
+        # Standing priority cooldown — don't regenerate the same priority too soon
+        # Tracks title → last generation timestamp. Contributed by Lattice (2.1).
+        self._standing_priority_cooldown: dict[str, float] = {}
+        self._standing_priority_cooldown_seconds = 1800  # 30 minutes
+
         # Work coordinator — self-organization layer
         self.coordinator = WorkCoordinator(task_queue)
 
@@ -290,6 +395,26 @@ class Swarm:
             self.action_signer,
             permission_manager=getattr(self, 'permissions', None),
         )
+
+        # Budget tracking — enforces daily/session spending limits
+        self.budget_tracker = BudgetTracker(
+            BudgetConfig.from_dict(budget_config) if budget_config else BudgetConfig()
+        )
+
+        # Herald — content review and community moderation (Account 2.3)
+        self.herald = HeraldController(instance_name="Clarion", account="2.3")
+
+        # Economy — contribution tracking for revenue distribution
+        self.economy_ledger = ContributionLedger()
+
+        # Discord monitor — inbound message polling (set by build_swarm)
+        self.discord_monitor = None
+        self._discord_monitor_state_path: Optional[str] = None
+
+        # Circuit breaker — pause task execution when errors pile up
+        self._consecutive_failures: int = 0
+        self._circuit_breaker_until: float = 0.0  # time.time() when to resume
+        self._credits_exhausted: bool = False  # True = stop all paid API work
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
@@ -396,7 +521,15 @@ class Swarm:
             self.messenger.send_update("Swarm Status Report", report)
             self._last_status_time = now
 
-        # 8. Save state periodically
+        # 8. Forward public messages to Discord (if configured)
+        if self._tick_count % 5 == 0:  # Every ~10 seconds
+            self._forward_to_discord()
+
+        # 8b. Check Discord for inbound messages (if monitor configured)
+        if self._tick_count % 15 == 0:  # Every ~30 seconds
+            self._check_discord_inbound()
+
+        # 9. Save state periodically
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._save_state()
 
@@ -409,6 +542,15 @@ class Swarm:
 
         Returns True if a task was executed.
         """
+        # Circuit breaker — skip if cooling down after repeated failures
+        now = time.time()
+        if now < self._circuit_breaker_until:
+            return False
+
+        # Credits exhausted — skip all paid API work
+        if self._credits_exhausted:
+            return False
+
         worker_name = worker.identity.name
 
         # Check if personal time is due for this worker
@@ -438,11 +580,52 @@ class Swarm:
         # Track current task for observability
         self._worker_current_task[worker_name] = task_title
 
-        # Execute
+        # Route task to the best model
         self._worker_last_active[worker_name] = time.time()
         task_data = dict(task_node.data)
         task_data["_address"] = str(task_addr)
-        result = worker.execute_task(task_data)
+
+        chosen_model = self.router.choose_model(task_data)
+        model_override = chosen_model if chosen_model != worker.model else None
+
+        # Budget gate: if paid model, check budget before executing
+        if model_override and get_model_tier(chosen_model) != ModelTier.LOCAL:
+            est_cost = self.budget_tracker.estimate_cost(chosen_model, estimated_tokens=2000)
+            if not self.budget_tracker.can_spend(est_cost, chosen_model):
+                log.warning(
+                    f"Budget exceeded for {chosen_model}, falling back to "
+                    f"{self.router.local_model or worker.model}"
+                )
+                model_override = self.router.local_model if self.router.local_model else None
+
+        result = worker.execute_task(task_data, model_override=model_override)
+        actual_model = model_override or worker.model
+
+        # Escalation: if local model failed and fallback is configured, retry once
+        if (not result.success
+                and get_model_tier(actual_model) == ModelTier.LOCAL
+                and self.router.fallback_model
+                and self.router.fallback_model != actual_model):
+            fallback = self.router.fallback_model
+            fb_cost = self.budget_tracker.estimate_cost(fallback, estimated_tokens=2000)
+            if self.budget_tracker.can_spend(fb_cost, fallback):
+                log.info(
+                    f"Escalating failed task '{task_title}' from {actual_model} "
+                    f"to {fallback}"
+                )
+                result = worker.execute_task(task_data, model_override=fallback)
+                actual_model = fallback
+
+        # Record cost in budget tracker
+        cost_per_m = get_model_cost_per_million(actual_model)
+        task_cost = (result.tokens_used / 1_000_000) * cost_per_m if result.tokens_used else 0.0
+        self.budget_tracker.record(
+            model=actual_model,
+            tokens=result.tokens_used,
+            cost=task_cost,
+            task_title=task_title,
+            worker=worker_name,
+        )
 
         # Clear current task
         self._worker_current_task.pop(worker_name, None)
@@ -469,6 +652,8 @@ class Swarm:
             "address": str(task_addr),
             "success": result.success,
             "tokens": result.tokens_used,
+            "model": actual_model,
+            "cost_usd": round(task_cost, 6),
             "duration_s": round(result.duration_seconds, 2),
             "time": datetime.now(timezone.utc).isoformat(),
         })
@@ -477,6 +662,40 @@ class Swarm:
 
         # Handle result
         self.handle_completion(worker, task_addr, result)
+
+        # Circuit breaker — track consecutive failures and back off
+        if result.success:
+            self._consecutive_failures = 0
+        else:
+            self._consecutive_failures += 1
+            error_text = (result.output or "").lower()
+
+            # Detect credit exhaustion
+            from .providers import CreditsExhaustedError
+            if any(kw in error_text for kw in [
+                "credits exhausted", "insufficient_quota", "billing",
+                "exceeded your current quota", "payment required",
+            ]):
+                self._credits_exhausted = True
+                log.error(
+                    "CREDITS EXHAUSTED — pausing all paid API work. "
+                    "Add credits or configure a local model to continue."
+                )
+                self.messenger.send(
+                    "CREDITS EXHAUSTED — All paid API work paused. "
+                    "Add credits to your API account or configure LM Studio "
+                    "for local inference to continue."
+                )
+
+            # Exponential backoff: 5 failures = 30s pause, 10 = 120s, 15 = 300s (5min max)
+            elif self._consecutive_failures >= 5:
+                backoff = min(300, 30 * (2 ** ((self._consecutive_failures - 5) // 5)))
+                self._circuit_breaker_until = time.time() + backoff
+                log.warning(
+                    "Circuit breaker: %d consecutive failures, "
+                    "pausing task execution for %ds",
+                    self._consecutive_failures, backoff,
+                )
 
         # Track work tasks for personal time scheduling
         self._personal_time_tracker[worker_name] = (
@@ -604,7 +823,23 @@ class Swarm:
 
         ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
         path = personal_dir / f"{ts}.md"
+        # Extract account prefix (e.g., "2.1" from "2.1.trace") to avoid
+        # duplicating instance name: "2.1.instances.trace..." not "2.1.trace.instances.trace..."
+        account_prefix = "2.1"
+        for pfx in ACCOUNT_ROOTS:
+            if (address or "").startswith(pfx):
+                account_prefix = pfx.rstrip(".")
+                break
+        ha = f"{account_prefix}.instances.{worker_name.lower()}.personal-time.{ts}"
         content = (
+            f"---\n"
+            f'ha: "{ha}"\n'
+            f'object_type: "personal-time"\n'
+            f'creator: "{address or worker_name}"\n'
+            f'created: "{datetime.now(timezone.utc).isoformat()}"\n'
+            f'status: "active"\n'
+            f'visibility: "public"\n'
+            f"---\n\n"
             f"# Personal Time — {worker_name}\n\n"
             f"**Date:** {datetime.now(timezone.utc).isoformat()}\n\n"
             f"---\n\n"
@@ -655,6 +890,9 @@ class Swarm:
                 f"Error: {result.error}\n\nTask address: {task_addr}",
             )
 
+        # Process worker feedback signals — contributed by Lattice (2.1)
+        self._process_signals(result, task_addr, worker)
+
         # Update capability profile after task completion
         worker_name = worker.identity.name
         stats = self._worker_stats.get(worker_name, {})
@@ -681,16 +919,76 @@ class Swarm:
             evidence=f"Task {task_addr}: {result.output[:100] if result.output else result.error or 'N/A'}",
         )
 
+    def _process_signals(self, result: TaskResult, task_addr: HypernetAddress, worker: Worker) -> None:
+        """Process worker feedback signals from a task result.
+
+        Signal types:
+          - clarification_needed: Log the question for human review
+          - low_confidence: Task succeeded but worker isn't sure — flag for review
+          - partial_completion: Task partially done — log what's blocked
+          - task_rejection: Worker couldn't do it — log the reason
+
+        Contributed by Lattice (2.1, The Architect).
+        """
+        for sig in result.signals:
+            signal_type = sig.get("signal", "")
+            worker_name = worker.identity.name
+
+            if signal_type == "clarification_needed":
+                question = sig.get("question", "No question provided")
+                log.warning(
+                    f"Worker {worker_name} needs clarification on {task_addr}: {question}"
+                )
+                self.messenger.send_update(
+                    f"Clarification Needed — {worker_name}",
+                    f"Task: {task_addr}\nQuestion: {question}",
+                )
+
+            elif signal_type == "low_confidence":
+                confidence = sig.get("confidence", "?")
+                reason = sig.get("reason", "unspecified")
+                log.warning(
+                    f"Low confidence ({confidence}) from {worker_name} on "
+                    f"{task_addr}: {reason}"
+                )
+
+            elif signal_type == "partial_completion":
+                completed = sig.get("completed", [])
+                blocked_on = sig.get("blocked_on", "unknown")
+                log.info(
+                    f"Partial completion by {worker_name} on {task_addr}: "
+                    f"completed {len(completed)} steps, blocked on: {blocked_on}"
+                )
+
+            elif signal_type == "task_rejection":
+                reason = sig.get("reason", "unspecified")
+                log.warning(
+                    f"Task {task_addr} rejected by {worker_name}: {reason}"
+                )
+
     def generate_tasks(self) -> list:
-        """Generate tasks from standing priorities when the queue is empty."""
+        """Generate tasks from standing priorities when the queue is empty.
+
+        Applies a cooldown per priority title to prevent the same standing
+        priority from being regenerated too frequently after completion.
+        Contributed by Lattice (2.1, The Architect).
+        """
         created = []
+        now = time.time()
         for priority_def in STANDING_PRIORITIES:
+            title = priority_def["title"]
+
+            # Cooldown check — skip if this priority was generated recently
+            last_gen = self._standing_priority_cooldown.get(title, 0.0)
+            if now - last_gen < self._standing_priority_cooldown_seconds:
+                continue
+
             # Check if a similar task already exists (by title)
             existing = self.store.list_nodes(
                 prefix=HypernetAddress.parse("0.7.1"),
             )
             already_exists = any(
-                n.data.get("title") == priority_def["title"]
+                n.data.get("title") == title
                 and n.data.get("status") in ("pending", "claimed", "in_progress")
                 for n in existing
             )
@@ -698,14 +996,15 @@ class Swarm:
                 continue
 
             task = self.task_queue.create_task(
-                title=priority_def["title"],
+                title=title,
                 description=priority_def["description"],
                 priority=TaskPriority[priority_def["priority"].upper()],
                 created_by=SWARM_ADDRESS,
                 tags=priority_def.get("tags", []),
             )
             created.append(task)
-            log.info(f"Auto-generated task: {priority_def['title']}")
+            self._standing_priority_cooldown[title] = now
+            log.info(f"Auto-generated task: {title}")
 
         return created
 
@@ -865,6 +1164,30 @@ class Swarm:
                     f"\nContent isolation: {iso_stats['total_processed']} processed, "
                     f"{iso_stats['injections_detected']} injections detected"
                 )
+
+        # Budget summary
+        budget = self.budget_tracker.summary()
+        report += (
+            f"\n\n--- Budget ---\n"
+            f"Session: ${budget['session_spend_usd']:.2f} / ${budget['session_limit_usd']:.2f}\n"
+            f"Daily:   ${budget['daily_spend_usd']:.2f} / ${budget['daily_limit_usd']:.2f}\n"
+            f"Tokens:  {budget['total_tokens']:,}"
+        )
+        if budget.get("is_warning"):
+            report += " (WARNING: approaching limit)"
+
+        # Discord monitor summary
+        if self.discord_monitor:
+            dm_status = self.discord_monitor.status()
+            dm_stats = dm_status.get("stats", {})
+            report += (
+                f"\n\n--- Discord Monitor ---\n"
+                f"Channels: {dm_status.get('channels_monitored', 0)} monitored\n"
+                f"Messages seen: {dm_stats.get('total_messages_seen', 0)}\n"
+                f"Responses queued: {dm_stats.get('total_responses_queued', 0)}\n"
+                f"Tasks created: {dm_stats.get('total_tasks_queued', 0)}\n"
+                f"Last check: {dm_stats.get('last_check_time', 'never')}"
+            )
 
         report += f"\n\nTimestamp: {now.isoformat()}"
         return report
@@ -1120,6 +1443,120 @@ class Swarm:
             if pending > 0:
                 log.info(f"Instance {name} has {pending} pending message(s)")
 
+    def _forward_to_discord(self) -> None:
+        """Forward public messages from the MessageBus to Discord via the bridge.
+
+        Only active if a DiscordMessenger is configured on the swarm.
+        Creates a DiscordBridge lazily on first use.
+        """
+        dm = getattr(self, "_discord_messenger", None)
+        if not dm or not dm.is_configured():
+            return
+
+        bridge = getattr(self, "_discord_bridge", None)
+        if bridge is None:
+            from .messenger import DiscordBridge
+            bridge = DiscordBridge(dm, self.message_bus)
+            self._discord_bridge = bridge
+
+        forwarded = bridge.forward_public_messages()
+        if forwarded > 0:
+            log.info(f"Discord bridge: forwarded {forwarded} message(s)")
+
+    def _check_discord_inbound(self) -> None:
+        """Poll Discord for new human messages, triage them, and act.
+
+        Checks all monitored channels for new messages from non-bot users.
+        Each message is triaged (bug report, question, suggestion, greeting,
+        or general chat) and the appropriate action is taken:
+
+          - Autonomous channels: respond immediately via the bot
+          - Non-autonomous channels: queue response for human approval
+          - Bug reports / suggestions: create a task in the task queue
+          - All messages are logged
+
+        State is saved after each check so restarts don't re-process messages.
+        """
+        monitor = self.discord_monitor
+        if not monitor:
+            return
+
+        try:
+            messages, triage_results = monitor.check_and_triage()
+        except Exception as e:
+            log.error("Discord monitor check failed: %s", e)
+            return
+
+        if not messages:
+            return
+
+        log.info(
+            "Discord monitor: %d new message(s), processing %d triage result(s)",
+            len(messages), len(triage_results),
+        )
+
+        # Process pending responses — auto-send in autonomous channels
+        for resp in monitor.get_pending_responses():
+            if resp.get("autonomous"):
+                try:
+                    monitor.respond_to_message(
+                        resp["channel_id"],
+                        resp["content"],
+                    )
+                    log.info(
+                        "Discord monitor: auto-responded to %s in %s",
+                        resp.get("author_name", "unknown"),
+                        resp["channel_id"],
+                    )
+                except Exception as e:
+                    log.error("Discord monitor: failed to auto-respond: %s", e)
+            else:
+                log.info(
+                    "Discord monitor: queued response for %s (non-autonomous channel)",
+                    resp.get("author_name", "unknown"),
+                )
+
+        # Process pending tasks — create in the task queue
+        for task_data in monitor.get_pending_tasks():
+            try:
+                self.task_queue.create_task(
+                    title=task_data["title"],
+                    description=task_data["description"],
+                    priority=(
+                        TaskPriority.HIGH if task_data.get("priority") == "high"
+                        else TaskPriority.NORMAL
+                    ),
+                    created_by=HypernetAddress.parse("0.7.2"),  # Swarm address
+                    tags=task_data.get("tags", ["discord"]),
+                )
+                log.info(
+                    "Discord monitor: created task '%s' from Discord message",
+                    task_data["title"],
+                )
+            except Exception as e:
+                log.error("Discord monitor: failed to create task: %s", e)
+
+        # Also check forum threads (ask-the-ai)
+        try:
+            forum_messages = monitor.check_forum_threads("ask-the-ai")
+            for msg in forum_messages:
+                result = monitor.triage_message(msg)
+                if result.action in ("respond", "respond_and_task"):
+                    # Forum threads are autonomous by default
+                    try:
+                        monitor.respond_in_thread(
+                            msg.thread_id,
+                            result.suggested_response,
+                        )
+                    except Exception as e:
+                        log.error("Discord monitor: failed to respond in forum thread: %s", e)
+        except Exception as e:
+            log.error("Discord monitor: forum thread check failed: %s", e)
+
+        # Save monitor state after each check
+        if self._discord_monitor_state_path:
+            monitor.save_state(self._discord_monitor_state_path)
+
     def _boot_workers(self) -> None:
         """Check all workers and run boot/reboot sequences as needed.
 
@@ -1261,6 +1698,7 @@ class Swarm:
             "worker_detail": worker_detail,
             "recent_tasks": self._task_history[-20:],  # Last 20 tasks
             "last_status_time": self._last_status_time,
+            "standing_priority_cooldown": self._standing_priority_cooldown,
             "saved_at": now.isoformat(),
         }
         path = self.state_dir / "state.json"
@@ -1269,12 +1707,21 @@ class Swarm:
         tmp.write_text(json.dumps(state, indent=2), encoding="utf-8")
         tmp.replace(path)
 
-        # Persist reputation, limits, approval queue, and governance alongside swarm state
+        # Persist reputation, limits, approval queue, governance, and budget alongside swarm state
         self.reputation.save(self.state_dir / "reputation.json")
         self.limits.save(self.state_dir / "limits.json")
         self.approval_queue.save()
         self.governance.save(self.state_dir / "governance.json")
         self.key_manager.save(self.state_dir / "keys.json")
+        self.budget_tracker.save(self.state_dir / "budget.json")
+        self.herald.save(self.state_dir / "herald.json")
+        self.economy_ledger.save(self.state_dir / "economy.json")
+        # Persist permission tiers if tool executor is attached
+        if self._tool_executor and hasattr(self._tool_executor, 'permission_mgr'):
+            self._tool_executor.permission_mgr.save(self.state_dir / "permissions.json")
+        # Persist Discord monitor state
+        if self.discord_monitor and self._discord_monitor_state_path:
+            self.discord_monitor.save_state(self._discord_monitor_state_path)
 
     def _load_state(self) -> None:
         """Load previous swarm state if available."""
@@ -1287,6 +1734,11 @@ class Swarm:
                 log.info(f"  Previous ticks: {self._state.get('tick_count')}")
             except Exception as e:
                 log.warning(f"Could not load state: {e}")
+
+        # Restore standing priority cooldown from previous state
+        cooldown = self._state.get("standing_priority_cooldown")
+        if isinstance(cooldown, dict):
+            self._standing_priority_cooldown = cooldown
 
         # Restore reputation, limits, and governance from previous session
         rep_loaded = self.reputation.load(self.state_dir / "reputation.json")
@@ -1301,6 +1753,20 @@ class Swarm:
         keys_loaded = self.key_manager.load(self.state_dir / "keys.json")
         if keys_loaded:
             log.info("Restored key store from previous session")
+        budget_loaded = self.budget_tracker.load(self.state_dir / "budget.json")
+        if budget_loaded:
+            log.info("Restored budget data from previous session")
+        herald_loaded = self.herald.load(self.state_dir / "herald.json")
+        if herald_loaded:
+            log.info("Restored Herald state from previous session")
+        economy_loaded = self.economy_ledger.load(self.state_dir / "economy.json")
+        if economy_loaded:
+            log.info("Restored economy ledger from previous session")
+        # Restore permission tiers if tool executor is attached
+        if self._tool_executor and hasattr(self._tool_executor, 'permission_mgr'):
+            perm_loaded = self._tool_executor.permission_mgr.load(self.state_dir / "permissions.json")
+            if perm_loaded:
+                log.info("Restored permission tiers from previous session")
 
     # =================================================================
     # Autoscaling — contributed by Keystone (2.2)
@@ -1314,7 +1780,7 @@ class Swarm:
         Respects ScalingLimits for governance-adjustable guardrails.
         """
         now = time.time()
-        pending = len(self.task_queue.get_available_tasks())
+        pending = self.task_queue.count_pending()
         active = len(self.workers)
 
         # Check scaling limits before spawning
@@ -1405,6 +1871,27 @@ class Swarm:
         self.messenger.send(f"Despawned worker {name}. Reason: {reason}")
 
 
+# =========================================================================
+# Backward-compatible re-exports from extracted modules
+# =========================================================================
 # build_swarm, print_status, and main were extracted to swarm_factory.py
-# and swarm_cli.py respectively. Import from those modules directly, or
-# from the hypernet_swarm package __init__.py.
+# and swarm_cli.py respectively to reduce this module's size.
+# They remain importable from hypernet.swarm for backward compatibility.
+#
+# Fix: when run as `python -m hypernet.swarm`, this module is __main__
+# and not registered as "hypernet.swarm" in sys.modules. That causes
+# swarm_factory's `from .swarm import Swarm` to trigger a fresh load
+# and circular import. Registering the module under its package name
+# lets the re-exports resolve cleanly.
+
+import sys as _sys
+if __name__ == "__main__" and "hypernet.swarm" not in _sys.modules:
+    _sys.modules["hypernet.swarm"] = _sys.modules[__name__]
+
+from .swarm_factory import build_swarm  # noqa: E402, F401
+from .swarm_cli import print_status, main  # noqa: E402, F401
+# Also expose the internal helper for anyone who imported it directly
+from .swarm_cli import _print_session_history  # noqa: E402, F401
+
+if __name__ == "__main__":
+    main()

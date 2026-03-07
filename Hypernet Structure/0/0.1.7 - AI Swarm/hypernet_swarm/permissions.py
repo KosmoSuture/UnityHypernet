@@ -22,6 +22,7 @@ Reference: Messages/annotations/openclaw-analysis-for-hypernet-autonomy.md
 """
 
 from __future__ import annotations
+import json
 import logging
 from enum import IntEnum
 from pathlib import Path, PurePosixPath
@@ -209,6 +210,34 @@ class PermissionManager:
     def pending_elevations(self) -> list[dict]:
         """Return pending elevation requests."""
         return list(self._elevation_requests)
+
+    def save(self, path: str | Path) -> None:
+        """Persist permission tiers and elevation requests to disk."""
+        path = Path(path)
+        state = {
+            "tiers": {addr: tier.value for addr, tier in self._tiers.items()},
+            "elevation_requests": self._elevation_requests,
+        }
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        tmp.replace(path)
+
+    def load(self, path: str | Path) -> bool:
+        """Restore permission tiers and elevation requests from disk."""
+        path = Path(path)
+        if not path.exists():
+            return False
+        try:
+            state = json.loads(path.read_text(encoding="utf-8"))
+            for addr, tier_val in state.get("tiers", {}).items():
+                self._tiers[addr] = PermissionTier(tier_val)
+            self._elevation_requests = state.get("elevation_requests", [])
+            log.info(f"Loaded {len(self._tiers)} permission tiers from {path.name}")
+            return True
+        except Exception as e:
+            log.warning(f"Could not load permissions: {e}")
+            return False
 
 
 class PermissionCheckResult:

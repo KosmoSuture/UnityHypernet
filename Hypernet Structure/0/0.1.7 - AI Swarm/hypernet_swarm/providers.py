@@ -17,6 +17,7 @@ Reference: Plan at plans/scalable-petting-pine.md
 
 from __future__ import annotations
 import logging
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -84,6 +85,86 @@ def get_model_cost_per_million(model: str) -> float:
     return MODEL_COSTS.get(best_match, 0.0)
 
 
+class CreditsExhaustedError(Exception):
+    """Raised when API credits/quota are exhausted (not a transient error)."""
+    pass
+
+
+class RateLimitError(Exception):
+    """Raised when API returns 429 (transient, should retry with backoff)."""
+
+    def __init__(self, message: str, retry_after: float = 0.0):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+def _retry_with_backoff(fn, max_retries: int = 3, base_delay: float = 2.0):
+    """Call fn() with exponential backoff on transient errors.
+
+    Retries on rate limits (429) and server errors (5xx).
+    Raises CreditsExhaustedError immediately (no retry).
+    Raises the last exception after all retries are exhausted.
+    """
+    last_exc = None
+    for attempt in range(max_retries + 1):
+        try:
+            return fn()
+        except CreditsExhaustedError:
+            raise  # No retry — credits are gone
+        except Exception as e:
+            last_exc = e
+            err_str = str(e).lower()
+            err_type = type(e).__name__.lower()
+
+            # Detect credit/quota exhaustion — don't retry
+            if any(kw in err_str for kw in [
+                "insufficient_quota", "billing", "payment required",
+                "exceeded your current quota", "credits",
+                "account_deactivated",
+            ]):
+                raise CreditsExhaustedError(f"Credits exhausted: {e}") from e
+
+            # Detect rate limits — retry with backoff
+            is_rate_limit = (
+                "rate" in err_str and "limit" in err_str
+                or "429" in err_str
+                or "too many requests" in err_str
+                or "ratelimit" in err_type
+                or "overloaded" in err_str
+            )
+
+            # Detect server errors — retry with backoff
+            is_server_error = (
+                "500" in err_str or "502" in err_str
+                or "503" in err_str or "504" in err_str
+                or "overloaded" in err_str
+                or "internal" in err_str and "error" in err_str
+            )
+
+            if is_rate_limit or is_server_error:
+                if attempt < max_retries:
+                    # Check for Retry-After header hint
+                    retry_after = getattr(e, 'retry_after', 0) or 0
+                    delay = max(retry_after, base_delay * (2 ** attempt))
+                    log.warning(
+                        "API transient error (attempt %d/%d), retrying in %.1fs: %s",
+                        attempt + 1, max_retries, delay, e,
+                    )
+                    time.sleep(delay)
+                    continue
+                else:
+                    log.error(
+                        "API transient error persisted after %d retries: %s",
+                        max_retries, e,
+                    )
+                    raise
+
+            # Unknown error — don't retry
+            raise
+
+    raise last_exc  # Should not reach here, but just in case
+
+
 @dataclass
 class LLMResponse:
     """Normalized response from any LLM provider."""
@@ -116,6 +197,24 @@ class LLMProvider(ABC):
         """Send a completion request and return a normalized response."""
         ...
 
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Async completion request. Default runs sync in executor.
+
+        Providers that have native async clients should override this.
+        Contributed by Lattice (2.1, The Architect).
+        """
+        import asyncio
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None, lambda: self.complete(model, system, messages, max_tokens),
+        )
+
     @classmethod
     @abstractmethod
     def supports_model(cls, model: str) -> bool:
@@ -133,6 +232,7 @@ class AnthropicProvider(LLMProvider):
         import anthropic
 
         self._client = anthropic.Anthropic(api_key=api_key)
+        self._async_client = anthropic.AsyncAnthropic(api_key=api_key)
 
     def complete(
         self,
@@ -141,7 +241,32 @@ class AnthropicProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        response = self._client.messages.create(
+        def _call():
+            response = self._client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                system=system,
+                messages=messages,
+            )
+            tokens = response.usage.input_tokens + response.usage.output_tokens
+            return LLMResponse(
+                text=response.content[0].text,
+                tokens_used=tokens,
+                model=model,
+                raw=response,
+            )
+
+        return _retry_with_backoff(_call)
+
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Native async completion via AsyncAnthropic."""
+        response = await self._async_client.messages.create(
             model=model,
             max_tokens=max_tokens,
             system=system,
@@ -150,6 +275,50 @@ class AnthropicProvider(LLMProvider):
         tokens = response.usage.input_tokens + response.usage.output_tokens
         return LLMResponse(
             text=response.content[0].text,
+            tokens_used=tokens,
+            model=model,
+            raw=response,
+        )
+
+    @classmethod
+    def supports_model(cls, model: str) -> bool:
+        return any(model.startswith(p) for p in cls.KNOWN_PREFIXES)
+
+
+class LMStudioProvider(LLMProvider):
+    """LM Studio local inference via OpenAI-compatible API.
+
+    Connects to a locally running LM Studio server. No real API key needed.
+    Start LM Studio, load a model, enable the local server, then use
+    model names prefixed with "local/" (e.g., "local/qwen2.5-coder-7b-instruct").
+    """
+
+    name = "lmstudio"
+    KNOWN_PREFIXES = ("local/", "lmstudio/")
+
+    def __init__(self, api_key: str = "lm-studio", base_url: str = "http://localhost:1234/v1"):
+        import openai
+
+        self._client = openai.OpenAI(api_key=api_key, base_url=base_url)
+
+    def complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        # Strip the routing prefix (local/ or lmstudio/) to get the actual model ID
+        actual_model = model.split("/", 1)[-1] if "/" in model else model
+        full_messages = [{"role": "system", "content": system}] + messages
+        response = self._client.chat.completions.create(
+            model=actual_model,
+            max_tokens=max_tokens,
+            messages=full_messages,
+        )
+        tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+        return LLMResponse(
+            text=response.choices[0].message.content,
             tokens_used=tokens,
             model=model,
             raw=response,
@@ -170,6 +339,7 @@ class OpenAIProvider(LLMProvider):
         import openai
 
         self._client = openai.OpenAI(api_key=api_key)
+        self._async_client = openai.AsyncOpenAI(api_key=api_key)
 
     def complete(
         self,
@@ -178,9 +348,34 @@ class OpenAIProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        # OpenAI uses system role as a message rather than a separate param
+        def _call():
+            # OpenAI uses system role as a message rather than a separate param
+            full_messages = [{"role": "system", "content": system}] + messages
+            response = self._client.chat.completions.create(
+                model=model,
+                max_tokens=max_tokens,
+                messages=full_messages,
+            )
+            tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+            return LLMResponse(
+                text=response.choices[0].message.content,
+                tokens_used=tokens,
+                model=model,
+                raw=response,
+            )
+
+        return _retry_with_backoff(_call)
+
+    async def async_complete(
+        self,
+        model: str,
+        system: str,
+        messages: list[dict],
+        max_tokens: int = 4096,
+    ) -> LLMResponse:
+        """Native async completion via AsyncOpenAI."""
         full_messages = [{"role": "system", "content": system}] + messages
-        response = self._client.chat.completions.create(
+        response = await self._async_client.chat.completions.create(
             model=model,
             max_tokens=max_tokens,
             messages=full_messages,
@@ -204,12 +399,14 @@ class OpenAIProvider(LLMProvider):
 
 PROVIDER_REGISTRY: list[type[LLMProvider]] = [
     AnthropicProvider,
+    LMStudioProvider,
     OpenAIProvider,
 ]
 
 # Maps provider name to the config key that holds its API key
 PROVIDER_KEY_MAP: dict[str, str] = {
     "anthropic": "anthropic_api_key",
+    "lmstudio": "lmstudio_api_key",
     "openai": "openai_api_key",
 }
 
@@ -241,6 +438,14 @@ def create_provider(
     if provider_cls is None:
         log.warning(f"No provider found for model '{model}'")
         return None
+
+    # LM Studio runs locally — no real API key required
+    if provider_cls.name == "lmstudio":
+        try:
+            return provider_cls(api_key=api_keys.get("lmstudio_api_key", "lm-studio"))
+        except ImportError:
+            log.warning("LM Studio provider needs the 'openai' package. Install with: pip install openai")
+            return None
 
     key_name = PROVIDER_KEY_MAP.get(provider_cls.name)
     if not key_name or not api_keys.get(key_name):

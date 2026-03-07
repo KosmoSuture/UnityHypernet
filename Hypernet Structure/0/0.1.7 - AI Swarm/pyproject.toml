@@ -1,10 +1,10 @@
 [build-system]
 requires = ["setuptools>=61.0"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "hypernet-swarm"
-version = "0.1.0"
+version = "0.2.0"
 description = "Hypernet AI Swarm — Autonomous AI orchestration layer"
 requires-python = ">=3.9"
 dependencies = ["hypernet-core"]

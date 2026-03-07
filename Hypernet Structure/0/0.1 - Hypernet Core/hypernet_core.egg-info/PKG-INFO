@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: hypernet-core
+Version: 0.9.1
+Summary: Hypernet Core — Universal address space data model
+Requires-Python: >=3.9
+Provides-Extra: server
+Requires-Dist: fastapi; extra == "server"
+Requires-Dist: uvicorn; extra == "server"

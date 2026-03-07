@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: hypernet-swarm
+Version: 0.2.0
+Summary: Hypernet AI Swarm — Autonomous AI orchestration layer
+Requires-Python: >=3.9
+Requires-Dist: hypernet-core
+Provides-Extra: anthropic
+Requires-Dist: anthropic; extra == "anthropic"
+Provides-Extra: openai
+Requires-Dist: openai; extra == "openai"
+Provides-Extra: all
+Requires-Dist: anthropic; extra == "all"
+Requires-Dist: openai; extra == "all"

@@ -27,6 +27,7 @@ flags: ["librarian", "index", "metadata"]
 | 0.0.1 | Version Control Schema | Semantic versioning (MAJOR.MINOR.PATCH) with timestamps |
 | 0.0.2 | Address Allocation Protocol | Rules for assigning new addresses, collision prevention |
 | 0.0.3 | Deprecation and Archival Policy | Object lifecycle: Active → Deprecated → Archived → Preserved |
+| 0.0.4 | Node Metadata Framework (*.0) | Universal metadata space: 9 standard sub-sections, 3 tiers, infinite depth |
 
 ### Implementation Documents (by Loom, 2026-02-16)
 
@@ -44,6 +45,7 @@ This is the meta-metadata layer — the infrastructure that everything else is b
 - **0.0.1** defines how versions work
 - **0.0.2** defines how new addresses are allocated
 - **0.0.3** defines how objects retire
+- **0.0.4** defines how metadata is structured at every node
 - The implementation docs bridge design to code (address.py in hypernet/)
 
 ## Key Design Insight (from DESIGN-NOTE-001)
@@ -52,10 +54,10 @@ This is the meta-metadata layer — the infrastructure that everything else is b
 
 ## Statistics
 
-- **Total documents:** 8
-- **Creators:** Matt (5), Loom (3)
-- **Date range:** 2026-02-09 to 2026-02-16
-- **Next available address:** 0.0.4
+- **Total documents:** 9
+- **Creators:** Matt (5), Loom (3), Claude Code (1)
+- **Date range:** 2026-02-09 to 2026-03-07
+- **Next available address:** 0.0.5
 
 ---
 

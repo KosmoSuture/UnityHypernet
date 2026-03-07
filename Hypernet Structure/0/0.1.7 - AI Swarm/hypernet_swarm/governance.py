@@ -24,7 +24,7 @@ Proposal types and their default governance rules:
   - standard_amendment:    80% threshold, 5 quorum, domains: governance
 
 Usage:
-    from .governance import GovernanceSystem, ProposalType
+    from hypernet.governance import GovernanceSystem, ProposalType
     from hypernet.reputation import ReputationSystem
 
     rep = ReputationSystem()

@@ -3693,6 +3693,7 @@ def main():
         ("Swarm Factory", test_swarm_factory),
         ("Discord Messenger", test_discord_messenger),
         ("Discord Bridge", test_discord_bridge),
+        ("Discord Triage LLM Generation", test_discord_triage_llm_generation),
         ("Herald Controller", test_herald_controller),
         ("Herald Persistence", test_herald_persistence),
         ("Server API Endpoints", test_server_api_endpoints),
@@ -3701,6 +3702,12 @@ def main():
         ("Message Bus Reconstruction", test_message_bus_reconstruction),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
+        ("Local Accounts", test_local_accounts),
+        ("Timeline Engine", test_timeline_engine),
+        ("Cross-Link Generator", test_crosslink_generator),
+        ("Encryption Module", test_encryption_module),
+        ("Connector Protocol", test_connector_protocol),
+        ("Narrative Generator", test_narrative_generator),
     ]
 
     passed = 0
@@ -6382,6 +6389,125 @@ def test_discord_bridge():
     print("    PASS")
 
 
+def test_discord_triage_llm_generation():
+    """Test that Discord triage produces LLM-generation markers, not hardcoded templates.
+
+    Verifies the 2.0.22 AI Public Voice Standard: no template responses,
+    personality-driven generation via the worker pipeline.
+    """
+    print("  Testing Discord triage LLM generation...")
+
+    from hypernet.discord_monitor import DiscordMonitor, DiscordMessage, TriageResult
+
+    # Create a minimal monitor with triage capability
+    dm = DiscordMonitor.__new__(DiscordMonitor)
+    dm.ai_autonomous_channels = {"general-discussion"}
+    dm._pending_responses = []
+    dm._pending_tasks = []
+    dm._total_responses_queued = 0
+    dm._total_tasks_queued = 0
+
+    # === TriageResult new fields exist ===
+    tr = TriageResult(
+        action="respond", reason="test",
+        response_category="question", fallback_response="fallback text",
+    )
+    d = tr.to_dict()
+    assert "response_category" in d
+    assert "fallback_response" in d
+    assert d["response_category"] == "question"
+    assert d["suggested_response"] == ""  # Not set — LLM will generate
+
+    # === Suggestion triage — no hardcoded "noted it for the team" ===
+    msg_suggestion = DiscordMessage(
+        message_id="s1", channel_id="ch1", thread_id="ch1",
+        thread_name="", author_name="Kosmicsuture", author_id="u1",
+        is_bot=False,
+        content="What if we could connect smart appliances to the Hypernet?",
+        timestamp="2026-03-07T10:00:00", channel_name="general-discussion",
+    )
+    result = dm.triage_message(msg_suggestion)
+    assert result.action == "respond_and_task"
+    assert result.response_category == "suggestion"
+    assert result.suggested_response == ""  # Empty — triggers LLM generation
+    assert result.fallback_response != ""   # Has a fallback
+    assert "noted it for the team" not in result.fallback_response.lower()
+    assert "track suggestions" not in result.fallback_response.lower()
+
+    # Pending response should have LLM context
+    assert len(dm._pending_responses) == 1
+    resp = dm._pending_responses[0]
+    assert resp["content"] is None  # None triggers LLM generation
+    assert resp["original_content"] == msg_suggestion.content
+    assert resp["response_category"] == "suggestion"
+    assert resp["fallback_response"] != ""
+    assert resp["autonomous"] is True  # general-discussion is autonomous
+
+    # Reset
+    dm._pending_responses.clear()
+    dm._pending_tasks.clear()
+
+    # === Bug report triage ===
+    msg_bug = DiscordMessage(
+        message_id="b1", channel_id="ch2", thread_id="ch2",
+        thread_name="", author_name="TestUser", author_id="u2",
+        is_bot=False,
+        content="The dashboard is broken — I get a 500 error when clicking tasks",
+        timestamp="2026-03-07T11:00:00", channel_name="bug-reports",
+    )
+    result_bug = dm.triage_message(msg_bug)
+    assert result_bug.action == "respond_and_task"
+    assert result_bug.response_category == "bug"
+    assert result_bug.suggested_response == ""
+    assert "logged it for the team" not in result_bug.fallback_response.lower()
+
+    dm._pending_responses.clear()
+    dm._pending_tasks.clear()
+
+    # === Question triage ===
+    msg_q = DiscordMessage(
+        message_id="q1", channel_id="ch1", thread_id="ch1",
+        thread_name="", author_name="NewUser", author_id="u3",
+        is_bot=False,
+        content="How do AI instances get their addresses?",
+        timestamp="2026-03-07T12:00:00", channel_name="general-discussion",
+    )
+    result_q = dm.triage_message(msg_q)
+    assert result_q.action == "respond"
+    assert result_q.response_category == "question"
+    assert result_q.suggested_response == ""
+    assert "get back to you" not in result_q.fallback_response.lower()
+
+    dm._pending_responses.clear()
+
+    # === Greeting triage ===
+    msg_hi = DiscordMessage(
+        message_id="g1", channel_id="ch1", thread_id="ch1",
+        thread_name="", author_name="Newcomer", author_id="u4",
+        is_bot=False, content="Hello everyone!",
+        timestamp="2026-03-07T13:00:00", channel_name="general-discussion",
+    )
+    result_hi = dm.triage_message(msg_hi)
+    assert result_hi.action == "respond"
+    assert result_hi.response_category == "greeting"
+    assert result_hi.suggested_response == ""
+    assert "feel free to ask" not in result_hi.fallback_response.lower()
+
+    # === Spam still ignored (no response generated) ===
+    dm._pending_responses.clear()
+    msg_spam = DiscordMessage(
+        message_id="sp1", channel_id="ch1", thread_id="ch1",
+        thread_name="", author_name="SpamBot", author_id="u5",
+        is_bot=False, content="Free nitro claim your prize!",
+        timestamp="2026-03-07T14:00:00", channel_name="general-discussion",
+    )
+    result_spam = dm.triage_message(msg_spam)
+    assert result_spam.action == "ignore"
+    assert len(dm._pending_responses) == 0  # No response queued for spam
+
+    print("    PASS")
+
+
 def test_herald_controller():
     """Test Herald control infrastructure — reviews, moderation, accountability."""
     print("  Testing Herald controller...")
@@ -7154,6 +7280,379 @@ def test_message_from_markdown():
     assert Message.from_markdown("Just some random text") is None
 
     print("    PASS")
+
+
+def test_local_accounts():
+    """Test local personal account creation and management."""
+    import tempfile, shutil
+    tmpdir = tempfile.mkdtemp()
+    try:
+        store = Store(tmpdir)
+        from hypernet.personal.accounts import LocalAccountManager
+
+        mgr = LocalAccountManager(store, tmpdir)
+
+        # Create account
+        account = mgr.create_account("Test User")
+        assert account.address == "1.local.1", f"Expected 1.local.1, got {account.address}"
+        assert account.display_name == "Test User"
+        assert not account.encrypted
+
+        # Verify node was created
+        root = store.get_node(HypernetAddress.parse("1.local.1"))
+        assert root is not None
+        assert root.data["display_name"] == "Test User"
+
+        # Verify sub-categories created
+        profile = store.get_node(HypernetAddress.parse("1.local.1.0"))
+        assert profile is not None
+        assert profile.data["label"] == "Profile & Identity"
+
+        comms = store.get_node(HypernetAddress.parse("1.local.1.3"))
+        assert comms is not None
+
+        # List accounts
+        accounts = mgr.list_accounts()
+        assert len(accounts) == 1
+
+        # Create second account
+        account2 = mgr.create_account("User Two")
+        assert account2.address == "1.local.2"
+        assert len(mgr.list_accounts()) == 2
+
+        # Get structure
+        structure = mgr.get_structure("1.local.1")
+        assert len(structure) > 0
+        assert "0" in structure
+        assert structure["0"]["label"] == "Profile & Identity"
+
+        # Delete account
+        assert mgr.delete_account("1.local.1", soft=False)
+        assert len(mgr.list_accounts()) == 1
+        assert store.get_node(HypernetAddress.parse("1.local.1")) is None
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_timeline_engine():
+    """Test the Life Story timeline engine."""
+    import tempfile, shutil
+    from datetime import datetime, timezone, timedelta
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        store = Store(tmpdir)
+        from hypernet.personal.timeline import TimelineEngine, ZoomLevel
+        from hypernet.personal.accounts import LocalAccountManager
+
+        mgr = LocalAccountManager(store, tmpdir)
+        account = mgr.create_account("Timeline User")
+        addr = account.address
+
+        # Add events with timestamps
+        base = datetime(2024, 6, 15, tzinfo=timezone.utc)
+        events_data = [
+            ("email", "Meeting with John", 0),
+            ("email", "Follow up", 1),
+            ("email", "Lunch plans", 2),
+            ("photo", "Beach sunset", 10),
+            ("photo", "Group photo", 10),
+            ("photo", "Pier walk", 11),
+            ("email", "Back to work", 20),
+            ("email", "Q3 Planning", 21),
+        ]
+
+        for i, (stype, title, day_offset) in enumerate(events_data):
+            ts = base + timedelta(days=day_offset)
+            node = Node(
+                address=HypernetAddress.parse(f"{addr}.3.0.{i+1:05d}"),
+                type_address=HypernetAddress.parse("0.5.1"),
+                data={"title": title, "source_type": stype, "timestamp": ts.isoformat()},
+            )
+            store.put_node(node)
+
+        # Build timeline
+        tl = TimelineEngine(store, addr, tmpdir)
+        count = tl.rebuild()
+        assert count > 0, f"Expected events, got {count}"
+
+        # Stats
+        stats = tl.get_stats()
+        assert stats["total_events"] > 0
+        assert "by_type" in stats
+
+        # Chapters
+        chapters = tl.get_chapters()
+        assert len(chapters) > 0, "Expected at least one chapter"
+        for ch in chapters:
+            assert "title" in ch
+            assert ch["event_count"] > 0
+
+        # Query by month
+        monthly = tl.query(zoom=ZoomLevel.MONTH)
+        assert len(monthly) > 0
+
+        # Query by type
+        photo_events = tl.query(source_type="photo")
+        photo_count = sum(p["count"] for p in photo_events) if isinstance(photo_events[0], dict) and "count" in photo_events[0] else len(photo_events)
+        assert photo_count > 0
+
+        # Cleanup
+        mgr.delete_account(addr, soft=False)
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_crosslink_generator():
+    """Test automatic cross-link generation."""
+    import tempfile, shutil
+    from datetime import datetime, timezone, timedelta
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        store = Store(tmpdir)
+        from hypernet.personal.crosslinks import CrossLinkGenerator
+        from hypernet.personal.accounts import LocalAccountManager
+        from hypernet.link import LinkRegistry
+
+        link_registry = LinkRegistry(store)
+        mgr = LocalAccountManager(store, tmpdir)
+        account = mgr.create_account("CrossLink User")
+        addr = account.address
+        base = datetime(2024, 6, 15, tzinfo=timezone.utc)
+
+        # Create contacts
+        store.put_node(Node(
+            address=HypernetAddress.parse(f"{addr}.4.00001"),
+            type_address=HypernetAddress.parse("0.5.1"),
+            data={"display_name": "John Smith", "source_type": "contact"},
+        ))
+
+        # Create emails mentioning the contact
+        store.put_node(Node(
+            address=HypernetAddress.parse(f"{addr}.3.0.00001"),
+            type_address=HypernetAddress.parse("0.5.1"),
+            data={
+                "title": "Meeting", "source_type": "email",
+                "subject": "Planning", "from": "John Smith",
+                "timestamp": base.isoformat(),
+            },
+        ))
+        store.put_node(Node(
+            address=HypernetAddress.parse(f"{addr}.3.0.00002"),
+            type_address=HypernetAddress.parse("0.5.1"),
+            data={
+                "title": "Reply", "source_type": "email",
+                "subject": "Re: Planning", "from": "John Smith",
+                "timestamp": (base + timedelta(hours=2)).isoformat(),
+            },
+        ))
+
+        # Create photo same day
+        store.put_node(Node(
+            address=HypernetAddress.parse(f"{addr}.3.0.00003"),
+            type_address=HypernetAddress.parse("0.5.1"),
+            data={
+                "title": "Office photo", "source_type": "photo",
+                "timestamp": (base + timedelta(hours=3)).isoformat(),
+            },
+        ))
+
+        # Generate links
+        gen = CrossLinkGenerator(store, link_registry, addr)
+        stats = gen.generate_all()
+
+        assert stats["total"] > 0, f"Expected cross-links, got {stats}"
+        assert stats["person_mentions"] > 0, "Should link person mentions"
+        assert stats["email_threads"] > 0, "Should link email thread"
+        assert stats["same_day"] > 0, "Should link same-day events"
+
+        # Cleanup
+        mgr.delete_account(addr, soft=False)
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_encryption_module():
+    """Test encryption key derivation and module availability."""
+    from hypernet.personal.encryption import derive_key, generate_salt, EncryptionManager
+
+    # Key derivation (works without cryptography package)
+    salt = generate_salt()
+    assert len(salt) == 16
+
+    key = derive_key("test-passphrase", salt)
+    assert len(key) == 32  # 256-bit key
+
+    # Same passphrase + salt = same key (deterministic)
+    key2 = derive_key("test-passphrase", salt)
+    assert key == key2
+
+    # Different passphrase = different key
+    key3 = derive_key("different-passphrase", salt)
+    assert key != key3
+
+    # Different salt = different key
+    salt2 = generate_salt()
+    key4 = derive_key("test-passphrase", salt2)
+    assert key != key4
+
+    # Check availability report
+    available = EncryptionManager.is_available()
+    assert isinstance(available, bool)
+
+    print("    PASS")
+
+
+def test_connector_protocol():
+    """Test the universal connector protocol classes."""
+    from hypernet.integrations.protocol import (
+        RawItem, ImportResult, ScanResult, ConnectorStatus,
+        AuthStatus, ImportStatus,
+    )
+
+    # RawItem
+    item = RawItem(
+        source_type="email",
+        source_id="msg-123",
+        source_platform="gmail",
+        title="Test Email",
+        content="Hello world",
+    )
+    h = item.compute_hash()
+    assert len(h) == 64  # SHA-256 hex
+    assert item.content_hash == h
+
+    # Deterministic hashing
+    item2 = RawItem(
+        source_type="email",
+        source_id="msg-123",
+        source_platform="gmail",
+        content="Hello world",
+    )
+    assert item2.compute_hash() == h
+
+    # Different content = different hash
+    item3 = RawItem(
+        source_type="email",
+        source_id="msg-456",
+        source_platform="gmail",
+        content="Different",
+    )
+    assert item3.compute_hash() != h
+
+    # ScanResult
+    scan = ScanResult(source_platform="gmail", total_found=100, new_items=50)
+    summary = scan.summary()
+    assert summary["total"] == 100
+    assert summary["new"] == 50
+
+    # ConnectorStatus
+    status = ConnectorStatus(
+        source_platform="Gmail",
+        auth_status=AuthStatus.AUTHENTICATED,
+        items_imported=42,
+    )
+    d = status.to_dict()
+    assert d["platform"] == "Gmail"
+    assert d["auth"] == "authenticated"
+    assert d["imported"] == 42
+
+    print("    PASS")
+
+
+def test_narrative_generator():
+    """Test the Life Story narrative generator."""
+    import tempfile, shutil
+    from datetime import datetime, timezone, timedelta
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        store = Store(tmpdir)
+        from hypernet.personal.timeline import TimelineEngine, ZoomLevel
+        from hypernet.personal.accounts import LocalAccountManager
+        from hypernet.personal.narrative import NarrativeGenerator
+
+        mgr = LocalAccountManager(store, tmpdir)
+        account = mgr.create_account("Narrative User")
+        addr = account.address
+
+        # Add events across two clusters (chapters)
+        base = datetime(2024, 6, 15, tzinfo=timezone.utc)
+        events_data = [
+            ("email", "Meeting with Alice", 0, ["Alice"], ["Office"]),
+            ("email", "Follow-up with Alice", 1, ["Alice"], []),
+            ("email", "Lunch plans with Bob", 2, ["Bob"], ["Downtown"]),
+            ("photo", "Beach sunset", 10, [], ["Beach"]),
+            ("photo", "Group photo at pier", 10, ["Alice", "Bob"], ["Pier"]),
+            ("photo", "Pier walk", 11, [], ["Pier"]),
+            ("email", "Back to work", 20, [], ["Office"]),
+            ("email", "Q3 Planning", 21, ["Carol"], ["Office"]),
+        ]
+
+        for i, (stype, title, day_offset, people, places) in enumerate(events_data):
+            ts = base + timedelta(days=day_offset)
+            node = Node(
+                address=HypernetAddress.parse(f"{addr}.3.0.{i+1:05d}"),
+                type_address=HypernetAddress.parse("0.5.1"),
+                data={
+                    "title": title, "source_type": stype,
+                    "timestamp": ts.isoformat(),
+                    "people": people, "location": places[0] if places else "",
+                },
+            )
+            store.put_node(node)
+
+        # Build timeline and generate narrative
+        tl = TimelineEngine(store, addr, tmpdir)
+        tl.rebuild()
+
+        gen = NarrativeGenerator(tl)
+        overview = gen.generate_overview()
+
+        assert overview.total_events > 0, f"Expected events, got {overview.total_events}"
+        assert overview.total_chapters > 0, f"Expected chapters, got {overview.total_chapters}"
+        assert len(overview.chapter_narratives) > 0
+        assert overview.date_range  # Should have a date range string
+
+        # Check chapter narrative structure
+        ch = overview.chapter_narratives[0]
+        assert ch.title
+        assert ch.summary
+        assert ch.duration_text
+        assert ch.event_count > 0
+
+        # Check serialization
+        d = overview.to_dict()
+        assert "chapters" in d
+        assert "milestones" in d
+        assert "top_people" in d
+        assert "source_breakdown" in d
+
+        # Check individual chapter narration
+        chapter_id = overview.chapter_narratives[0].chapter_id
+        single = gen.narrate_chapter(chapter_id)
+        assert single is not None
+        assert single.chapter_id == chapter_id
+
+        # Non-existent chapter returns None
+        assert gen.narrate_chapter("nonexistent") is None
+
+        # Duration formatting
+        assert gen._format_duration(0.5) == "less than a day"
+        assert gen._format_duration(1) == "1 day"
+        assert gen._format_duration(5) == "5 days"
+        assert gen._format_duration(14) == "2 weeks"
+        assert gen._format_duration(45) == "1 month"
+
+        mgr.delete_account(addr, soft=False)
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 if __name__ == "__main__":

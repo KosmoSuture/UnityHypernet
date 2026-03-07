@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hypernet-core"
+version = "0.9.1"
+description = "Hypernet Core — Universal address space data model"
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+server = ["fastapi", "uvicorn"]
+
+[tool.setuptools.packages.find]
+include = ["hypernet*"]
+exclude = ["hypernet_swarm*"]

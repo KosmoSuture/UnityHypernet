@@ -316,12 +316,42 @@ def main():
 
     from .swarm_factory import build_swarm
 
-    swarm, _ = build_swarm(
+    swarm, web_messenger = build_swarm(
         data_dir=args.data,
         archive_root=args.archive,
         config_path=args.config,
         mock=args.mock,
     )
+
+    # Start the web server in a background thread so the dashboard is available
+    server_thread = None
+    try:
+        from .server import create_app, attach_swarm
+        import threading
+        import uvicorn
+
+        app = create_app(data_dir=args.data)
+        app.state._archive_root = args.archive
+        app.state._data_dir = args.data
+        attach_swarm(app, swarm, web_messenger)
+
+        server_config = uvicorn.Config(
+            app, host="0.0.0.0", port=8000,
+            log_level="warning",  # Quiet — swarm logs are enough
+        )
+        server = uvicorn.Server(server_config)
+
+        server_thread = threading.Thread(target=server.run, daemon=True)
+        server_thread.start()
+        print(f"  Dashboard: http://localhost:8000/swarm/dashboard")
+        print(f"  Explorer:  http://localhost:8000/")
+        print()
+    except ImportError:
+        print("  (Dashboard not available — install fastapi and uvicorn)")
+        print()
+    except Exception as e:
+        print(f"  (Dashboard failed to start: {e})")
+        print()
 
     # Handle graceful shutdown
     def signal_handler(sig, frame):
