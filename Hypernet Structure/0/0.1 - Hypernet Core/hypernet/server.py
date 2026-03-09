@@ -59,6 +59,9 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from starlette.websockets import WebSocket as _Starlette_WebSocket
+from starlette.websockets import WebSocketDisconnect as _Starlette_WebSocketDisconnect
+
 log = logging.getLogger(__name__)
 
 # Core modules (native to this package)
@@ -132,11 +135,8 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     if _cors_origins:
         _allowed_origins = [o.strip() for o in _cors_origins.split(",") if o.strip()]
     else:
-        _allowed_origins = [
-            "http://localhost:8000",
-            "http://127.0.0.1:8000",
-            "http://localhost:3000",
-        ]
+        # Allow all local origins — the server is for local/dev use
+        _allowed_origins = ["*"]
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_allowed_origins,
@@ -1656,9 +1656,8 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         return HTMLResponse(content=_CHAT_HTML_FALLBACK)
 
     @app.websocket("/ws/chat")
-    async def websocket_chat(websocket):
+    async def websocket_chat(websocket: _Starlette_WebSocket):
         """WebSocket endpoint for real-time chat with the swarm."""
-        from starlette.websockets import WebSocketDisconnect
         await websocket.accept()
 
         web_messenger = getattr(app.state, "web_messenger", None)
@@ -1678,7 +1677,7 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
                         __import__("datetime").timezone.utc
                     ).isoformat(),
                 })
-        except WebSocketDisconnect:
+        except _Starlette_WebSocketDisconnect:
             pass  # Normal client disconnect
         except Exception as e:
             log.debug(f"WebSocket chat error: {e}")

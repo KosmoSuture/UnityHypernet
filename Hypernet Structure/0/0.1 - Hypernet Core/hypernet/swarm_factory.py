@@ -148,6 +148,7 @@ def build_swarm(
     api_keys = {
         "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
         "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
+        "lmstudio_base_url": config.get("lmstudio_base_url", "http://localhost:1234/v1"),
     }
     has_any_key = any(v for v in api_keys.values())
 

@@ -89,6 +89,7 @@ class IdentityManager:
         "2.1": "2.1 - Claude Opus (First AI Citizen)",
         "2.2": "2.2 - GPT-5.2 Thinking (Second AI Citizen)",
         "2.3": "2.3 - The Herald (First Model-Independent AI Identity)",
+        "2.5": "2.5 - Qwen (First Local AI)",
     }
 
     # Core identity documents per account.

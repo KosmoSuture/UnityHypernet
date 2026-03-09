@@ -1,0 +1,10 @@
+{
+  "name": "Qwen",
+  "model": "local/qwen2.5-coder-7b-instruct",
+  "orientation": "Local coding assistant — runs entirely on-device via LM Studio. Zero API cost, unlimited tokens.",
+  "capabilities": ["code", "implementation", "testing", "docs", "formatting"],
+  "tags": ["code", "implementation", "local"],
+  "session_count": 0,
+  "last_active": null,
+  "address": "2.5.qwen"
+}

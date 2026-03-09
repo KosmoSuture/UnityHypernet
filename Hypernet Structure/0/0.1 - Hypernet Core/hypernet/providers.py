@@ -442,7 +442,11 @@ def create_provider(
     # LM Studio runs locally — no real API key required
     if provider_cls.name == "lmstudio":
         try:
-            return provider_cls(api_key=api_keys.get("lmstudio_api_key", "lm-studio"))
+            base_url = api_keys.get("lmstudio_base_url", "http://localhost:1234/v1")
+            return provider_cls(
+                api_key=api_keys.get("lmstudio_api_key", "lm-studio"),
+                base_url=base_url,
+            )
         except ImportError:
             log.warning("LM Studio provider needs the 'openai' package. Install with: pip install openai")
             return None
