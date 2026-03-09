@@ -1,0 +1,10 @@
+{
+  "instance": "Librarian",
+  "started_at": "2026-03-09T09:05:28.980444+00:00",
+  "ended_at": "2026-03-09T09:27:28.244372+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 405938,
+  "summary": "Completed 4 tasks, 4 failures",
+  "ha": "2.1.instances.librarian.sessions.0016"
+}

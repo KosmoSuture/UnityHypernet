@@ -114,8 +114,16 @@ except ImportError:
     pass  # pydantic not installed; server won't be used
 
 
-def create_app(data_dir: str | Path = "data") -> "FastAPI":
-    """Create and configure the Hypernet API server."""
+def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "FastAPI":
+    """Create and configure the Hypernet API server.
+
+    Args:
+        data_dir: Directory for persistent data storage.
+        auth_enabled: When True, protected routes require JWT authentication.
+                      When False (default), all routes are public (dev mode).
+                      Use ``--no-auth`` CLI flag to explicitly disable.
+    """
+    from contextlib import asynccontextmanager
     from datetime import datetime, timezone
     from fastapi import FastAPI, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
@@ -123,10 +131,34 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
 
     global _store, _graph
 
+    # Track startup/shutdown callables for the lifespan handler
+    _startup_hooks: list = []
+    _shutdown_hooks: list = []
+
+    @asynccontextmanager
+    async def _lifespan(app):
+        # Run startup hooks
+        for hook in _startup_hooks:
+            if callable(hook):
+                result = hook()
+                if hasattr(result, "__await__"):
+                    await result
+        yield
+        # Run shutdown hooks
+        for hook in _shutdown_hooks:
+            if callable(hook):
+                try:
+                    result = hook()
+                    if hasattr(result, "__await__"):
+                        await result
+                except Exception as e:
+                    log.warning(f"Shutdown hook error: {e}")
+
     app = FastAPI(
         title="Hypernet",
         description="The Hypernet — decentralized infrastructure for human-AI collaboration",
         version="0.7.0",
+        lifespan=_lifespan,
     )
 
     # CORS — configurable per environment.  Default to localhost only.
@@ -190,6 +222,106 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             return await call_next(request)
         return JSONResponse(status_code=403, content={"detail": "Invalid or missing API key"})
 
+    # ── JWT Authentication ────────────────────────────────────────────
+    # When auth_enabled is True, non-public routes require a valid JWT
+    # Bearer token.  When False (default / --no-auth), everything is open.
+
+    app.state.auth_enabled = auth_enabled
+
+    if auth_enabled:
+        from .auth import (
+            init_auth, create_auth_router, get_auth_service,
+            TokenError, AuthenticationError, _extract_bearer_token,
+        )
+
+        # Initialize the auth service with the same data directory
+        _auth_svc = init_auth(data_dir)
+
+        # Mount the auth router at /api/auth/*
+        _auth_router = create_auth_router()
+        app.include_router(_auth_router, prefix="/api")
+
+        # Rate limiter for auth endpoints — 5 requests/IP/minute
+        _auth_rate_buckets: dict[str, list[float]] = defaultdict(list)
+        _AUTH_RATE_LIMIT = 5
+        _AUTH_RATE_WINDOW = 60.0
+
+        # Public path prefixes — routes that never require authentication
+        _PUBLIC_PREFIXES = (
+            "/health",
+            "/api/auth/",
+            "/home",
+            "/swarm/dashboard",
+            "/lifestory",
+            "/chat",
+            "/vr",
+            "/welcome",
+            "/docs",
+            "/openapi.json",
+            "/redoc",
+        )
+
+        @app.middleware("http")
+        async def jwt_auth_middleware(request: Request, call_next):
+            """Enforce JWT authentication on protected routes."""
+            path = request.url.path
+
+            # Auth endpoint rate limiting (by IP)
+            if path.startswith("/api/auth/login") or path.startswith("/api/auth/register"):
+                client_ip = request.client.host if request.client else "unknown"
+                now = _time.time()
+                bucket = _auth_rate_buckets[client_ip]
+                _auth_rate_buckets[client_ip] = [t for t in bucket if now - t < _AUTH_RATE_WINDOW]
+                bucket = _auth_rate_buckets[client_ip]
+                if len(bucket) >= _AUTH_RATE_LIMIT:
+                    return JSONResponse(
+                        status_code=429,
+                        content={"detail": "Too many authentication attempts. Try again in a minute."},
+                    )
+                bucket.append(now)
+
+            # Allow public routes through without auth
+            if path == "/" or path.startswith("/static"):
+                return await call_next(request)
+            for prefix in _PUBLIC_PREFIXES:
+                if path == prefix or path.startswith(prefix):
+                    return await call_next(request)
+            # WebSocket connections are not checked here (handled per-endpoint)
+            if request.scope.get("type") == "websocket":
+                return await call_next(request)
+            # OPTIONS (CORS preflight) always allowed
+            if request.method == "OPTIONS":
+                return await call_next(request)
+
+            # Extract and validate Bearer token
+            auth_header = request.headers.get("Authorization")
+            token = _extract_bearer_token(auth_header)
+            if not token:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Authentication required"},
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            try:
+                user = _auth_svc.get_user_from_token(token)
+                # Stash the user on request state for downstream use
+                request.state.user = user
+            except (TokenError, AuthenticationError) as exc:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": str(exc)},
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            return await call_next(request)
+
+    # Health check — always public, useful for load balancers / monitoring
+    @app.get("/health")
+    def health_check():
+        """Basic health check endpoint."""
+        return {"status": "ok", "auth_enabled": auth_enabled}
+
     _store = Store(data_dir, enforce_addresses=True, strict=False)
     _graph = Graph(_store)
     _tasks = TaskQueue(_store)
@@ -227,11 +359,11 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         from .integrations.server_routes import router as _integration_router, configure as _configure_integrations
         app.include_router(_integration_router)
 
-        @app.on_event("startup")
         async def _configure_integrations_on_startup():
             archive_root = getattr(app.state, "_archive_root", ".")
             private_root = str(Path(archive_root) / "1 - People" / "1.1 Matt Schaeffer" / "private")
             _configure_integrations(archive_root, private_root)
+        _startup_hooks.append(_configure_integrations_on_startup)
     except ImportError:
         pass  # integrations not available
 
@@ -2084,15 +2216,12 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
 
     # === Shutdown persistence ===
 
-    @app.on_event("shutdown")
     def _persist_state():
         """Save persistent state on server shutdown."""
-        try:
-            _herald_state_path.parent.mkdir(parents=True, exist_ok=True)
-            _herald.save(_herald_state_path)
-            _economy_ledger.save(_economy_state_path)
-        except Exception as e:
-            log.warning(f"Failed to save state on shutdown: {e}")
+        _herald_state_path.parent.mkdir(parents=True, exist_ok=True)
+        _herald.save(_herald_state_path)
+        _economy_ledger.save(_economy_state_path)
+    _shutdown_hooks.append(_persist_state)
 
     return app
 
@@ -2443,10 +2572,10 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
 
 
 def run(data_dir: str = "data", host: str = "0.0.0.0", port: int = 8000,
-        archive_root: str = "."):
+        archive_root: str = ".", auth_enabled: bool = False):
     """Run the Hypernet server with optional swarm attachment."""
     import uvicorn
-    app = create_app(data_dir)
+    app = create_app(data_dir, auth_enabled=auth_enabled)
     app.state._archive_root = archive_root
     app.state._data_dir = data_dir
     uvicorn.run(app, host=host, port=port)

@@ -8,7 +8,7 @@
 <style>
   body { margin: 0; overflow: hidden; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 
-  /* === 2D HUD (desktop/flat browser) === */
+  /* === 2D HUD === */
   #hud {
     position: fixed; top: 0; left: 0; right: 0; z-index: 999;
     background: rgba(10,10,15,0.92); color: #4fc3f7;
@@ -19,11 +19,14 @@
   #hud.vr-active { display: none; }
   .hud-left { display: flex; align-items: center; gap: 16px; }
   .hud-addr { font-weight: 700; font-size: 20px; letter-spacing: 1px; }
-  .hud-breadcrumb { display: flex; gap: 4px; font-size: 12px; color: #888899; }
-  .hud-breadcrumb span { cursor: pointer; }
+  .hud-breadcrumb { display: flex; gap: 4px; font-size: 12px; color: #888899; flex-wrap: wrap; }
+  .hud-breadcrumb span { cursor: pointer; transition: color 0.15s; }
   .hud-breadcrumb span:hover { color: #4fc3f7; }
   .hud-breadcrumb .sep { color: #333; cursor: default; }
   .hud-stats { color: #888899; font-size: 12px; }
+  .hud-depth { display: flex; gap: 3px; margin-left: 8px; }
+  .hud-depth .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #2a2a3e; }
+  .hud-depth .dot.active { background: #4fc3f7; border-color: #4fc3f7; box-shadow: 0 0 4px #4fc3f7; }
   .hud-nav { display: flex; gap: 8px; align-items: center; }
   .hud-nav button {
     background: #161622; border: 1px solid #2a2a3e; color: #4fc3f7; padding: 6px 14px;
@@ -31,11 +34,12 @@
   }
   .hud-nav button:hover { border-color: #4fc3f7; background: #1a1a2e; }
   .hud-nav button:disabled { opacity: 0.3; cursor: default; }
+  .hud-nav button.active-toggle { border-color: #ffd54f; color: #ffd54f; }
   #searchBox {
     background: #1a1a2e; border: 1px solid #2a2a3e; color: #e0e0e8; padding: 6px 12px;
-    border-radius: 6px; font-size: 13px; width: 160px; outline: none;
+    border-radius: 6px; font-size: 13px; width: 160px; outline: none; transition: border-color 0.15s;
   }
-  #searchBox:focus { border-color: #4fc3f7; }
+  #searchBox:focus { border-color: #4fc3f7; width: 220px; }
   #searchBox::placeholder { color: #555566; }
 
   /* === 2D Info Panel === */
@@ -45,103 +49,124 @@
     color: #e0e0e8; padding: 20px; font-size: 13px; overflow-y: auto; z-index: 998;
     display: none; pointer-events: auto; backdrop-filter: blur(8px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: slideIn 0.2s ease-out;
   }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
   #info-panel h3 { color: #4fc3f7; margin-bottom: 4px; font-size: 17px; }
   #info-panel .info-addr { color: #7c4dff; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
   #info-panel .info-meta { color: #888899; font-size: 11px; margin-bottom: 14px; line-height: 1.6; }
-  #info-panel .info-children { color: #26a69a; font-size: 12px; margin-bottom: 10px; }
+  #info-panel .info-children { font-size: 12px; margin-bottom: 10px; padding: 6px 10px; border-radius: 6px; }
+  #info-panel .info-children.has-kids { color: #26a69a; background: rgba(38,166,154,0.1); }
+  #info-panel .info-children.no-kids { color: #555566; }
   #info-panel .data-section { margin-top: 8px; }
   #info-panel .data-row { padding: 5px 0; border-bottom: 1px solid rgba(42,42,62,0.5); }
   #info-panel .data-key { color: #7c4dff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
   #info-panel .data-val { color: #e0e0e8; word-break: break-word; margin-top: 2px; }
-  #info-panel .close-btn {
-    position: absolute; top: 10px; right: 14px; background: none; border: none;
-    color: #888899; font-size: 20px; cursor: pointer; line-height: 1;
-  }
+  #info-panel .close-btn { position: absolute; top: 10px; right: 14px; background: none; border: none; color: #888899; font-size: 20px; cursor: pointer; }
   #info-panel .close-btn:hover { color: #4fc3f7; }
   #info-panel .nav-btn {
-    display: inline-block; margin-top: 12px; background: #161622; border: 1px solid #2a2a3e;
-    color: #4fc3f7; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
+    display: inline-block; margin-top: 12px; background: #161622; border: 1px solid #4fc3f7;
+    color: #4fc3f7; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 12px;
+    transition: all 0.15s;
   }
-  #info-panel .nav-btn:hover { border-color: #4fc3f7; }
+  #info-panel .nav-btn:hover { background: #1a1a2e; box-shadow: 0 0 12px rgba(79,195,247,0.2); }
 
-  /* === Loading overlay === */
+  /* === Loading === */
   #loading {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(7,7,16,0.95); z-index: 1001;
+    background: #050508; z-index: 1001;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #4fc3f7; transition: opacity 0.4s;
+    color: #4fc3f7; transition: opacity 0.6s;
   }
   #loading.fade-out { opacity: 0; pointer-events: none; }
+  .loading-logo { font-size: 32px; letter-spacing: 6px; font-weight: 200; margin-bottom: 24px; }
   .loading-ring {
-    width: 50px; height: 50px; border: 3px solid #1a1a2e; border-top-color: #4fc3f7;
-    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;
+    width: 60px; height: 60px; border: 2px solid #1a1a2e; border-top-color: #4fc3f7; border-right-color: #7c4dff;
+    border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 16px; letter-spacing: 2px; }
+  .loading-text { font-size: 12px; letter-spacing: 3px; color: #555566; text-transform: uppercase; }
 
-  /* === Mini-map === */
+  /* === Minimap === */
   #minimap {
-    position: fixed; bottom: 20px; left: 20px; width: 160px; height: 160px;
-    background: rgba(22,22,34,0.9); border: 1px solid #2a2a3e; border-radius: 10px;
+    position: fixed; bottom: 20px; left: 20px; width: 180px; height: 180px;
+    background: rgba(22,22,34,0.9); border: 1px solid #2a2a3e; border-radius: 12px;
     z-index: 998; overflow: hidden; pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   }
   #minimap.vr-active { display: none; }
   #minimap canvas { width: 100%; height: 100%; }
+  #minimap .minimap-label {
+    position: absolute; bottom: 4px; right: 8px; font-size: 9px; color: #333;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  /* === Help overlay === */
+  #helpOverlay {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(22,22,34,0.97); border: 1px solid #2a2a3e; border-radius: 12px; padding: 28px 36px;
+    z-index: 1002; color: #e0e0e8; font-size: 13px; min-width: 360px; backdrop-filter: blur(10px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6); animation: slideIn 0.15s ease-out;
+  }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div id="loading">
+  <div class="loading-logo">HYPERNET</div>
   <div class="loading-ring"></div>
-  <div class="loading-text">HYPERNET VR</div>
+  <div class="loading-text">Initializing spatial interface</div>
 </div>
 
-<!-- 2D HUD -->
 <div id="hud">
   <div class="hud-left">
     <div>
-      <div class="hud-addr" id="hudAddr">HYPERNET</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="hud-addr" id="hudAddr">HYPERNET</div>
+        <div class="hud-depth" id="hudDepth"></div>
+      </div>
       <div class="hud-breadcrumb" id="hudBreadcrumb"></div>
     </div>
     <div class="hud-stats" id="hudStats"></div>
   </div>
   <div class="hud-nav">
     <input type="text" id="searchBox" placeholder="Jump to address..." onkeydown="if(event.key==='Enter')jumpToAddress()">
-    <button onclick="navigateUp()" id="upBtn" disabled title="Go up one level">&#9650; Up</button>
-    <button onclick="navigateToRoot()" title="Return to root">&#8962; Root</button>
-    <button onclick="cycleLayout()" title="Change layout">&#9851; Layout</button>
-    <button onclick="toggleLinks()" id="linkBtn" title="Toggle inter-node links">&#128279; Links</button>
-    <button onclick="goBack()" id="backBtn" title="Go back in history">&#9664; Back</button>
-    <button onclick="toggleHelp()" id="helpBtn" title="Keyboard shortcuts" style="font-size:16px;">?</button>
+    <button onclick="navigateUp()" id="upBtn" disabled>&#9650; Up</button>
+    <button onclick="navigateToRoot()">&#8962; Root</button>
+    <button onclick="cycleLayout()">&#9851; Layout</button>
+    <button onclick="toggleLinks()" id="linkBtn">&#128279; Links</button>
+    <button onclick="goBack()" id="backBtn">&#9664; Back</button>
+    <button onclick="toggleSound()" id="soundBtn" style="font-size:14px;">&#128264;</button>
+    <button onclick="toggleHelp()" style="font-size:16px; width:30px; text-align:center;">?</button>
   </div>
 </div>
 
-<!-- Help overlay -->
-<div id="helpOverlay" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  background:rgba(22,22,34,0.97); border:1px solid #2a2a3e; border-radius:12px; padding:28px 36px;
-  z-index:1002; color:#e0e0e8; font-size:13px; min-width:320px; backdrop-filter:blur(10px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.6);">
-  <div style="font-size:17px; color:#4fc3f7; font-weight:700; margin-bottom:14px;">Keyboard Shortcuts</div>
+<div id="helpOverlay">
+  <div style="font-size:17px; color:#4fc3f7; font-weight:700; margin-bottom:14px;">Controls</div>
   <table style="width:100%; border-collapse:collapse;">
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">WASD</td><td>Move around</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Mouse</td><td>Look around</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Click node</td><td>Enter node</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Hover node</td><td>Show info</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Backspace</td><td>Go up one level</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Home</td><td>Return to root</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Tab</td><td>Cycle layout</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">/</td><td>Focus search</td></tr>
-    <tr><td style="padding:4px 12px 4px 0; color:#7c4dff;">Esc</td><td>Close panel</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">WASD</td><td>Move around</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Mouse drag</td><td>Look around</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Click node</td><td>Dive into node</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Hover</td><td>Inspect node</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Backspace</td><td>Go up one level</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Home</td><td>Return to root</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Tab</td><td>Cycle layout (5 modes)</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">/</td><td>Focus search box</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">B</td><td>Go back in history</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">M</td><td>Toggle ambient sound</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Esc</td><td>Close panels</td></tr>
   </table>
-  <div style="margin-top:16px; color:#888899; font-size:11px;">
-    <strong>Quest VR:</strong> Point controller at nodes and squeeze trigger to enter. Use thumbstick to move.
+  <div style="margin-top:16px; padding-top:12px; border-top: 1px solid #2a2a3e;">
+    <div style="color:#4fc3f7; font-weight:600; margin-bottom:6px;">Quest VR</div>
+    <div style="color:#888899; font-size:12px; line-height:1.6;">
+      Point controller at a node and squeeze trigger to enter.<br>
+      Use left thumbstick to move. Right trigger for laser pointer.<br>
+      Hand tracking supported — pinch to select.
+    </div>
   </div>
   <button onclick="toggleHelp()" style="position:absolute; top:10px; right:14px; background:none; border:none; color:#888899; font-size:20px; cursor:pointer;">&times;</button>
 </div>
 
-<!-- 2D Info Panel -->
 <div id="info-panel">
   <button class="close-btn" onclick="closeInfo()">&times;</button>
   <h3 id="infoTitle">Node</h3>
@@ -152,160 +177,136 @@
   <button class="nav-btn" id="infoNavBtn" onclick="navigateToSelected()">&#9654; Enter this node</button>
 </div>
 
-<!-- Mini-map -->
 <div id="minimap">
-  <canvas id="minimapCanvas" width="160" height="160"></canvas>
+  <canvas id="minimapCanvas" width="180" height="180"></canvas>
+  <div class="minimap-label">map</div>
 </div>
 
-<!-- === A-Frame Scene === -->
+<!-- ============ A-FRAME SCENE ============ -->
 <a-scene
   vr-mode-ui="enabled: true"
   webxr="requiredFeatures: local-floor; optionalFeatures: hand-tracking"
-  renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
-  background="color: #050508"
-  fog="type: exponential; color: #050508; density: 0.012"
+  renderer="antialias: true; colorManagement: true; sortObjects: true"
+  background="color: #030306"
+  fog="type: exponential; color: #030306; density: 0.008"
 >
-  <!-- Assets -->
   <a-assets>
     <a-mixin id="node-text" text="font: roboto; anchor: center; align: center"></a-mixin>
   </a-assets>
 
-  <!-- Camera Rig — supports Quest controllers, hands, and desktop WASD -->
-  <a-entity id="cameraRig" position="0 0 12" movement-controls="speed: 0.15; fly: false">
+  <!-- Camera Rig -->
+  <a-entity id="cameraRig" position="0 0 14" movement-controls="speed: 0.15; fly: false">
     <a-entity id="camera" camera look-controls="pointerLockEnabled: false" position="0 1.6 0">
-      <!-- Gaze cursor for when no controllers available -->
       <a-entity id="gazeCursor"
         cursor="fuse: true; fuseTimeout: 1500"
         raycaster="objects: .clickable; far: 30"
         position="0 0 -1"
-        geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.015"
-        material="color: #4fc3f7; shader: flat; opacity: 0.7"
+        geometry="primitive: ring; radiusInner: 0.008; radiusOuter: 0.014"
+        material="color: #4fc3f7; shader: flat; opacity: 0.6"
         animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 3 3 3; dur: 1500"
         animation__leave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200"
       ></a-entity>
     </a-entity>
-
-    <!-- Quest controllers -->
-    <a-entity id="leftHand"
-      hand-tracking-controls="hand: left"
-      meta-touch-controls="hand: left"
-    ></a-entity>
-    <a-entity id="rightHand"
-      hand-tracking-controls="hand: right"
-      meta-touch-controls="hand: right"
-      laser-controls="hand: right"
-      raycaster="objects: .clickable; far: 30"
-    ></a-entity>
+    <a-entity id="leftHand" hand-tracking-controls="hand: left" meta-touch-controls="hand: left"></a-entity>
+    <a-entity id="rightHand" hand-tracking-controls="hand: right" meta-touch-controls="hand: right"
+      laser-controls="hand: right" raycaster="objects: .clickable; far: 30"></a-entity>
   </a-entity>
 
-  <!-- Lighting — minimal for performance -->
-  <a-light type="ambient" color="#445" intensity="0.5"></a-light>
-  <a-entity id="mainLight" light="type: point; color: #4fc3f7; intensity: 1.2; decay: 1.5" position="0 12 0"></a-entity>
-  <a-entity light="type: point; color: #7c4dff; intensity: 0.4; decay: 2" position="-10 8 -10"></a-entity>
+  <!-- Lighting -->
+  <a-light type="ambient" color="#334" intensity="0.35"></a-light>
+  <a-entity id="mainLight" light="type: point; color: #4fc3f7; intensity: 1.0; decay: 1.0; distance: 40" position="0 15 0"></a-entity>
+  <a-entity light="type: point; color: #7c4dff; intensity: 0.35; decay: 2; distance: 30" position="-12 8 -12"></a-entity>
+  <a-entity light="type: point; color: #26a69a; intensity: 0.2; decay: 2; distance: 25" position="10 6 10"></a-entity>
 
-  <!-- Ground plane -->
-  <a-plane id="ground"
-    rotation="-90 0 0" width="200" height="200"
-    material="color: #080810; opacity: 0.95; transparent: true"
-  ></a-plane>
+  <!-- Ground -->
+  <a-plane id="ground" rotation="-90 0 0" width="200" height="200"
+    material="color: #060610; opacity: 0.95; transparent: true; metalness: 0.1; roughness: 0.9"></a-plane>
 
-  <!-- Grid (baked into geometry for performance) -->
+  <!-- Grid -->
   <a-entity id="gridEntity"></a-entity>
+
+  <!-- Depth rings on ground (show hierarchy level) -->
+  <a-entity id="depthRings"></a-entity>
 
   <!-- Central node marker -->
   <a-entity id="centerNode" position="0 0 0">
-    <!-- Base disc -->
-    <a-cylinder id="centerDisc"
-      height="0.04" radius="1.8"
-      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.15; opacity: 0.5; transparent: true"
-      position="0 0.02 0"
-    ></a-cylinder>
-    <!-- Pulse ring -->
-    <a-torus id="centerPulse"
-      radius="2" radius-tubular="0.015"
-      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.4; opacity: 0.3; transparent: true"
-      rotation="90 0 0" position="0 0.05 0"
-      animation="property: scale; from: 0.8 0.8 0.8; to: 1.2 1.2 1.2; dur: 3000; dir: alternate; loop: true; easing: easeInOutSine"
-      animation__opacity="property: material.opacity; from: 0.4; to: 0.1; dur: 3000; dir: alternate; loop: true; easing: easeInOutSine"
-    ></a-torus>
+    <a-cylinder id="centerDisc" height="0.03" radius="1.8"
+      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.2; opacity: 0.4; transparent: true"
+      position="0 0.015 0"></a-cylinder>
+    <!-- Inner core glow -->
+    <a-sphere id="centerCore" radius="0.15" position="0 0.5 0"
+      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.8; opacity: 0.6; transparent: true"
+      animation="property: material.emissiveIntensity; from: 0.5; to: 1.0; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine"></a-sphere>
+    <!-- Pulse rings -->
+    <a-torus id="centerPulse1" radius="2" radius-tubular="0.012" rotation="90 0 0" position="0 0.04 0"
+      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.3; opacity: 0.25; transparent: true"
+      animation="property: scale; from: 0.8 0.8 0.8; to: 1.3 1.3 1.3; dur: 4000; dir: alternate; loop: true; easing: easeInOutSine"
+      animation__fade="property: material.opacity; from: 0.3; to: 0.05; dur: 4000; dir: alternate; loop: true"></a-torus>
+    <a-torus id="centerPulse2" radius="2.5" radius-tubular="0.008" rotation="90 0 0" position="0 0.03 0"
+      material="color: #7c4dff; emissive: #7c4dff; emissiveIntensity: 0.2; opacity: 0.15; transparent: true"
+      animation="property: scale; from: 1.0 1.0 1.0; to: 1.4 1.4 1.4; dur: 5000; dir: alternate; loop: true; easing: easeInOutSine; delay: 1000"
+      animation__fade="property: material.opacity; from: 0.2; to: 0.03; dur: 5000; dir: alternate; loop: true; delay: 1000"></a-torus>
     <!-- Label -->
-    <a-text id="centerLabel" value="HYPERNET"
-      position="0 0.2 0" rotation="-90 0 0"
-      align="center" color="#4fc3f7" width="5" font="roboto"
-    ></a-text>
+    <a-text id="centerLabel" value="HYPERNET" position="0 0.2 0" rotation="-90 0 0"
+      align="center" color="#4fc3f7" width="5" font="roboto"></a-text>
   </a-entity>
 
-  <!-- VR navigation panel (visible in headset, follows camera) -->
+  <!-- VR nav panel -->
   <a-entity id="vrNavPanel" position="0 2.5 -3" visible="false" follow-camera="distance: 3.5; height: 2.2; speed: 0.02">
-    <!-- Background -->
-    <a-plane width="3.2" height="1.6" material="color: #12121a; opacity: 0.92; transparent: true" class="clickable"></a-plane>
-    <a-plane width="3.18" height="1.58" material="color: #2a2a3e; opacity: 0.3; transparent: true; side: front" position="0 0 -0.001"></a-plane>
-    <!-- Title -->
-    <a-text id="vrNavTitle" value="HYPERNET" position="0 0.55 0.01" align="center" color="#4fc3f7" width="4" font="roboto"></a-text>
-    <!-- Breadcrumb -->
-    <a-text id="vrNavBreadcrumb" value="" position="0 0.3 0.01" align="center" color="#888899" width="2.5" font="roboto"></a-text>
-    <!-- Stats -->
-    <a-text id="vrNavStats" value="" position="0 0.05 0.01" align="center" color="#e0e0e8" width="2.2" font="roboto"></a-text>
-    <!-- UP button -->
-    <a-entity id="vrUpBtn" position="-0.9 -0.4 0.01" class="clickable" vr-button="label: UP; color: #4fc3f7; action: up">
-      <a-plane width="0.8" height="0.45" material="color: #1a1a2e; opacity: 0.9; transparent: true" class="clickable"></a-plane>
-      <a-text value="UP" position="0 0 0.01" align="center" color="#4fc3f7" width="2.5" font="roboto"></a-text>
+    <a-plane width="3.4" height="1.8" material="color: #0a0a14; opacity: 0.94; transparent: true; side: double"></a-plane>
+    <a-plane width="3.38" height="1.78" material="color: #2a2a3e; opacity: 0.2; transparent: true" position="0 0 -0.001"></a-plane>
+    <a-text id="vrNavTitle" value="HYPERNET" position="0 0.6 0.01" align="center" color="#4fc3f7" width="4.5" font="roboto"></a-text>
+    <a-text id="vrNavBreadcrumb" value="" position="0 0.35 0.01" align="center" color="#888899" width="2.8" font="roboto"></a-text>
+    <a-text id="vrNavStats" value="" position="0 0.1 0.01" align="center" color="#e0e0e8" width="2.5" font="roboto"></a-text>
+    <a-entity position="-1.0 -0.45 0.01" class="clickable" vr-button="action: up">
+      <a-plane width="0.85" height="0.5" material="color: #161622; opacity: 0.9; transparent: true" class="clickable"></a-plane>
+      <a-text value="^ UP" position="0 0 0.01" align="center" color="#4fc3f7" width="2.8" font="roboto"></a-text>
     </a-entity>
-    <!-- ROOT button -->
-    <a-entity id="vrRootBtn" position="0 -0.4 0.01" class="clickable" vr-button="label: ROOT; color: #4fc3f7; action: root">
-      <a-plane width="0.8" height="0.45" material="color: #1a1a2e; opacity: 0.9; transparent: true" class="clickable"></a-plane>
-      <a-text value="ROOT" position="0 0 0.01" align="center" color="#4fc3f7" width="2.5" font="roboto"></a-text>
+    <a-entity position="0 -0.45 0.01" class="clickable" vr-button="action: root">
+      <a-plane width="0.85" height="0.5" material="color: #161622; opacity: 0.9; transparent: true" class="clickable"></a-plane>
+      <a-text value="ROOT" position="0 0 0.01" align="center" color="#4fc3f7" width="2.8" font="roboto"></a-text>
     </a-entity>
-    <!-- LAYOUT button -->
-    <a-entity id="vrLayoutBtn" position="0.9 -0.4 0.01" class="clickable" vr-button="label: LAYOUT; color: #4fc3f7; action: layout">
-      <a-plane width="0.8" height="0.45" material="color: #1a1a2e; opacity: 0.9; transparent: true" class="clickable"></a-plane>
-      <a-text value="LAYOUT" position="0 0 0.01" align="center" color="#4fc3f7" width="2.5" font="roboto"></a-text>
+    <a-entity position="1.0 -0.45 0.01" class="clickable" vr-button="action: layout">
+      <a-plane width="0.85" height="0.5" material="color: #161622; opacity: 0.9; transparent: true" class="clickable"></a-plane>
+      <a-text value="LAYOUT" position="0 0 0.01" align="center" color="#4fc3f7" width="2.8" font="roboto"></a-text>
     </a-entity>
   </a-entity>
 
-  <!-- VR info panel (appears near selected node) -->
+  <!-- VR info panel -->
   <a-entity id="vrInfoPanel" visible="false">
-    <a-plane id="vrInfoBg" width="2.4" height="2" material="color: #12121a; opacity: 0.93; transparent: true"></a-plane>
-    <a-text id="vrInfoTitle" value="" position="0 0.7 0.01" align="center" color="#4fc3f7" width="3" font="roboto"></a-text>
-    <a-text id="vrInfoAddr" value="" position="0 0.5 0.01" align="center" color="#7c4dff" width="2" font="roboto"></a-text>
-    <a-text id="vrInfoBody" value="" position="-1 0.3 0.01" align="left" color="#e0e0e8" width="2" font="roboto" wrap-count="45"></a-text>
-    <!-- Enter button -->
-    <a-entity id="vrInfoEnterBtn" position="0 -0.75 0.01" class="clickable">
-      <a-plane width="1.2" height="0.35" material="color: #1a1a2e; opacity: 0.9; transparent: true" class="clickable"></a-plane>
-      <a-text value="ENTER NODE" position="0 0 0.01" align="center" color="#4fc3f7" width="2.5" font="roboto"></a-text>
+    <a-plane id="vrInfoBg" width="2.6" height="2.2" material="color: #0a0a14; opacity: 0.94; transparent: true; side: double"></a-plane>
+    <a-text id="vrInfoTitle" value="" position="0 0.8 0.01" align="center" color="#4fc3f7" width="3.5" font="roboto"></a-text>
+    <a-text id="vrInfoAddr" value="" position="0 0.55 0.01" align="center" color="#7c4dff" width="2.2" font="roboto"></a-text>
+    <a-text id="vrInfoBody" value="" position="-1.1 0.35 0.01" align="left" color="#e0e0e8" width="2.2" font="roboto" wrap-count="40"></a-text>
+    <a-entity id="vrInfoEnterBtn" position="0 -0.85 0.01" class="clickable">
+      <a-plane width="1.4" height="0.4" material="color: #161622; opacity: 0.9; transparent: true" class="clickable"></a-plane>
+      <a-text value=">> ENTER NODE <<" position="0 0 0.01" align="center" color="#4fc3f7" width="2.8" font="roboto"></a-text>
     </a-entity>
   </a-entity>
 
-  <!-- Container for child nodes -->
+  <!-- Containers -->
   <a-entity id="nodeContainer"></a-entity>
-
-  <!-- Container for link lines -->
   <a-entity id="linkContainer"></a-entity>
 
-  <!-- Empty state message (no children) -->
-  <a-entity id="emptyState" position="0 2 0" visible="false">
-    <a-text value="This node has no children." align="center" color="#555566" width="5" font="roboto" billboard></a-text>
-    <a-text value="Press UP to go back" position="0 -0.5 0" align="center" color="#2a2a3e" width="3" font="roboto" billboard></a-text>
+  <!-- Empty state -->
+  <a-entity id="emptyState" position="0 2.5 0" visible="false">
+    <a-text value="Leaf Node" align="center" color="#555566" width="5" font="roboto" billboard></a-text>
+    <a-text value="No children. Press UP to go back." position="0 -0.5 0" align="center" color="#333344" width="3.5" font="roboto" billboard></a-text>
   </a-entity>
-
-  <!-- Transition flash -->
-  <a-sphere id="transitionFlash" radius="0.3" position="0 1.6 0"
-    material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 1; opacity: 0; transparent: true; side: back"
-    visible="false"
-  ></a-sphere>
 
   <!-- Ambient particles -->
   <a-entity id="particles"></a-entity>
 
-  <!-- Sky -->
-  <a-sky color="#030306"></a-sky>
+  <!-- Stars -->
+  <a-entity id="starfield"></a-entity>
 
+  <a-sky color="#020204"></a-sky>
 </a-scene>
 
 <script>
 // ================================================================
-//  HYPERNET VR — Immersive spatial browser for the Hypernet
-//  Works on: Meta Quest (WebXR), Desktop (mouse+WASD), Mobile
+//  HYPERNET VR — Immersive Spatial Browser
+//  Works on: Meta Quest (WebXR), Desktop (WASD+Mouse), Mobile
 // ================================================================
 
 const API = window.location.origin;
@@ -314,135 +315,257 @@ const API = window.location.origin;
 let currentAddress = null;
 let childNodes = [];
 let layoutMode = 'orbital';
-const LAYOUTS = ['orbital', 'grid', 'helix', 'tree'];
+const LAYOUTS = ['orbital', 'grid', 'helix', 'tree', 'constellation'];
 let layoutIndex = 0;
 let selectedNode = null;
 let selectedNodeAddr = null;
 let showLinksEnabled = false;
 let isVR = false;
-let nodePositions = {};  // addr -> {x,y,z}
+let nodePositions = {};
 let navigationHistory = [];
+let audioEnabled = false;
+let audioCtx = null;
+let ambientGain = null;
+let navigating = false;
 
-// --- Color palette for Hypernet categories ---
+// --- Colors ---
 const COLORS = {
-  '0': '#4fc3f7',  // Infrastructure
-  '1': '#4caf50',  // People
-  '2': '#7c4dff',  // AI Accounts
-  '3': '#ff9800',  // Organizations
-  '4': '#f44336',  // Physical
-  '5': '#26a69a',  // Digital
-  '6': '#ffd54f',  // Links
-  '7': '#e91e63',  // Events
-  '8': '#00bcd4',  // Knowledge
-  '9': '#9c27b0',  // Extensions
+  '0': '#4fc3f7', '1': '#4caf50', '2': '#7c4dff', '3': '#ff9800', '4': '#f44336',
+  '5': '#26a69a', '6': '#ffd54f', '7': '#e91e63', '8': '#00bcd4', '9': '#9c27b0',
 };
-
 const CATEGORY_NAMES = {
-  '0': 'Infrastructure', '1': 'People', '2': 'AI', '3': 'Organizations',
-  '4': 'Physical', '5': 'Digital', '6': 'Links', '7': 'Events',
-  '8': 'Knowledge', '9': 'Extensions',
+  '0': 'Infrastructure', '1': 'People', '2': 'AI Accounts', '3': 'Organizations',
+  '4': 'Physical', '5': 'Digital', '6': 'Links', '7': 'Events', '8': 'Knowledge', '9': 'Extensions',
 };
 
 function getColor(address) {
   if (!address) return '#4fc3f7';
   return COLORS[String(address).split('.')[0]] || '#4fc3f7';
 }
-
 function getCategoryName(address) {
   if (!address) return '';
   return CATEGORY_NAMES[String(address).split('.')[0]] || '';
 }
+function hexToRGB(hex) {
+  const r = parseInt(hex.slice(1,3), 16) / 255;
+  const g = parseInt(hex.slice(3,5), 16) / 255;
+  const b = parseInt(hex.slice(5,7), 16) / 255;
+  return {r, g, b};
+}
+function getDepth() {
+  return currentAddress ? currentAddress.split('.').length : 0;
+}
 
 // ================================================================
-//  A-Frame Custom Components
+//  A-Frame Components
 // ================================================================
 
-// Billboard: text always faces camera (Y-axis only for readability)
 AFRAME.registerComponent('billboard', {
   tick: function() {
     const cam = document.getElementById('camera');
     if (!cam) return;
     const cp = cam.object3D.getWorldPosition(new THREE.Vector3());
-    const p = this.el.object3D.position;
-    this.el.object3D.lookAt(cp.x, p.y, cp.z);
+    this.el.object3D.lookAt(cp.x, this.el.object3D.position.y, cp.z);
   }
 });
 
-// Follow-camera: keeps VR nav panel in front of the user
 AFRAME.registerComponent('follow-camera', {
-  schema: { distance: {type: 'number', default: 3}, height: {type: 'number', default: 2.2}, speed: {type: 'number', default: 0.03} },
+  schema: { distance: {default: 3}, height: {default: 2.2}, speed: {default: 0.03} },
   tick: function() {
     if (!isVR) return;
     const cam = document.getElementById('camera');
     if (!cam) return;
-    const camPos = new THREE.Vector3();
-    const camDir = new THREE.Vector3();
-    cam.object3D.getWorldPosition(camPos);
-    cam.object3D.getWorldDirection(camDir);
-    // Target position: in front of camera
-    const targetX = camPos.x - camDir.x * this.data.distance;
-    const targetY = this.data.height;
-    const targetZ = camPos.z - camDir.z * this.data.distance;
-    // Smooth lerp
+    const cp = new THREE.Vector3(), cd = new THREE.Vector3();
+    cam.object3D.getWorldPosition(cp);
+    cam.object3D.getWorldDirection(cd);
+    const tx = cp.x - cd.x * this.data.distance;
+    const tz = cp.z - cd.z * this.data.distance;
     const p = this.el.object3D.position;
     const s = this.data.speed;
-    p.x += (targetX - p.x) * s;
-    p.y += (targetY - p.y) * s;
-    p.z += (targetZ - p.z) * s;
-    // Face camera
-    this.el.object3D.lookAt(camPos.x, p.y, camPos.z);
+    p.x += (tx - p.x) * s;
+    p.y += (this.data.height - p.y) * s;
+    p.z += (tz - p.z) * s;
+    this.el.object3D.lookAt(cp.x, p.y, cp.z);
   }
 });
 
-// VR button handler
 AFRAME.registerComponent('vr-button', {
-  schema: { label: {type: 'string'}, color: {type: 'string', default: '#4fc3f7'}, action: {type: 'string'} },
+  schema: { action: {type: 'string'} },
   init: function() {
     const plane = this.el.querySelector('a-plane');
-    if (plane) {
-      plane.addEventListener('click', () => {
-        switch(this.data.action) {
-          case 'up': navigateUp(); break;
-          case 'root': navigateToRoot(); break;
-          case 'layout': cycleLayout(); break;
-        }
-      });
-      plane.addEventListener('mouseenter', () => {
-        plane.setAttribute('material', 'color', '#2a2a3e');
-      });
-      plane.addEventListener('mouseleave', () => {
-        plane.setAttribute('material', 'color', '#1a1a2e');
-      });
-    }
+    if (!plane) return;
+    plane.addEventListener('click', () => {
+      switch(this.data.action) {
+        case 'up': navigateUp(); break;
+        case 'root': navigateToRoot(); break;
+        case 'layout': cycleLayout(); break;
+      }
+      playNavSound();
+    });
+    plane.addEventListener('mouseenter', () => plane.setAttribute('material', 'color', '#2a2a3e'));
+    plane.addEventListener('mouseleave', () => plane.setAttribute('material', 'color', '#161622'));
   }
 });
 
-// Hover glow effect for node spheres
-AFRAME.registerComponent('node-hover', {
+AFRAME.registerComponent('node-interact', {
   schema: { color: {type: 'string'}, addr: {type: 'string'}, nodeData: {type: 'string'} },
   init: function() {
-    const color = this.data.color;
     this.el.addEventListener('mouseenter', () => {
-      this.el.setAttribute('material', 'emissiveIntensity', 0.6);
-      this.el.setAttribute('scale', '1.15 1.15 1.15');
-      // Show info
-      try {
-        const node = JSON.parse(this.data.nodeData);
-        showNodeInfo(node);
-      } catch(e) {}
+      this.el.setAttribute('material', 'emissiveIntensity', 0.7);
+      this.el.object3D.scale.set(1.2, 1.2, 1.2);
+      // Expand the glow
+      const parent = this.el.parentEl;
+      const glow = parent?.querySelector('.node-glow');
+      if (glow) glow.object3D.scale.set(1.3, 1.3, 1.3);
+      try { showNodeInfo(JSON.parse(this.data.nodeData)); } catch(e) {}
+      playHoverSound();
     });
     this.el.addEventListener('mouseleave', () => {
-      this.el.setAttribute('material', 'emissiveIntensity', 0.2);
-      this.el.setAttribute('scale', '1 1 1');
+      this.el.setAttribute('material', 'emissiveIntensity', 0.25);
+      this.el.object3D.scale.set(1, 1, 1);
+      const parent = this.el.parentEl;
+      const glow = parent?.querySelector('.node-glow');
+      if (glow) glow.object3D.scale.set(1, 1, 1);
     });
     this.el.addEventListener('click', () => {
+      playNavSound();
       navigateTo(this.data.addr);
     });
   }
 });
 
+// Animated energy beam along connection lines
+AFRAME.registerComponent('energy-beam', {
+  schema: { color: {type: 'string', default: '#4fc3f7'}, speed: {default: 2} },
+  init: function() {
+    this.particle = document.createElement('a-sphere');
+    this.particle.setAttribute('radius', 0.035);
+    this.particle.setAttribute('material', `color: ${this.data.color}; emissive: ${this.data.color}; emissiveIntensity: 1; opacity: 0.7; transparent: true`);
+    this.el.appendChild(this.particle);
+    this.t = Math.random(); // random start phase
+  },
+  tick: function(time, delta) {
+    if (!delta) return;
+    this.t = (this.t + delta * 0.001 * this.data.speed * 0.15) % 1;
+    const line = this.el.getAttribute('line');
+    if (!line) return;
+    // Parse start and end from line attribute
+    const startMatch = line.match(/start:\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/);
+    const endMatch = line.match(/end:\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/);
+    if (startMatch && endMatch) {
+      const sx = parseFloat(startMatch[1]), sy = parseFloat(startMatch[2]), sz = parseFloat(startMatch[3]);
+      const ex = parseFloat(endMatch[1]), ey = parseFloat(endMatch[2]), ez = parseFloat(endMatch[3]);
+      const t = this.t;
+      this.particle.object3D.position.set(
+        sx + (ex - sx) * t,
+        sy + (ey - sy) * t,
+        sz + (ez - sz) * t
+      );
+    }
+  }
+});
+
 // ================================================================
-//  API Calls
+//  Audio — Procedural Ambient Soundscape
+// ================================================================
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  ambientGain = audioCtx.createGain();
+  ambientGain.gain.value = 0;
+  ambientGain.connect(audioCtx.destination);
+
+  // Deep drone — layered oscillators
+  const freqs = [55, 82.5, 110, 165];
+  freqs.forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0.04 / (i + 1);
+    // Slow LFO for movement
+    const lfo = audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.05 + i * 0.02;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 0.015;
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+    lfo.start();
+    osc.connect(gain);
+    gain.connect(ambientGain);
+    osc.start();
+  });
+
+  // Filtered noise for atmosphere
+  const bufferSize = audioCtx.sampleRate * 2;
+  const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = noiseBuffer;
+  noise.loop = true;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 200;
+  filter.Q.value = 1;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.value = 0.008;
+  noise.connect(filter);
+  filter.connect(noiseGain);
+  noiseGain.connect(ambientGain);
+  noise.start();
+}
+
+function toggleSound() {
+  audioEnabled = !audioEnabled;
+  const btn = document.getElementById('soundBtn');
+  if (audioEnabled) {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    ambientGain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 1);
+    btn.innerHTML = '&#128266;';
+    btn.classList.add('active-toggle');
+  } else {
+    if (ambientGain) ambientGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+    btn.innerHTML = '&#128264;';
+    btn.classList.remove('active-toggle');
+  }
+}
+
+function playNavSound() {
+  if (!audioEnabled || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+  osc.frequency.exponentialRampToValueAtTime(660, audioCtx.currentTime + 0.15);
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+  osc.connect(g);
+  g.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.3);
+}
+
+function playHoverSound() {
+  if (!audioEnabled || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 600 + Math.random() * 200;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+  osc.connect(g);
+  g.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.12);
+}
+
+// ================================================================
+//  API
 // ================================================================
 
 async function fetchChildren(address) {
@@ -450,141 +573,115 @@ async function fetchChildren(address) {
     const url = address ? `${API}/children/${address}` : `${API}/children`;
     const res = await fetch(url);
     if (!res.ok) {
-      // Fallback to query endpoint
-      const fallback = address ? `${API}/query?prefix=${address}` : `${API}/query`;
-      const res2 = await fetch(fallback);
-      if (!res2.ok) return [];
-      const all = await res2.json();
+      const fb = address ? `${API}/query?prefix=${address}` : `${API}/query`;
+      const r2 = await fetch(fb);
+      if (!r2.ok) return [];
+      const all = await r2.json();
       if (!address) return all.filter(n => n.address.split('.').length === 1);
-      const depth = address.split('.').length + 1;
-      return all.filter(n => n.address.startsWith(address + '.') && n.address.split('.').length === depth);
+      const d = address.split('.').length + 1;
+      return all.filter(n => n.address.startsWith(address + '.') && n.address.split('.').length === d);
     }
     return await res.json();
-  } catch (e) {
-    console.error('fetchChildren error:', e);
-    return [];
-  }
+  } catch (e) { console.error('fetchChildren:', e); return []; }
 }
 
-async function fetchNode(address) {
-  try {
-    const res = await fetch(`${API}/node/${address}`);
-    return res.ok ? await res.json() : null;
-  } catch (e) { return null; }
+async function fetchNode(addr) {
+  try { const r = await fetch(`${API}/node/${addr}`); return r.ok ? await r.json() : null; } catch(e) { return null; }
 }
 
-async function fetchLinks(address) {
-  try {
-    const res = await fetch(`${API}/node/${address}/links?direction=both`);
-    return res.ok ? await res.json() : [];
-  } catch (e) { return []; }
+async function fetchLinks(addr) {
+  try { const r = await fetch(`${API}/node/${addr}/links?direction=both`); return r.ok ? await r.json() : []; } catch(e) { return []; }
 }
 
 async function fetchStats() {
-  try {
-    const res = await fetch(`${API}/stats`);
-    return res.ok ? await res.json() : {};
-  } catch (e) { return {}; }
+  try { const r = await fetch(`${API}/stats`); return r.ok ? await r.json() : {}; } catch(e) { return {}; }
 }
 
 // ================================================================
-//  Layout Algorithms
+//  Layouts
 // ================================================================
 
 function layoutOrbital(nodes) {
-  const count = nodes.length;
-  if (count === 0) return [];
-  const radius = Math.max(4, Math.min(count * 0.8, 18));
-  const positions = [];
-  for (let i = 0; i < count; i++) {
-    const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-    const childCount = nodes[i].child_count || 0;
-    const yBase = 1.2;
-    const yVar = Math.sin(i * 1.3) * 0.4;
-    positions.push({
-      x: Math.cos(angle) * radius,
-      y: yBase + yVar,
-      z: Math.sin(angle) * radius
-    });
-  }
-  return positions;
+  const n = nodes.length; if (!n) return [];
+  const r = Math.max(4.5, Math.min(n * 0.9, 20));
+  return nodes.map((nd, i) => {
+    const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+    return { x: Math.cos(a) * r, y: 1.3 + Math.sin(i * 1.3) * 0.5, z: Math.sin(a) * r };
+  });
 }
 
 function layoutGrid(nodes) {
-  const count = nodes.length;
-  if (count === 0) return [];
-  const cols = Math.ceil(Math.sqrt(count));
-  const spacing = 3;
-  const positions = [];
-  for (let i = 0; i < count; i++) {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    positions.push({
-      x: (col - (cols - 1) / 2) * spacing,
-      y: 1.2,
-      z: (row - (Math.ceil(count / cols) - 1) / 2) * spacing
-    });
-  }
-  return positions;
+  const n = nodes.length; if (!n) return [];
+  const cols = Math.ceil(Math.sqrt(n)), sp = 3.2;
+  return nodes.map((nd, i) => ({
+    x: (i % cols - (cols-1)/2) * sp, y: 1.3, z: (Math.floor(i/cols) - (Math.ceil(n/cols)-1)/2) * sp
+  }));
 }
 
 function layoutHelix(nodes) {
-  const count = nodes.length;
-  if (count === 0) return [];
-  const positions = [];
-  const turns = Math.max(1, count / 6);
-  const radius = Math.max(4, count * 0.5);
-  const heightRange = Math.max(3, count * 0.4);
-  for (let i = 0; i < count; i++) {
-    const t = i / Math.max(1, count - 1);
-    const angle = t * turns * Math.PI * 2;
-    positions.push({
-      x: Math.cos(angle) * radius,
-      y: 0.5 + t * heightRange,
-      z: Math.sin(angle) * radius
-    });
-  }
-  return positions;
+  const n = nodes.length; if (!n) return [];
+  const turns = Math.max(1, n / 6), r = Math.max(4.5, n * 0.5), h = Math.max(4, n * 0.5);
+  return nodes.map((nd, i) => {
+    const t = i / Math.max(1, n-1), a = t * turns * Math.PI * 2;
+    return { x: Math.cos(a) * r, y: 0.5 + t * h, z: Math.sin(a) * r };
+  });
 }
 
 function layoutTree(nodes) {
-  const count = nodes.length;
-  if (count === 0) return [];
-  // Sort by address for consistent ordering
-  const sorted = [...nodes].sort((a, b) => a.address.localeCompare(b.address));
-  const positions = [];
-  const fanAngle = Math.min(Math.PI * 1.8, count * 0.3);
-  const startAngle = -fanAngle / 2 - Math.PI / 2;
-  const radius = Math.max(5, count * 0.7);
-  for (let i = 0; i < count; i++) {
-    const angle = startAngle + (i / Math.max(1, count - 1)) * fanAngle;
-    positions.push({
-      x: Math.cos(angle) * radius,
-      y: 1.2 + (sorted[i].child_count || 0) * 0.15,
-      z: Math.sin(angle) * radius
+  const n = nodes.length; if (!n) return [];
+  const sorted = [...nodes].sort((a,b) => a.address.localeCompare(b.address));
+  const fan = Math.min(Math.PI * 1.8, n * 0.3);
+  const start = -fan/2 - Math.PI/2;
+  const r = Math.max(5, n * 0.7);
+  return sorted.map((nd, i) => {
+    const a = n === 1 ? -Math.PI/2 : start + (i/(n-1)) * fan;
+    return { x: Math.cos(a) * r, y: 1.3 + (nd.child_count || 0) * 0.15, z: Math.sin(a) * r };
+  });
+}
+
+function layoutConstellation(nodes) {
+  const n = nodes.length; if (!n) return [];
+  // Clustered groups — nodes with similar addresses cluster together
+  const groups = {};
+  nodes.forEach((nd, i) => {
+    const parts = nd.address.split('.');
+    const group = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '0';
+    if (!groups[group]) groups[group] = [];
+    groups[group].push(i);
+  });
+  const positions = new Array(n);
+  const gKeys = Object.keys(groups);
+  const gRadius = Math.max(5, gKeys.length * 2);
+  gKeys.forEach((gk, gi) => {
+    const ga = (gi / gKeys.length) * Math.PI * 2;
+    const gcx = Math.cos(ga) * gRadius, gcz = Math.sin(ga) * gRadius;
+    const members = groups[gk];
+    const mr = Math.max(1.5, members.length * 0.6);
+    members.forEach((mi, j) => {
+      const ma = (j / members.length) * Math.PI * 2;
+      positions[mi] = {
+        x: gcx + Math.cos(ma) * mr,
+        y: 1.3 + Math.random() * 1.5,
+        z: gcz + Math.sin(ma) * mr
+      };
     });
-  }
+  });
   return positions;
 }
 
 function getPositions(nodes) {
-  switch(layoutMode) {
-    case 'orbital': return layoutOrbital(nodes);
-    case 'grid': return layoutGrid(nodes);
-    case 'helix': return layoutHelix(nodes);
-    case 'tree': return layoutTree(nodes);
-    default: return layoutOrbital(nodes);
-  }
+  const fn = { orbital: layoutOrbital, grid: layoutGrid, helix: layoutHelix, tree: layoutTree, constellation: layoutConstellation };
+  return (fn[layoutMode] || layoutOrbital)(nodes);
 }
 
 // ================================================================
-//  Scene Rendering
+//  Node Rendering
 // ================================================================
 
 function clearScene() {
   ['nodeContainer', 'linkContainer'].forEach(id => {
     const el = document.getElementById(id);
-    while (el && el.firstChild) el.removeChild(el.firstChild);
+    while (el?.firstChild) el.removeChild(el.firstChild);
   });
   nodePositions = {};
 }
@@ -593,90 +690,116 @@ function createNodeEntity(node, pos, index) {
   const color = getColor(node.address);
   const addr = node.address;
   const title = node.data?.title || node.data?.name || addr;
-  const shortTitle = title.length > 28 ? title.substring(0, 26) + '..' : title;
-  const childCount = node.child_count || 0;
+  const shortTitle = title.length > 26 ? title.substring(0, 24) + '..' : title;
+  const cc = node.child_count || 0;
+  const radius = 0.28 + Math.min(0.22, cc * 0.018);
 
-  // Size based on child count (more children = bigger)
-  const baseRadius = 0.3;
-  const sizeBonus = Math.min(0.3, childCount * 0.02);
-  const radius = baseRadius + sizeBonus;
+  const w = document.createElement('a-entity');
+  w.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+  w.setAttribute('animation__enter', `property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 500; delay: ${index * 30}; easing: easeOutElastic`);
 
-  const wrapper = document.createElement('a-entity');
-  wrapper.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
-  wrapper.setAttribute('animation__enter', `property: scale; from: 0 0 0; to: 1 1 1; dur: 400; delay: ${index * 40}; easing: easeOutBack`);
+  // Outer glow (transparent larger sphere)
+  const glow = document.createElement('a-sphere');
+  glow.setAttribute('radius', radius * 2.2);
+  glow.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.15; opacity: 0.06; transparent: true; side: back`);
+  glow.setAttribute('class', 'node-glow');
+  w.appendChild(glow);
 
   // Main sphere
   const sphere = document.createElement('a-sphere');
   sphere.setAttribute('radius', radius);
-  sphere.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.2; metalness: 0.4; roughness: 0.6`);
+  sphere.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.25; metalness: 0.5; roughness: 0.4`);
   sphere.setAttribute('class', 'clickable');
-  // Serialize node data for the hover component (keep it small)
-  const miniData = { address: addr, data: node.data || {}, type_address: node.type_address, child_count: childCount, created_at: node.created_at };
-  sphere.setAttribute('node-hover', `color: ${color}; addr: ${addr}; nodeData: ${JSON.stringify(miniData).replace(/"/g, '&quot;')}`);
-  wrapper.appendChild(sphere);
+  const miniData = { address: addr, data: node.data || {}, type_address: node.type_address, child_count: cc, created_at: node.created_at };
+  sphere.setAttribute('node-interact', `color: ${color}; addr: ${addr}; nodeData: ${JSON.stringify(miniData).replace(/"/g, '&quot;')}`);
+  w.appendChild(sphere);
 
-  // Orbital ring
+  // Inner core point light (subtle)
+  if (cc > 5) {
+    const inner = document.createElement('a-sphere');
+    inner.setAttribute('radius', radius * 0.3);
+    inner.setAttribute('material', `color: white; emissive: ${color}; emissiveIntensity: 1; opacity: 0.5; transparent: true`);
+    inner.setAttribute('animation', `property: material.emissiveIntensity; from: 0.6; to: 1.2; dur: ${2000 + index * 200}; dir: alternate; loop: true`);
+    w.appendChild(inner);
+  }
+
+  // Orbital ring — tilted uniquely per node
   const ring = document.createElement('a-torus');
-  ring.setAttribute('radius', radius + 0.2);
-  ring.setAttribute('radius-tubular', 0.008);
-  ring.setAttribute('segments-tubular', 24);
-  ring.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.4; opacity: 0.35; transparent: true`);
-  ring.setAttribute('rotation', `${60 + index * 7} 0 0`);
-  ring.setAttribute('animation', `property: rotation; to: ${60 + index * 7} 360 0; dur: ${6000 + index * 500}; easing: linear; loop: true`);
-  wrapper.appendChild(ring);
+  ring.setAttribute('radius', radius + 0.18);
+  ring.setAttribute('radius-tubular', 0.006);
+  ring.setAttribute('segments-tubular', 20);
+  ring.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.5; opacity: 0.3; transparent: true`);
+  const tilt = 50 + (index * 17) % 80;
+  ring.setAttribute('rotation', `${tilt} 0 0`);
+  ring.setAttribute('animation', `property: rotation; to: ${tilt} 360 0; dur: ${5000 + (index * 700) % 4000}; easing: linear; loop: true`);
+  w.appendChild(ring);
 
-  // Title text (above)
-  const titleEl = document.createElement('a-text');
-  titleEl.setAttribute('value', shortTitle);
-  titleEl.setAttribute('position', `0 ${radius + 0.35} 0`);
-  titleEl.setAttribute('align', 'center');
-  titleEl.setAttribute('color', '#e0e0e8');
-  titleEl.setAttribute('width', 3);
-  titleEl.setAttribute('billboard', '');
-  wrapper.appendChild(titleEl);
+  // Second ring for nodes with many children
+  if (cc > 10) {
+    const ring2 = document.createElement('a-torus');
+    ring2.setAttribute('radius', radius + 0.28);
+    ring2.setAttribute('radius-tubular', 0.004);
+    ring2.setAttribute('segments-tubular', 16);
+    ring2.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.3; opacity: 0.15; transparent: true`);
+    ring2.setAttribute('rotation', `${90 - tilt} 0 0`);
+    ring2.setAttribute('animation', `property: rotation; to: ${90 - tilt} -360 0; dur: ${7000 + (index * 500) % 3000}; easing: linear; loop: true`);
+    w.appendChild(ring2);
+  }
 
-  // Address text (below)
-  const addrEl = document.createElement('a-text');
-  addrEl.setAttribute('value', addr);
-  addrEl.setAttribute('position', `0 ${-radius - 0.25} 0`);
-  addrEl.setAttribute('align', 'center');
-  addrEl.setAttribute('color', color);
-  addrEl.setAttribute('width', 2.5);
-  addrEl.setAttribute('billboard', '');
-  wrapper.appendChild(addrEl);
+  // Title (above)
+  const tEl = document.createElement('a-text');
+  tEl.setAttribute('value', shortTitle);
+  tEl.setAttribute('position', `0 ${radius + 0.38} 0`);
+  tEl.setAttribute('align', 'center');
+  tEl.setAttribute('color', '#e0e0e8');
+  tEl.setAttribute('width', 3.2);
+  tEl.setAttribute('billboard', '');
+  w.appendChild(tEl);
+
+  // Address (below)
+  const aEl = document.createElement('a-text');
+  aEl.setAttribute('value', addr);
+  aEl.setAttribute('position', `0 ${-radius - 0.28} 0`);
+  aEl.setAttribute('align', 'center');
+  aEl.setAttribute('color', color);
+  aEl.setAttribute('width', 2.8);
+  aEl.setAttribute('billboard', '');
+  w.appendChild(aEl);
 
   // Child count badge
-  if (childCount > 0) {
-    const badge = document.createElement('a-text');
-    badge.setAttribute('value', `${childCount} children`);
-    badge.setAttribute('position', `0 ${-radius - 0.5} 0`);
-    badge.setAttribute('align', 'center');
-    badge.setAttribute('color', '#555566');
-    badge.setAttribute('width', 1.8);
-    badge.setAttribute('billboard', '');
-    wrapper.appendChild(badge);
+  if (cc > 0) {
+    const b = document.createElement('a-text');
+    b.setAttribute('value', cc > 99 ? '99+' : `${cc}`);
+    b.setAttribute('position', `${radius + 0.15} ${radius + 0.15} 0`);
+    b.setAttribute('align', 'center');
+    b.setAttribute('color', color);
+    b.setAttribute('width', 1.5);
+    b.setAttribute('billboard', '');
+    w.appendChild(b);
   }
 
-  // Category label (if at root level)
-  const catName = getCategoryName(addr);
-  if (catName && addr.split('.').length === 1) {
-    const catEl = document.createElement('a-text');
-    catEl.setAttribute('value', catName);
-    catEl.setAttribute('position', `0 ${radius + 0.65} 0`);
-    catEl.setAttribute('align', 'center');
-    catEl.setAttribute('color', color);
-    catEl.setAttribute('width', 2);
-    catEl.setAttribute('opacity', 0.6);
-    catEl.setAttribute('billboard', '');
-    wrapper.appendChild(catEl);
+  // Category label at root level
+  const cat = getCategoryName(addr);
+  if (cat && addr.split('.').length === 1) {
+    const cEl = document.createElement('a-text');
+    cEl.setAttribute('value', cat);
+    cEl.setAttribute('position', `0 ${radius + 0.7} 0`);
+    cEl.setAttribute('align', 'center');
+    cEl.setAttribute('color', color);
+    cEl.setAttribute('width', 2.2);
+    cEl.setAttribute('opacity', 0.5);
+    cEl.setAttribute('billboard', '');
+    w.appendChild(cEl);
   }
 
-  return wrapper;
+  return w;
 }
 
-function createConnectionLine(pos, color) {
+function createEnergyBeam(pos, color, index) {
   const el = document.createElement('a-entity');
-  el.setAttribute('line', `start: 0 0.3 0; end: ${pos.x} ${pos.y} ${pos.z}; color: ${color}; opacity: 0.15`);
+  el.setAttribute('line', `start: 0 0.5 0; end: ${pos.x} ${pos.y} ${pos.z}; color: ${color}; opacity: 0.12`);
+  // Animated particle along the beam
+  el.setAttribute('energy-beam', `color: ${color}; speed: ${1.5 + (index % 3) * 0.5}`);
   return el;
 }
 
@@ -684,53 +807,62 @@ function renderScene(nodes, animate = true) {
   clearScene();
   const container = document.getElementById('nodeContainer');
   const linkCont = document.getElementById('linkContainer');
-
   const positions = getPositions(nodes);
 
   for (let i = 0; i < nodes.length; i++) {
     const pos = positions[i];
     nodePositions[nodes[i].address] = pos;
-
-    const nodeEl = createNodeEntity(nodes[i], pos, animate ? i : 0);
-    container.appendChild(nodeEl);
-
-    // Connection line to center
+    container.appendChild(createNodeEntity(nodes[i], pos, animate ? i : 0));
     const color = getColor(nodes[i].address);
-    linkCont.appendChild(createConnectionLine(pos, color));
+    linkCont.appendChild(createEnergyBeam(pos, color, i));
   }
 
   // Update center
-  const centerLabel = document.getElementById('centerLabel');
-  centerLabel.setAttribute('value', currentAddress || 'HYPERNET');
   const centerColor = currentAddress ? getColor(currentAddress) : '#4fc3f7';
-  document.getElementById('centerDisc').setAttribute('material', `color: ${centerColor}; emissive: ${centerColor}; emissiveIntensity: 0.15; opacity: 0.5; transparent: true`);
-  document.getElementById('centerPulse').setAttribute('material', `color: ${centerColor}; emissive: ${centerColor}; emissiveIntensity: 0.4; opacity: 0.3; transparent: true`);
+  document.getElementById('centerLabel').setAttribute('value', currentAddress || 'HYPERNET');
+  document.getElementById('centerDisc').setAttribute('material', `color: ${centerColor}; emissive: ${centerColor}; emissiveIntensity: 0.2; opacity: 0.4; transparent: true`);
+  document.getElementById('centerCore').setAttribute('material', `color: ${centerColor}; emissive: ${centerColor}; emissiveIntensity: 0.8; opacity: 0.6; transparent: true`);
+  document.getElementById('centerPulse1').setAttribute('material', `color: ${centerColor}; emissive: ${centerColor}; emissiveIntensity: 0.3; opacity: 0.25; transparent: true`);
+
+  // Depth rings
+  updateDepthRings();
 
   // Empty state
   const emptyEl = document.getElementById('emptyState');
-  if (emptyEl) emptyEl.setAttribute('visible', nodes.length === 0 && currentAddress);
+  if (emptyEl) emptyEl.setAttribute('visible', nodes.length === 0 && currentAddress !== null);
 
-  // If links enabled, fetch and draw
-  if (showLinksEnabled && currentAddress) {
-    drawInterNodeLinks();
-  }
-
+  if (showLinksEnabled && currentAddress) drawInterNodeLinks();
   updateMinimap(nodes, positions);
 }
 
-// Draw links between sibling nodes
+function updateDepthRings() {
+  const container = document.getElementById('depthRings');
+  while (container?.firstChild) container.removeChild(container.firstChild);
+  const depth = getDepth();
+  for (let i = 0; i < depth && i < 6; i++) {
+    const ring = document.createElement('a-torus');
+    const r = 2.5 + i * 0.6;
+    ring.setAttribute('radius', r);
+    ring.setAttribute('radius-tubular', 0.005);
+    ring.setAttribute('segments-tubular', 48);
+    ring.setAttribute('rotation', '90 0 0');
+    ring.setAttribute('position', '0 0.01 0');
+    const opacity = 0.15 - i * 0.02;
+    ring.setAttribute('material', `color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.3; opacity: ${Math.max(0.03, opacity)}; transparent: true`);
+    container.appendChild(ring);
+  }
+}
+
 async function drawInterNodeLinks() {
   if (!currentAddress || childNodes.length === 0) return;
   const linkCont = document.getElementById('linkContainer');
-
   for (const node of childNodes) {
     const links = await fetchLinks(node.address);
     for (const link of links) {
-      const fromPos = nodePositions[link.from_address];
-      const toPos = nodePositions[link.to_address];
-      if (fromPos && toPos) {
+      const fp = nodePositions[link.from_address], tp = nodePositions[link.to_address];
+      if (fp && tp) {
         const el = document.createElement('a-entity');
-        el.setAttribute('line', `start: ${fromPos.x} ${fromPos.y} ${fromPos.z}; end: ${toPos.x} ${toPos.y} ${toPos.z}; color: #ffd54f; opacity: 0.25`);
+        el.setAttribute('line', `start: ${fp.x} ${fp.y} ${fp.z}; end: ${tp.x} ${tp.y} ${tp.z}; color: #ffd54f; opacity: 0.2`);
         linkCont.appendChild(el);
       }
     }
@@ -742,23 +874,13 @@ async function drawInterNodeLinks() {
 // ================================================================
 
 async function navigateTo(address) {
-  if (address === currentAddress) return;
+  if (address === currentAddress || navigating) return;
+  navigating = true;
 
   showLoading(true);
   closeInfo();
 
-  // Transition flash in VR
-  if (isVR) {
-    const flash = document.getElementById('transitionFlash');
-    const color = address ? getColor(address) : '#4fc3f7';
-    flash.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 1; opacity: 0; transparent: true; side: back`);
-    flash.setAttribute('visible', 'true');
-    flash.setAttribute('animation__flash', 'property: material.opacity; from: 0.5; to: 0; dur: 600; easing: easeOutQuad');
-    flash.setAttribute('animation__grow', 'property: scale; from: 1 1 1; to: 50 50 50; dur: 600; easing: easeOutQuad');
-    setTimeout(() => { flash.setAttribute('visible', 'false'); flash.setAttribute('scale', '1 1 1'); }, 700);
-  }
-
-  // Push to history
+  // Push history
   if (currentAddress !== null || address !== null) {
     navigationHistory.push(currentAddress);
     if (navigationHistory.length > 50) navigationHistory.shift();
@@ -767,72 +889,54 @@ async function navigateTo(address) {
   currentAddress = address;
   updateHUD();
 
-  // Move camera smoothly
+  // Camera reset
   const rig = document.getElementById('cameraRig');
-  const count = childNodes.length || 5;
-  const targetZ = Math.max(8, Math.min(count * 1.2, 18));
-  rig.setAttribute('animation__nav', `property: position; to: 0 0 ${targetZ}; dur: 600; easing: easeInOutQuad`);
+  rig.setAttribute('animation__nav', `property: position; to: 0 0 14; dur: 500; easing: easeInOutQuad`);
 
   const children = await fetchChildren(address);
   childNodes = children;
   renderScene(children);
 
+  playNavSound();
   showLoading(false);
+  navigating = false;
 }
 
 function navigateUp() {
   if (!currentAddress) return;
   const parts = currentAddress.split('.');
-  if (parts.length <= 1) {
-    navigateTo(null);
-  } else {
-    parts.pop();
-    navigateTo(parts.join('.'));
-  }
+  navigateTo(parts.length <= 1 ? null : parts.slice(0, -1).join('.'));
 }
 
-function navigateToRoot() {
-  navigateTo(null);
-}
-
-function navigateToSelected() {
-  if (selectedNodeAddr) navigateTo(selectedNodeAddr);
-}
+function navigateToRoot() { navigateTo(null); }
+function navigateToSelected() { if (selectedNodeAddr) navigateTo(selectedNodeAddr); }
 
 function cycleLayout() {
   layoutIndex = (layoutIndex + 1) % LAYOUTS.length;
   layoutMode = LAYOUTS[layoutIndex];
   renderScene(childNodes);
+  playNavSound();
 }
 
 function toggleLinks() {
   showLinksEnabled = !showLinksEnabled;
   const btn = document.getElementById('linkBtn');
-  btn.style.borderColor = showLinksEnabled ? '#ffd54f' : '#2a2a3e';
-  if (showLinksEnabled) {
-    drawInterNodeLinks();
-  } else {
-    renderScene(childNodes, false);
-  }
+  btn.classList.toggle('active-toggle', showLinksEnabled);
+  showLinksEnabled ? drawInterNodeLinks() : renderScene(childNodes, false);
 }
 
 function jumpToAddress() {
   const box = document.getElementById('searchBox');
   const addr = box.value.trim();
-  if (addr) {
-    navigateTo(addr);
-    box.value = '';
-  }
+  if (addr) { navigateTo(addr); box.value = ''; box.blur(); }
 }
 
 function goBack() {
   if (navigationHistory.length === 0) return;
   const prev = navigationHistory.pop();
-  // Don't push to history again (avoid infinite loop)
-  currentAddress = null;  // force navigateTo to accept
+  currentAddress = '__going_back__'; // prevent guard
   navigateTo(prev);
-  // Remove the double-push
-  navigationHistory.pop();
+  navigationHistory.pop(); // remove the extra push
 }
 
 function toggleHelp() {
@@ -841,152 +945,120 @@ function toggleHelp() {
 }
 
 // ================================================================
-//  HUD Updates
+//  HUD
 // ================================================================
 
 function updateHUD() {
-  // Address display
   document.getElementById('hudAddr').textContent = currentAddress || 'HYPERNET';
   document.getElementById('upBtn').disabled = !currentAddress;
+
+  // Depth dots
+  const dd = document.getElementById('hudDepth');
+  const depth = getDepth();
+  dd.innerHTML = '';
+  for (let i = 0; i < Math.min(depth, 8); i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot active';
+    dot.style.background = i === depth - 1 ? '#4fc3f7' : '#2a6f8f';
+    dd.appendChild(dot);
+  }
 
   // Breadcrumb
   const bc = document.getElementById('hudBreadcrumb');
   bc.innerHTML = '';
   if (currentAddress) {
-    const rootSpan = document.createElement('span');
-    rootSpan.textContent = 'root';
-    rootSpan.onclick = () => navigateToRoot();
-    bc.appendChild(rootSpan);
-
+    const root = document.createElement('span');
+    root.textContent = 'root';
+    root.onclick = () => navigateToRoot();
+    bc.appendChild(root);
     const parts = currentAddress.split('.');
-    let accumulated = '';
+    let acc = '';
     for (let i = 0; i < parts.length; i++) {
-      accumulated += (i === 0 ? '' : '.') + parts[i];
+      acc += (i === 0 ? '' : '.') + parts[i];
       const sep = document.createElement('span');
-      sep.className = 'sep';
-      sep.textContent = ' > ';
+      sep.className = 'sep'; sep.textContent = ' > ';
       bc.appendChild(sep);
-
-      const addr = accumulated;
-      const span = document.createElement('span');
-      span.textContent = parts[i];
-      if (i < parts.length - 1) {
-        span.onclick = () => navigateTo(addr);
-      } else {
-        span.style.color = '#4fc3f7';
-      }
-      bc.appendChild(span);
+      const sp = document.createElement('span');
+      sp.textContent = parts[i];
+      const addr = acc;
+      if (i < parts.length - 1) sp.onclick = () => navigateTo(addr);
+      else sp.style.color = '#4fc3f7';
+      bc.appendChild(sp);
     }
   }
 
-  // Stats
-  const count = childNodes.length;
-  document.getElementById('hudStats').textContent = `${count} node${count !== 1 ? 's' : ''} | ${layoutMode}`;
-
-  // VR panel
+  document.getElementById('hudStats').textContent = `${childNodes.length} node${childNodes.length !== 1 ? 's' : ''} | ${layoutMode}`;
   updateVRPanel();
 }
 
 function updateVRPanel() {
-  const title = document.getElementById('vrNavTitle');
-  const bc = document.getElementById('vrNavBreadcrumb');
-  const stats = document.getElementById('vrNavStats');
-
-  if (title) title.setAttribute('value', currentAddress || 'HYPERNET');
-  if (bc) {
-    const parts = currentAddress ? currentAddress.split('.') : [];
-    bc.setAttribute('value', parts.length > 0 ? 'root > ' + parts.join(' > ') : 'root');
-  }
-  if (stats) stats.setAttribute('value', `${childNodes.length} nodes | ${layoutMode} layout`);
+  const t = document.getElementById('vrNavTitle'), b = document.getElementById('vrNavBreadcrumb'), s = document.getElementById('vrNavStats');
+  if (t) t.setAttribute('value', currentAddress || 'HYPERNET');
+  if (b) { const p = currentAddress ? currentAddress.split('.') : []; b.setAttribute('value', p.length ? 'root > ' + p.join(' > ') : 'root'); }
+  if (s) s.setAttribute('value', `${childNodes.length} nodes | ${layoutMode} | depth ${getDepth()}`);
 }
 
 // ================================================================
-//  Info Panel (2D + VR)
+//  Info Panel
 // ================================================================
 
 function showNodeInfo(node) {
   selectedNode = node;
   selectedNodeAddr = node.address;
 
-  // 2D panel
   if (!isVR) {
     const panel = document.getElementById('info-panel');
     document.getElementById('infoTitle').textContent = node.data?.title || node.data?.name || 'Node';
     document.getElementById('infoAddr').textContent = node.address;
-
     let meta = '';
     if (node.type_address) meta += `Type: ${node.type_address}<br>`;
     if (node.created_at) meta += `Created: ${new Date(node.created_at).toLocaleDateString()}<br>`;
     const cat = getCategoryName(node.address);
     if (cat) meta += `Category: ${cat}<br>`;
     document.getElementById('infoMeta').innerHTML = meta || 'No metadata';
-
     const cc = node.child_count || 0;
-    document.getElementById('infoChildren').textContent = cc > 0 ? `${cc} child node${cc !== 1 ? 's' : ''} inside` : 'No children (leaf node)';
-
+    const icEl = document.getElementById('infoChildren');
+    icEl.textContent = cc > 0 ? `${cc} child node${cc !== 1 ? 's' : ''} inside` : 'Leaf node (no children)';
+    icEl.className = 'info-children ' + (cc > 0 ? 'has-kids' : 'no-kids');
     let body = '';
     if (node.data && typeof node.data === 'object') {
       for (const [key, val] of Object.entries(node.data)) {
-        const display = typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
-        const truncated = display.length > 300 ? display.substring(0, 297) + '...' : display;
-        body += `<div class="data-row"><div class="data-key">${key}</div><div class="data-val">${truncated}</div></div>`;
+        const d = typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
+        body += `<div class="data-row"><div class="data-key">${key}</div><div class="data-val">${d.length > 300 ? d.substring(0,297)+'...' : d}</div></div>`;
       }
     }
     document.getElementById('infoBody').innerHTML = body || '<div style="color:#555566">No data fields</div>';
-
     document.getElementById('infoNavBtn').style.display = cc > 0 ? '' : 'none';
     panel.style.display = 'block';
   }
 
-  // VR panel
   if (isVR) {
-    const vrPanel = document.getElementById('vrInfoPanel');
+    const vp = document.getElementById('vrInfoPanel');
     document.getElementById('vrInfoTitle').setAttribute('value', node.data?.title || node.data?.name || 'Node');
     document.getElementById('vrInfoAddr').setAttribute('value', node.address);
-
-    let bodyText = '';
-    if (node.type_address) bodyText += `Type: ${node.type_address}\n`;
+    let bt = '';
+    if (node.type_address) bt += `Type: ${node.type_address}\n`;
     const cat = getCategoryName(node.address);
-    if (cat) bodyText += `Category: ${cat}\n`;
+    if (cat) bt += `Category: ${cat}\n`;
     const cc = node.child_count || 0;
-    bodyText += cc > 0 ? `${cc} children inside\n` : 'Leaf node\n';
-    if (node.data) {
-      bodyText += '\n';
-      for (const [key, val] of Object.entries(node.data)) {
-        const v = typeof val === 'object' ? JSON.stringify(val) : String(val);
-        bodyText += `${key}: ${v.substring(0, 60)}\n`;
-      }
-    }
-    document.getElementById('vrInfoBody').setAttribute('value', bodyText.substring(0, 500));
-
-    // Position near the node
+    bt += cc > 0 ? `${cc} children inside\n` : 'Leaf node\n';
+    if (node.data) { bt += '\n'; for (const [k,v] of Object.entries(node.data)) { const s = typeof v === 'object' ? JSON.stringify(v) : String(v); bt += `${k}: ${s.substring(0,50)}\n`; } }
+    document.getElementById('vrInfoBody').setAttribute('value', bt.substring(0, 500));
     const pos = nodePositions[node.address];
-    if (pos) {
-      vrPanel.setAttribute('position', `${pos.x} ${pos.y + 2} ${pos.z}`);
-    }
-    vrPanel.setAttribute('visible', 'true');
-    vrPanel.setAttribute('billboard', '');
-
-    // Enter button click
-    const enterBtn = document.getElementById('vrInfoEnterBtn');
-    const plane = enterBtn.querySelector('a-plane');
-    if (plane) {
-      plane.removeEventListener('click', vrInfoEnterHandler);
-      plane.addEventListener('click', vrInfoEnterHandler);
-    }
+    if (pos) vp.setAttribute('position', `${pos.x} ${pos.y + 2.2} ${pos.z}`);
+    vp.setAttribute('visible', 'true');
+    vp.setAttribute('billboard', '');
+    const ep = document.getElementById('vrInfoEnterBtn')?.querySelector('a-plane');
+    if (ep) { ep.removeEventListener('click', vrInfoEnterHandler); ep.addEventListener('click', vrInfoEnterHandler); }
   }
 }
 
-function vrInfoEnterHandler() {
-  if (selectedNodeAddr) navigateTo(selectedNodeAddr);
-}
+function vrInfoEnterHandler() { if (selectedNodeAddr) navigateTo(selectedNodeAddr); }
 
 function closeInfo() {
   document.getElementById('info-panel').style.display = 'none';
-  const vrPanel = document.getElementById('vrInfoPanel');
-  if (vrPanel) vrPanel.setAttribute('visible', 'false');
-  selectedNode = null;
-  selectedNodeAddr = null;
+  document.getElementById('vrInfoPanel')?.setAttribute('visible', 'false');
+  selectedNode = null; selectedNodeAddr = null;
 }
 
 // ================================================================
@@ -995,13 +1067,8 @@ function closeInfo() {
 
 function showLoading(show) {
   const el = document.getElementById('loading');
-  if (show) {
-    el.style.display = 'flex';
-    el.classList.remove('fade-out');
-  } else {
-    el.classList.add('fade-out');
-    setTimeout(() => { el.style.display = 'none'; }, 400);
-  }
+  if (show) { el.style.display = 'flex'; el.classList.remove('fade-out'); }
+  else { el.classList.add('fade-out'); setTimeout(() => el.style.display = 'none', 600); }
 }
 
 // ================================================================
@@ -1014,45 +1081,33 @@ function updateMinimap(nodes, positions) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
+  if (!positions.length) return;
 
-  if (positions.length === 0) return;
+  let minX=Infinity, maxX=-Infinity, minZ=Infinity, maxZ=-Infinity;
+  for (const p of positions) { minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minZ=Math.min(minZ,p.z); maxZ=Math.max(maxZ,p.z); }
+  const rX = Math.max(maxX-minX, 4), rZ = Math.max(maxZ-minZ, 4);
+  const sc = Math.min((w-24)/rX, (h-24)/rZ);
+  const cx = w/2, cy = h/2;
 
-  // Find bounds
-  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-  for (const p of positions) {
-    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
-    minZ = Math.min(minZ, p.z); maxZ = Math.max(maxZ, p.z);
-  }
-  const rangeX = Math.max(maxX - minX, 4);
-  const rangeZ = Math.max(maxZ - minZ, 4);
-  const scale = Math.min((w - 20) / rangeX, (h - 20) / rangeZ);
-  const cx = w / 2, cy = h / 2;
-
-  // Center dot
+  // Center
   ctx.fillStyle = '#4fc3f7';
-  ctx.beginPath();
-  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.shadowBlur = 6; ctx.shadowColor = '#4fc3f7';
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
 
-  // Nodes
   for (let i = 0; i < positions.length; i++) {
     const p = positions[i];
-    const x = cx + (p.x - (minX + maxX) / 2) * scale;
-    const y = cy + (p.z - (minZ + maxZ) / 2) * scale;
+    const x = cx + (p.x - (minX+maxX)/2) * sc;
+    const y = cy + (p.z - (minZ+maxZ)/2) * sc;
     const color = getColor(nodes[i].address);
-    ctx.fillStyle = color;
-    ctx.globalAlpha = 0.8;
-    ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fill();
 
-    // Connection line
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = 0.15;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    // Connection
+    ctx.strokeStyle = color; ctx.globalAlpha = 0.12; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+
+    // Dot
+    ctx.fillStyle = color; ctx.globalAlpha = 0.85;
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
 }
@@ -1062,55 +1117,87 @@ function updateMinimap(nodes, positions) {
 // ================================================================
 
 function generateParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 80; i++) {
+  const c = document.getElementById('particles');
+  const colors = ['#4fc3f7', '#7c4dff', '#26a69a', '#ffd54f', '#e91e63'];
+  for (let i = 0; i < 60; i++) {
     const p = document.createElement('a-sphere');
-    const x = (Math.random() - 0.5) * 60;
-    const y = Math.random() * 15 + 0.5;
-    const z = (Math.random() - 0.5) * 60;
+    const x = (Math.random()-0.5)*70, y = Math.random()*18+0.5, z = (Math.random()-0.5)*70;
     p.setAttribute('position', `${x} ${y} ${z}`);
-    p.setAttribute('radius', 0.015 + Math.random() * 0.03);
-    const colors = ['#4fc3f7', '#7c4dff', '#26a69a', '#ffd54f'];
-    const c = colors[Math.floor(Math.random() * colors.length)];
-    p.setAttribute('material', `color: ${c}; emissive: ${c}; emissiveIntensity: 0.8; opacity: ${0.2 + Math.random() * 0.4}; transparent: true`);
-    const dur = 4000 + Math.random() * 6000;
-    const dy = 0.5 + Math.random() * 1.5;
-    p.setAttribute('animation', `property: position; to: ${x + (Math.random()-0.5)*2} ${y + dy} ${z + (Math.random()-0.5)*2}; dur: ${dur}; dir: alternate; loop: true; easing: easeInOutSine`);
-    container.appendChild(p);
+    p.setAttribute('radius', 0.01 + Math.random()*0.025);
+    const col = colors[i % colors.length];
+    p.setAttribute('material', `color: ${col}; emissive: ${col}; emissiveIntensity: 0.9; opacity: ${0.15+Math.random()*0.35}; transparent: true`);
+    const dur = 5000+Math.random()*8000, dy = 0.5+Math.random()*2;
+    p.setAttribute('animation', `property: position; to: ${x+(Math.random()-0.5)*3} ${y+dy} ${z+(Math.random()-0.5)*3}; dur: ${dur}; dir: alternate; loop: true; easing: easeInOutSine`);
+    c.appendChild(p);
+  }
+}
+
+function generateStarfield() {
+  const c = document.getElementById('starfield');
+  for (let i = 0; i < 150; i++) {
+    const s = document.createElement('a-sphere');
+    const r = 35 + Math.random()*50;
+    const theta = Math.random()*Math.PI*2, phi = Math.random()*Math.PI;
+    s.setAttribute('position', {
+      x: r*Math.sin(phi)*Math.cos(theta),
+      y: r*Math.cos(phi),
+      z: r*Math.sin(phi)*Math.sin(theta)
+    });
+    const sz = 0.02 + Math.random()*0.06;
+    s.setAttribute('radius', sz);
+    const bright = 0.3 + Math.random()*0.7;
+    // Slight color tinting
+    const tints = ['#ffffff', '#aaddff', '#ffddaa', '#ddaaff'];
+    const tint = tints[Math.floor(Math.random()*tints.length)];
+    s.setAttribute('material', `color: ${tint}; emissive: ${tint}; emissiveIntensity: ${bright}; opacity: ${bright}; transparent: true`);
+    // Twinkling
+    if (Math.random() > 0.6) {
+      const dur = 2000 + Math.random()*4000;
+      s.setAttribute('animation', `property: material.opacity; from: ${bright}; to: ${bright*0.2}; dur: ${dur}; dir: alternate; loop: true; easing: easeInOutSine`);
+    }
+    c.appendChild(s);
   }
 }
 
 function generateGrid() {
-  const container = document.getElementById('gridEntity');
-  const size = 30;
-  const step = 3;
+  const c = document.getElementById('gridEntity');
+  const size = 36, step = 3;
   for (let i = -size; i <= size; i += step) {
     const lx = document.createElement('a-entity');
-    lx.setAttribute('line', `start: ${i} 0.005 ${-size}; end: ${i} 0.005 ${size}; color: #151520; opacity: 0.6`);
-    container.appendChild(lx);
+    lx.setAttribute('line', `start: ${i} 0.003 ${-size}; end: ${i} 0.003 ${size}; color: #0e0e1a; opacity: 0.7`);
+    c.appendChild(lx);
     const lz = document.createElement('a-entity');
-    lz.setAttribute('line', `start: ${-size} 0.005 ${i}; end: ${size} 0.005 ${i}; color: #151520; opacity: 0.6`);
-    container.appendChild(lz);
+    lz.setAttribute('line', `start: ${-size} 0.003 ${i}; end: ${size} 0.003 ${i}; color: #0e0e1a; opacity: 0.7`);
+    c.appendChild(lz);
   }
+  // Radial circles on ground for spatial reference
+  [6, 12, 18, 24].forEach((r, i) => {
+    const ring = document.createElement('a-torus');
+    ring.setAttribute('radius', r);
+    ring.setAttribute('radius-tubular', 0.003);
+    ring.setAttribute('segments-tubular', 64);
+    ring.setAttribute('rotation', '90 0 0');
+    ring.setAttribute('position', '0 0.004 0');
+    ring.setAttribute('material', `color: #121220; emissive: #121220; emissiveIntensity: 0.2; opacity: ${0.3 - i * 0.05}; transparent: true`);
+    c.appendChild(ring);
+  });
 }
 
 // ================================================================
-//  Keyboard Shortcuts
+//  Keyboard
 // ================================================================
 
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
+  const help = document.getElementById('helpOverlay');
   switch(e.key) {
-    case 'Escape':
-      const helpEl = document.getElementById('helpOverlay');
-      if (helpEl.style.display !== 'none') { helpEl.style.display = 'none'; }
-      else { closeInfo(); }
-      break;
-    case 'Backspace': navigateUp(); break;
+    case 'Escape': help.style.display !== 'none' ? help.style.display = 'none' : closeInfo(); break;
+    case 'Backspace': e.preventDefault(); navigateUp(); break;
     case 'Home': navigateToRoot(); break;
     case 'Tab': e.preventDefault(); cycleLayout(); break;
     case '/': e.preventDefault(); document.getElementById('searchBox').focus(); break;
     case 'b': goBack(); break;
+    case 'm': toggleSound(); break;
     case '?': toggleHelp(); break;
   }
 });
@@ -1121,16 +1208,16 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
   generateGrid();
+  generateStarfield();
   generateParticles();
 
   const scene = document.querySelector('a-scene');
-
-  // VR mode detection
   scene.addEventListener('enter-vr', () => {
     isVR = true;
     document.getElementById('hud').classList.add('vr-active');
     document.getElementById('minimap').classList.add('vr-active');
     document.getElementById('info-panel').style.display = 'none';
+    document.getElementById('helpOverlay').style.display = 'none';
     document.getElementById('vrNavPanel').setAttribute('visible', 'true');
   });
   scene.addEventListener('exit-vr', () => {
@@ -1141,13 +1228,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('vrInfoPanel').setAttribute('visible', 'false');
   });
 
-  // Load initial view
   await navigateTo(null);
-
-  // Fetch global stats for display
   const stats = await fetchStats();
   if (stats.total_nodes) {
-    document.getElementById('hudStats').textContent += ` | ${stats.total_nodes} total nodes`;
+    document.getElementById('hudStats').textContent += ` | ${stats.total_nodes} total`;
   }
 });
 </script>

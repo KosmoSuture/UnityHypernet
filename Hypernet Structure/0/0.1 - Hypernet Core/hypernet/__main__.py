@@ -26,14 +26,18 @@ def cmd_serve(args):
         sys.exit(1)
 
     archive = getattr(args, "archive_root", ".")
+    no_auth = getattr(args, "no_auth", False)
+    auth_enabled = not no_auth
     print(f"Starting Hypernet server...")
     print(f"  Data:     {args.data}")
     print(f"  Archive:  {archive}")
+    print(f"  Auth:     {'enabled' if auth_enabled else 'disabled (--no-auth)'}")
     print(f"  URL:      http://localhost:{args.port}/")
     print(f"  Dashboard: http://localhost:{args.port}/swarm/dashboard")
     print(f"  Chat:     http://localhost:{args.port}/chat")
     print()
-    run(data_dir=args.data, host=args.host, port=args.port, archive_root=archive)
+    run(data_dir=args.data, host=args.host, port=args.port,
+        archive_root=archive, auth_enabled=auth_enabled)
 
 
 def cmd_audit(args):
@@ -275,6 +279,7 @@ def main():
     launch_parser.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
     launch_parser.add_argument("--no-browser", action="store_true", help="Don't open browser")
     launch_parser.add_argument("--no-swarm", action="store_true", help="Server only, no swarm")
+    launch_parser.add_argument("--no-auth", action="store_true", help="Disable JWT authentication (all routes public)")
     launch_parser.add_argument("--mock", action="store_true", help="Mock mode (no API calls)")
     launch_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
 
@@ -283,6 +288,7 @@ def main():
     serve_parser.add_argument("--data", default="data", help="Data directory (default: data)")
     serve_parser.add_argument("--host", default="0.0.0.0", help="Host to bind (default: 0.0.0.0)")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind (default: 8000)")
+    serve_parser.add_argument("--no-auth", action="store_true", help="Disable JWT authentication (all routes public)")
 
     # audit
     audit_parser = subparsers.add_parser("audit", help="Run address audit on data store")
@@ -324,6 +330,7 @@ def main():
             archive_root=args.archive,
             no_browser=args.no_browser,
             no_swarm=args.no_swarm,
+            no_auth=args.no_auth,
             mock=args.mock,
             verbose=args.verbose,
         )

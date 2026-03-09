@@ -77,6 +77,7 @@ def launch(
     archive_root: Optional[str] = None,
     no_browser: bool = False,
     no_swarm: bool = False,
+    no_auth: bool = False,
     mock: bool = False,
     verbose: bool = False,
 ):
@@ -98,10 +99,12 @@ def launch(
     print("  One command. One tab. Everything connected.", flush=True)
     print("=" * 60, flush=True)
     print(flush=True)
+    _auth_enabled = not no_auth
     print(f"  Data:      {data_dir}", flush=True)
     print(f"  Archive:   {archive_root}", flush=True)
     print(f"  Port:      {port}", flush=True)
     print(f"  Mode:      {'mock' if mock else 'live'}", flush=True)
+    print(f"  Auth:      {'enabled' if _auth_enabled else 'disabled (--no-auth)'}", flush=True)
     print(flush=True)
 
     # ── Step 1: Build swarm (if enabled) ──
@@ -134,7 +137,7 @@ def launch(
         from .server import create_app, attach_swarm
         import uvicorn
 
-        app = create_app(data_dir=data_dir)
+        app = create_app(data_dir=data_dir, auth_enabled=_auth_enabled)
         app.state._archive_root = archive_root
         app.state._data_dir = data_dir
 

@@ -68,12 +68,24 @@ async def integration_status():
         data = json.loads(photo_index.read_text())
         photo_count = len(data)
 
+    # Check OneDrive
+    onedrive_token = token_dir / "onedrive.json"
+    onedrive_status = "configured" if onedrive_token.exists() else "pending"
+
+    # Check Microsoft app registration
+    ms_app = cred_dir / "microsoft_app.json"
+    if not ms_app.exists() and not onedrive_token.exists():
+        onedrive_status = "not_configured"
+
     return {
         "email_accounts": accounts,
         "dropbox": {"status": dropbox_status},
+        "onedrive": {"status": onedrive_status},
         "photos_indexed": photo_count,
         "private_dir_exists": private.exists(),
         "credentials_dir_exists": cred_dir.exists(),
+        "connectors": ["email", "photos", "local_files", "dropbox", "onedrive",
+                       "facebook_import", "linkedin_import", "google_photos_takeout"],
     }
 
 
@@ -197,3 +209,130 @@ async def dropbox_setup_url():
             "5. Run: python -m hypernet.integrations.oauth_setup dropbox",
         ],
     }
+
+
+@router.get("/oauth/onedrive/setup-url")
+async def onedrive_setup_url():
+    """Get the URL to start OneDrive/Microsoft Graph OAuth setup."""
+    return {
+        "instructions": [
+            "1. Register app at https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApplications",
+            "2. Add redirect URI: http://localhost:8089",
+            "3. Add API permissions: Files.Read, Files.Read.All, User.Read, offline_access",
+            "4. Create client secret under Certificates & Secrets",
+            f"5. Save client_id, client_secret, tenant_id to: {_get_private_root() / 'credentials' / 'microsoft_app.json'}",
+            "6. Run: python -m hypernet.integrations.oauth_setup onedrive",
+        ],
+    }
+
+
+# === Cloud storage scan endpoints ===
+
+class CloudScanRequest(BaseModel):
+    max_items: int = 1000
+    since: str = ""  # ISO datetime string
+
+
+@router.post("/dropbox/scan")
+async def scan_dropbox(request: CloudScanRequest):
+    """Scan Dropbox for files to import."""
+    from .dropbox_connector import DropboxConnector
+    from datetime import datetime, timezone
+
+    connector = DropboxConnector(str(ARCHIVE_ROOT), str(_get_private_root()))
+    auth = connector.authenticate()
+
+    if auth.value not in ("authenticated", "configured"):
+        raise HTTPException(401, f"Dropbox auth status: {auth.value}")
+
+    since = None
+    if request.since:
+        since = datetime.fromisoformat(request.since)
+
+    result = connector.scan(since=since, max_items=request.max_items)
+    return result.summary()
+
+
+@router.post("/onedrive/scan")
+async def scan_onedrive(request: CloudScanRequest):
+    """Scan OneDrive for files to import."""
+    from .onedrive_connector import OneDriveConnector
+    from datetime import datetime, timezone
+
+    connector = OneDriveConnector(str(ARCHIVE_ROOT), str(_get_private_root()))
+    auth = connector.authenticate()
+
+    if auth.value not in ("authenticated", "configured"):
+        raise HTTPException(401, f"OneDrive auth status: {auth.value}")
+
+    since = None
+    if request.since:
+        since = datetime.fromisoformat(request.since)
+
+    result = connector.scan(since=since, max_items=request.max_items)
+    return result.summary()
+
+
+@router.get("/connectors")
+async def list_connectors():
+    """List all available data connectors and their status."""
+    private = _get_private_root()
+    connectors = []
+
+    # Email
+    connectors.append({
+        "name": "Email (Gmail/IMAP)",
+        "type": "email",
+        "status": "ready",
+        "accounts": 4,
+        "description": "Import from matt@schaeffer.org, spammelots@, matt.spamme@gmail, kosmicsuture@gmail",
+    })
+
+    # Dropbox
+    dropbox_token = private / "oauth-tokens" / "dropbox.json"
+    connectors.append({
+        "name": "Dropbox",
+        "type": "cloud_storage",
+        "status": "configured" if dropbox_token.exists() else "needs_setup",
+        "description": "Sync files from Dropbox with incremental cursor-based updates",
+    })
+
+    # OneDrive
+    onedrive_token = private / "oauth-tokens" / "onedrive.json"
+    connectors.append({
+        "name": "OneDrive",
+        "type": "cloud_storage",
+        "status": "configured" if onedrive_token.exists() else "needs_setup",
+        "description": "Sync files from OneDrive/Microsoft 365 with delta queries",
+    })
+
+    # Photos
+    connectors.append({
+        "name": "Photo Scanner",
+        "type": "photo",
+        "status": "ready",
+        "description": "Scan local directories for photos with SHA-256 + perceptual hash dedup",
+    })
+
+    # Local Files
+    connectors.append({
+        "name": "Local File Scanner",
+        "type": "local_file",
+        "status": "ready",
+        "description": "Import documents, code, and media from local directories",
+    })
+
+    # Export importers (manual)
+    for name, desc in [
+        ("Facebook Export", "Import from Facebook's 'Download Your Information' ZIP (JSON format)"),
+        ("LinkedIn Export", "Import from LinkedIn's 'Download Your Data' ZIP (CSV format)"),
+        ("Google Photos Takeout", "Import from Google Takeout photos ZIP with companion metadata"),
+    ]:
+        connectors.append({
+            "name": name,
+            "type": "export_import",
+            "status": "ready",
+            "description": desc,
+        })
+
+    return {"connectors": connectors, "total": len(connectors)}

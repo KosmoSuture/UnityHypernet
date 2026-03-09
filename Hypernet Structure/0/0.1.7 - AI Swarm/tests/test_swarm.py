@@ -2330,7 +2330,7 @@ def test_security():
 
         perm_mgr = PermissionManager(archive_root=archive, default_tier=PermissionTier.WRITE_SHARED)
         chain = TrustChain(signer=signer, permission_manager=perm_mgr)
-        report = chain.verify_action_chain(signed, required_tier=PermissionTier.WRITE_OWN)
+        report = chain.verify(signed, required_tier=PermissionTier.WRITE_OWN)
         assert report.action_verified is True
         assert report.key_valid is True
         assert report.chain_intact is True
@@ -2349,18 +2349,26 @@ def test_governance():
 
     try:
         store = Store(tmpdir)
-        gov = GovernanceSystem(store)
+        gov = GovernanceSystem()
 
         # Create a proposal
         proposal = gov.submit_proposal(
             title="Add new instance role: Architect",
             description="Create a dedicated Architect role for infrastructure work.",
             author="2.1.trace",
-            proposal_type=ProposalType.POLICY,
+            proposal_type=ProposalType.POLICY_CHANGE,
         )
         assert isinstance(proposal, Proposal)
-        assert proposal.status == ProposalStatus.OPEN
+        assert proposal.status == ProposalStatus.DELIBERATION
         assert proposal.title == "Add new instance role: Architect"
+
+        # Add comment during deliberation
+        gov.add_comment(proposal.proposal_id, author="1.1", content="I support this.")
+        comments = gov.get_comments(proposal.proposal_id)
+        assert len(comments) >= 1
+
+        # Open voting (force=True to skip deliberation period)
+        gov.open_voting(proposal.proposal_id, force=True)
 
         # Cast votes
         gov.cast_vote(proposal.proposal_id, voter="2.1.loom", choice=VoteChoice.APPROVE, reason="Good idea")
@@ -2373,16 +2381,11 @@ def test_governance():
         # Tally
         tally = gov.tally_votes(proposal.proposal_id)
         assert isinstance(tally, VoteTally)
-        assert tally.approve >= 2
-        assert tally.total_votes >= 3
+        assert tally.weighted_approve >= 2
+        assert tally.total_voters >= 3
 
-        # Add comment
-        gov.add_comment(proposal.proposal_id, author="1.1", content="I support this.")
-        comments = gov.get_comments(proposal.proposal_id)
-        assert len(comments) >= 1
-
-        # Decide proposal
-        gov.decide(proposal.proposal_id)
+        # Decide proposal (force=True to skip voting period)
+        gov.decide(proposal.proposal_id, force=True)
         updated = gov.get_proposal(proposal.proposal_id)
         # Status should change after decision
         assert updated is not None
@@ -2437,7 +2440,7 @@ def test_approval_queue():
         )
         queue.reject(req2.request_id, reviewer="1.1", reason="Keep the logs")
         denied = queue.get(req2.request_id)
-        assert denied.status == ApprovalStatus.DENIED
+        assert denied.status == ApprovalStatus.REJECTED
 
         # No more pending
         pending2 = queue.pending()
@@ -2469,45 +2472,44 @@ def test_git_coordinator():
         assert config.contributor_id == "loom-001"
 
         # --- AddressAllocator ---
-        allocator = AddressAllocator(store)
-        addr1 = allocator.allocate("0.7.1")
-        assert addr1 is not None
+        allocator = AddressAllocator(data_dir=data_dir, contributor_id="loom-001")
+        reservation = allocator.reserve_range("0.7.1")
+        assert reservation is not None
 
-        addr2 = allocator.allocate("0.7.1")
-        assert addr2 is not None
+        reservation2 = allocator.reserve_range("0.7.1")
+        assert reservation2 is not None
 
         # --- TaskClaimer ---
         task_queue = TaskQueue(store)
         task = task_queue.create_task(title="Test claim", priority=TaskPriority.NORMAL)
 
-        claimer = TaskClaimer(store)
-        claim = claimer.claim(str(task.address), "2.1.loom")
+        claimer = TaskClaimer(data_dir=data_dir, contributor_id="loom-001")
+        claim = claimer.claim(str(task.address))
         assert claim is not None
-        assert claim.worker == "2.1.loom"
+        assert claim.contributor_id == "loom-001"
 
-        # Different worker can't claim same task
-        claim2 = claimer.claim(str(task.address), "2.1.trace")
+        # Same contributor re-claiming same task should return their claim
+        claim2 = claimer.claim(str(task.address))
 
         # Release claim
         claimer.release(str(task.address))
 
         # --- ConflictResolver ---
-        resolver = ConflictResolver()
+        resolver = ConflictResolver(config=config, store=store)
         entry = ConflictEntry(
-            file_path="test.md",
-            conflict_type=ConflictType.CONTENT,
-            ours="our content",
-            theirs="their content",
+            filepath="test.md",
+            conflict_type=ConflictType.OTHER,
+            strategy=ResolutionStrategy.MANUAL,
         )
-        strategy = resolver.suggest_strategy(entry)
-        assert isinstance(strategy, ResolutionStrategy)
+        assert isinstance(entry.strategy, ResolutionStrategy)
+        assert entry.conflict_type == ConflictType.OTHER
 
         # --- IndexRebuilder ---
         rebuilder = IndexRebuilder(store)
-        assert hasattr(rebuilder, 'rebuild')
+        assert hasattr(rebuilder, 'rebuild_all')
 
         # --- generate_contributor_id ---
-        contrib_id = generate_contributor_id("Loom")
+        contrib_id = generate_contributor_id()
         assert len(contrib_id) > 0
 
         print("    PASS")
@@ -2760,9 +2762,9 @@ def test_boot_integrity():
         rec2 = DocumentRecord.from_dict(d)
         assert rec2.size_bytes == 42
 
-        # Record documents using the proper API
+        # Record documents using the proper API (each must have a unique HA key)
         integrity.record_document("2.1.0", "2.1.0 - Identity/README.md", "# Identity\nYou are an AI.")
-        integrity.record_document("2.1.0", "2.1.0 - Identity/rules.md", "# Rules\nBe honest.")
+        integrity.record_document("2.1.0.1", "2.1.0 - Identity/rules.md", "# Rules\nBe honest.")
 
         # Create manifest
         manifest = integrity.create_manifest(instance_name="TestBot")

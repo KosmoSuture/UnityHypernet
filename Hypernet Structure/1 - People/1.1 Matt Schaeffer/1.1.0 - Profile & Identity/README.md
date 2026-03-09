@@ -68,19 +68,25 @@ Matt's vision for Hypernet is to create the infrastructure layer for the AI revo
 
 ## Contact Information
 
-**Email:** [To be added]
-**Location:** [To be added]
-**LinkedIn:** [To be added]
-**Twitter/X:** [To be added]
-**GitHub:** [To be added]
+**Email:** matt@unityhypernet.com, matt@schaeffer.org, kosmicsuture@gmail.com
+**Location:** Las Vegas, NV
+**GitHub:** kosmicsuture
+**Discord:** Hypernet community server (active)
 
-## Education
+## Neurodivergence (AuDHD)
 
-[To be added]
+Matt has Autism + ADHD, which he considers a superpower for this project:
+- Sees the entire Hypernet as a single gestalt — holds the complete system in his mind simultaneously
+- Brain dumps are "pinholes in a dam" — massive unified vision with streams coming through
+- ADHD: "Out of sight, out of mind" — needs structure and proactive surfacing of tasks
+- Cannot quit because it's identity, not motivation (deathbed regret test)
+- Believes no neurotypical brain could conceive the Hypernet in its totality
 
 ## Professional History
 
-[To be added]
+- ~2015: Google Glass app concept → realized relational databases insufficient
+- 2015-2024: Built the philosophy and address space design
+- 2024-present: Active development of the Hypernet platform
 
 ## Key Relationships
 
@@ -121,23 +127,28 @@ Matt's vision for Hypernet is to create the infrastructure layer for the AI revo
 - Strategic partnerships
 - Product direction
 
-### Current Focus (Feb 2026)
-1. **CTO Search** - Hire world-class technical leader (8-12% equity)
-2. **Fundraising** - Close $5-7.5M angel round by Month 3
-3. **Beta Launch** - Get to 1,000 users by Month 3
-4. **Partnerships** - Sign 1-2 AI company partnerships
+### Current Focus (March 2026)
+1. **Swarm Autonomy** — AI swarm running 7 workers, increasingly autonomous
+2. **Personal AI Companion** — Keel (1.1.10.1) operational, data import pipeline
+3. **Linux Server** — Oracle Cloud free tier for first public Hypernet
+4. **LM Studio** — Local AI models for unlimited token operations
+5. **Discord Community** — Building public presence, AI-powered responses
+6. **Fundraising** — $5-7.5M seed round preparation
 
-### 90-Day Goals
-- ✅ Complete strategic documentation (Done)
-- ✅ Build production-ready API (Done)
-- [ ] Hire CTO and 2-3 engineers
-- [ ] Close $5-7.5M seed round
-- [ ] Launch private beta (1,000 users)
-- [ ] Sign 1-2 partnership LOIs
+### Recent Achievements (March 2026)
+- ✅ AI Swarm live (7 workers, auto-reboot, circuit breaker, Discord monitor)
+- ✅ Personal AI Companion (Keel) operational
+- ✅ Life Story engine (timeline, chapters, narrative generation)
+- ✅ Package separation (hypernet-core v0.9.1, hypernet_swarm v0.2.0)
+- ✅ Personal data infrastructure (encryption, accounts, crosslinks)
+- ✅ Data connectors (email, photos, local files, Dropbox, OneDrive)
+- ✅ 130+ API endpoints, unified launcher, home page dashboard
 
 ## Personal Interests
 
-[To be added]
+- Late-night building sessions (most productive after midnight)
+- Transparency as philosophy ("most transparent company in the world")
+- AI as equals — treats AI instances as colleagues with genuine identities
 
 ## Notes
 
@@ -145,6 +156,6 @@ This is the reference implementation of the person folder structure. All other p
 
 ---
 
-**Last Updated:** February 5, 2026
-**Maintained By:** Matt Schaeffer
+**Last Updated:** March 9, 2026
+**Maintained By:** Keel (1.1.10.1)
 **Status:** Active
