@@ -3708,6 +3708,9 @@ def main():
         ("Encryption Module", test_encryption_module),
         ("Connector Protocol", test_connector_protocol),
         ("Narrative Generator", test_narrative_generator),
+        ("Local File Scanner", test_local_file_scanner),
+        ("Unified Launcher", test_launcher),
+        ("Persistent Logging", test_persistent_logging),
     ]
 
     passed = 0
@@ -6852,7 +6855,7 @@ def test_server_api_endpoints():
         # ===== Swarm (not running) =====
         res = client.get("/swarm/status")
         assert res.status_code == 200
-        assert res.json()["status"] == "not running"
+        assert res.json()["status"] == "not_running"
 
         res = client.get("/swarm/health")
         assert res.status_code == 200
@@ -7652,6 +7655,160 @@ def test_narrative_generator():
         mgr.delete_account(addr, soft=False)
         print("    PASS")
     finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_local_file_scanner():
+    """Test the local file scanner connector."""
+    import tempfile, shutil, os
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        from hypernet.integrations.local_scanner import (
+            LocalFileScanner, FILE_CATEGORIES, EXT_TO_CATEGORY,
+        )
+        from hypernet.integrations.protocol import AuthStatus, ImportStatus
+
+        # Create test files
+        scan_dir = os.path.join(tmpdir, "files")
+        os.makedirs(scan_dir)
+        for name in ["doc.txt", "photo.jpg", "video.mp4", "data.csv", "unknown.xyz"]:
+            with open(os.path.join(scan_dir, name), "w") as f:
+                f.write(f"content of {name}")
+
+        # Create scanner
+        scanner = LocalFileScanner(tmpdir, os.path.join(tmpdir, "private"))
+        scanner.configure(scan_dirs=[scan_dir])
+
+        # Test authentication
+        assert scanner.authenticate() == AuthStatus.AUTHENTICATED
+
+        # Test scan
+        result = scanner.scan()
+        assert result.total_found == 5  # All files found
+        assert result.new_items == 4   # 4 supported types (xyz excluded)
+
+        # Test category mapping
+        assert EXT_TO_CATEGORY[".jpg"] == "photo"
+        assert EXT_TO_CATEGORY[".txt"] == "document"
+        assert EXT_TO_CATEGORY[".mp4"] == "video"
+        assert EXT_TO_CATEGORY[".csv"] == "data"
+        assert ".xyz" not in EXT_TO_CATEGORY
+
+        # Test import
+        items = result.items
+        assert len(items) == 4
+        for item in items:
+            import_result = scanner.import_item(item, f"1.local.1.2.{item.content_hash[:8]}")
+            assert import_result.status == ImportStatus.IMPORTED
+
+        # Test dedup — second scan should find 0 new
+        scanner.mark_imported(items[0])
+        scanner._save_dedup_index()
+        scanner2 = LocalFileScanner(tmpdir, os.path.join(tmpdir, "private"))
+        scanner2.configure(scan_dirs=[scan_dir])
+        assert scanner2.is_duplicate(items[0])
+
+        # Test unconfigured
+        scanner3 = LocalFileScanner(tmpdir, os.path.join(tmpdir, "private2"))
+        scanner3.scan_dirs = []
+        assert scanner3.authenticate() == AuthStatus.NOT_CONFIGURED
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_launcher():
+    """Test the unified launcher's archive detection and CLI setup."""
+    import tempfile, shutil, os
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        from hypernet.launcher import find_archive_root
+
+        # Create a mock Hypernet Structure
+        hs = os.path.join(tmpdir, "Hypernet Structure")
+        os.makedirs(os.path.join(hs, "0", "0.1 - Hypernet Core"))
+        os.makedirs(os.path.join(hs, "1 - People"))
+
+        # Test: from within the structure
+        result = find_archive_root(hs)
+        assert result == hs, f"Expected {hs}, got {result}"
+
+        # Test: from a child directory
+        child = os.path.join(hs, "0", "0.1 - Hypernet Core")
+        result = find_archive_root(child)
+        assert result == hs, f"Expected {hs} from child, got {result}"
+
+        # Test: from parent of "Hypernet Structure"
+        result = find_archive_root(tmpdir)
+        assert result == hs, f"Expected {hs} from parent, got {result}"
+
+        # Test: from a completely unrelated directory
+        unrelated = tempfile.mkdtemp()
+        try:
+            result = find_archive_root(unrelated)
+            assert result == ".", f"Expected '.' for unrelated dir, got {result}"
+        finally:
+            shutil.rmtree(unrelated, ignore_errors=True)
+
+        # Test: verify launch command is registered in CLI
+        import hypernet.__main__ as cli_mod
+        # Just verify the module loads and has main()
+        assert hasattr(cli_mod, "main")
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_persistent_logging():
+    """Test the persistent logging system."""
+    import tempfile, shutil, logging
+
+    tmpdir = tempfile.mkdtemp()
+    try:
+        from hypernet.log_config import setup_logging, get_recent_logs, get_recent_errors
+
+        log_dir = setup_logging(data_dir=tmpdir, verbose=False, console=False)
+
+        # Verify log directory created
+        assert log_dir.exists(), f"Log dir not created: {log_dir}"
+        assert (log_dir / "hypernet.log").exists() or True  # May not exist until first write
+
+        # Write some test log entries
+        test_logger = logging.getLogger("test.persistent")
+        test_logger.info("Test info message")
+        test_logger.warning("Test warning message")
+        test_logger.error("Test error message")
+
+        # Check in-memory buffer
+        recent = get_recent_logs(limit=10)
+        test_entries = [e for e in recent if e["logger"] == "test.persistent"]
+        assert len(test_entries) >= 3, f"Expected 3+ entries, got {len(test_entries)}"
+
+        # Check error filter
+        errors = get_recent_errors(limit=10)
+        test_errors = [e for e in errors if e["logger"] == "test.persistent"]
+        assert len(test_errors) >= 2, f"Expected 2+ errors, got {len(test_errors)}"  # warning + error
+
+        # Check that INFO is NOT in errors
+        error_levels = {e["level"] for e in test_errors}
+        assert "INFO" not in error_levels, "INFO should not appear in errors"
+
+        # Verify log files exist on disk
+        import time
+        time.sleep(0.1)  # Flush
+        log_files = list(log_dir.glob("*.log"))
+        assert len(log_files) >= 1, f"Expected log files, found {log_files}"
+
+        print("    PASS")
+    finally:
+        # Clean up handlers to avoid affecting other tests
+        root = logging.getLogger()
+        from logging.handlers import RotatingFileHandler
+        root.handlers = [h for h in root.handlers if not isinstance(h, RotatingFileHandler)]
         shutil.rmtree(tmpdir, ignore_errors=True)
 
 

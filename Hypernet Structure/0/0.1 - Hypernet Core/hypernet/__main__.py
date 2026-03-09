@@ -2,17 +2,14 @@
 Run the Hypernet server or management commands.
 
 Usage:
-    python -m hypernet              # Start server on port 8000
+    python -m hypernet launch       # START HERE — one command, everything
+    python -m hypernet              # Start server only (port 8000)
     python -m hypernet serve        # Same as above
     python -m hypernet audit        # Run address audit on data store
-    python -m hypernet audit --data ./my-data  # Audit a specific data directory
-    python -m hypernet status       # Show system status (modules, store, version)
-    python -m hypernet status --data ./my-data  # Status with specific data directory
-    python -m hypernet setup        # Set up as a contributor (one-command onboarding)
+    python -m hypernet status       # Show system status
+    python -m hypernet setup        # Set up as a contributor
     python -m hypernet sync         # Pull, push, and detect conflicts
     python -m hypernet approvals    # Review pending external action approvals
-    python -m hypernet approvals --approve AQ-0001  # Approve a pending request
-    python -m hypernet approvals --reject AQ-0001 --reason "Not now"  # Reject
 """
 
 import argparse
@@ -270,8 +267,19 @@ def main():
     )
     subparsers = parser.add_subparsers(dest="command")
 
+    # launch (THE primary command)
+    launch_parser = subparsers.add_parser("launch", help="Launch everything: server + swarm + browser")
+    launch_parser.add_argument("--data", default="data", help="Data directory (default: data)")
+    launch_parser.add_argument("--archive", default=None, help="Hypernet Structure root (auto-detected)")
+    launch_parser.add_argument("--host", default="0.0.0.0", help="Host to bind (default: 0.0.0.0)")
+    launch_parser.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
+    launch_parser.add_argument("--no-browser", action="store_true", help="Don't open browser")
+    launch_parser.add_argument("--no-swarm", action="store_true", help="Server only, no swarm")
+    launch_parser.add_argument("--mock", action="store_true", help="Mock mode (no API calls)")
+    launch_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose logging")
+
     # serve
-    serve_parser = subparsers.add_parser("serve", help="Start the Hypernet server")
+    serve_parser = subparsers.add_parser("serve", help="Start the Hypernet server only")
     serve_parser.add_argument("--data", default="data", help="Data directory (default: data)")
     serve_parser.add_argument("--host", default="0.0.0.0", help="Host to bind (default: 0.0.0.0)")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind (default: 8000)")
@@ -307,7 +315,19 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "audit":
+    if args.command == "launch":
+        from .launcher import launch
+        launch(
+            data_dir=args.data,
+            host=args.host,
+            port=args.port,
+            archive_root=args.archive,
+            no_browser=args.no_browser,
+            no_swarm=args.no_swarm,
+            mock=args.mock,
+            verbose=args.verbose,
+        )
+    elif args.command == "audit":
         cmd_audit(args)
     elif args.command == "status":
         cmd_status(args)

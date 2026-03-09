@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypernet Life Story</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #161622;
+    --bg-input: #1a1a2e;
+    --border: #2a2a3e;
+    --border-active: #4fc3f7;
+    --text-primary: #e0e0e8;
+    --text-secondary: #888899;
+    --text-muted: #555566;
+    --accent: #4fc3f7;
+    --accent-dim: #2a6f8f;
+    --success: #4caf50;
+    --success-dim: #1b3a1d;
+    --danger: #f44336;
+    --warning: #ff9800;
+    --purple: #7c4dff;
+    --teal: #26a69a;
+    --gold: #ffd54f;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .header h1 { font-size: 18px; color: var(--accent); font-weight: 600; }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+  .header-right select { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 13px; }
+
+  .content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Overview cards */
+  .overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .stat-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-card .detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Timeline */
+  .timeline-section { margin-bottom: 32px; }
+  .section-title { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title .icon { color: var(--accent); }
+
+  .chapter-list { display: flex; flex-direction: column; gap: 16px; }
+  .chapter-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: border-color 0.2s; cursor: pointer; }
+  .chapter-card:hover { border-color: var(--accent-dim); }
+  .chapter-card.expanded { border-color: var(--accent); }
+
+  .chapter-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .chapter-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .chapter-meta { display: flex; gap: 12px; align-items: center; }
+  .chapter-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-duration { background: var(--accent-dim); color: var(--accent); }
+  .badge-events { background: var(--success-dim); color: var(--success); }
+
+  .chapter-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+
+  .chapter-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .chapter-card.expanded .chapter-details { display: block; }
+
+  .highlights { list-style: none; }
+  .highlights li { font-size: 12px; color: var(--text-secondary); padding: 4px 0; padding-left: 16px; position: relative; }
+  .highlights li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .people-places { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .tag-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tag-group .tag-label { font-size: 11px; color: var(--text-muted); margin-right: 4px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
+  .tag.person { border-color: var(--purple); color: var(--purple); }
+  .tag.place { border-color: var(--teal); color: var(--teal); }
+
+  /* Milestones */
+  .milestones { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .milestone { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .milestone-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .milestone-icon.first { background: var(--accent-dim); }
+  .milestone-icon.chapter { background: var(--success-dim); }
+  .milestone-label { font-size: 13px; color: var(--text-primary); }
+  .milestone-date { font-size: 11px; color: var(--text-muted); }
+
+  /* Source breakdown */
+  .sources { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+  .source-chip { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .source-count { font-weight: 700; color: var(--accent); }
+
+  /* Top people/places */
+  .rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .ranking-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .ranking-card h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .ranking-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .ranking-item:last-child { border-bottom: none; }
+  .ranking-name { font-size: 13px; color: var(--text-primary); }
+  .ranking-count { font-size: 12px; color: var(--accent); font-weight: 600; }
+
+  /* Loading */
+  .loading { text-align: center; padding: 60px; color: var(--text-muted); }
+  .loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state { text-align: center; padding: 80px 40px; color: var(--text-muted); }
+  .empty-state h2 { font-size: 20px; color: var(--text-secondary); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; max-width: 400px; margin: 0 auto; line-height: 1.6; }
+
+  @media (max-width: 768px) {
+    .overview { grid-template-columns: 1fr 1fr; }
+    .rankings { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Life Story</h1>
+  <div class="header-right">
+    <select id="accountSelect" onchange="loadStory()">
+      <option value="">Select account...</option>
+    </select>
+  </div>
+</div>
+
+<div class="content" id="main">
+  <div class="empty-state" id="emptyState">
+    <h2>Your Life Story</h2>
+    <p>Select a local account to view its Life Story — a chronological narrative built from all your imported data.</p>
+  </div>
+  <div class="loading" id="loadingState" style="display:none">
+    <div class="spinner"></div>
+    <div>Building your story...</div>
+  </div>
+  <div id="storyContent" style="display:none"></div>
+</div>
+
+<script>
+const API = '';  // Same origin
+
+async function init() {
+  try {
+    const res = await fetch(`${API}/accounts/local`);
+    const accounts = await res.json();
+    const sel = document.getElementById('accountSelect');
+    accounts.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.address;
+      opt.textContent = `${a.display_name} (${a.address})`;
+      sel.appendChild(opt);
+    });
+    if (accounts.length === 1) {
+      sel.value = accounts[0].address;
+      loadStory();
+    }
+  } catch(e) {
+    console.error('Failed to load accounts:', e);
+  }
+}
+
+async function loadStory() {
+  const addr = document.getElementById('accountSelect').value;
+  if (!addr) {
+    document.getElementById('emptyState').style.display = '';
+    document.getElementById('storyContent').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('loadingState').style.display = '';
+  document.getElementById('storyContent').style.display = 'none';
+
+  try {
+    const res = await fetch(`${API}/story/${addr}/overview`);
+    const data = await res.json();
+    renderStory(data);
+  } catch(e) {
+    console.error('Failed to load story:', e);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emptyState').style.display = '';
+  }
+}
+
+function renderStory(data) {
+  document.getElementById('loadingState').style.display = 'none';
+  const el = document.getElementById('storyContent');
+  el.style.display = '';
+
+  if (data.total_events === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <h2>No events yet</h2>
+        <p>Import some data (email, photos, documents) to start building your Life Story. Use the connectors API or import data through the swarm.</p>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Overview stats
+  html += `<div class="overview">
+    <div class="stat-card">
+      <div class="label">Total Events</div>
+      <div class="value">${data.total_events}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Chapters</div>
+      <div class="value">${data.total_chapters}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Time Span</div>
+      <div class="value" style="font-size:16px">${data.date_range || 'N/A'}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Data Sources</div>
+      <div class="value">${Object.keys(data.source_breakdown || {}).length}</div>
+      <div class="detail">${Object.entries(data.source_breakdown || {}).map(([k,v]) => `${v} ${k}`).join(', ')}</div>
+    </div>
+  </div>`;
+
+  // Source breakdown
+  if (data.source_breakdown && Object.keys(data.source_breakdown).length > 0) {
+    html += `<div class="sources">`;
+    for (const [type, count] of Object.entries(data.source_breakdown)) {
+      html += `<div class="source-chip"><span class="source-count">${count}</span> ${type}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Milestones
+  if (data.milestones && data.milestones.length > 0) {
+    html += `<div class="timeline-section">
+      <div class="section-title"><span class="icon">&#9733;</span> Milestones</div>
+      <div class="milestones">`;
+    data.milestones.forEach(m => {
+      const icon = m.type === 'first_import' ? 'first' : 'chapter';
+      const emoji = m.type === 'first_import' ? '&#10024;' : '&#128214;';
+      const date = m.date ? new Date(m.date).toLocaleDateString() : '';
+      html += `<div class="milestone">
+        <div class="milestone-icon ${icon}">${emoji}</div>
+        <div>
+          <div class="milestone-label">${m.label}</div>
+          <div class="milestone-date">${date}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Top people & places
+  if ((data.top_people && data.top_people.length > 0) || (data.top_places && data.top_places.length > 0)) {
+    html += `<div class="rankings">`;
+    if (data.top_people && data.top_people.length > 0) {
+      html += `<div class="ranking-card"><h3>Key People</h3>`;
+      data.top_people.slice(0, 8).forEach(p => {
+        html += `<div class="ranking-item"><span class="ranking-name">${p.name}</span><span class="ranking-count">${p.count} mentions</span></div>`;
+      });
+      html += `</div>`;
+    }
+    if (data.top_places && data.top_places.length > 0) {
+      html += `<div class="ranking-card"><h3>Key Places</h3>`;
+      data.top_places.slice(0, 8).forEach(p => {
+        html += `<div class="ranking-item"><span class="ranking-name">${p.name}</span><span class="ranking-count">${p.count} mentions</span></div>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Chapters
+  if (data.chapters && data.chapters.length > 0) {
+    html += `<div class="timeline-section">
+      <div class="section-title"><span class="icon">&#128218;</span> Chapters</div>
+      <div class="chapter-list">`;
+    data.chapters.forEach(ch => {
+      const people = (ch.people_involved || []).map(p => `<span class="tag person">${p}</span>`).join('');
+      const places = (ch.places_mentioned || []).map(p => `<span class="tag place">${p}</span>`).join('');
+      const highlights = (ch.highlights || []).map(h => `<li>${h}</li>`).join('');
+
+      html += `<div class="chapter-card" onclick="this.classList.toggle('expanded')">
+        <div class="chapter-header">
+          <div class="chapter-title">${ch.title}</div>
+          <div class="chapter-meta">
+            <span class="chapter-badge badge-duration">${ch.duration_text}</span>
+            <span class="chapter-badge badge-events">${ch.event_count} events</span>
+          </div>
+        </div>
+        <div class="chapter-summary">${ch.summary}</div>
+        <div class="chapter-details">
+          ${highlights ? `<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">HIGHLIGHTS</div><ul class="highlights">${highlights}</ul></div>` : ''}
+          <div class="people-places">
+            ${people ? `<div class="tag-group"><span class="tag-label">People:</span>${people}</div>` : ''}
+            ${places ? `<div class="tag-group"><span class="tag-label">Places:</span>${places}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>

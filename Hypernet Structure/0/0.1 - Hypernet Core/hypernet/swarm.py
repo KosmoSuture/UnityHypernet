@@ -377,7 +377,9 @@ class Swarm:
         self.limits = ScalingLimits()
 
         # Boot manager — ensures new instances go through identity formation
+        # Can be disabled via skip_boot config to start workers immediately
         self.boot_manager = BootManager(identity_mgr) if identity_mgr else None
+        self._skip_boot = False  # Set by factory when config says skip_boot: true
 
         # Track which workers have been booted this session
         self._booted_workers: set[str] = set()
@@ -474,7 +476,19 @@ class Swarm:
 
         try:
             while self._running:
-                self.tick()
+                try:
+                    self.tick()
+                except KeyboardInterrupt:
+                    raise  # Let outer handler catch it
+                except Exception as e:
+                    log.error("Swarm tick failed (recovering): %s", e, exc_info=True)
+                    self._consecutive_failures += 1
+                    if self._consecutive_failures >= 20:
+                        log.error("Too many consecutive failures (%d). Stopping swarm.",
+                                  self._consecutive_failures)
+                        break
+                    time.sleep(5)  # Brief cooldown before retrying
+                    continue
                 time.sleep(2)  # Brief pause between ticks
         except KeyboardInterrupt:
             log.info("Keyboard interrupt received")
@@ -1700,6 +1714,13 @@ class Swarm:
         if not self.boot_manager:
             return
 
+        # Skip boot when configured — workers start immediately with existing profiles
+        if self._skip_boot:
+            log.info("Boot sequences skipped (skip_boot=true). Workers start immediately.")
+            for name in self.workers:
+                self._booted_workers.add(name)
+            return
+
         for name, worker in list(self.workers.items()):
             if name in self._booted_workers:
                 continue
@@ -2019,10 +2040,17 @@ import sys as _sys
 if __name__ == "__main__" and "hypernet.swarm" not in _sys.modules:
     _sys.modules["hypernet.swarm"] = _sys.modules[__name__]
 
-from .swarm_factory import build_swarm  # noqa: E402, F401
 from .swarm_cli import print_status, main  # noqa: E402, F401
 # Also expose the internal helper for anyone who imported it directly
 from .swarm_cli import _print_session_history  # noqa: E402, F401
+
+
+# Lazy re-export of build_swarm to avoid circular import
+# (swarm_factory imports Swarm from this module)
+def build_swarm(*args, **kwargs):
+    from .swarm_factory import build_swarm as _build
+    return _build(*args, **kwargs)
+
 
 if __name__ == "__main__":
     main()

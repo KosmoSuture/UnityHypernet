@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypernet</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #161622;
+    --bg-input: #1a1a2e;
+    --border: #2a2a3e;
+    --border-active: #4fc3f7;
+    --text-primary: #e0e0e8;
+    --text-secondary: #888899;
+    --text-muted: #555566;
+    --accent: #4fc3f7;
+    --accent-dim: #2a6f8f;
+    --success: #4caf50;
+    --success-dim: #1b3a1d;
+    --danger: #f44336;
+    --danger-dim: #3a1515;
+    --warning: #ff9800;
+    --warning-dim: #3a2a0a;
+    --purple: #7c4dff;
+    --teal: #26a69a;
+    --gold: #ffd54f;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+  .header h1 { font-size: 22px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
+  .header-status { display: flex; gap: 12px; align-items: center; font-size: 12px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .status-dot.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
+  .status-dot.off { background: var(--danger); }
+
+  .content { flex: 1; max-width: 1000px; margin: 0 auto; padding: 40px 32px; width: 100%; }
+
+  .greeting { margin-bottom: 40px; }
+  .greeting h2 { font-size: 28px; font-weight: 300; color: var(--text-primary); margin-bottom: 8px; }
+  .greeting p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
+  .card:hover { border-color: var(--accent-dim); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .card .card-status { font-size: 11px; margin-top: 12px; padding: 4px 10px; border-radius: 12px; display: inline-block; }
+  .card .card-status.active { background: var(--success-dim); color: var(--success); }
+  .card .card-status.inactive { background: var(--bg-input); color: var(--text-muted); }
+
+  .card.primary { border-color: var(--accent-dim); border-width: 2px; }
+  .card.primary:hover { border-color: var(--accent); }
+
+  .quick-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 40px; }
+  .qstat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+  .qstat .val { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .qstat .lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  .section-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; font-weight: 600; }
+
+  .recent-activity { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-text { color: var(--text-secondary); }
+  .activity-time { color: var(--text-muted); font-size: 11px; }
+
+  .footer { padding: 16px 32px; text-align: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); }
+  .footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>HYPERNET</h1>
+  <div class="header-status">
+    <span>Server <span class="status-dot on" id="serverDot"></span></span>
+    <span>Swarm <span class="status-dot off" id="swarmDot"></span></span>
+  </div>
+</div>
+
+<div class="content">
+  <div class="greeting">
+    <h2 id="greetingText">Welcome back.</h2>
+    <p id="greetingSubtext">Your Hypernet is running. Choose where to go.</p>
+  </div>
+
+  <div class="section-title">Control Centers</div>
+  <div class="cards">
+    <a class="card primary" href="/swarm/dashboard">
+      <div class="card-icon">&#9881;</div>
+      <h3>Swarm Dashboard</h3>
+      <p>Monitor AI workers, manage tasks, chat with the swarm, review approvals. Your primary control center.</p>
+      <span class="card-status" id="swarmStatus">checking...</span>
+    </a>
+
+    <a class="card" href="/chat">
+      <div class="card-icon">&#128172;</div>
+      <h3>Talk to the Swarm</h3>
+      <p>Direct conversation with your AI workers. Ask questions, give directions, get reports.</p>
+      <span class="card-status active">always available</span>
+    </a>
+
+    <a class="card" href="/lifestory">
+      <div class="card-icon">&#128214;</div>
+      <h3>Life Story</h3>
+      <p>Your personal timeline, chapters, milestones, and narrative. The story your data tells about your life.</p>
+      <span class="card-status" id="storyStatus">checking...</span>
+    </a>
+  </div>
+
+  <div class="section-title">Tools</div>
+  <div class="cards">
+    <a class="card" href="/">
+      <div class="card-icon">&#127760;</div>
+      <h3>Graph Explorer</h3>
+      <p>Visual exploration of the Hypernet address space. Browse nodes, links, and the full archive structure.</p>
+    </a>
+
+    <a class="card" href="/welcome">
+      <div class="card-icon">&#128220;</div>
+      <h3>Public Welcome</h3>
+      <p>The Herald's front door. What the world sees when they visit the Hypernet. Your public face.</p>
+    </a>
+
+    <a class="card" href="/docs" target="_blank">
+      <div class="card-icon">&#128736;</div>
+      <h3>API Documentation</h3>
+      <p>Full REST API reference. Every endpoint, every parameter. Auto-generated from the server code.</p>
+    </a>
+  </div>
+
+  <div class="section-title">Quick Stats</div>
+  <div class="quick-stats" id="quickStats">
+    <div class="qstat"><div class="val" id="statNodes">-</div><div class="lbl">Nodes</div></div>
+    <div class="qstat"><div class="val" id="statLinks">-</div><div class="lbl">Links</div></div>
+    <div class="qstat"><div class="val" id="statWorkers">-</div><div class="lbl">Workers</div></div>
+    <div class="qstat"><div class="val" id="statTasks">-</div><div class="lbl">Tasks</div></div>
+    <div class="qstat"><div class="val" id="statAccounts">-</div><div class="lbl">Accounts</div></div>
+    <div class="qstat"><div class="val" id="statRoutes">130+</div><div class="lbl">API Routes</div></div>
+  </div>
+
+  <div class="section-title">Recent Tasks</div>
+  <div class="recent-activity" id="recentActivity">
+    <div class="activity-item"><span class="activity-text">Loading...</span></div>
+  </div>
+</div>
+
+<div class="footer">
+  Hypernet v0.9 &mdash; <a href="https://github.com/kosmicsuture/hypernet">Source</a> &mdash; One command. One tab. Everything connected.
+</div>
+
+<script>
+// Greeting based on time of day
+function setGreeting() {
+  const hour = new Date().getHours();
+  const el = document.getElementById('greetingText');
+  if (hour < 5) el.textContent = "Burning the midnight oil.";
+  else if (hour < 12) el.textContent = "Good morning.";
+  else if (hour < 17) el.textContent = "Good afternoon.";
+  else if (hour < 21) el.textContent = "Good evening.";
+  else el.textContent = "Late night session.";
+}
+setGreeting();
+
+// Check swarm status
+async function checkSwarm() {
+  try {
+    const res = await fetch('/swarm/status');
+    const data = await res.json();
+    document.getElementById('swarmDot').className = 'status-dot on';
+    const workers = data.workers ? Object.keys(data.workers).length : 0;
+    document.getElementById('statWorkers').textContent = workers;
+    document.getElementById('swarmStatus').textContent = `${workers} workers active`;
+    document.getElementById('swarmStatus').className = 'card-status active';
+
+    // Tasks
+    const tasks = data.tasks || {};
+    document.getElementById('statTasks').textContent = tasks.total || 0;
+
+    // Recent tasks
+    if (tasks.recent && tasks.recent.length > 0) {
+      const el = document.getElementById('recentActivity');
+      el.innerHTML = tasks.recent.slice(0, 5).map(t => {
+        const status = t.status === 'completed' ? '&#10003;' : t.status === 'failed' ? '&#10007;' : '&#9679;';
+        return `<div class="activity-item">
+          <span class="activity-text">${status} ${t.title || t.address || 'Task'}</span>
+          <span class="activity-time">${t.worker || ''}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    document.getElementById('swarmStatus').textContent = 'not running';
+    document.getElementById('swarmStatus').className = 'card-status inactive';
+  }
+}
+
+// Check store stats
+async function checkStore() {
+  try {
+    const res = await fetch('/stats');
+    const data = await res.json();
+    document.getElementById('statNodes').textContent = data.total_nodes || 0;
+    document.getElementById('statLinks').textContent = data.total_links || 0;
+  } catch(e) {}
+}
+
+// Check local accounts
+async function checkAccounts() {
+  try {
+    const res = await fetch('/accounts/local');
+    const data = await res.json();
+    document.getElementById('statAccounts').textContent = data.length || 0;
+    if (data.length > 0) {
+      document.getElementById('storyStatus').textContent = `${data.length} account(s)`;
+      document.getElementById('storyStatus').className = 'card-status active';
+    } else {
+      document.getElementById('storyStatus').textContent = 'no accounts yet';
+      document.getElementById('storyStatus').className = 'card-status inactive';
+    }
+  } catch(e) {
+    document.getElementById('storyStatus').textContent = 'available';
+    document.getElementById('storyStatus').className = 'card-status inactive';
+  }
+}
+
+// Initialize
+checkSwarm();
+checkStore();
+checkAccounts();
+
+// Auto-refresh every 30s
+setInterval(checkSwarm, 30000);
+</script>
+</body>
+</html>

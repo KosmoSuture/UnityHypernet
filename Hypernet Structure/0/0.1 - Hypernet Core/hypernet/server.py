@@ -55,8 +55,11 @@ Endpoints follow the addressing spec:
 """
 
 from __future__ import annotations
+import logging
 from pathlib import Path
 from typing import Optional
+
+log = logging.getLogger(__name__)
 
 # Core modules (native to this package)
 from .address import HypernetAddress
@@ -110,6 +113,7 @@ except ImportError:
 
 def create_app(data_dir: str | Path = "data") -> "FastAPI":
     """Create and configure the Hypernet API server."""
+    from datetime import datetime, timezone
     from fastapi import FastAPI, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
     from pydantic import BaseModel
@@ -320,6 +324,46 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             raise HTTPException(404, f"Chapter not found: {chapter_id}")
         return narrative.to_dict()
 
+    # === Local File Scanner API ===
+    from .integrations.local_scanner import LocalFileScanner
+
+    _scanner = LocalFileScanner(
+        str(Path(data_dir).parent),
+        str(Path(data_dir).parent / "private"),
+    )
+
+    @app.get("/scanner/status")
+    def scanner_status():
+        """Get local file scanner status."""
+        return _scanner.get_status().to_dict()
+
+    @app.post("/scanner/configure")
+    def scanner_configure(scan_dirs: list[str], max_size_mb: float = 100.0):
+        """Configure directories to scan."""
+        _scanner.configure(scan_dirs=scan_dirs, max_size_mb=max_size_mb)
+        return {"configured": True, "dirs": scan_dirs}
+
+    @app.post("/scanner/scan")
+    def scanner_scan(max_items: int = 500):
+        """Scan configured directories for new files."""
+        result = _scanner.scan(max_items=max_items)
+        return result.summary()
+
+    @app.post("/scanner/import/{account_address:path}")
+    def scanner_import(account_address: str, max_items: int = 100):
+        """Scan and import files into a local account."""
+        result = _scanner.scan(max_items=max_items)
+        imported = []
+        for item in result.items:
+            cat_addr = _scanner.get_category_address(item.source_type)
+            target = f"{account_address}.{cat_addr}.{item.content_hash[:8]}"
+            imp = _scanner.import_item(item, target)
+            if imp.status.value == "imported":
+                _scanner.mark_imported(item)
+                imported.append({"address": target, "file": item.title})
+        _scanner._save_dedup_index()
+        return {"imported": len(imported), "items": imported[:20]}
+
     # === Request/Response models ===
 
     class NodeCreate(BaseModel):
@@ -494,13 +538,31 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         return task.to_dict()
 
     @app.get("/tasks")
-    def list_tasks(tag: Optional[str] = None, priority: Optional[str] = None):
+    def list_tasks(tag: Optional[str] = None, priority: Optional[str] = None,
+                   status: Optional[str] = None, limit: int = 50):
+        """List tasks. By default shows pending only. Use status=all for everything."""
         tags = [tag] if tag else None
         pri_map = {"low": TaskPriority.LOW, "normal": TaskPriority.NORMAL,
                    "high": TaskPriority.HIGH, "critical": TaskPriority.CRITICAL}
         pri = pri_map.get(priority) if priority else None
-        tasks = _tasks.get_available_tasks(tags=tags, priority=pri)
-        return [t.to_dict() for t in tasks]
+
+        if status == "all":
+            # Return all tasks (pending + completed + failed)
+            prefix = HypernetAddress.parse("0.7.1")
+            all_nodes = _store.list_nodes(prefix=prefix)
+            tasks_list = []
+            for node in all_nodes:
+                d = node.to_dict()
+                if tags and not any(t in d.get("data", {}).get("tags", []) for t in tags):
+                    continue
+                tasks_list.append(d.get("data", {}))
+            # Sort: pending first, then by creation time
+            status_order = {"pending": 0, "claimed": 1, "in_progress": 2, "completed": 3, "failed": 4}
+            tasks_list.sort(key=lambda t: (status_order.get(t.get("status", ""), 5), t.get("created_at", "")))
+            return tasks_list[:limit]
+        else:
+            tasks = _tasks.get_available_tasks(tags=tags, priority=pri)
+            return [t.to_dict() for t in tasks]
 
     @app.post("/tasks/{address:path}/claim")
     def claim_task(address: str, body: TaskAction):
@@ -883,6 +945,80 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             return {"descriptions": swarm._tool_executor.get_tool_descriptions()}
         return {"descriptions": []}
 
+    # === Permission management endpoints ===
+
+    @app.post("/permissions/grant")
+    def grant_permission(body: dict):
+        """Grant a permission tier to a worker from the web UI.
+
+        Body: {"worker": "Librarian", "tier": "EXTERNAL", "tool": "discord_post", "granted_by": "1.1"}
+        """
+        from .permissions import PermissionTier
+        swarm = getattr(app.state, "swarm", None)
+        if not swarm or not hasattr(swarm, "_tool_executor"):
+            raise HTTPException(503, "Swarm not running")
+
+        pm = swarm._tool_executor.permission_mgr
+        worker_name = body.get("worker", "").strip()
+        tier_name = body.get("tier", "").strip()
+        granted_by = body.get("granted_by", "unknown")
+
+        if not worker_name or not tier_name:
+            raise HTTPException(400, "worker and tier are required")
+
+        # Map tier name to enum
+        try:
+            tier = PermissionTier[tier_name]
+        except KeyError:
+            raise HTTPException(400, f"Unknown tier: {tier_name}. Valid: {[t.name for t in PermissionTier]}")
+
+        # Apply to specific worker or all workers
+        workers_updated = []
+        if worker_name.lower() == "all":
+            for w_name in swarm.workers:
+                w_addr = getattr(swarm.workers[w_name], "address", w_name)
+                pm.set_tier(str(w_addr), tier)
+                workers_updated.append(w_name)
+        else:
+            # Find the worker by name
+            if worker_name in swarm.workers:
+                w_addr = getattr(swarm.workers[worker_name], "address", worker_name)
+                pm.set_tier(str(w_addr), tier)
+                workers_updated.append(worker_name)
+            else:
+                # Try as direct address
+                pm.set_tier(worker_name, tier)
+                workers_updated.append(worker_name)
+
+        log.info(f"Permission granted via web UI: {workers_updated} -> {tier_name} (by {granted_by})")
+
+        return {
+            "granted": True,
+            "worker": ", ".join(workers_updated),
+            "tier": tier_name,
+            "tier_value": int(tier),
+            "granted_by": granted_by,
+        }
+
+    @app.get("/permissions")
+    def list_permissions():
+        """List current permission tiers for all workers."""
+        swarm = getattr(app.state, "swarm", None)
+        if not swarm or not hasattr(swarm, "_tool_executor"):
+            return {"workers": [], "default_tier": "WRITE_SHARED"}
+
+        pm = swarm._tool_executor.permission_mgr
+        workers = {}
+        for w_name in swarm.workers:
+            w_addr = str(getattr(swarm.workers[w_name], "address", w_name))
+            tier = pm.get_tier(w_addr)
+            workers[w_name] = {"address": w_addr, "tier": tier.name, "tier_value": int(tier)}
+
+        return {
+            "workers": workers,
+            "default_tier": pm.default_tier.name,
+        }
+
     # === Herald control endpoints ===
 
     # Initialize Herald controller — persistent across restarts
@@ -1115,7 +1251,11 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     def swarm_status():
         swarm = getattr(app.state, "swarm", None)
         if swarm is None:
-            return {"status": "not running", "message": "Start swarm with: python -m hypernet.swarm"}
+            return {"status": "not_running", "message": "Start swarm with: python -m hypernet launch"}
+        if not getattr(swarm, "_running", False):
+            return {"status": "stopped", "message": "Swarm is stopped. Click Start to restart.",
+                    "worker_count": len(swarm.workers),
+                    "workers": [{"name": n} for n in swarm.workers]}
         # Return structured data for the dashboard
         workers_info = []
         for name, worker in swarm.workers.items():
@@ -1330,6 +1470,30 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             return HTMLResponse(content=swarm_html.read_text(encoding="utf-8"))
         return HTMLResponse(content=_DASHBOARD_HTML)
 
+    @app.get("/lifestory")
+    def lifestory_dashboard():
+        """Serve the Life Story dashboard UI."""
+        from fastapi.responses import HTMLResponse
+        ls_html = _STATIC_DIR / "lifestory.html"
+        if ls_html.exists():
+            return HTMLResponse(content=ls_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Life Story</h1><p>Dashboard not found.</p>")
+
+    @app.get("/home")
+    def home_dashboard():
+        """Serve the unified home page — one tab to rule them all."""
+        from fastapi.responses import HTMLResponse
+        home_html = _STATIC_DIR / "home.html"
+        if home_html.exists():
+            return HTMLResponse(content=home_html.read_text(encoding="utf-8"))
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/swarm/dashboard")
+
+    @app.get("/stats")
+    def store_stats():
+        """Return store statistics (nodes, links, categories)."""
+        return _store.stats()
+
     @app.get("/welcome")
     def welcome_page():
         """Serve the public welcome page — the Herald's front door."""
@@ -1338,6 +1502,36 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         if welcome_html.exists():
             return HTMLResponse(content=welcome_html.read_text(encoding="utf-8"))
         return HTMLResponse(content="<h1>Welcome to the Hypernet</h1><p>The welcome page is being written.</p>")
+
+    # === Log Access API ===
+    @app.get("/logs/recent")
+    def logs_recent(limit: int = 100, level: Optional[str] = None):
+        """Get recent log entries from the in-memory buffer."""
+        from .log_config import get_recent_logs
+        return get_recent_logs(limit=limit, level=level)
+
+    @app.get("/logs/errors")
+    def logs_errors(limit: int = 50):
+        """Get recent errors and warnings."""
+        from .log_config import get_recent_errors
+        return get_recent_errors(limit=limit)
+
+    @app.get("/logs/files")
+    def logs_files():
+        """List available log files with sizes."""
+        log_dir = Path(data_dir) / "logs"
+        if not log_dir.exists():
+            return []
+        files = []
+        for f in sorted(log_dir.glob("*.log*")):
+            files.append({
+                "name": f.name,
+                "size_bytes": f.stat().st_size,
+                "modified": datetime.fromtimestamp(
+                    f.stat().st_mtime, tz=timezone.utc
+                ).isoformat(),
+            })
+        return files
 
     # --- Swarm configuration endpoint (used by the GUI config tab) ---
     # SwarmConfig is defined at module level for Pydantic v2 compatibility
@@ -1432,7 +1626,7 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         archive = getattr(app.state, "_archive_root", ".")
         data = getattr(app.state, "_data_dir", "data")
         try:
-            from .swarm import build_swarm as _build
+            from .swarm_factory import build_swarm as _build
             swarm, web_msg = _build(data_dir=data, archive_root=archive)
             app.state.swarm = swarm
             app.state.web_messenger = web_msg
@@ -1440,6 +1634,7 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             t.start()
             return {"status": "started", "workers": list(swarm.workers.keys())}
         except Exception as e:
+            log.exception("Failed to build swarm")
             return {"status": "error", "message": str(e)}
 
     @app.post("/swarm/stop")

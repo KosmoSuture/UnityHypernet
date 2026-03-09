@@ -314,6 +314,13 @@
     <!-- Tasks Panel -->
     <div class="panel" id="panel-tasks">
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;align-items:center;flex-wrap:wrap">
+        <select id="tasks-filter-status" onchange="loadTaskList()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
+          <option value="all">All Tasks</option>
+          <option value="pending">Pending Only</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
+        </select>
         <select id="tasks-filter-priority" onchange="loadTaskList()" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:var(--radius-sm);font-size:13px">
           <option value="">All Priorities</option>
           <option value="critical">Critical</option>
@@ -603,6 +610,7 @@ async function refresh() {
     const trustData = trustRes ? await trustRes.json() : null;
 
     const running = data.status === 'running';
+    const stopped = data.status === 'stopped' || data.status === 'not_running';
     const badge = document.getElementById('status-badge');
     badge.textContent = running ? 'RUNNING' : 'STOPPED';
     badge.className = 'status-badge ' + (running ? 'status-running' : 'status-stopped');
@@ -610,7 +618,8 @@ async function refresh() {
     document.getElementById('btn-stop').disabled = !running;
 
     if (!running) {
-      document.getElementById('s-workers').textContent = '0';
+      document.getElementById('s-workers').textContent = data.worker_count || '0';
+      if (data.message) addLog('info', data.message);
       return;
     }
 
@@ -709,13 +718,20 @@ async function startSwarm() {
       addLog('error', 'Start failed: ' + data.message);
       document.getElementById('btn-start').disabled = false;
       badge.textContent = 'STOPPED'; badge.className = 'status-badge status-stopped';
+      alert('Swarm failed to start: ' + data.message);
       return;
     }
-    addLog('info', 'Swarm started with workers: ' + (data.workers||[]).join(', '));
-    setTimeout(refresh, 2000);
+    if (data.status === 'already_running') {
+      addLog('info', 'Swarm is already running');
+    } else {
+      addLog('info', 'Swarm started with workers: ' + (data.workers||[]).join(', '));
+    }
+    setTimeout(refresh, 3000);  // Give swarm time to initialize
   } catch (e) {
     addLog('error', 'Start error: ' + e.message);
     document.getElementById('btn-start').disabled = false;
+    badge.textContent = 'STOPPED'; badge.className = 'status-badge status-stopped';
+    alert('Swarm start error: ' + e.message);
   }
 }
 
@@ -1246,39 +1262,50 @@ async function createTask() {
 }
 
 async function loadTaskList() {
+  const statusFilter = document.getElementById('tasks-filter-status').value;
   const priority = document.getElementById('tasks-filter-priority').value;
   const tag = document.getElementById('tasks-filter-tag').value.trim();
-  let params = [];
+  let params = ['status=all'];  // Always fetch all, filter client-side
   if (priority) params.push('priority=' + encodeURIComponent(priority));
   if (tag) params.push('tag=' + encodeURIComponent(tag));
-  const query = params.length ? '?' + params.join('&') : '';
+  const query = '?' + params.join('&');
 
   try {
     const res = await fetch('/tasks' + query);
-    const tasks = await res.json();
+    let tasks = await res.json();
     const container = document.getElementById('tasks-list');
+
+    // Client-side status filtering
+    if (statusFilter && statusFilter !== 'all') {
+      tasks = tasks.filter(t => (t.status || 'pending') === statusFilter);
+    }
 
     if (!tasks.length) {
       container.innerHTML = '<div class="empty-state">No tasks found</div>';
       return;
     }
 
-    container.innerHTML = tasks.map(t => {
+    // Count by status for summary
+    const counts = {};
+    tasks.forEach(t => { const s = t.status || 'pending'; counts[s] = (counts[s] || 0) + 1; });
+    const summary = Object.entries(counts).map(([s,c]) => `<span class="task-status-badge task-status-${esc(s)}">${c} ${esc(s)}</span>`).join(' ');
+
+    let html = `<div style="margin-bottom:10px;font-size:12px;color:var(--text-muted)">${tasks.length} tasks: ${summary}</div>`;
+
+    html += tasks.map(t => {
       const status = t.status || 'pending';
       const pri = (t.priority || 'normal').toLowerCase();
       const addr = t.address || '';
       const assignee = t.assignee || '';
       const tags = (t.tags || []).map(g => `<span style="font-size:10px;color:var(--teal);background:rgba(38,166,154,0.1);padding:1px 5px;border-radius:4px">${esc(g)}</span>`).join(' ');
+      const result = t.result || '';
+      const failReason = t.failure_reason || '';
 
       let actions = '';
       if (status === 'pending') {
-        actions = `
-          <button class="btn btn-ghost" onclick="claimTask('${safeAttr(addr)}')">Claim</button>
-        `;
+        actions = `<button class="btn btn-ghost" onclick="claimTask('${safeAttr(addr)}')">Claim</button>`;
       } else if (status === 'claimed') {
-        actions = `
-          <button class="btn btn-start" onclick="startTask('${safeAttr(addr)}')">Start</button>
-        `;
+        actions = `<button class="btn btn-start" onclick="startTask('${safeAttr(addr)}')">Start</button>`;
       } else if (status === 'in_progress') {
         actions = `
           <button class="btn btn-start" onclick="completeTask('${safeAttr(addr)}')">Complete</button>
@@ -1286,7 +1313,10 @@ async function loadTaskList() {
         `;
       }
 
-      return `<div class="task-card priority-${esc(pri)}">
+      // Dim completed/failed tasks
+      const dimStyle = (status === 'completed' || status === 'failed') ? 'opacity:0.7;' : '';
+
+      return `<div class="task-card priority-${esc(pri)}" style="${dimStyle}">
         <div class="task-card-header">
           <div class="task-card-title">${esc(t.title || 'Untitled')}</div>
           <span class="task-card-addr">${esc(addr)}</span>
@@ -1298,9 +1328,13 @@ async function loadTaskList() {
           ${tags}
         </div>
         ${t.description ? `<div class="task-card-desc">${esc(t.description)}</div>` : ''}
+        ${result ? `<div class="task-card-desc" style="color:var(--success);font-size:11px">Result: ${esc(result)}</div>` : ''}
+        ${failReason ? `<div class="task-card-desc" style="color:var(--danger);font-size:11px">Failed: ${esc(failReason)}</div>` : ''}
         ${actions ? `<div class="task-card-actions">${actions}</div>` : ''}
       </div>`;
     }).join('');
+
+    container.innerHTML = html;
   } catch (e) {
     document.getElementById('tasks-list').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
   }
@@ -1490,6 +1524,11 @@ async function loadTools() {
             <pre id="grant-${esc(t.name)}">Loading...</pre>
           </details>
         </div>
+        ${!t.available ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+          <button class="btn btn-start" onclick="grantPermission('${safeAttr(t.name)}', '${safeAttr(t.required_tier)}')" style="font-size:11px">
+            Grant ${esc(t.required_tier)} Access
+          </button>
+        </div>` : ''}
       </div>
     `).join('');
 
@@ -1515,6 +1554,41 @@ async function loadTools() {
     });
   } catch (e) {
     container.innerHTML = `<div class="empty-state">Error loading tools: ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Permission Granting ──
+async function grantPermission(toolName, requiredTier) {
+  const worker = prompt('Grant permission to which worker? (e.g., Librarian, Loom, or "all" for all workers):');
+  if (!worker) return;
+
+  const tierMap = {'READ_ONLY': 0, 'WRITE_OWN': 1, 'WRITE_SHARED': 2, 'EXTERNAL': 3, 'DESTRUCTIVE': 4};
+  const tierValue = tierMap[requiredTier];
+
+  if (tierValue === undefined) {
+    alert('Unknown tier: ' + requiredTier);
+    return;
+  }
+
+  if (tierValue >= 3) {
+    if (!confirm(`WARNING: You are about to grant ${requiredTier} access to ${worker}.\n\nThis allows the worker to ${
+      tierValue === 3 ? 'make external API calls (Discord, email, etc.)' :
+      'perform destructive operations (delete files, reset data)'
+    }.\n\nAre you sure?`)) return;
+  }
+
+  try {
+    const res = await fetch('/permissions/grant', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({worker: worker, tier: requiredTier, tool: toolName, granted_by: '1.1'}),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    alert(`Permission granted: ${data.worker} now has ${data.tier} access`);
+    loadTools();
+  } catch (e) {
+    alert('Error granting permission: ' + e.message);
   }
 }
 

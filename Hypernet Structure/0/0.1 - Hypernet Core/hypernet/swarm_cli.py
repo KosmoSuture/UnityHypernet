@@ -298,13 +298,9 @@ def main():
         print(f"Node index: {total_before} -> {total_after} entries ({total_before - total_after} removed)")
         return
 
-    # Configure logging
-    level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    # Configure persistent logging (file + console + in-memory)
+    from .log_config import setup_logging
+    setup_logging(data_dir=args.data, verbose=args.verbose)
 
     print("=" * 60)
     print("  Hypernet Swarm Orchestrator")
