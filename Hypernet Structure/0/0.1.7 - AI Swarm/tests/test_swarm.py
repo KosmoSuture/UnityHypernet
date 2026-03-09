@@ -2834,8 +2834,8 @@ def test_discord_monitor():
 
         # State persistence
         monitor = DiscordMonitor(bot_token="fake-token", guild_id="guild-001", channels={"ch-001": "test-channel"})
-        monitor._processed_ids.add("msg-001")
-        monitor._processed_ids.add("msg-002")
+        monitor._processed.add("msg-001")
+        monitor._processed.add("msg-002")
 
         state_path = Path(tmpdir) / "monitor_state.json"
         monitor.save_state(str(state_path))
@@ -2843,8 +2843,8 @@ def test_discord_monitor():
 
         monitor2 = DiscordMonitor(bot_token="fake-token", guild_id="guild-001", channels={"ch-001": "test-channel"})
         monitor2.load_state(str(state_path))
-        assert "msg-001" in monitor2._processed_ids
-        assert "msg-002" in monitor2._processed_ids
+        assert "msg-001" in monitor2._processed
+        assert "msg-002" in monitor2._processed
 
         print("    PASS")
 

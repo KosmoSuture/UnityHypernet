@@ -498,6 +498,41 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         )
         return [n.to_dict() for n in nodes]
 
+    @app.get("/children/{address:path}")
+    def get_children(address: str, include_deleted: bool = False):
+        """Get direct children of a node (one level deep). Used by VR spatial browser."""
+        ha = HypernetAddress.parse(address)
+        all_nodes = _store.list_nodes(
+            prefix=ha,
+            include_deleted=include_deleted,
+        )
+        target_depth = len(ha.parts) + 1
+        children = [
+            n for n in all_nodes
+            if len(n.address.parts) == target_depth
+        ]
+        # Include child count for each child (for sizing in VR)
+        result = []
+        for child in children:
+            d = child.to_dict()
+            grandchildren = _store.list_nodes(prefix=child.address, include_deleted=False)
+            d["child_count"] = max(0, len(grandchildren) - 1)  # exclude self
+            result.append(d)
+        return result
+
+    @app.get("/children")
+    def get_root_children(include_deleted: bool = False):
+        """Get top-level root nodes. Used by VR spatial browser."""
+        all_nodes = _store.list_nodes(include_deleted=include_deleted)
+        roots = [n for n in all_nodes if len(n.address.parts) == 1]
+        result = []
+        for root in roots:
+            d = root.to_dict()
+            grandchildren = _store.list_nodes(prefix=root.address, include_deleted=False)
+            d["child_count"] = max(0, len(grandchildren) - 1)
+            result.append(d)
+        return result
+
     @app.get("/stats")
     def get_stats():
         return _store.stats()
@@ -1504,6 +1539,15 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     def store_stats():
         """Return store statistics (nodes, links, categories)."""
         return _store.stats()
+
+    @app.get("/vr")
+    def vr_interface():
+        """Serve the WebXR VR interface — spatial Hypernet browser for Quest headsets."""
+        from fastapi.responses import HTMLResponse
+        vr_html = _STATIC_DIR / "vr.html"
+        if vr_html.exists():
+            return HTMLResponse(content=vr_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Hypernet VR</h1><p>VR interface not found.</p>")
 
     @app.get("/welcome")
     def welcome_page():

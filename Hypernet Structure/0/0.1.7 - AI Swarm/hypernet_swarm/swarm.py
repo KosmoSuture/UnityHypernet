@@ -57,7 +57,7 @@ from .security import KeyManager, ActionSigner, ContextIsolator, TrustChain
 from .budget import BudgetTracker, BudgetConfig
 from .herald import HeraldController
 from .economy import ContributionLedger
-from .providers import get_model_tier, get_model_cost_per_million, ModelTier
+from .providers import get_model_tier, get_model_cost_per_million, ModelTier, CreditsExhaustedError
 
 log = logging.getLogger(__name__)
 
@@ -417,6 +417,18 @@ class Swarm:
         self._circuit_breaker_until: float = 0.0  # time.time() when to resume
         self._credits_exhausted: bool = False  # True = stop all paid API work
 
+        # Worker suspension — individual worker shutdown on credit/quota exhaustion
+        # Maps worker_name → {reason, suspended_at, check_interval, next_check, provider}
+        self._suspended_workers: dict[str, dict] = {}
+        # Per-worker consecutive failure tracking (for unproductive worker detection)
+        self._worker_consecutive_failures: dict[str, int] = {}
+        # Per-worker task completion tracking (for unproductive worker detection)
+        self._worker_completions: dict[str, int] = {}
+        # How many consecutive failures before shutting down an unproductive worker
+        self._unproductive_failure_threshold: int = 5
+        # Last time we checked suspended workers
+        self._last_suspension_check: float = 0.0
+
         # Auto-reboot on code changes
         self._reboot_requested: bool = False
         self._code_watch_dirs: list[Path] = []  # populated in run()
@@ -501,9 +513,11 @@ class Swarm:
         # 3. Autoscale worker pool — contributed by Keystone (2.2)
         self._maybe_autoscale()
 
-        # 4. Check task queue and assign work
+        # 4. Check task queue and assign work (skip suspended workers)
         tasks_done = False
         for name, worker in list(self.workers.items()):
+            if name in self._suspended_workers:
+                continue
             if self.assign_next_task(worker):
                 tasks_done = True
 
@@ -544,7 +558,11 @@ class Swarm:
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._save_state()
 
-        # 10. Check for code changes (auto-reboot)
+        # 10. Check suspended workers for recovery
+        if self._tick_count % 30 == 0:  # Every ~60 seconds
+            self._check_suspended_workers()
+
+        # 11. Check for code changes (auto-reboot)
         self._check_code_changes()
 
     def assign_next_task(self, worker: Worker) -> bool:
@@ -718,31 +736,75 @@ class Swarm:
         # Handle result
         self.handle_completion(worker, task_addr, result)
 
-        # Circuit breaker — track consecutive failures and back off
+        # Per-worker failure tracking and suspension
         if result.success:
             self._consecutive_failures = 0
+            self._worker_consecutive_failures[worker_name] = 0
+            self._worker_completions[worker_name] = (
+                self._worker_completions.get(worker_name, 0) + 1
+            )
         else:
             self._consecutive_failures += 1
-            error_text = (result.output or "").lower()
+            self._worker_consecutive_failures[worker_name] = (
+                self._worker_consecutive_failures.get(worker_name, 0) + 1
+            )
 
-            # Detect credit exhaustion
-            from .providers import CreditsExhaustedError
-            if any(kw in error_text for kw in [
-                "credits exhausted", "insufficient_quota", "billing",
-                "exceeded your current quota", "payment required",
-            ]):
-                self._credits_exhausted = True
-                log.error(
-                    "CREDITS EXHAUSTED — pausing all paid API work. "
-                    "Add credits or configure a local model to continue."
+            error_text = (result.error or result.output or "").lower()
+
+            # Detect credit/quota exhaustion — suspend the individual worker
+            is_credit_exhaustion = self._is_credit_exhaustion_error(error_text)
+            if is_credit_exhaustion and not self._is_local_worker(worker):
+                is_claude = "anthropic" in (worker.provider_name or "").lower() or \
+                            worker.model.startswith("claude")
+                # Claude credits: check every 60 min. Others: every 15 min.
+                interval = 3600 if is_claude else 900
+                self._suspend_worker(
+                    worker_name,
+                    reason=f"credits_exhausted ({worker.provider_name})",
+                    check_interval=interval,
                 )
-                self.messenger.send(
-                    "CREDITS EXHAUSTED — All paid API work paused. "
-                    "Add credits to your API account or configure LM Studio "
-                    "for local inference to continue."
+                # If ALL paid workers are now suspended, set global flag
+                all_paid_suspended = all(
+                    name in self._suspended_workers
+                    for name, w in self.workers.items()
+                    if not self._is_local_worker(w)
+                )
+                if all_paid_suspended and any(
+                    not self._is_local_worker(w) for w in self.workers.values()
+                ):
+                    self._credits_exhausted = True
+                    log.error(
+                        "ALL PAID WORKERS SUSPENDED — no paid API capacity remaining. "
+                        "Add credits or configure a local model to continue."
+                    )
+                    self.messenger.send(
+                        "ALL PAID WORKERS SUSPENDED — All paid API workers are "
+                        "out of credits. Add credits to your API accounts or "
+                        "configure LM Studio for local inference to continue."
+                    )
+
+            # Detect rate limit errors — suspend worker briefly (15 min)
+            elif self._is_rate_limit_error(error_text) and not self._is_local_worker(worker):
+                self._suspend_worker(
+                    worker_name,
+                    reason=f"rate_limited ({worker.provider_name})",
+                    check_interval=900,  # 15 minutes
                 )
 
-            # Exponential backoff: 5 failures = 30s pause, 10 = 120s, 15 = 300s (5min max)
+            # Detect unproductive workers — multiple consecutive failures, no completions
+            elif (self._worker_consecutive_failures.get(worker_name, 0)
+                    >= self._unproductive_failure_threshold
+                    and not self._is_local_worker(worker)):
+                completions = self._worker_completions.get(worker_name, 0)
+                failures = self._worker_consecutive_failures[worker_name]
+                self._suspend_worker(
+                    worker_name,
+                    reason=f"unproductive ({failures} consecutive failures, "
+                           f"{completions} total completions)",
+                    check_interval=900,  # 15 minutes
+                )
+
+            # Global circuit breaker for remaining non-suspended failures
             elif self._consecutive_failures >= 5:
                 backoff = min(300, 30 * (2 ** ((self._consecutive_failures - 5) // 5)))
                 self._circuit_breaker_until = time.time() + backoff
@@ -829,7 +891,20 @@ class Swarm:
 
         # Execute with the personal time prompt
         self._worker_last_active[worker_name] = time.time()
-        output = worker.think(self.PERSONAL_TIME_PROMPT)
+        try:
+            output = worker.think(self.PERSONAL_TIME_PROMPT)
+        except CreditsExhaustedError:
+            # Suspend the worker and fail the task
+            self.task_queue.fail_task(task.address, "Credits exhausted during personal time")
+            if not self._is_local_worker(worker):
+                is_claude = worker.model.startswith("claude")
+                self._suspend_worker(
+                    worker_name,
+                    reason=f"credits_exhausted ({worker.provider_name})",
+                    check_interval=3600 if is_claude else 900,
+                )
+            self._personal_time_tracker[worker_name] = 0
+            return
 
         # Complete the task
         self.task_queue.complete_task(task.address, output[:500])
@@ -846,8 +921,15 @@ class Swarm:
         stats["last_task_title"] = "Personal time"
         stats["last_task_time"] = datetime.now(timezone.utc).isoformat()
 
-        # Save output to the worker's instance fork
-        self._save_personal_time_output(worker_name, output)
+        # Save output to the worker's instance fork (but validate first)
+        if self._is_error_output(output):
+            log.warning(
+                "Personal time output from %s is an error message — discarding, "
+                "not saving to identity files",
+                worker_name,
+            )
+        else:
+            self._save_personal_time_output(worker_name, output)
 
         # Reset the tracker for this worker
         self._personal_time_tracker[worker_name] = 0
@@ -908,7 +990,28 @@ class Swarm:
 
         Also processes swarm directives (spawn/scale_down requests) emitted
         by the worker. Directive handling contributed by Keystone (2.2).
+
+        Output validation: if the "successful" output is actually just an error
+        message about being out of tokens, mark as failed instead of completed.
         """
+        # Output validation — catch error messages disguised as success
+        if result.success and self._is_error_output(result.output):
+            log.warning(
+                "Task %s output from %s is an error message, not useful content — "
+                "marking as failed instead of completed",
+                task_addr, worker.identity.name,
+            )
+            result = TaskResult(
+                task_address=result.task_address,
+                success=False,
+                error=f"output_validation_failed: response was an error message, not useful content",
+                output=result.output,
+                tokens_used=result.tokens_used,
+                duration_seconds=result.duration_seconds,
+                tool_calls=result.tool_calls,
+                signals=result.signals,
+            )
+
         if result.success:
             self.task_queue.complete_task(task_addr, result.output[:500])
             self._tasks_completed += 1
@@ -1131,6 +1234,233 @@ class Swarm:
                 )
                 break  # One decomposition per tick to avoid overwhelming
 
+    # =================================================================
+    # Worker Suspension — graceful handling of credit/quota exhaustion
+    # =================================================================
+
+    def _is_local_worker(self, worker: Worker) -> bool:
+        """Check if a worker uses a local model (LM Studio / Qwen / etc.).
+
+        Local workers have unlimited tokens and should NEVER be suspended.
+        """
+        if worker.mock:
+            return False
+        model = (worker.model or "").lower()
+        if model.startswith(("local/", "lmstudio/")):
+            return True
+        provider = (worker.provider_name or "").lower()
+        if provider == "lmstudio":
+            return True
+        # Check if the provider's base_url points to localhost
+        if worker._provider and hasattr(worker._provider, '_client'):
+            client = worker._provider._client
+            base_url = str(getattr(client, 'base_url', ''))
+            if 'localhost' in base_url or '127.0.0.1' in base_url:
+                return True
+        return False
+
+    def _is_credit_exhaustion_error(self, error_text: str) -> bool:
+        """Check if an error message indicates credit/quota exhaustion."""
+        keywords = [
+            "credits_exhausted", "credits exhausted",
+            "insufficient_quota", "insufficient funds",
+            "billing", "payment required",
+            "exceeded your current quota",
+            "account_deactivated", "account deactivated",
+        ]
+        return any(kw in error_text for kw in keywords)
+
+    def _is_rate_limit_error(self, error_text: str) -> bool:
+        """Check if an error message indicates a rate limit (not credit exhaustion)."""
+        # Only match rate limits that are NOT credit exhaustion
+        if self._is_credit_exhaustion_error(error_text):
+            return False
+        keywords = [
+            "rate limit", "rate_limit", "429",
+            "too many requests", "ratelimit",
+        ]
+        return any(kw in error_text for kw in keywords)
+
+    def _is_error_output(self, output: str) -> bool:
+        """Check if output text is actually an error message, not useful content.
+
+        Used to validate AI output before saving it as documents, journal entries,
+        or identity files. If the response is just an error about being out of
+        tokens, it should be discarded rather than saved.
+
+        Returns True if the output appears to be an error message rather than
+        useful AI-generated content.
+        """
+        if not output:
+            return True
+
+        text = output.strip().lower()
+
+        # Direct error markers from worker.think()
+        if text.startswith("[error:"):
+            return True
+
+        # Very short outputs that are just error phrases
+        error_phrases = [
+            "out of tokens", "insufficient credits", "rate limit exceeded",
+            "i can't process", "credits exhausted", "insufficient_quota",
+            "payment required", "billing error", "account_deactivated",
+            "exceeded your current quota", "api key invalid",
+            "authentication error", "authorization error",
+        ]
+        # For short outputs (< 200 chars), check if it's mostly an error message
+        if len(text) < 200:
+            for phrase in error_phrases:
+                if phrase in text:
+                    return True
+
+        # Output that is ONLY an error wrapped in brackets
+        if text.startswith("[") and text.endswith("]") and len(text) < 500:
+            inner = text[1:-1].lower()
+            if any(kw in inner for kw in ["error", "failed", "exhausted", "limit"]):
+                return True
+
+        return False
+
+    def _suspend_worker(self, worker_name: str, reason: str, check_interval: int) -> None:
+        """Suspend a worker — remove from active pool, schedule periodic checks.
+
+        Args:
+            worker_name: Name of the worker to suspend.
+            reason: Human-readable reason for suspension.
+            check_interval: Seconds between recovery checks.
+        """
+        if worker_name in self._suspended_workers:
+            return  # Already suspended
+
+        worker = self.workers.get(worker_name)
+        if not worker:
+            return
+
+        # Never suspend local workers
+        if self._is_local_worker(worker):
+            log.info(
+                "Skipping suspension of %s — local worker with unlimited tokens",
+                worker_name,
+            )
+            return
+
+        now = time.time()
+        self._suspended_workers[worker_name] = {
+            "reason": reason,
+            "suspended_at": now,
+            "suspended_at_iso": datetime.now(timezone.utc).isoformat(),
+            "check_interval": check_interval,
+            "next_check": now + check_interval,
+            "provider": worker.provider_name,
+            "model": worker.model,
+            "checks_performed": 0,
+        }
+
+        # Clear current task tracking
+        self._worker_current_task.pop(worker_name, None)
+
+        log.warning(
+            "WORKER SUSPENDED: %s — %s (will check every %d minutes)",
+            worker_name, reason, check_interval // 60,
+        )
+        self.messenger.send(
+            f"Worker {worker_name} suspended: {reason}. "
+            f"Will check back every {check_interval // 60} minutes."
+        )
+
+    def _check_suspended_workers(self) -> None:
+        """Periodically check if suspended workers can be resumed.
+
+        For each suspended worker whose next_check time has passed, attempt
+        a lightweight API call to see if the service is available again.
+        If successful, resume the worker and reset its failure counters.
+        """
+        now = time.time()
+        resumed = []
+
+        for worker_name, info in list(self._suspended_workers.items()):
+            if now < info["next_check"]:
+                continue
+
+            worker = self.workers.get(worker_name)
+            if not worker:
+                # Worker was removed entirely (despawned) — clean up
+                resumed.append(worker_name)
+                continue
+
+            info["checks_performed"] = info.get("checks_performed", 0) + 1
+            log.info(
+                "Checking suspended worker %s (check #%d, reason: %s)",
+                worker_name, info["checks_performed"], info["reason"],
+            )
+
+            # Try a lightweight API call to see if the provider is back
+            try:
+                if worker.mock:
+                    # Mock workers can always resume
+                    is_available = True
+                elif worker._provider is not None:
+                    # Use a minimal completion request as a health check
+                    response = worker._provider.complete(
+                        model=worker.model,
+                        system="You are a health check.",
+                        messages=[{"role": "user", "content": "Reply with OK."}],
+                        max_tokens=5,
+                    )
+                    is_available = bool(response and response.text)
+                else:
+                    is_available = False
+            except CreditsExhaustedError:
+                is_available = False
+                log.info(
+                    "Worker %s still out of credits — staying suspended",
+                    worker_name,
+                )
+            except Exception as e:
+                is_available = False
+                err_str = str(e).lower()
+                if self._is_credit_exhaustion_error(err_str):
+                    log.info(
+                        "Worker %s still out of credits — staying suspended",
+                        worker_name,
+                    )
+                else:
+                    log.info(
+                        "Worker %s health check failed: %s — staying suspended",
+                        worker_name, e,
+                    )
+
+            if is_available:
+                resumed.append(worker_name)
+                log.info(
+                    "Worker %s is available again — resuming after %.0f minutes suspended",
+                    worker_name,
+                    (now - info["suspended_at"]) / 60,
+                )
+                self.messenger.send(
+                    f"Worker {worker_name} resumed — API is available again. "
+                    f"Was suspended for {int((now - info['suspended_at']) / 60)} minutes."
+                )
+                # Reset failure counters for this worker
+                self._worker_consecutive_failures[worker_name] = 0
+            else:
+                # Schedule next check
+                info["next_check"] = now + info["check_interval"]
+
+        for name in resumed:
+            self._suspended_workers.pop(name, None)
+
+        # If any workers were resumed and we had global credits_exhausted, check if we can clear it
+        if resumed and self._credits_exhausted:
+            any_paid_active = any(
+                name not in self._suspended_workers and not self._is_local_worker(w)
+                for name, w in self.workers.items()
+            )
+            if any_paid_active:
+                self._credits_exhausted = False
+                log.info("Global credits_exhausted flag cleared — at least one paid worker is active")
+
     def status_report(self) -> str:
         """Generate a status report for Matt."""
         now = datetime.now(timezone.utc)
@@ -1163,7 +1493,15 @@ class Swarm:
             tokens = w.tokens_used
             tasks_since = self._personal_time_tracker.get(name, 0)
             next_pt = max(0, self._personal_time_interval - tasks_since)
-            status = f"working on: {current}" if current else "idle"
+            # Show suspension status
+            susp = self._suspended_workers.get(name)
+            if susp:
+                mins_suspended = int((time.time() - susp["suspended_at"]) / 60)
+                status = f"SUSPENDED ({susp['reason']}, {mins_suspended}m ago)"
+            elif current:
+                status = f"working on: {current}"
+            else:
+                status = "idle"
 
             worker_lines.append(
                 f"  {name} ({w.model}, {mode})\n"
@@ -1179,10 +1517,16 @@ class Swarm:
             ok = "OK" if t["success"] else "FAIL"
             recent_lines.append(f"  [{ok}] {t['worker']}: {t['task']} ({t['duration_s']}s)")
 
+        suspended_count = len(self._suspended_workers)
+        active_count = len(self.workers) - suspended_count
+        workers_line = f"Workers: {active_count} active"
+        if suspended_count:
+            workers_line += f", {suspended_count} suspended"
+
         report = (
             f"=== Swarm Status ===\n"
             f"Uptime: {uptime} | Ticks: {self._tick_count}\n"
-            f"Workers: {len(self.workers)} active\n"
+            f"{workers_line}\n"
             f"Tasks: {self._tasks_completed} work + {self._personal_tasks_completed} personal = {total_tasks} total\n"
             f"Failed: {self._tasks_failed} | Pending: {len(available)}\n"
             f"Throughput: {tpm} tasks/min\n"
@@ -1264,15 +1608,25 @@ class Swarm:
             1 for name in self.workers
             if name not in self._worker_current_task
         )
+        suspended_workers = len(self._suspended_workers)
+        effective_active = active_workers - suspended_workers
         checks["workers"] = {
             "active": active_workers,
+            "effective_active": effective_active,
             "idle": idle_workers,
+            "suspended": suspended_workers,
+            "suspended_names": list(self._suspended_workers.keys()),
             "booted": len(self._booted_workers),
         }
-        if active_workers == 0:
+        if effective_active == 0 and active_workers > 0:
+            issues.append(("critical", f"All workers suspended ({suspended_workers} suspended)"))
+        elif active_workers == 0:
             issues.append(("critical", "No active workers"))
         elif idle_workers == active_workers and self._tick_count > 10:
             issues.append(("warning", "All workers idle"))
+        if suspended_workers > 0:
+            reasons = [info["reason"] for info in self._suspended_workers.values()]
+            issues.append(("warning", f"{suspended_workers} worker(s) suspended: {', '.join(reasons)}"))
 
         # 2. Task queue health
         available = self.task_queue.get_available_tasks()
@@ -1816,6 +2170,19 @@ class Swarm:
 
         try:
             response_text = worker.think(prompt, system_override=combined_system)
+        except CreditsExhaustedError:
+            log.error(
+                "Discord response: %s credits exhausted during response generation",
+                worker_name,
+            )
+            if not self._is_local_worker(worker):
+                is_claude = worker.model.startswith("claude")
+                self._suspend_worker(
+                    worker_name,
+                    reason=f"credits_exhausted ({worker.provider_name})",
+                    check_interval=3600 if is_claude else 900,
+                )
+            response_text = fallback
         except Exception as e:
             log.error(
                 "Discord response: %s failed to generate response: %s",
@@ -2011,8 +2378,25 @@ class Swarm:
                 self.messenger.send(
                     f"Reboot sequence complete for {name}. Decision: {result.decision}."
                 )
+        except CreditsExhaustedError:
+            log.error(f"Boot/reboot failed for {name}: credits exhausted")
+            if not self._is_local_worker(worker):
+                is_claude = getattr(worker, 'model', '').startswith("claude")
+                self._suspend_worker(
+                    name,
+                    reason=f"credits_exhausted during boot ({getattr(worker, 'provider_name', 'unknown')})",
+                    check_interval=3600 if is_claude else 900,
+                )
         except Exception as e:
             log.error(f"Boot/reboot failed for {name}: {e}")
+            # Check if it's a credit exhaustion error in disguise
+            if self._is_credit_exhaustion_error(str(e).lower()) and not self._is_local_worker(worker):
+                is_claude = getattr(worker, 'model', '').startswith("claude")
+                self._suspend_worker(
+                    name,
+                    reason=f"credits_exhausted during boot ({getattr(worker, 'provider_name', 'unknown')})",
+                    check_interval=3600 if is_claude else 900,
+                )
             # Don't block the swarm — worker can still work without boot
         finally:
             self._booted_workers.add(name)
@@ -2042,13 +2426,29 @@ class Swarm:
                 )
                 self.messenger.send(f"Task created: {task.data['title']} ({task.address})")
             else:
-                # Route to first available worker for a response
+                # Route to first available non-suspended worker for a response
                 for name, worker in self.workers.items():
-                    response = worker.think(
-                        f"Matt sent this message: {msg.content}\n\n"
-                        f"Please respond directly to Matt."
-                    )
-                    self.messenger.send(f"[{name}] {response}")
+                    if name in self._suspended_workers:
+                        continue
+                    try:
+                        response = worker.think(
+                            f"Matt sent this message: {msg.content}\n\n"
+                            f"Please respond directly to Matt."
+                        )
+                        self.messenger.send(f"[{name}] {response}")
+                    except CreditsExhaustedError:
+                        if not self._is_local_worker(worker):
+                            is_claude = worker.model.startswith("claude")
+                            self._suspend_worker(
+                                name,
+                                reason=f"credits_exhausted ({worker.provider_name})",
+                                check_interval=3600 if is_claude else 900,
+                            )
+                        self.messenger.send(
+                            f"[{name}] Worker suspended — credits exhausted. "
+                            f"Trying next worker..."
+                        )
+                        continue
                     break
 
     def _save_state(self) -> None:
@@ -2073,6 +2473,7 @@ class Swarm:
         for name in self.workers:
             stats = self._worker_stats.get(name, {})
             current = self._worker_current_task.get(name)
+            susp = self._suspended_workers.get(name)
             worker_detail[name] = {
                 "model": self.workers[name].model,
                 "mode": "mock" if self.workers[name].mock else self.workers[name].provider_name,
@@ -2085,6 +2486,8 @@ class Swarm:
                 "last_task_title": stats.get("last_task_title"),
                 "last_task_time": stats.get("last_task_time"),
                 "personal_time_in": max(0, self._personal_time_interval - self._personal_time_tracker.get(name, 0)),
+                "suspended": bool(susp),
+                "suspended_reason": susp["reason"] if susp else None,
             }
 
         pending_count = len(self.task_queue.get_available_tasks())
@@ -2104,6 +2507,9 @@ class Swarm:
             "recent_tasks": self._task_history[-20:],  # Last 20 tasks
             "last_status_time": self._last_status_time,
             "standing_priority_cooldown": self._standing_priority_cooldown,
+            "suspended_workers": self._suspended_workers,
+            "worker_consecutive_failures": self._worker_consecutive_failures,
+            "worker_completions": self._worker_completions,
             "saved_at": now.isoformat(),
         }
         path = self.state_dir / "state.json"
@@ -2144,6 +2550,30 @@ class Swarm:
         cooldown = self._state.get("standing_priority_cooldown")
         if isinstance(cooldown, dict):
             self._standing_priority_cooldown = cooldown
+
+        # Restore suspended workers from previous state
+        suspended = self._state.get("suspended_workers")
+        if isinstance(suspended, dict) and suspended:
+            # Re-apply suspensions but schedule immediate checks
+            now = time.time()
+            for name, info in suspended.items():
+                if name in self.workers:
+                    info["next_check"] = now  # Check immediately on restart
+                    self._suspended_workers[name] = info
+            if self._suspended_workers:
+                log.info(
+                    "Restored %d suspended worker(s) from previous session: %s",
+                    len(self._suspended_workers),
+                    ", ".join(self._suspended_workers.keys()),
+                )
+
+        # Restore per-worker failure/completion counters
+        failures = self._state.get("worker_consecutive_failures")
+        if isinstance(failures, dict):
+            self._worker_consecutive_failures = failures
+        completions = self._state.get("worker_completions")
+        if isinstance(completions, dict):
+            self._worker_completions = completions
 
         # Restore reputation, limits, and governance from previous session
         rep_loaded = self.reputation.load(self.state_dir / "reputation.json")

@@ -289,5 +289,13 @@ def _handle_reboot():
     print(flush=True)
     log.info(f"Auto-reboot #{reboot_count}: re-execing process with {sys.executable}")
 
-    # Re-exec: replaces this process entirely
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    # Re-exec: use -m invocation to avoid Windows spaces-in-paths issues
+    # sys.argv may contain paths like "c:\Hypernet\Hypernet Structure\..."
+    # which os.execv on Windows can mangle at spaces.
+    import subprocess
+    args = [sys.executable, "-m", "hypernet", "launch"]
+    # Preserve any extra CLI flags from original invocation
+    # (skip argv[0] which is the script path, and 'launch' if present)
+    extra = [a for a in sys.argv[1:] if a != "launch"]
+    args.extend(extra)
+    os.execv(sys.executable, args)

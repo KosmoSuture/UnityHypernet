@@ -6852,6 +6852,45 @@ def test_server_api_endpoints():
         res = client.get("/favorites/stats")
         assert res.status_code == 200
 
+        # ===== VR Interface =====
+        res = client.get("/vr")
+        assert res.status_code == 200
+        assert "Hypernet VR" in res.text
+        assert "aframe" in res.text.lower()
+
+        # ===== Children endpoints (used by VR spatial browser) =====
+        # Seed test nodes directly via store (avoids PUT body parsing issue)
+        import hypernet.server as _srv_mod
+        _test_store = _srv_mod._store
+        _test_store.put_node(Node(address=HypernetAddress.parse("8"), data={"title": "Knowledge"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("8.1"), data={"title": "Knowledge Base"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("8.1.1"), data={"title": "Math"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("8.1.2"), data={"title": "Science"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("8.1.2.1"), data={"title": "Physics"}))
+
+        # Root children
+        res = client.get("/children")
+        assert res.status_code == 200
+        root_children = res.json()
+        assert isinstance(root_children, list)
+        root_addrs = [c["address"] for c in root_children]
+        assert "8" in root_addrs
+
+        # Children of 8.1
+        res = client.get("/children/8.1")
+        assert res.status_code == 200
+        children_8_1 = res.json()
+        assert len(children_8_1) == 2
+        addrs = [c["address"] for c in children_8_1]
+        assert "8.1.1" in addrs
+        assert "8.1.2" in addrs
+        # Each child should have child_count field
+        for c in children_8_1:
+            assert "child_count" in c
+        # 8.1.2 should have 1 child (8.1.2.1)
+        sci = [c for c in children_8_1 if c["address"] == "8.1.2"][0]
+        assert sci["child_count"] == 1
+
         # ===== Swarm (not running) =====
         res = client.get("/swarm/status")
         assert res.status_code == 200

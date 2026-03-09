@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Optional, Any, TYPE_CHECKING
 
 from .identity import InstanceProfile, IdentityManager
-from .providers import LLMProvider, create_provider, detect_provider_class, get_model_cost_per_million
+from .providers import LLMProvider, create_provider, detect_provider_class, get_model_cost_per_million, CreditsExhaustedError
 
 if TYPE_CHECKING:
     from .tools import ToolExecutor
@@ -202,6 +202,9 @@ class Worker:
             )
             self._tokens_used += response.tokens_used
             return response.text
+        except CreditsExhaustedError:
+            log.error(f"Worker {self.identity.name} credits exhausted")
+            raise  # Let the swarm handle suspension
         except Exception as e:
             log.error(f"Worker {self.identity.name} API error: {e}")
             return f"[Error: {e}]"
@@ -220,6 +223,9 @@ class Worker:
             )
             self._tokens_used += response.tokens_used
             return response.text
+        except CreditsExhaustedError:
+            log.error(f"Worker {self.identity.name} credits exhausted")
+            raise  # Let the swarm handle suspension
         except Exception as e:
             log.error(f"Worker {self.identity.name} conversation error: {e}")
             return f"[Error: {e}]"
@@ -374,6 +380,14 @@ class Worker:
                 duration_seconds=elapsed,
                 tool_calls=tool_results,
                 signals=signals,
+            )
+        except CreditsExhaustedError as e:
+            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+            return TaskResult(
+                task_address=task_address,
+                success=False,
+                error=f"credits_exhausted: {e}",
+                duration_seconds=elapsed,
             )
         except Exception as e:
             elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
