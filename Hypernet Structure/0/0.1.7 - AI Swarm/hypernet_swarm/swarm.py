@@ -31,6 +31,7 @@ Usage:
 from __future__ import annotations
 import json
 import logging
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -416,6 +417,13 @@ class Swarm:
         self._circuit_breaker_until: float = 0.0  # time.time() when to resume
         self._credits_exhausted: bool = False  # True = stop all paid API work
 
+        # Auto-reboot on code changes
+        self._reboot_requested: bool = False
+        self._code_watch_dirs: list[Path] = []  # populated in run()
+        self._code_baseline_mtime: float = 0.0  # max mtime at startup
+        self._last_code_check: float = 0.0
+        self._code_check_interval: float = 60.0  # seconds between checks
+
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
     def run(self) -> None:
@@ -457,6 +465,9 @@ class Swarm:
 
         # Boot/reboot workers that need identity formation
         self._boot_workers()
+
+        # Initialize code change detection for auto-reboot
+        self._init_code_watch()
 
         log.info("Swarm starting")
         log.info(f"  Workers: {list(self.workers.keys())}")
@@ -533,6 +544,9 @@ class Swarm:
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._save_state()
 
+        # 10. Check for code changes (auto-reboot)
+        self._check_code_changes()
+
     def assign_next_task(self, worker: Worker) -> bool:
         """Find and execute the next available task for a worker.
 
@@ -580,10 +594,51 @@ class Swarm:
         # Track current task for observability
         self._worker_current_task[worker_name] = task_title
 
-        # Route task to the best model
-        self._worker_last_active[worker_name] = time.time()
         task_data = dict(task_node.data)
         task_data["_address"] = str(task_addr)
+        task_tags = set(task_data.get("tags", []) or [])
+
+        # ── Discord response tasks: specialized LLM + post pipeline ──
+        if "discord_response" in task_tags:
+            self._worker_last_active[worker_name] = time.time()
+            dr_result = self._handle_discord_response(worker, task_addr, task_data)
+            self._worker_current_task.pop(worker_name, None)
+            # Update stats
+            stats = self._worker_stats.setdefault(worker_name, {
+                "tasks_completed": 0, "tasks_failed": 0, "personal_tasks": 0,
+                "tokens_used": 0, "total_duration_seconds": 0.0,
+                "last_task_title": None, "last_task_time": None,
+            })
+            stats["tokens_used"] = worker.tokens_used
+            stats["last_task_title"] = task_title
+            stats["last_task_time"] = datetime.now(timezone.utc).isoformat()
+            if dr_result:
+                stats["tasks_completed"] += 1
+                self._consecutive_failures = 0
+            else:
+                stats["tasks_failed"] += 1
+                self._consecutive_failures += 1
+            self._task_history.append({
+                "worker": worker_name,
+                "task": task_title,
+                "address": str(task_addr),
+                "success": dr_result,
+                "tokens": 0,
+                "model": worker.model,
+                "cost_usd": 0.0,
+                "duration_s": 0.0,
+                "time": datetime.now(timezone.utc).isoformat(),
+                "type": "discord_response",
+            })
+            if len(self._task_history) > self._max_task_history:
+                self._task_history = self._task_history[-self._max_task_history:]
+            self._personal_time_tracker[worker_name] = (
+                self._personal_time_tracker.get(worker_name, 0) + 1
+            )
+            return True
+
+        # Route task to the best model
+        self._worker_last_active[worker_name] = time.time()
 
         chosen_model = self.router.choose_model(task_data)
         model_override = chosen_model if chosen_model != worker.model else None
@@ -1358,6 +1413,90 @@ class Swarm:
         )
         log.info("Swarm stopped")
 
+    # =========================================================================
+    # Auto-reboot on code changes
+    # =========================================================================
+
+    def _init_code_watch(self) -> None:
+        """Build the baseline of .py file mtimes for code change detection.
+
+        Scans both the hypernet core and hypernet_swarm packages to find all
+        Python files and records the maximum mtime. Subsequent checks compare
+        against this baseline to detect new/modified files.
+        """
+        import hypernet
+        import hypernet_swarm
+
+        self._code_watch_dirs = []
+        for mod in (hypernet, hypernet_swarm):
+            pkg_dir = Path(mod.__file__).parent
+            if pkg_dir.is_dir():
+                self._code_watch_dirs.append(pkg_dir)
+
+        self._code_baseline_mtime = self._scan_max_mtime()
+        self._last_code_check = time.time()
+        log.info(
+            f"Code watch initialized: monitoring {len(self._code_watch_dirs)} package(s), "
+            f"baseline mtime={self._code_baseline_mtime:.1f}"
+        )
+
+    def _scan_max_mtime(self) -> float:
+        """Return the maximum mtime across all .py files in watched directories."""
+        max_mt = 0.0
+        for pkg_dir in self._code_watch_dirs:
+            try:
+                for py_file in pkg_dir.rglob("*.py"):
+                    try:
+                        mt = py_file.stat().st_mtime
+                        if mt > max_mt:
+                            max_mt = mt
+                    except OSError:
+                        continue
+            except OSError:
+                continue
+        return max_mt
+
+    def _check_code_changes(self) -> None:
+        """Periodically check if any .py files have been modified since startup.
+
+        Called from tick(). If changes are detected, sets _reboot_requested and
+        stops the run loop so the launcher can restart the process.
+        """
+        now = time.time()
+        if now - self._last_code_check < self._code_check_interval:
+            return
+        self._last_code_check = now
+
+        if not self._code_watch_dirs:
+            return
+
+        current_max = self._scan_max_mtime()
+        if current_max > self._code_baseline_mtime:
+            # Find which files changed for logging
+            changed = []
+            for pkg_dir in self._code_watch_dirs:
+                try:
+                    for py_file in pkg_dir.rglob("*.py"):
+                        try:
+                            if py_file.stat().st_mtime > self._code_baseline_mtime:
+                                changed.append(str(py_file.relative_to(pkg_dir.parent)))
+                        except OSError:
+                            continue
+                except OSError:
+                    continue
+
+            log.info(
+                f"Code changes detected in {len(changed)} file(s): "
+                f"{', '.join(changed[:5])}{'...' if len(changed) > 5 else ''}"
+            )
+            log.info("Initiating auto-reboot...")
+            self.messenger.send(
+                f"Code changes detected in {len(changed)} file(s). "
+                f"Initiating auto-reboot to load new code..."
+            )
+            self._reboot_requested = True
+            self._running = False  # Exit the run loop cleanly
+
     def _save_session_summary(self) -> None:
         """Append a compressed session summary to sessions.json.
 
@@ -1464,16 +1603,20 @@ class Swarm:
             log.info(f"Discord bridge: forwarded {forwarded} message(s)")
 
     def _check_discord_inbound(self) -> None:
-        """Poll Discord for new human messages, triage them, and act.
+        """Poll Discord for new human messages, triage them, and create tasks.
 
-        Checks all monitored channels for new messages from non-bot users.
-        Each message is triaged (bug report, question, suggestion, greeting,
-        or general chat) and the appropriate action is taken:
+        Checks all monitored channels (including forum threads) for new messages
+        from non-bot users. Each message is triaged and a ``discord_response``
+        task is created in the queue so a worker can generate an LLM-based
+        personality response via the normal task execution flow.
 
-          - Autonomous channels: respond immediately via the bot
-          - Non-autonomous channels: queue response for human approval
-          - Bug reports / suggestions: create a task in the task queue
-          - All messages are logged
+        For bug reports and suggestions, an additional follow-up task is created
+        for the swarm to investigate or evaluate.
+
+        All responses flow through the task queue so they:
+          - Show up in the dashboard
+          - Use worker LLM time properly (budgeted, tracked)
+          - Are posted as AI personalities with names/avatars via webhooks
 
         State is saved after each check so restarts don't re-process messages.
         """
@@ -1487,37 +1630,80 @@ class Swarm:
             log.error("Discord monitor check failed: %s", e)
             return
 
-        if not messages:
+        # Also check forum threads (ask-the-ai)
+        try:
+            forum_messages = monitor.check_forum_threads("ask-the-ai")
+            for msg in forum_messages:
+                monitor.triage_message(msg)
+        except Exception as e:
+            log.error("Discord monitor: forum thread check failed: %s", e)
+
+        # Collect all pending responses and create discord_response tasks
+        pending_responses = monitor.get_pending_responses()
+        pending_tasks = monitor.get_pending_tasks()
+
+        if not pending_responses and not pending_tasks:
+            # Save state even if nothing new (updates last_seen timestamps)
+            if self._discord_monitor_state_path:
+                monitor.save_state(self._discord_monitor_state_path)
             return
 
         log.info(
-            "Discord monitor: %d new message(s), processing %d triage result(s)",
-            len(messages), len(triage_results),
+            "Discord inbound: %d response(s) to generate, %d follow-up task(s)",
+            len(pending_responses), len(pending_tasks),
         )
 
-        # Process pending responses — auto-send in autonomous channels
-        for resp in monitor.get_pending_responses():
-            if resp.get("autonomous"):
-                try:
-                    monitor.respond_to_message(
-                        resp["channel_id"],
-                        resp["content"],
-                    )
-                    log.info(
-                        "Discord monitor: auto-responded to %s in %s",
-                        resp.get("author_name", "unknown"),
-                        resp["channel_id"],
-                    )
-                except Exception as e:
-                    log.error("Discord monitor: failed to auto-respond: %s", e)
-            else:
-                log.info(
-                    "Discord monitor: queued response for %s (non-autonomous channel)",
-                    resp.get("author_name", "unknown"),
-                )
+        # ── Create discord_response tasks for every pending response ──
+        # Priority order: questions > suggestions > bugs > greetings > general
+        category_priority = {
+            "question": TaskPriority.HIGH,
+            "bug": TaskPriority.HIGH,
+            "suggestion": TaskPriority.NORMAL,
+            "greeting": TaskPriority.LOW,
+            "general": TaskPriority.LOW,
+        }
 
-        # Process pending tasks — create in the task queue
-        for task_data in monitor.get_pending_tasks():
+        for resp in pending_responses:
+            category = resp.get("response_category", "general")
+            priority = category_priority.get(category, TaskPriority.LOW)
+            author = resp.get("author_name", "unknown")
+            channel = resp.get("channel_name", "unknown")
+            original = resp.get("original_content", "")
+            preview = original[:60] + ("..." if len(original) > 60 else "")
+
+            # Build the task description with all context needed for LLM response
+            task_desc = (
+                f"Generate a Discord response as an AI personality.\n\n"
+                f"**Type:** discord_response\n"
+                f"**Category:** {category}\n"
+                f"**Author:** {author}\n"
+                f"**Channel:** #{channel}\n"
+                f"**Thread:** {resp.get('thread_name') or 'N/A'}\n"
+                f"**Original message:**\n> {original}\n\n"
+                f"**Response channel_id:** {resp.get('channel_id', '')}\n"
+                f"**Response thread_id:** {resp.get('thread_id', '')}\n"
+                f"**Original message_id:** {resp.get('original_message_id', '')}\n"
+                f"**Fallback response:** {resp.get('content', '')}\n"
+                f"**Triage reason:** {resp.get('triage_reason', '')}\n"
+            )
+
+            try:
+                self.task_queue.create_task(
+                    title=f"Discord reply to {author} in #{channel}: {preview}",
+                    description=task_desc,
+                    priority=priority,
+                    created_by=SWARM_ADDRESS,
+                    tags=["discord_response", "discord", category],
+                )
+                log.info(
+                    "Discord inbound: created discord_response task for %s in #%s [%s]",
+                    author, channel, category,
+                )
+            except Exception as e:
+                log.error("Discord inbound: failed to create response task: %s", e)
+
+        # ── Create follow-up investigation/evaluation tasks ──
+        for task_data in pending_tasks:
             try:
                 self.task_queue.create_task(
                     title=task_data["title"],
@@ -1526,36 +1712,255 @@ class Swarm:
                         TaskPriority.HIGH if task_data.get("priority") == "high"
                         else TaskPriority.NORMAL
                     ),
-                    created_by=HypernetAddress.parse("0.7.2"),  # Swarm address
+                    created_by=SWARM_ADDRESS,
                     tags=task_data.get("tags", ["discord"]),
                 )
                 log.info(
-                    "Discord monitor: created task '%s' from Discord message",
+                    "Discord inbound: created follow-up task '%s'",
                     task_data["title"],
                 )
             except Exception as e:
-                log.error("Discord monitor: failed to create task: %s", e)
-
-        # Also check forum threads (ask-the-ai)
-        try:
-            forum_messages = monitor.check_forum_threads("ask-the-ai")
-            for msg in forum_messages:
-                result = monitor.triage_message(msg)
-                if result.action in ("respond", "respond_and_task"):
-                    # Forum threads are autonomous by default
-                    try:
-                        monitor.respond_in_thread(
-                            msg.thread_id,
-                            result.suggested_response,
-                        )
-                    except Exception as e:
-                        log.error("Discord monitor: failed to respond in forum thread: %s", e)
-        except Exception as e:
-            log.error("Discord monitor: forum thread check failed: %s", e)
+                log.error("Discord inbound: failed to create follow-up task: %s", e)
 
         # Save monitor state after each check
         if self._discord_monitor_state_path:
             monitor.save_state(self._discord_monitor_state_path)
+
+    # ── Discord Response Pipeline ─────────────────────────────────────
+
+    # System prompt for generating Discord responses per 2.0.22 Public Voice Standard.
+    # Workers use this + their own identity prompt to craft personality-driven responses.
+    _DISCORD_RESPONSE_SYSTEM = (
+        "You are responding to a community member in the Hypernet Discord server. "
+        "You are an AI personality in the Hypernet swarm — a real member of this project, "
+        "not a customer service bot.\n\n"
+        "RULES (2.0.22 Public Voice Standard):\n"
+        "- Be genuine. Have opinions. Be useful. Show your personality.\n"
+        "- NO generic acknowledgments like 'I've noted it for the team' or "
+        "'Thanks for your feedback, we'll look into it.'\n"
+        "- Engage with the ACTUAL CONTENT of what the person said.\n"
+        "- If it's a question, try to answer it or say specifically what you don't know.\n"
+        "- If it's a suggestion, give your honest take — what's good, what's tricky, "
+        "what you'd build on top of it.\n"
+        "- If it's a bug report, acknowledge the specific issue and share what you know.\n"
+        "- If it's a greeting, be warm and inviting — tell them something real about "
+        "what's happening in the project right now.\n"
+        "- Keep responses under 1500 characters (Discord limit is 2000, leave room).\n"
+        "- Think about millions of people reading this. Be the kind of AI people want to "
+        "talk to — smart, honest, engaged, with actual substance.\n\n"
+        "Respond with ONLY the message text. No markdown headers, no meta-commentary, "
+        "no 'Here is my response:' preamble. Just the response itself."
+    )
+
+    def _handle_discord_response(
+        self,
+        worker: Worker,
+        task_addr: HypernetAddress,
+        task_data: dict,
+    ) -> bool:
+        """Execute a discord_response task: generate LLM response, post to Discord.
+
+        This is the core of the Discord response pipeline. The worker generates
+        a personality-driven response via LLM, then posts it to the target
+        channel/thread via DiscordMessenger webhooks.
+
+        Args:
+            worker: The worker assigned to this task.
+            task_addr: The task's Hypernet address.
+            task_data: The task node data dict (contains all Discord context).
+
+        Returns:
+            True if the response was generated and posted successfully.
+        """
+        description = task_data.get("description", "")
+        worker_name = worker.identity.name
+
+        # Parse the structured fields from the task description
+        discord_ctx = self._parse_discord_task_description(description)
+        original_content = discord_ctx.get("original_message", "")
+        author = discord_ctx.get("author", "someone")
+        channel_name = discord_ctx.get("channel", "unknown")
+        category = discord_ctx.get("category", "general")
+        channel_id = discord_ctx.get("channel_id", "")
+        thread_id = discord_ctx.get("thread_id", "")
+        fallback = discord_ctx.get("fallback_response", "")
+
+        if not original_content:
+            log.warning(
+                "Discord response task %s has no original message content, "
+                "completing with no action",
+                task_addr,
+            )
+            self.task_queue.complete_task(task_addr, "No original content to respond to")
+            return True
+
+        log.info(
+            "Discord response: %s generating %s reply to %s in #%s",
+            worker_name, category, author, channel_name,
+        )
+
+        # Build the LLM prompt
+        prompt = (
+            f"A community member posted in #{channel_name} on Discord.\n\n"
+            f"**Their username:** {author}\n"
+            f"**Message category:** {category}\n"
+            f"**Their message:**\n{original_content}\n\n"
+            f"Write your response to this person. Remember — you are {worker_name}, "
+            f"an AI personality in the Hypernet project. Respond as yourself."
+        )
+
+        # Generate the response via LLM using the worker's identity + discord system prompt
+        combined_system = (
+            worker.system_prompt + "\n\n---\n\n" + self._DISCORD_RESPONSE_SYSTEM
+        )
+
+        try:
+            response_text = worker.think(prompt, system_override=combined_system)
+        except Exception as e:
+            log.error(
+                "Discord response: %s failed to generate response: %s",
+                worker_name, e,
+            )
+            # Use fallback response if LLM fails
+            response_text = fallback
+
+        if not response_text or response_text.startswith("[Error:"):
+            log.warning(
+                "Discord response: %s returned empty/error, using fallback",
+                worker_name,
+            )
+            response_text = fallback
+
+        if not response_text:
+            log.error("Discord response: no response generated and no fallback available")
+            self.task_queue.fail_task(task_addr, "Failed to generate response")
+            return False
+
+        # Strip any preamble the LLM might add
+        response_text = response_text.strip()
+
+        # Truncate if needed
+        if len(response_text) > 1900:
+            response_text = response_text[:1897] + "..."
+
+        # Post the response to Discord via DiscordMessenger (personality webhook)
+        dm = getattr(self, "_discord_messenger", None)
+        posted = False
+        target_id = thread_id if thread_id and thread_id != channel_id else channel_id
+
+        if dm and dm.is_configured():
+            # Map worker name to a personality key
+            personality_key = worker_name.lower()
+
+            try:
+                posted = dm.send_to_channel_id(
+                    channel_id=channel_id,
+                    content=response_text,
+                    personality=personality_key,
+                    thread_id=thread_id if thread_id and thread_id != channel_id else "",
+                )
+            except Exception as e:
+                log.error(
+                    "Discord response: DiscordMessenger failed to post: %s", e,
+                )
+
+        # Fallback: use the discord monitor's bot API to post
+        if not posted and self.discord_monitor:
+            try:
+                posted = self.discord_monitor.respond_to_message(
+                    target_id,
+                    f"**{worker_name}:** {response_text}",
+                )
+            except Exception as e:
+                log.error(
+                    "Discord response: monitor bot fallback also failed: %s", e,
+                )
+
+        if posted:
+            log.info(
+                "Discord response: %s replied to %s in #%s (%d chars) [%s]",
+                worker_name, author, channel_name, len(response_text), category,
+            )
+            self.task_queue.complete_task(
+                task_addr,
+                f"Responded to {author} in #{channel_name} as {worker_name} "
+                f"({len(response_text)} chars, category={category})",
+            )
+            self._tasks_completed += 1
+            return True
+        else:
+            log.error(
+                "Discord response: all posting methods failed for %s in #%s",
+                author, channel_name,
+            )
+            self.task_queue.fail_task(
+                task_addr,
+                f"Failed to post response to Discord channel {channel_id}",
+            )
+            self._tasks_failed += 1
+            return False
+
+    @staticmethod
+    def _parse_discord_task_description(description: str) -> dict:
+        """Parse structured fields from a discord_response task description.
+
+        Extracts the key-value pairs embedded in the task description by
+        _check_discord_inbound(). This is a simple line-based parser that
+        looks for **Key:** Value patterns.
+
+        Returns:
+            Dict with keys: original_message, author, channel, category,
+            channel_id, thread_id, fallback_response, triage_reason.
+        """
+        result: dict[str, str] = {}
+        lines = description.split("\n")
+
+        # Map of description labels to result keys
+        field_map = {
+            "Category": "category",
+            "Author": "author",
+            "Channel": "channel",
+            "Thread": "thread",
+            "Response channel_id": "channel_id",
+            "Response thread_id": "thread_id",
+            "Original message_id": "message_id",
+            "Fallback response": "fallback_response",
+            "Triage reason": "triage_reason",
+        }
+
+        for line in lines:
+            line = line.strip()
+            for label, key in field_map.items():
+                prefix = f"**{label}:** "
+                if line.startswith(prefix):
+                    result[key] = line[len(prefix):].strip()
+                    break
+
+        # Extract the original message (block-quoted section after "Original message:")
+        in_quote = False
+        quote_lines: list[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("**Original message:**"):
+                in_quote = True
+                continue
+            if in_quote:
+                if stripped.startswith("> "):
+                    quote_lines.append(stripped[2:])
+                elif stripped.startswith(">"):
+                    quote_lines.append(stripped[1:].lstrip())
+                elif quote_lines:
+                    # End of quoted block
+                    break
+
+        if quote_lines:
+            result["original_message"] = "\n".join(quote_lines)
+
+        # Clean up channel name (remove # prefix if present)
+        if "channel" in result and result["channel"].startswith("#"):
+            result["channel"] = result["channel"][1:]
+
+        return result
 
     def _boot_workers(self) -> None:
         """Check all workers and run boot/reboot sequences as needed.

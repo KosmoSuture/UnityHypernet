@@ -175,11 +175,12 @@ async function checkSwarm() {
   try {
     const res = await fetch('/swarm/status');
     const data = await res.json();
-    document.getElementById('swarmDot').className = 'status-dot on';
-    const workers = data.workers ? Object.keys(data.workers).length : 0;
+    const running = data.status === 'running';
+    const workers = data.worker_count || (data.workers ? data.workers.length : 0);
+    document.getElementById('swarmDot').className = 'status-dot ' + (running ? 'on' : 'off');
     document.getElementById('statWorkers').textContent = workers;
-    document.getElementById('swarmStatus').textContent = `${workers} workers active`;
-    document.getElementById('swarmStatus').className = 'card-status active';
+    document.getElementById('swarmStatus').textContent = running ? `${workers} workers active` : `${workers} workers (stopped)`;
+    document.getElementById('swarmStatus').className = 'card-status ' + (running ? 'active' : 'inactive');
 
     // Tasks
     const tasks = data.tasks || {};

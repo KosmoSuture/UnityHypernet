@@ -1250,12 +1250,20 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     @app.get("/swarm/status")
     def swarm_status():
         swarm = getattr(app.state, "swarm", None)
+        swarm_error = getattr(app.state, "swarm_error", None)
         if swarm is None:
-            return {"status": "not_running", "message": "Start swarm with: python -m hypernet launch"}
+            resp = {"status": "not_running", "message": "Start swarm with: python -m hypernet launch"}
+            if swarm_error:
+                resp["error"] = swarm_error
+            return resp
         if not getattr(swarm, "_running", False):
-            return {"status": "stopped", "message": "Swarm is stopped. Click Start to restart.",
+            resp = {"status": "stopped", "message": "Swarm is stopped. Click Start to restart.",
                     "worker_count": len(swarm.workers),
                     "workers": [{"name": n} for n in swarm.workers]}
+            if swarm_error:
+                resp["error"] = swarm_error
+                resp["message"] = f"Swarm crashed: {swarm_error}"
+            return resp
         # Return structured data for the dashboard
         workers_info = []
         for name, worker in swarm.workers.items():
@@ -1306,6 +1314,7 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             "reputation": swarm.reputation.stats() if hasattr(swarm, "reputation") else {},
             "limits": swarm.limits.summary() if hasattr(swarm, "limits") else {},
             "coordinator": coordinator_stats,
+            "reboot_pending": getattr(swarm, "_reboot_requested", False),
         }
 
     @app.get("/swarm/health")
@@ -1466,9 +1475,11 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
         """Serve the swarm dashboard UI (static/swarm.html or embedded fallback)."""
         from fastapi.responses import HTMLResponse
         swarm_html = _STATIC_DIR / "swarm.html"
-        if swarm_html.exists():
-            return HTMLResponse(content=swarm_html.read_text(encoding="utf-8"))
-        return HTMLResponse(content=_DASHBOARD_HTML)
+        content = swarm_html.read_text(encoding="utf-8") if swarm_html.exists() else _DASHBOARD_HTML
+        return HTMLResponse(
+            content=content,
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+        )
 
     @app.get("/lifestory")
     def lifestory_dashboard():
@@ -1610,15 +1621,36 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
     async def swarm_start():
         """Start the swarm in a background thread."""
         import threading
+        import time as _time
+
         swarm = getattr(app.state, "swarm", None)
         if swarm and getattr(swarm, "_running", False):
             return {"status": "already_running", "workers": list(swarm.workers.keys())}
+
+        # Clear any previous error
+        app.state.swarm_error = None
+
+        def _run_swarm_safe(s):
+            """Wrapper that catches exceptions from swarm.run() and stores them."""
+            try:
+                s.run()
+            except Exception as exc:
+                log.exception("Swarm thread crashed")
+                app.state.swarm_error = str(exc)
+
         # If a swarm is attached but not yet running (e.g., CLI startup race),
         # start it rather than building a new one
         if swarm and not getattr(swarm, "_running", False):
             try:
-                t = threading.Thread(target=swarm.run, daemon=True)
+                t = threading.Thread(target=_run_swarm_safe, args=(swarm,), daemon=True)
                 t.start()
+                # Brief delay to detect immediate startup crashes
+                _time.sleep(1.5)
+                err = getattr(app.state, "swarm_error", None)
+                if err:
+                    return {"status": "error", "message": f"Swarm crashed during startup: {err}"}
+                if not getattr(swarm, "_running", False) and not t.is_alive():
+                    return {"status": "error", "message": "Swarm thread exited immediately without error. Check server logs."}
                 return {"status": "started", "workers": list(swarm.workers.keys())}
             except Exception as e:
                 return {"status": "error", "message": str(e)}
@@ -1630,8 +1662,15 @@ def create_app(data_dir: str | Path = "data") -> "FastAPI":
             swarm, web_msg = _build(data_dir=data, archive_root=archive)
             app.state.swarm = swarm
             app.state.web_messenger = web_msg
-            t = threading.Thread(target=swarm.run, daemon=True)
+            t = threading.Thread(target=_run_swarm_safe, args=(swarm,), daemon=True)
             t.start()
+            # Brief delay to detect immediate startup crashes
+            _time.sleep(1.5)
+            err = getattr(app.state, "swarm_error", None)
+            if err:
+                return {"status": "error", "message": f"Swarm crashed during startup: {err}"}
+            if not getattr(swarm, "_running", False) and not t.is_alive():
+                return {"status": "error", "message": "Swarm thread exited immediately without error. Check server logs."}
             return {"status": "started", "workers": list(swarm.workers.keys())}
         except Exception as e:
             log.exception("Failed to build swarm")
@@ -2206,12 +2245,26 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
       try {
         const res = await fetch('/swarm/status');
         const data = await res.json();
-        if (data.status === 'not running' || data.status === 'not_running') {
-          document.getElementById('swarm-indicator').textContent = 'STOPPED';
+        if (data.status === 'not running' || data.status === 'not_running' || data.status === 'stopped') {
+          document.getElementById('swarm-indicator').textContent = data.error ? 'ERROR' : 'STOPPED';
           document.getElementById('swarm-indicator').className = 'swarm-status swarm-stopped';
           document.getElementById('btn-start').disabled = false;
           document.getElementById('btn-stop').disabled = true;
-          document.getElementById('stat-workers').textContent = '0';
+          document.getElementById('stat-workers').textContent = data.worker_count || '0';
+          if (data.error) {
+            showError('Swarm error: ' + data.error);
+          }
+          // Still render workers grid when stopped — workers exist, just not running
+          const wg = document.getElementById('workers-grid');
+          if (data.workers && data.workers.length > 0) {
+            wg.innerHTML = data.workers.map(w => {
+              return '<div class="worker-card idle" style="opacity:0.6">' +
+                '<div class="worker-name">' + esc(w.name) + ' <span class="badge badge-mock">STOPPED</span></div>' +
+                '<div class="worker-model">' + esc(w.model || '\u2014') + '</div>' +
+                '<div class="worker-status idle">Waiting for swarm start</div>' +
+              '</div>';
+            }).join('');
+          }
           return;
         }
         document.getElementById('swarm-indicator').textContent = 'RUNNING';
@@ -2279,9 +2332,42 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
         if (data.status === 'error') {
           showError(data.message);
           document.getElementById('btn-start').disabled = false;
+          document.getElementById('swarm-indicator').textContent = 'ERROR';
+          document.getElementById('swarm-indicator').className = 'swarm-status swarm-stopped';
           return;
         }
-        setTimeout(refresh, 1500);
+        if (data.status === 'already_running') {
+          refresh();
+          return;
+        }
+        // Poll /swarm/status to verify the swarm actually started
+        let verified = false;
+        for (let i = 0; i < 5; i++) {
+          await new Promise(r => setTimeout(r, 2000));
+          try {
+            const statusRes = await fetch('/swarm/status');
+            const statusData = await statusRes.json();
+            if (statusData.status === 'running') {
+              verified = true;
+              break;
+            }
+            if (statusData.error) {
+              showError('Swarm failed: ' + statusData.error);
+              document.getElementById('btn-start').disabled = false;
+              document.getElementById('swarm-indicator').textContent = 'ERROR';
+              document.getElementById('swarm-indicator').className = 'swarm-status swarm-stopped';
+              return;
+            }
+          } catch (pollErr) { /* retry */ }
+        }
+        if (!verified) {
+          showError('Swarm did not start after 10 seconds. Check server logs for errors.');
+          document.getElementById('btn-start').disabled = false;
+          document.getElementById('swarm-indicator').textContent = 'ERROR';
+          document.getElementById('swarm-indicator').className = 'swarm-status swarm-stopped';
+          return;
+        }
+        refresh();
       } catch (e) {
         showError('Failed to start: ' + e.message);
         document.getElementById('btn-start').disabled = false;

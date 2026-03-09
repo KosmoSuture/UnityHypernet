@@ -16,21 +16,26 @@ import os
 from pathlib import Path
 from typing import Optional
 
+# Core modules — these live in hypernet (the canonical source)
 from .address import HypernetAddress
 from .store import Store
 from .tasks import TaskQueue, TaskPriority
-from .identity import IdentityManager
-from .worker import Worker
-from .messenger import (
+
+# Swarm modules — use hypernet_swarm package (the canonical source)
+# The core hypernet/ package has stale copies of these from before the
+# swarm separation. Always import from hypernet_swarm to get current code.
+from hypernet_swarm.identity import IdentityManager
+from hypernet_swarm.worker import Worker
+from hypernet_swarm.messenger import (
     MultiMessenger, WebMessenger,
     EmailMessenger, TelegramMessenger, DiscordMessenger,
 )
-from .permissions import PermissionManager, PermissionTier
-from .audit import AuditTrail
-from .tools import ToolExecutor
-from .agent_tools import create_default_registry, ToolRegistry
-from .discord_monitor import DiscordMonitor
-from .swarm import Swarm, ModelRouter
+from hypernet_swarm.permissions import PermissionManager, PermissionTier
+from hypernet_swarm.audit import AuditTrail
+from hypernet_swarm.tools import ToolExecutor
+from hypernet_swarm.agent_tools import create_default_registry, ToolRegistry
+from hypernet_swarm.discord_monitor import DiscordMonitor
+from hypernet_swarm.swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
 
@@ -49,6 +54,22 @@ def build_swarm(
         config_path: Optional path to swarm_config.json
         mock: If True, all workers run in mock mode
     """
+    log.info("build_swarm() called: data_dir=%s, archive_root=%s, config_path=%s, mock=%s",
+             data_dir, archive_root, config_path, mock)
+    try:
+        return _build_swarm_inner(data_dir, archive_root, config_path, mock)
+    except Exception:
+        log.exception("build_swarm() FAILED — exception during swarm construction")
+        raise
+
+
+def _build_swarm_inner(
+    data_dir: str,
+    archive_root: str,
+    config_path: Optional[str],
+    mock: bool,
+) -> "tuple[Swarm, WebMessenger]":
+    """Inner implementation of build_swarm, wrapped for error logging."""
     # Load config — search order: explicit path, secrets/config.json, swarm_config.json, env vars
     config = {}
     if config_path and Path(config_path).exists():

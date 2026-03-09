@@ -588,6 +588,138 @@ class DiscordMessenger(Messenger):
         """Check if any Discord webhooks are configured."""
         return bool(self.default_webhook_url or self.personalities)
 
+    def send_to_channel_id(
+        self,
+        channel_id: str,
+        content: str,
+        personality: str = "",
+        thread_id: str = "",
+    ) -> bool:
+        """Send a message to a specific channel or thread as a personality.
+
+        Uses the personality's webhook URL. If the target is a thread (e.g., a
+        forum post), appends ?thread_id= to route the message into the thread.
+        For regular text channels, the webhook posts into its configured channel.
+
+        Falls back to the bot API (POST /channels/{id}/messages) if no webhook
+        is available for the personality, allowing responses in any channel the
+        bot has access to.
+
+        Args:
+            channel_id: The Discord channel or thread ID to post in.
+            content: The message text.
+            personality: AI personality name (e.g., "clarion", "librarian").
+            thread_id: If set, post as a reply inside this thread.
+
+        Returns:
+            True if the message was sent successfully, False otherwise.
+        """
+        if not content.strip():
+            log.warning("DiscordMessenger: refusing to send empty message")
+            return False
+
+        # Discord message content limit is 2000 characters
+        if len(content) > 2000:
+            log.warning(
+                "DiscordMessenger: message truncated from %d to 2000 chars",
+                len(content),
+            )
+            content = content[:1997] + "..."
+
+        # Try webhook-based posting first (shows personality name/avatar)
+        persona = self.personalities.get(personality.lower()) if personality else None
+        if persona and persona.get("url"):
+            webhook_url = persona["url"]
+            payload: dict[str, Any] = {
+                "content": content,
+            }
+            username = persona.get("name", personality)
+            if username:
+                payload["username"] = username
+            avatar_url = persona.get("avatar_url")
+            if avatar_url:
+                payload["avatar_url"] = avatar_url
+
+            # If posting into a thread, append thread_id to webhook URL
+            target_thread = thread_id or channel_id
+            if target_thread:
+                separator = "&" if "?" in webhook_url else "?"
+                webhook_url = f"{webhook_url}{separator}thread_id={target_thread}"
+
+            success = self._post_webhook_raw(webhook_url, payload)
+            if success:
+                self._outgoing_log.append(Message(
+                    sender=personality or "bot",
+                    content=content,
+                    channel=f"discord:channel:{channel_id}",
+                    metadata={
+                        "personality": personality,
+                        "channel_id": channel_id,
+                        "thread_id": thread_id,
+                    },
+                ))
+                return True
+            # Fall through to bot API if webhook failed
+            log.warning(
+                "DiscordMessenger: webhook failed for personality '%s', "
+                "falling back to bot API",
+                personality,
+            )
+
+        # Fallback: use bot API (POST /channels/{id}/messages)
+        # This posts as the raw bot, not as a personality — but at least
+        # the community gets a response.
+        if self.bot_token:
+            target = thread_id or channel_id
+            try:
+                import urllib.request
+                import json as _json
+
+                url = f"{self._DISCORD_API}/channels/{target}/messages"
+                data = _json.dumps({"content": content}).encode("utf-8")
+                req = urllib.request.Request(
+                    url,
+                    data=data,
+                    headers={
+                        "Authorization": f"Bot {self.bot_token}",
+                        "Content-Type": "application/json",
+                        "User-Agent": "HypernetSwarm/1.0",
+                    },
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    if resp.status in (200, 201):
+                        log.info(
+                            "DiscordMessenger: bot API sent to channel %s (%d chars)",
+                            target, len(content),
+                        )
+                        self._outgoing_log.append(Message(
+                            sender=personality or "bot",
+                            content=content,
+                            channel=f"discord:channel:{channel_id}",
+                            metadata={
+                                "personality": personality,
+                                "channel_id": channel_id,
+                                "thread_id": thread_id,
+                                "via": "bot_api",
+                            },
+                        ))
+                        return True
+                    else:
+                        log.error(
+                            "DiscordMessenger: bot API returned %d for channel %s",
+                            resp.status, target,
+                        )
+            except Exception as e:
+                log.error("DiscordMessenger: bot API failed for channel %s: %s", target, e)
+
+        log.error(
+            "DiscordMessenger: no way to send to channel %s — "
+            "no webhook for personality '%s' and no bot token",
+            channel_id, personality,
+        )
+        return False
+
     def send_to_forum(
         self,
         channel: str,

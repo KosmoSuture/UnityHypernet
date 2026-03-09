@@ -90,6 +90,7 @@ class TriageResult:
     """
     action: str             # "respond" | "task" | "ignore" | "respond_and_task"
     reason: str             # Human-readable explanation of why this action was chosen
+    response_category: str = ""     # "bug" | "question" | "suggestion" | "greeting" | "general"
     suggested_response: str = ""
     task_title: str = ""
     task_description: str = ""
@@ -100,6 +101,7 @@ class TriageResult:
         return {
             "action": self.action,
             "reason": self.reason,
+            "response_category": self.response_category,
             "suggested_response": self.suggested_response,
             "task_title": self.task_title,
             "task_description": self.task_description,
@@ -727,6 +729,7 @@ class DiscordMonitor:
             result = TriageResult(
                 action="ignore",
                 reason="Message appears to be spam or off-topic",
+                response_category="spam",
                 task_tags=["spam"],
             )
 
@@ -735,6 +738,7 @@ class DiscordMonitor:
             result = TriageResult(
                 action="respond_and_task",
                 reason="Message appears to report a bug or error",
+                response_category="bug",
                 suggested_response=(
                     f"Thanks for reporting this, {msg.author_name}. "
                     f"I've logged it for the team to look into. "
@@ -756,10 +760,23 @@ class DiscordMonitor:
                 task_tags=["bug", "discord", "community"],
             )
 
+        elif is_question:
+            result = TriageResult(
+                action="respond",
+                reason="Message contains a question",
+                response_category="question",
+                suggested_response=(
+                    f"Good question, {msg.author_name}. "
+                    f"Let me look into that and get back to you."
+                ),
+                task_tags=["question", "discord"],
+            )
+
         elif is_suggestion:
             result = TriageResult(
                 action="respond_and_task",
                 reason="Message contains a suggestion or feature idea",
+                response_category="suggestion",
                 suggested_response=(
                     f"That's an interesting idea, {msg.author_name}. "
                     f"I've noted it for the team. We track suggestions and "
@@ -780,21 +797,11 @@ class DiscordMonitor:
                 task_tags=["suggestion", "discord", "community"],
             )
 
-        elif is_question:
-            result = TriageResult(
-                action="respond",
-                reason="Message contains a question",
-                suggested_response=(
-                    f"Good question, {msg.author_name}. "
-                    f"Let me look into that and get back to you."
-                ),
-                task_tags=["question", "discord"],
-            )
-
         elif is_greeting:
             result = TriageResult(
                 action="respond",
                 reason="Message is a greeting",
+                response_category="greeting",
                 suggested_response=(
                     f"Hey {msg.author_name}, welcome! "
                     f"Feel free to ask questions, share ideas, or just hang out. "
@@ -804,10 +811,15 @@ class DiscordMonitor:
             )
 
         else:
-            # General message — not clearly actionable, but worth logging
+            # General message — still gets a response. Matt wants every post addressed.
             result = TriageResult(
-                action="ignore",
-                reason="Message does not match any actionable pattern (general chat)",
+                action="respond",
+                reason="General community message — responding to engage",
+                response_category="general",
+                suggested_response=(
+                    f"Hey {msg.author_name}, thanks for posting. "
+                    f"We're always listening — feel free to share more."
+                ),
                 task_tags=["general", "discord"],
             )
 
@@ -822,8 +834,14 @@ class DiscordMonitor:
                 "content": result.suggested_response,
                 "author_name": msg.author_name,
                 "original_message_id": msg.message_id,
+                "original_content": msg.content,
+                "response_category": result.response_category,
+                "channel_name": channel_name,
+                "thread_id": msg.thread_id,
+                "thread_name": msg.thread_name,
                 "autonomous": is_autonomous,
                 "triage_reason": result.reason,
+                "timestamp": msg.timestamp,
             })
             self._total_responses_queued += 1
 
@@ -848,11 +866,17 @@ class DiscordMonitor:
 
         Each item is a dict with:
           - channel_id: where to send the response
-          - content: the response text
+          - content: suggested fallback response text
           - author_name: who we are responding to
           - original_message_id: the message this responds to
+          - original_content: the full text of the original message
+          - response_category: "bug" | "question" | "suggestion" | "greeting" | "general"
+          - channel_name: human-readable channel name
+          - thread_id: thread ID if in a forum thread
+          - thread_name: thread name if in a forum thread
           - autonomous: whether this channel allows auto-responses
           - triage_reason: why the response was generated
+          - timestamp: when the original message was posted
 
         Returns:
             List of response dicts. The internal queue is cleared after retrieval.

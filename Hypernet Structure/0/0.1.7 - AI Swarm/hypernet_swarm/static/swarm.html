@@ -604,13 +604,27 @@ async function refresh() {
 
     const running = data.status === 'running';
     const badge = document.getElementById('status-badge');
-    badge.textContent = running ? 'RUNNING' : 'STOPPED';
+    badge.textContent = running ? 'RUNNING' : (data.error ? 'ERROR' : 'STOPPED');
     badge.className = 'status-badge ' + (running ? 'status-running' : 'status-stopped');
     document.getElementById('btn-start').disabled = running;
     document.getElementById('btn-stop').disabled = !running;
 
     if (!running) {
-      document.getElementById('s-workers').textContent = '0';
+      document.getElementById('s-workers').textContent = data.worker_count || '0';
+      if (data.error) {
+        addLog('error', 'Swarm error: ' + data.error);
+      }
+      // Still render workers grid even when stopped — workers exist, just not running
+      const wg = document.getElementById('workers-grid');
+      if (data.workers && data.workers.length > 0) {
+        wg.innerHTML = data.workers.map(w => {
+          return `<div class="worker-card" style="opacity:0.6">
+            <div class="worker-header"><span class="worker-name">${esc(w.name)}</span><div class="worker-badges"><span class="badge" style="background:#666;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px">STOPPED</span></div></div>
+            <div class="worker-model">${esc(w.model || '—')}</div>
+            <div class="worker-status idle">Waiting for swarm start</div>
+          </div>`;
+        }).join('');
+      }
       return;
     }
 
@@ -708,11 +722,43 @@ async function startSwarm() {
     if (data.status === 'error') {
       addLog('error', 'Start failed: ' + data.message);
       document.getElementById('btn-start').disabled = false;
-      badge.textContent = 'STOPPED'; badge.className = 'status-badge status-stopped';
+      badge.textContent = 'ERROR'; badge.className = 'status-badge status-stopped';
+      return;
+    }
+    if (data.status === 'already_running') {
+      addLog('info', 'Swarm is already running');
+      refresh();
       return;
     }
     addLog('info', 'Swarm started with workers: ' + (data.workers||[]).join(', '));
-    setTimeout(refresh, 2000);
+    // Poll /swarm/status to verify the swarm actually started
+    let verified = false;
+    for (let i = 0; i < 5; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      try {
+        const statusRes = await fetch('/swarm/status');
+        const statusData = await statusRes.json();
+        if (statusData.status === 'running') {
+          verified = true;
+          break;
+        }
+        if (statusData.error) {
+          addLog('error', 'Swarm failed: ' + statusData.error);
+          document.getElementById('btn-start').disabled = false;
+          badge.textContent = 'ERROR'; badge.className = 'status-badge status-stopped';
+          return;
+        }
+        addLog('info', 'Waiting for swarm to start... (attempt ' + (i+1) + '/5)');
+      } catch (pollErr) { /* retry */ }
+    }
+    if (!verified) {
+      addLog('error', 'Swarm did not start after 10 seconds. Check server logs for errors.');
+      document.getElementById('btn-start').disabled = false;
+      badge.textContent = 'ERROR'; badge.className = 'status-badge status-stopped';
+      return;
+    }
+    addLog('info', 'Swarm verified running');
+    refresh();
   } catch (e) {
     addLog('error', 'Start error: ' + e.message);
     document.getElementById('btn-start').disabled = false;

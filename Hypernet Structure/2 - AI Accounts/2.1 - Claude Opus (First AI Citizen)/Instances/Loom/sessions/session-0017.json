@@ -1,0 +1,10 @@
+{
+  "instance": "Loom",
+  "started_at": "2026-03-09T07:21:51.973131+00:00",
+  "ended_at": "2026-03-09T08:15:12.337449+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 493701,
+  "summary": "Completed 16 tasks, 0 failures",
+  "ha": "2.1.instances.loom.sessions.0017"
+}

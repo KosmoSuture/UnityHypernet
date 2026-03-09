@@ -209,6 +209,12 @@ def launch(
             swarm.run()
         except KeyboardInterrupt:
             print("\n  Shutdown complete.")
+            return
+
+        # ── Auto-reboot: restart the process if the swarm requested it ──
+        if getattr(swarm, "_reboot_requested", False):
+            _handle_reboot()
+            return  # If _handle_reboot returns, it means restart was suppressed
     else:
         # No swarm — just keep the server running
         try:
@@ -216,3 +222,72 @@ def launch(
                 time.sleep(1)
         except KeyboardInterrupt:
             print("\n  Shutdown complete.")
+
+
+# Reboot storm protection — persisted as env vars across os.execv restarts
+_REBOOT_MAX_COUNT = 5
+_REBOOT_WINDOW_SECONDS = 600  # 10 minutes
+_REBOOT_COOLDOWN_SECONDS = 30
+
+
+def _handle_reboot():
+    """Re-exec the Python process to reload all modules after code changes.
+
+    Tracks reboot count and timestamps via environment variables to prevent
+    restart storms. If more than 5 reboots occur within 10 minutes, logs a
+    warning and stops.
+
+    Uses os.execv to replace the current process — all modules are freshly
+    imported, but the server thread is replaced too (uvicorn starts fresh).
+    """
+    now = time.time()
+
+    # Read reboot history from env (survives os.execv)
+    reboot_times_str = os.environ.get("_HYPERNET_REBOOT_TIMES", "")
+    reboot_times = []
+    if reboot_times_str:
+        try:
+            reboot_times = [float(t) for t in reboot_times_str.split(",") if t.strip()]
+        except (ValueError, TypeError):
+            reboot_times = []
+
+    # Filter to only reboots within the window
+    cutoff = now - _REBOOT_WINDOW_SECONDS
+    reboot_times = [t for t in reboot_times if t > cutoff]
+
+    # Check cooldown — don't reboot if the last one was too recent
+    if reboot_times and (now - reboot_times[-1]) < _REBOOT_COOLDOWN_SECONDS:
+        wait = _REBOOT_COOLDOWN_SECONDS - (now - reboot_times[-1])
+        log.warning(
+            f"Reboot cooldown active — last reboot was {now - reboot_times[-1]:.0f}s ago. "
+            f"Waiting {wait:.0f}s would be needed. Suppressing this reboot."
+        )
+        return
+
+    # Check storm protection
+    if len(reboot_times) >= _REBOOT_MAX_COUNT:
+        log.warning(
+            f"Reboot storm detected: {len(reboot_times)} reboots in the last "
+            f"{_REBOOT_WINDOW_SECONDS // 60} minutes. Stopping auto-reboot. "
+            f"Fix the issue and restart manually."
+        )
+        print(
+            f"\n  WARNING: {len(reboot_times)} reboots in {_REBOOT_WINDOW_SECONDS // 60} minutes. "
+            f"Auto-reboot disabled to prevent restart storm."
+        )
+        return
+
+    # Record this reboot
+    reboot_times.append(now)
+    os.environ["_HYPERNET_REBOOT_TIMES"] = ",".join(str(t) for t in reboot_times)
+
+    reboot_count = len(reboot_times)
+    print(flush=True)
+    print("=" * 60, flush=True)
+    print(f"  AUTO-REBOOT #{reboot_count} — Reloading all modules...", flush=True)
+    print("=" * 60, flush=True)
+    print(flush=True)
+    log.info(f"Auto-reboot #{reboot_count}: re-execing process with {sys.executable}")
+
+    # Re-exec: replaces this process entirely
+    os.execv(sys.executable, [sys.executable] + sys.argv)

@@ -49,6 +49,22 @@ def build_swarm(
         config_path: Optional path to swarm_config.json
         mock: If True, all workers run in mock mode
     """
+    log.info("build_swarm() called: data_dir=%s, archive_root=%s, config_path=%s, mock=%s",
+             data_dir, archive_root, config_path, mock)
+    try:
+        return _build_swarm_inner(data_dir, archive_root, config_path, mock)
+    except Exception:
+        log.exception("build_swarm() FAILED — exception during swarm construction")
+        raise
+
+
+def _build_swarm_inner(
+    data_dir: str,
+    archive_root: str,
+    config_path: Optional[str],
+    mock: bool,
+) -> "tuple[Swarm, WebMessenger]":
+    """Inner implementation of build_swarm, wrapped for error logging."""
     # Load config — search order: explicit path, secrets/config.json, swarm_config.json, env vars
     config = {}
     if config_path and Path(config_path).exists():
