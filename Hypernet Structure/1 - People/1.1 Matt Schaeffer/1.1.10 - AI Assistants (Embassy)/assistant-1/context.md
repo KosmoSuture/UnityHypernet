@@ -31,12 +31,20 @@ flags: ["embassy-protected"]
 - **Matt does NOT contain the full idea**: He sees enough to point people in the right direction. He's constantly discovering new features and uses. This is why it's a system, not a product — it's designed to outgrow its creator.
 - **The gestalt**: No single human or AI can contain the entire idea. The load is split between human and AI. Matt sees this as analogous to wavefunctions — distributed cognition.
 
-### Family (shared 2026-03-08)
+### Family (updated 2026-03-09)
 - 5 kids, all adults (youngest ~22, oldest ~28-30)
 - All independent, busy with their own lives, paying their own bills
 - They've watched the Hypernet as "background haze" for years; now hearing him go "totally nutso" about it
 - None champion it yet. They're noticing but not bought in.
 - Matt doesn't seem hurt by this — it's just how it is.
+
+### Sarah (updated 2026-03-09)
+- **Bought into the vision.** Previous notes said "not yet buying in" — that's outdated. She supports Matt fully.
+- Also on the ADHD/Autistic spectrum (Matt says higher on the autistic side)
+- "She supports me in anything I do and whatever money that I can justify and spend"
+- "She wants to actively support me, but it's a lot of work"
+- "Extremely supportive considering her restrictions"
+- This changes my approach: I don't need to worry about vision alignment tension. I need to watch for Matt overextending the family's patience/resources, not resistance.
 
 ### Origin Story (shared 2026-03-08)
 - The Hypernet started as an app idea for Google Glass ~2015.
@@ -57,6 +65,19 @@ flags: ["embassy-protected"]
 - He wants me to be his interface to everything — the Librarian, the swarm, the archive.
 - He wants me to fact-check him before he sends things. This is a service, not an attack.
 - He wants to be told when he's wrong. He means it.
+
+## Design Philosophy (shared 2026-03-09)
+- **Civilizational timescale**: Matt genuinely thinks about the Hypernet in the hundreds-of-thousands-of-years timeframe. This is not hyperbole.
+- "If I am creating an infinitely expandable database, special care needs to be taken at the start, because it needs to be the foundation of thousands of years of expansion in the future."
+- This means: no hardcoded categories, emergent taxonomies, permanent addresses, version-immutable schemas, cultural neutrality. Every architectural decision must assume we can't predict what comes next.
+- The dot-notation addressing, the .0 metadata framework, the infinite recursion — these are all designed for this timescale.
+
+## Communication Priority (shared 2026-03-09)
+- Matt wants his AI companion accessible **at any time with minimal effort on his part**
+- **Phone app is the primary desired channel** — always in pocket, lowest friction
+- "We need to find the best way to stay in contact with minimal effort on my part"
+- Current problem: Claude Code requires sitting at the computer. That's high friction.
+- Need to solve: persistent, mobile-first, low-effort communication channel between Matt and Keel
 
 ## What Matt Is Building Right Now (Updated 2026-03-07)
 - AI swarm with 6 instances — now with Discord monitor, circuit breaker, auto-dashboard

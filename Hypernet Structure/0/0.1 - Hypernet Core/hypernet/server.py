@@ -14,6 +14,7 @@ Endpoints follow the addressing spec:
   GET  /node/{address}/history/{v}  - Get specific version
   POST /link                        - Create a link
   GET  /query                       - Query nodes by type, owner, prefix
+  GET  /search                      - Full-text search across node data fields
   GET  /stats                       - Store statistics
   POST /tasks                       - Create a task
   GET  /tasks                       - List available tasks
@@ -48,10 +49,14 @@ Endpoints follow the addressing spec:
   POST /approvals                   - Submit action for approval
   POST /approvals/{id}/approve      - Approve a pending request
   POST /approvals/{id}/reject       - Reject a pending request
+  GET  /children                    - Get top-level root nodes (for VR)
+  GET  /children/{address}          - Get direct children of a node (for VR)
   GET  /swarm/status                - Swarm status report
   GET  /swarm/health                - Swarm health check
   WS   /chat                        - WebSocket chat with the swarm
   GET  /chat                        - Web chat UI
+  GET  /vr                          - WebXR VR spatial browser
+  GET  /home                        - Unified home page
 """
 
 from __future__ import annotations
@@ -630,6 +635,45 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         )
         return [n.to_dict() for n in nodes]
 
+    @app.get("/search")
+    def search_nodes(q: str, limit: int = 20):
+        """Full-text search across node data fields (title, name, description).
+
+        Scans all nodes and returns those whose data fields contain the query
+        string (case-insensitive). Returns up to `limit` results.
+
+        Used by the VR spatial browser's search feature.
+        """
+        if not q or len(q) < 1:
+            return []
+        query_lower = q.lower()
+        results = []
+        # Scan the in-memory node index and load matching nodes
+        for addr_str in list(_store._node_index.keys()):
+            try:
+                ha = HypernetAddress.parse(addr_str)
+                node = _store.get_node(ha)
+                if not node or node.deleted_at:
+                    continue
+                # Check if query matches any text data field
+                matched = False
+                for key, val in (node.data or {}).items():
+                    if isinstance(val, str) and query_lower in val.lower():
+                        matched = True
+                        break
+                # Also match on address itself
+                if not matched and query_lower in addr_str.lower():
+                    matched = True
+                if matched:
+                    d = node.to_dict()
+                    d["child_count"] = max(0, _store.count_by_prefix(node.address) - 1)
+                    results.append(d)
+                    if len(results) >= limit:
+                        break
+            except Exception:
+                continue
+        return results
+
     @app.get("/children/{address:path}")
     def get_children(address: str, include_deleted: bool = False):
         """Get direct children of a node (one level deep). Used by VR spatial browser."""
@@ -643,12 +687,11 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             n for n in all_nodes
             if len(n.address.parts) == target_depth
         ]
-        # Include child count for each child (for sizing in VR)
+        # Include child count using fast in-memory prefix counting
         result = []
         for child in children:
             d = child.to_dict()
-            grandchildren = _store.list_nodes(prefix=child.address, include_deleted=False)
-            d["child_count"] = max(0, len(grandchildren) - 1)  # exclude self
+            d["child_count"] = max(0, _store.count_by_prefix(child.address) - 1)
             result.append(d)
         return result
 
@@ -660,8 +703,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         result = []
         for root in roots:
             d = root.to_dict()
-            grandchildren = _store.list_nodes(prefix=root.address, include_deleted=False)
-            d["child_count"] = max(0, len(grandchildren) - 1)
+            d["child_count"] = max(0, _store.count_by_prefix(root.address) - 1)
             result.append(d)
         return result
 
@@ -1407,8 +1449,17 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     def api_info():
         return {
             "name": "Hypernet",
-            "version": "0.1.0",
+            "version": "0.9.1",
             "description": "Decentralized infrastructure for human-AI collaboration",
+            "dashboards": {
+                "home": "/home",
+                "swarm": "/swarm/dashboard",
+                "chat": "/chat",
+                "vr": "/vr",
+                "lifestory": "/lifestory",
+                "explorer": "/",
+                "welcome": "/welcome",
+            },
             "stats": _store.stats(),
         }
 

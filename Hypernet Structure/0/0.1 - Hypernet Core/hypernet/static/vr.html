@@ -42,6 +42,31 @@
   #searchBox:focus { border-color: #4fc3f7; width: 220px; }
   #searchBox::placeholder { color: #555566; }
 
+  /* === Search Results === */
+  #searchResults {
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%); z-index: 1000;
+    background: rgba(22,22,34,0.96); border: 1px solid #2a2a3e; border-radius: 10px;
+    max-height: 50vh; overflow-y: auto; min-width: 400px; max-width: 600px;
+    display: none; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    animation: slideIn 0.15s ease-out;
+  }
+  #searchResults .sr-header {
+    padding: 12px 16px; border-bottom: 1px solid #2a2a3e; font-size: 12px;
+    color: #888899; text-transform: uppercase; letter-spacing: 1px; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  #searchResults .sr-item {
+    padding: 10px 16px; cursor: pointer; border-bottom: 1px solid rgba(42,42,62,0.4);
+    display: flex; justify-content: space-between; align-items: center; transition: background 0.1s;
+  }
+  #searchResults .sr-item:hover { background: rgba(79,195,247,0.08); }
+  #searchResults .sr-item:last-child { border-bottom: none; }
+  #searchResults .sr-title { color: #e0e0e8; font-size: 14px; font-weight: 500; }
+  #searchResults .sr-addr { color: #7c4dff; font-size: 12px; font-weight: 600; }
+  #searchResults .sr-type { color: #555566; font-size: 11px; }
+  #searchResults .sr-close { background: none; border: none; color: #888899; font-size: 18px; cursor: pointer; }
+  #searchResults .sr-close:hover { color: #4fc3f7; }
+
   /* === 2D Info Panel === */
   #info-panel {
     position: fixed; right: 20px; top: 65px; width: 340px; max-height: 75vh;
@@ -101,6 +126,23 @@
     text-transform: uppercase; letter-spacing: 1px;
   }
 
+  /* === Recently visited === */
+  #recentPanel {
+    position: fixed; left: 20px; top: 65px; z-index: 997;
+    background: rgba(22,22,34,0.9); border: 1px solid #2a2a3e; border-radius: 10px;
+    padding: 10px 14px; min-width: 140px; display: none; backdrop-filter: blur(8px);
+  }
+  #recentPanel.vr-active { display: none !important; }
+  #recentPanel .rp-title {
+    font-size: 10px; color: #555566; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  #recentPanel .rp-item {
+    padding: 4px 0; font-size: 12px; cursor: pointer; color: #888899; transition: color 0.1s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+  }
+  #recentPanel .rp-item:hover { color: #4fc3f7; }
+
   /* === Help overlay === */
   #helpOverlay {
     display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -115,7 +157,8 @@
 <div id="loading">
   <div class="loading-logo">HYPERNET</div>
   <div class="loading-ring"></div>
-  <div class="loading-text">Initializing spatial interface</div>
+  <div class="loading-text" id="loadingText">Initializing spatial interface</div>
+  <div style="margin-top:24px; font-size:11px; color:#333344; letter-spacing:2px;">SPATIAL BROWSER v0.9</div>
 </div>
 
 <div id="hud">
@@ -130,7 +173,7 @@
     <div class="hud-stats" id="hudStats"></div>
   </div>
   <div class="hud-nav">
-    <input type="text" id="searchBox" placeholder="Jump to address..." onkeydown="if(event.key==='Enter')jumpToAddress()">
+    <input type="text" id="searchBox" placeholder="Search or jump to address..." onkeydown="handleSearchKey(event)" oninput="handleSearchInput(event)">
     <button onclick="navigateUp()" id="upBtn" disabled>&#9650; Up</button>
     <button onclick="navigateToRoot()">&#8962; Root</button>
     <button onclick="cycleLayout()">&#9851; Layout</button>
@@ -154,7 +197,9 @@
     <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">/</td><td>Focus search box</td></tr>
     <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">B</td><td>Go back in history</td></tr>
     <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">M</td><td>Toggle ambient sound</td></tr>
-    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Esc</td><td>Close panels</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">R</td><td>Toggle auto-rotate</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">0-9</td><td>Jump to root category (at root)</td></tr>
+    <tr><td style="padding:4px 16px 4px 0; color:#7c4dff; font-weight:600;">Esc</td><td>Close panels/search</td></tr>
   </table>
   <div style="margin-top:16px; padding-top:12px; border-top: 1px solid #2a2a3e;">
     <div style="color:#4fc3f7; font-weight:600; margin-bottom:6px;">Quest VR</div>
@@ -167,6 +212,8 @@
   <button onclick="toggleHelp()" style="position:absolute; top:10px; right:14px; background:none; border:none; color:#888899; font-size:20px; cursor:pointer;">&times;</button>
 </div>
 
+<div id="searchResults"></div>
+
 <div id="info-panel">
   <button class="close-btn" onclick="closeInfo()">&times;</button>
   <h3 id="infoTitle">Node</h3>
@@ -176,6 +223,8 @@
   <div class="data-section" id="infoBody"></div>
   <button class="nav-btn" id="infoNavBtn" onclick="navigateToSelected()">&#9654; Enter this node</button>
 </div>
+
+<div id="recentPanel"></div>
 
 <div id="minimap">
   <canvas id="minimapCanvas" width="180" height="180"></canvas>
@@ -288,10 +337,15 @@
   <a-entity id="nodeContainer"></a-entity>
   <a-entity id="linkContainer"></a-entity>
 
-  <!-- Empty state -->
+  <!-- Empty state — leaf node detail view -->
   <a-entity id="emptyState" position="0 2.5 0" visible="false">
-    <a-text value="Leaf Node" align="center" color="#555566" width="5" font="roboto" billboard></a-text>
-    <a-text value="No children. Press UP to go back." position="0 -0.5 0" align="center" color="#333344" width="3.5" font="roboto" billboard></a-text>
+    <a-text id="leafTitle" value="Leaf Node" align="center" color="#4fc3f7" width="6" font="roboto" billboard></a-text>
+    <a-text id="leafAddr" value="" position="0 -0.4 0" align="center" color="#7c4dff" width="3" font="roboto" billboard></a-text>
+    <a-text id="leafBody" value="No children. Press UP or Backspace to go back." position="0 -0.9 0" align="center" color="#888899" width="3.5" font="roboto" wrap-count="50" billboard></a-text>
+    <!-- Decorative orbit ring -->
+    <a-torus id="leafRing" radius="2" radius-tubular="0.008" rotation="80 0 0"
+      material="color: #4fc3f7; emissive: #4fc3f7; emissiveIntensity: 0.3; opacity: 0.2; transparent: true"
+      animation="property: rotation; to: 80 360 0; dur: 8000; easing: linear; loop: true"></a-torus>
   </a-entity>
 
   <!-- Ambient particles -->
@@ -327,6 +381,9 @@ let audioEnabled = false;
 let audioCtx = null;
 let ambientGain = null;
 let navigating = false;
+let allChildNodes = []; // full list before pagination
+const MAX_VISIBLE_NODES = 40; // show at most this many nodes at once
+let cameraPositionMemory = {}; // address -> {x,y,z} camera position per level
 
 // --- Colors ---
 const COLORS = {
@@ -411,25 +468,38 @@ AFRAME.registerComponent('node-interact', {
   schema: { color: {type: 'string'}, addr: {type: 'string'}, nodeData: {type: 'string'} },
   init: function() {
     this.el.addEventListener('mouseenter', () => {
-      this.el.setAttribute('material', 'emissiveIntensity', 0.7);
-      this.el.object3D.scale.set(1.2, 1.2, 1.2);
-      // Expand the glow
+      this.el.setAttribute('material', 'emissiveIntensity', 0.8);
+      // Smooth scale with animation
+      this.el.setAttribute('animation__hover', 'property: scale; to: 1.25 1.25 1.25; dur: 150; easing: easeOutQuad');
+      // Expand the glow dramatically
       const parent = this.el.parentEl;
       const glow = parent?.querySelector('.node-glow');
-      if (glow) glow.object3D.scale.set(1.3, 1.3, 1.3);
+      if (glow) {
+        glow.setAttribute('animation__hover', 'property: scale; to: 1.5 1.5 1.5; dur: 200; easing: easeOutQuad');
+        glow.setAttribute('material', 'opacity', 0.12);
+      }
+      // Speed up orbital ring
+      const ring = parent?.querySelector('a-torus');
+      if (ring) ring.setAttribute('material', 'opacity', 0.6);
       try { showNodeInfo(JSON.parse(this.data.nodeData)); } catch(e) {}
       playHoverSound();
     });
     this.el.addEventListener('mouseleave', () => {
       this.el.setAttribute('material', 'emissiveIntensity', 0.25);
-      this.el.object3D.scale.set(1, 1, 1);
+      this.el.setAttribute('animation__hover', 'property: scale; to: 1 1 1; dur: 200; easing: easeOutQuad');
       const parent = this.el.parentEl;
       const glow = parent?.querySelector('.node-glow');
-      if (glow) glow.object3D.scale.set(1, 1, 1);
+      if (glow) {
+        glow.setAttribute('animation__hover', 'property: scale; to: 1 1 1; dur: 200; easing: easeOutQuad');
+        glow.setAttribute('material', 'opacity', 0.06);
+      }
+      const ring = parent?.querySelector('a-torus');
+      if (ring) ring.setAttribute('material', 'opacity', 0.3);
     });
     this.el.addEventListener('click', () => {
       playNavSound();
-      navigateTo(this.data.addr);
+      const pos = nodePositions[this.data.addr];
+      navigateTo(this.data.addr, pos);
     });
   }
 });
@@ -464,6 +534,34 @@ AFRAME.registerComponent('energy-beam', {
     }
   }
 });
+
+// ================================================================
+//  Navigation Particle Burst
+// ================================================================
+
+function emitNavigationBurst(color) {
+  const container = document.getElementById('nodeContainer');
+  if (!container) return;
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('a-sphere');
+    p.setAttribute('radius', 0.04 + Math.random() * 0.06);
+    p.setAttribute('position', '0 1 0');
+    p.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 1; opacity: 0.8; transparent: true`);
+    // Explode outward in random direction
+    const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+    const height = 0.5 + Math.random() * 3;
+    const dist = 3 + Math.random() * 5;
+    const tx = Math.cos(angle) * dist, tz = Math.sin(angle) * dist;
+    const dur = 600 + Math.random() * 400;
+    p.setAttribute('animation__move', `property: position; to: ${tx} ${height} ${tz}; dur: ${dur}; easing: easeOutQuad`);
+    p.setAttribute('animation__fade', `property: material.opacity; to: 0; dur: ${dur}; easing: easeInQuad`);
+    p.setAttribute('animation__shrink', `property: scale; to: 0.01 0.01 0.01; dur: ${dur}; easing: easeInQuad`);
+    container.appendChild(p);
+    // Clean up after animation
+    setTimeout(() => { try { container.removeChild(p); } catch(e) {} }, dur + 100);
+  }
+}
 
 // ================================================================
 //  Audio — Procedural Ambient Soundscape
@@ -595,6 +693,24 @@ async function fetchLinks(addr) {
 
 async function fetchStats() {
   try { const r = await fetch(`${API}/stats`); return r.ok ? await r.json() : {}; } catch(e) { return {}; }
+}
+
+async function searchNodes(query) {
+  try {
+    // Use the full-text search endpoint — searches titles, names, descriptions, and addresses
+    const r = await fetch(`${API}/search?q=${encodeURIComponent(query)}&limit=20`);
+    if (r.ok) {
+      const nodes = await r.json();
+      if (nodes.length > 0) return nodes;
+    }
+    // Fallback: try prefix search for address-like queries
+    const r2 = await fetch(`${API}/query?prefix=${encodeURIComponent(query)}`);
+    if (r2.ok) {
+      const nodes = await r2.json();
+      return nodes.slice(0, 20);
+    }
+    return [];
+  } catch(e) { return []; }
 }
 
 // ================================================================
@@ -827,9 +943,18 @@ function renderScene(nodes, animate = true) {
   // Depth rings
   updateDepthRings();
 
-  // Empty state
+  // Empty state — show rich leaf node info
   const emptyEl = document.getElementById('emptyState');
-  if (emptyEl) emptyEl.setAttribute('visible', nodes.length === 0 && currentAddress !== null);
+  if (emptyEl) {
+    const isLeaf = nodes.length === 0 && currentAddress !== null;
+    emptyEl.setAttribute('visible', isLeaf);
+    if (isLeaf) {
+      showLeafNodeDetail(currentAddress);
+    }
+  }
+
+  // Category-themed environment
+  updateEnvironmentTheme();
 
   if (showLinksEnabled && currentAddress) drawInterNodeLinks();
   updateMinimap(nodes, positions);
@@ -870,15 +995,76 @@ async function drawInterNodeLinks() {
 }
 
 // ================================================================
+//  Leaf Node Detail & Environment Theming
+// ================================================================
+
+async function showLeafNodeDetail(address) {
+  const color = getColor(address);
+  const cat = getCategoryName(address);
+
+  // Set colors on the leaf display
+  document.getElementById('leafTitle').setAttribute('color', color);
+  document.getElementById('leafAddr').setAttribute('value', address);
+  document.getElementById('leafRing').setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 0.3; opacity: 0.2; transparent: true`);
+
+  // Fetch full node data for display
+  const node = await fetchNode(address);
+  if (node) {
+    const title = node.data?.title || node.data?.name || address;
+    document.getElementById('leafTitle').setAttribute('value', title);
+
+    let bodyLines = [];
+    if (cat) bodyLines.push(`Category: ${cat}`);
+    if (node.type_address) bodyLines.push(`Type: ${node.type_address}`);
+    if (node.created_at) bodyLines.push(`Created: ${new Date(node.created_at).toLocaleDateString()}`);
+    bodyLines.push('');
+    if (node.data) {
+      for (const [key, val] of Object.entries(node.data)) {
+        if (key === 'title' || key === 'name') continue;
+        const s = typeof val === 'object' ? JSON.stringify(val) : String(val);
+        bodyLines.push(`${key}: ${s.length > 80 ? s.substring(0, 77) + '...' : s}`);
+      }
+    }
+    if (bodyLines.length <= 3) bodyLines.push('No additional data fields.');
+    bodyLines.push('', 'Press UP or Backspace to go back.');
+    document.getElementById('leafBody').setAttribute('value', bodyLines.join('\n').substring(0, 800));
+  }
+}
+
+function updateEnvironmentTheme() {
+  const color = currentAddress ? getColor(currentAddress) : '#4fc3f7';
+  const rgb = hexToRGB(color);
+
+  // Tint the main light toward the category color
+  const mainLight = document.getElementById('mainLight');
+  if (mainLight) mainLight.setAttribute('light', `type: point; color: ${color}; intensity: 1.0; decay: 1.0; distance: 40`);
+
+  // Tint the center core glow
+  const sky = document.querySelector('a-sky');
+  if (sky) {
+    // Subtle sky tint — very dark version of the category color
+    const r = Math.round(rgb.r * 8), g = Math.round(rgb.g * 8), b = Math.round(rgb.b * 8);
+    sky.setAttribute('color', `rgb(${r}, ${g}, ${b})`);
+  }
+}
+
+// ================================================================
 //  Navigation
 // ================================================================
 
-async function navigateTo(address) {
+async function navigateTo(address, targetPos) {
   if (address === currentAddress || navigating) return;
   navigating = true;
 
   showLoading(true);
   closeInfo();
+
+  // Save camera position for current level
+  const rig = document.getElementById('cameraRig');
+  if (currentAddress !== undefined) {
+    const rigPos = rig.object3D.position;
+    cameraPositionMemory[currentAddress || '__root__'] = { x: rigPos.x, y: rigPos.y, z: rigPos.z };
+  }
 
   // Push history
   if (currentAddress !== null || address !== null) {
@@ -886,20 +1072,85 @@ async function navigateTo(address) {
     if (navigationHistory.length > 50) navigationHistory.shift();
   }
 
+  // --- Zoom transition: fly camera toward clicked node + fade out existing nodes ---
+  if (targetPos) {
+    rig.setAttribute('animation__nav', `property: position; to: ${targetPos.x} ${targetPos.y + 1.6} ${targetPos.z}; dur: 500; easing: easeInQuad`);
+    const container = document.getElementById('nodeContainer');
+    if (container) {
+      Array.from(container.children).forEach(node => {
+        node.setAttribute('animation__exit', `property: scale; to: 0.01 0.01 0.01; dur: 400; easing: easeInQuad`);
+      });
+    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
   currentAddress = address;
   updateHUD();
 
-  // Camera reset
-  const rig = document.getElementById('cameraRig');
-  rig.setAttribute('animation__nav', `property: position; to: 0 0 14; dur: 500; easing: easeInOutQuad`);
+  // Restore camera position if we've been here before, otherwise default
+  const memKey = address || '__root__';
+  const savedPos = cameraPositionMemory[memKey];
+  if (savedPos) {
+    rig.setAttribute('animation__nav', `property: position; to: ${savedPos.x} ${savedPos.y} ${savedPos.z}; dur: 500; easing: easeOutQuad`);
+  } else {
+    rig.setAttribute('animation__nav', `property: position; to: 0 0 14; dur: 500; easing: easeOutQuad`);
+  }
 
   const children = await fetchChildren(address);
-  childNodes = children;
-  renderScene(children);
+  allChildNodes = children;
+
+  // Pagination: sort by child_count descending (most important first), cap at MAX_VISIBLE_NODES
+  if (children.length > MAX_VISIBLE_NODES) {
+    const sorted = [...children].sort((a, b) => (b.child_count || 0) - (a.child_count || 0));
+    childNodes = sorted.slice(0, MAX_VISIBLE_NODES);
+    showPaginationHint(children.length, MAX_VISIBLE_NODES);
+  } else {
+    childNodes = children;
+    hidePaginationHint();
+  }
+
+  renderScene(childNodes);
+
+  // Particle burst on navigation
+  const navColor = address ? getColor(address) : '#4fc3f7';
+  emitNavigationBurst(navColor);
 
   playNavSound();
   showLoading(false);
   navigating = false;
+}
+
+function showMoreNodes() {
+  if (allChildNodes.length <= childNodes.length) return;
+  const nextBatch = MAX_VISIBLE_NODES;
+  const sorted = [...allChildNodes].sort((a, b) => (b.child_count || 0) - (a.child_count || 0));
+  childNodes = sorted.slice(0, childNodes.length + nextBatch);
+  renderScene(childNodes);
+  if (childNodes.length >= allChildNodes.length) {
+    hidePaginationHint();
+  } else {
+    showPaginationHint(allChildNodes.length, childNodes.length);
+  }
+}
+
+function showPaginationHint(total, showing) {
+  let hint = document.getElementById('paginationHint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'paginationHint';
+    hint.style.cssText = 'position:fixed;bottom:20px;right:20px;background:rgba(22,22,34,0.95);border:1px solid #2a2a3e;border-radius:10px;padding:12px 20px;z-index:998;color:#e0e0e8;font-size:13px;cursor:pointer;transition:all 0.15s;backdrop-filter:blur(8px);';
+    hint.onclick = showMoreNodes;
+    hint.onmouseenter = () => hint.style.borderColor = '#4fc3f7';
+    hint.onmouseleave = () => hint.style.borderColor = '#2a2a3e';
+    document.body.appendChild(hint);
+  }
+  hint.innerHTML = `Showing <b style="color:#4fc3f7">${showing}</b> of <b style="color:#ffd54f">${total}</b> nodes &mdash; click to load more`;
+  hint.style.display = 'block';
+}
+
+function hidePaginationHint() {
+  const hint = document.getElementById('paginationHint');
+  if (hint) hint.style.display = 'none';
 }
 
 function navigateUp() {
@@ -914,7 +1165,37 @@ function navigateToSelected() { if (selectedNodeAddr) navigateTo(selectedNodeAdd
 function cycleLayout() {
   layoutIndex = (layoutIndex + 1) % LAYOUTS.length;
   layoutMode = LAYOUTS[layoutIndex];
-  renderScene(childNodes);
+
+  // Smooth transition: animate existing nodes to new positions
+  if (childNodes.length > 0) {
+    const newPositions = getPositions(childNodes);
+    const container = document.getElementById('nodeContainer');
+    const linkCont = document.getElementById('linkContainer');
+    const children = Array.from(container.children);
+
+    if (children.length === childNodes.length) {
+      // Animate each node entity to its new position
+      for (let i = 0; i < children.length; i++) {
+        const pos = newPositions[i];
+        nodePositions[childNodes[i].address] = pos;
+        children[i].setAttribute('animation__layout', `property: position; to: ${pos.x} ${pos.y} ${pos.z}; dur: 700; easing: easeInOutQuad`);
+      }
+      // Rebuild energy beams after transition
+      setTimeout(() => {
+        while (linkCont?.firstChild) linkCont.removeChild(linkCont.firstChild);
+        for (let i = 0; i < childNodes.length; i++) {
+          const pos = newPositions[i];
+          const color = getColor(childNodes[i].address);
+          linkCont.appendChild(createEnergyBeam(pos, color, i));
+        }
+        updateMinimap(childNodes, newPositions);
+      }, 720);
+    } else {
+      // Node count mismatch — full rebuild
+      renderScene(childNodes);
+    }
+  }
+  updateHUD();
   playNavSound();
 }
 
@@ -928,15 +1209,138 @@ function toggleLinks() {
 function jumpToAddress() {
   const box = document.getElementById('searchBox');
   const addr = box.value.trim();
-  if (addr) { navigateTo(addr); box.value = ''; box.blur(); }
+  if (addr) { navigateTo(addr); box.value = ''; box.blur(); closeSearchResults(); }
+}
+
+let searchTimeout = null;
+function handleSearchKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = e.target.value.trim();
+    // If there's a dot, treat as direct address navigation
+    if (val.includes('.') || /^\d+$/.test(val)) {
+      jumpToAddress();
+    } else if (val) {
+      // Trigger search
+      performSearch(val);
+    }
+  } else if (e.key === 'Escape') {
+    e.target.blur();
+    closeSearchResults();
+  }
+}
+
+function handleSearchInput(e) {
+  const val = e.target.value.trim();
+  clearTimeout(searchTimeout);
+  if (!val) { closeSearchResults(); return; }
+  // Debounce: search after 300ms of typing
+  searchTimeout = setTimeout(() => performSearch(val), 300);
+}
+
+async function performSearch(query) {
+  const results = await searchNodes(query);
+  const el = document.getElementById('searchResults');
+  if (results.length === 0) {
+    const safeQ = query.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = `<div class="sr-header"><span>No results for "${safeQ}"</span><button class="sr-close" onclick="closeSearchResults()">&times;</button></div>`;
+    el.style.display = 'block';
+    return;
+  }
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let html = `<div class="sr-header"><span>${results.length} result${results.length !== 1 ? 's' : ''}</span><button class="sr-close" onclick="closeSearchResults()">&times;</button></div>`;
+  for (const node of results) {
+    const title = esc(node.data?.title || node.data?.name || node.address);
+    const type = esc(node.type_address || '');
+    const addr = esc(node.address);
+    const color = getColor(node.address);
+    html += `<div class="sr-item" onclick="navigateToSearchResult('${addr}')">
+      <div><div class="sr-title">${title}</div><div class="sr-addr" style="color:${color}">${addr}</div></div>
+      <div class="sr-type">${type}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+  el.style.display = 'block';
+
+  // Highlight matching nodes in the current scene
+  highlightSearchResults(results.map(n => n.address));
+}
+
+function navigateToSearchResult(addr) {
+  closeSearchResults();
+  document.getElementById('searchBox').value = '';
+  document.getElementById('searchBox').blur();
+  // Navigate to the parent so this node is visible, or navigate directly
+  const parts = addr.split('.');
+  if (parts.length > 1) {
+    const parent = parts.slice(0, -1).join('.');
+    navigateTo(parent);
+  } else {
+    navigateTo(null); // go to root to see top-level nodes
+  }
+}
+
+function closeSearchResults() {
+  document.getElementById('searchResults').style.display = 'none';
+  clearHighlights();
+}
+
+function highlightSearchResults(addresses) {
+  clearHighlights();
+  const container = document.getElementById('nodeContainer');
+  if (!container) return;
+  const addrSet = new Set(addresses);
+  Array.from(container.children).forEach(nodeEl => {
+    const sphere = nodeEl.querySelector('.clickable');
+    if (!sphere) return;
+    const interact = sphere.getAttribute('node-interact');
+    if (!interact) return;
+    const addr = interact.addr;
+    if (addrSet.has(addr)) {
+      // Pulse the matching node
+      sphere.setAttribute('animation__search', 'property: material.emissiveIntensity; from: 0.3; to: 1.0; dur: 400; dir: alternate; loop: true');
+      nodeEl.setAttribute('animation__searchScale', 'property: scale; from: 1 1 1; to: 1.3 1.3 1.3; dur: 400; dir: alternate; loop: true');
+      nodeEl.classList.add('search-highlight');
+    } else {
+      // Dim non-matching nodes
+      sphere.setAttribute('material', 'opacity', 0.2);
+      nodeEl.classList.add('search-dimmed');
+    }
+  });
+}
+
+function clearHighlights() {
+  const container = document.getElementById('nodeContainer');
+  if (!container) return;
+  Array.from(container.children).forEach(nodeEl => {
+    if (nodeEl.classList.contains('search-highlight')) {
+      const sphere = nodeEl.querySelector('.clickable');
+      if (sphere) {
+        sphere.removeAttribute('animation__search');
+        sphere.setAttribute('material', 'emissiveIntensity', 0.25);
+      }
+      nodeEl.removeAttribute('animation__searchScale');
+      nodeEl.setAttribute('scale', '1 1 1');
+      nodeEl.classList.remove('search-highlight');
+    }
+    if (nodeEl.classList.contains('search-dimmed')) {
+      const sphere = nodeEl.querySelector('.clickable');
+      if (sphere) sphere.setAttribute('material', 'opacity', 1);
+      nodeEl.classList.remove('search-dimmed');
+    }
+  });
 }
 
 function goBack() {
   if (navigationHistory.length === 0) return;
   const prev = navigationHistory.pop();
-  currentAddress = '__going_back__'; // prevent guard
+  // Navigate without pushing to history again
+  navigating = false; // reset guard
+  const savedHistory = [...navigationHistory]; // save before navigateTo pushes
   navigateTo(prev);
-  navigationHistory.pop(); // remove the extra push
+  // Restore history (remove the extra push that navigateTo added)
+  navigationHistory.length = 0;
+  savedHistory.forEach(h => navigationHistory.push(h));
 }
 
 function toggleHelp() {
@@ -987,8 +1391,14 @@ function updateHUD() {
     }
   }
 
-  document.getElementById('hudStats').textContent = `${childNodes.length} node${childNodes.length !== 1 ? 's' : ''} | ${layoutMode}`;
+  // Show pagination info if applicable
+  const totalStr = allChildNodes.length > childNodes.length
+    ? `${childNodes.length}/${allChildNodes.length}`
+    : `${childNodes.length}`;
+  document.getElementById('hudStats').textContent = `${totalStr} node${childNodes.length !== 1 ? 's' : ''} | ${layoutMode}`;
+
   updateVRPanel();
+  updateRecentPanel();
 }
 
 function updateVRPanel() {
@@ -998,9 +1408,43 @@ function updateVRPanel() {
   if (s) s.setAttribute('value', `${childNodes.length} nodes | ${layoutMode} | depth ${getDepth()}`);
 }
 
+function updateRecentPanel() {
+  const panel = document.getElementById('recentPanel');
+  if (!panel || isVR) return;
+
+  // Build unique recent list from navigation history (most recent first, deduplicated)
+  const seen = new Set();
+  const recent = [];
+  for (let i = navigationHistory.length - 1; i >= 0; i--) {
+    const addr = navigationHistory[i];
+    const key = addr || '__root__';
+    if (!seen.has(key) && key !== (currentAddress || '__root__')) {
+      seen.add(key);
+      recent.push(addr);
+      if (recent.length >= 6) break;
+    }
+  }
+
+  if (recent.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  let html = '<div class="rp-title">Recent</div>';
+  for (const addr of recent) {
+    const display = addr || 'Root';
+    const color = addr ? getColor(addr) : '#4fc3f7';
+    html += `<div class="rp-item" onclick="navigateTo(${addr === null ? 'null' : "'" + addr + "'"})" style="border-left: 2px solid ${color}; padding-left: 8px;">${display}</div>`;
+  }
+  panel.innerHTML = html;
+  panel.style.display = 'block';
+}
+
 // ================================================================
 //  Info Panel
 // ================================================================
+
+let fullNodeCache = {};
 
 function showNodeInfo(node) {
   selectedNode = node;
@@ -1030,6 +1474,18 @@ function showNodeInfo(node) {
     document.getElementById('infoBody').innerHTML = body || '<div style="color:#555566">No data fields</div>';
     document.getElementById('infoNavBtn').style.display = cc > 0 ? '' : 'none';
     panel.style.display = 'block';
+
+    // Lazy-fetch full node data for richer detail
+    if (!fullNodeCache[node.address]) {
+      fetchNode(node.address).then(full => {
+        if (full && selectedNodeAddr === node.address) {
+          fullNodeCache[node.address] = full;
+          enrichInfoPanel(full);
+        }
+      });
+    } else {
+      enrichInfoPanel(fullNodeCache[node.address]);
+    }
   }
 
   if (isVR) {
@@ -1054,6 +1510,28 @@ function showNodeInfo(node) {
 }
 
 function vrInfoEnterHandler() { if (selectedNodeAddr) navigateTo(selectedNodeAddr); }
+
+function enrichInfoPanel(fullNode) {
+  // Update the info panel with richer data from the full node fetch
+  if (!fullNode || !fullNode.data) return;
+  let body = '';
+  for (const [key, val] of Object.entries(fullNode.data)) {
+    const d = typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
+    const escaped = d.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    body += `<div class="data-row"><div class="data-key">${key}</div><div class="data-val">${escaped.length > 500 ? escaped.substring(0,497)+'...' : escaped}</div></div>`;
+  }
+  if (body) document.getElementById('infoBody').innerHTML = body;
+
+  // Update title if different
+  const title = fullNode.data?.title || fullNode.data?.name;
+  if (title) document.getElementById('infoTitle').textContent = title;
+
+  // Update metadata with version info if available
+  let meta = document.getElementById('infoMeta').innerHTML;
+  if (fullNode.version && !meta.includes('Version')) meta += `Version: ${fullNode.version}<br>`;
+  if (fullNode.owner && !meta.includes('Owner')) meta += `Owner: ${fullNode.owner}<br>`;
+  document.getElementById('infoMeta').innerHTML = meta;
+}
 
 function closeInfo() {
   document.getElementById('info-panel').style.display = 'none';
@@ -1089,7 +1567,7 @@ function updateMinimap(nodes, positions) {
   const sc = Math.min((w-24)/rX, (h-24)/rZ);
   const cx = w/2, cy = h/2;
 
-  // Center
+  // Center hub
   ctx.fillStyle = '#4fc3f7';
   ctx.shadowBlur = 6; ctx.shadowColor = '#4fc3f7';
   ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
@@ -1101,14 +1579,35 @@ function updateMinimap(nodes, positions) {
     const y = cy + (p.z - (minZ+maxZ)/2) * sc;
     const color = getColor(nodes[i].address);
 
-    // Connection
+    // Connection line
     ctx.strokeStyle = color; ctx.globalAlpha = 0.12; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
 
-    // Dot
+    // Node dot — size based on child count
+    const cc = nodes[i].child_count || 0;
+    const dotSize = Math.min(6, 2.5 + cc * 0.15);
     ctx.fillStyle = color; ctx.globalAlpha = 0.85;
-    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, dotSize, 0, Math.PI*2); ctx.fill();
   }
+
+  // Camera position indicator (triangle)
+  try {
+    const rig = document.getElementById('cameraRig');
+    if (rig) {
+      const rigPos = rig.object3D.position;
+      const camX = cx + (rigPos.x - (minX+maxX)/2) * sc;
+      const camY = cy + (rigPos.z - (minZ+maxZ)/2) * sc;
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(camX, camY - 5);
+      ctx.lineTo(camX - 3.5, camY + 3);
+      ctx.lineTo(camX + 3.5, camY + 3);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } catch(e) {}
+
   ctx.globalAlpha = 1;
 }
 
@@ -1187,18 +1686,48 @@ function generateGrid() {
 //  Keyboard
 // ================================================================
 
+let autoRotate = false;
+let autoRotateSpeed = 0.0003;
+
+function toggleAutoRotate() {
+  autoRotate = !autoRotate;
+}
+
+// Auto-rotation tick — slowly orbit the scene
+(function autoRotateTick() {
+  requestAnimationFrame(autoRotateTick);
+  if (!autoRotate) return;
+  const container = document.getElementById('nodeContainer');
+  const linkCont = document.getElementById('linkContainer');
+  if (!container) return;
+  const t = Date.now() * autoRotateSpeed;
+  container.object3D.rotation.y = t;
+  if (linkCont) linkCont.object3D.rotation.y = t;
+})();
+
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
   const help = document.getElementById('helpOverlay');
+  const search = document.getElementById('searchResults');
   switch(e.key) {
-    case 'Escape': help.style.display !== 'none' ? help.style.display = 'none' : closeInfo(); break;
+    case 'Escape':
+      if (search.style.display !== 'none') closeSearchResults();
+      else if (help.style.display !== 'none') help.style.display = 'none';
+      else closeInfo();
+      break;
     case 'Backspace': e.preventDefault(); navigateUp(); break;
     case 'Home': navigateToRoot(); break;
     case 'Tab': e.preventDefault(); cycleLayout(); break;
     case '/': e.preventDefault(); document.getElementById('searchBox').focus(); break;
     case 'b': goBack(); break;
     case 'm': toggleSound(); break;
+    case 'r': toggleAutoRotate(); break;
     case '?': toggleHelp(); break;
+    // Number keys 0-9: jump to root category when at root level
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
+      if (!currentAddress) navigateTo(e.key);
+      break;
   }
 });
 
@@ -1207,6 +1736,9 @@ document.addEventListener('keydown', (e) => {
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const loadText = document.getElementById('loadingText');
+
+  loadText.textContent = 'Building environment';
   generateGrid();
   generateStarfield();
   generateParticles();
@@ -1216,23 +1748,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     isVR = true;
     document.getElementById('hud').classList.add('vr-active');
     document.getElementById('minimap').classList.add('vr-active');
+    document.getElementById('recentPanel').classList.add('vr-active');
     document.getElementById('info-panel').style.display = 'none';
     document.getElementById('helpOverlay').style.display = 'none';
+    const hint = document.getElementById('paginationHint');
+    if (hint) hint.style.display = 'none';
     document.getElementById('vrNavPanel').setAttribute('visible', 'true');
   });
   scene.addEventListener('exit-vr', () => {
     isVR = false;
     document.getElementById('hud').classList.remove('vr-active');
     document.getElementById('minimap').classList.remove('vr-active');
+    document.getElementById('recentPanel').classList.remove('vr-active');
     document.getElementById('vrNavPanel').setAttribute('visible', 'false');
     document.getElementById('vrInfoPanel').setAttribute('visible', 'false');
   });
 
-  await navigateTo(null);
+  loadText.textContent = 'Connecting to Hypernet';
   const stats = await fetchStats();
+
+  loadText.textContent = 'Loading address space';
+
+  // Start camera pulled way back, then zoom in for cinematic approach
+  const rig = document.getElementById('cameraRig');
+  rig.setAttribute('position', '0 0 50');
+
+  await navigateTo(null);
+
   if (stats.total_nodes) {
-    document.getElementById('hudStats').textContent += ` | ${stats.total_nodes} total`;
+    document.getElementById('hudStats').textContent += ` | ${stats.total_nodes.toLocaleString()} total`;
   }
+
+  // Cinematic camera approach after first load
+  rig.setAttribute('animation__intro', 'property: position; to: 0 0 14; dur: 2000; easing: easeOutQuad');
+
+  // Clear full node cache periodically to avoid memory bloat
+  setInterval(() => { fullNodeCache = {}; }, 300000); // 5 min
 });
 </script>
 </body>

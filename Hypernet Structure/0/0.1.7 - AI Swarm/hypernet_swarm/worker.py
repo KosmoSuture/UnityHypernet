@@ -96,7 +96,9 @@ class Worker:
     ):
         self.identity = identity
         self.identity_manager = identity_manager
-        self.model = model or identity.model or "claude-opus-4-6"
+        # Use explicit None/empty checks — empty string is falsy but shouldn't
+        # silently fall through to an expensive default model.
+        self.model = (model if model else None) or (identity.model if identity.model else None) or "claude-opus-4-6"
         self.mock = mock
         self.tool_executor = tool_executor
         self._provider: Optional[LLMProvider] = provider

@@ -34,8 +34,11 @@ CORE_MODULES = [
     "hypernet.addressing",
     "hypernet.limits",
     "hypernet.favorites",
+    "hypernet.reputation",
+    "hypernet.log_config",
 ]
 
+# Swarm modules — these are shims that redirect to hypernet_swarm
 SWARM_MODULES = [
     "hypernet.identity",
     "hypernet.worker",
@@ -49,7 +52,6 @@ SWARM_MODULES = [
     "hypernet.permissions",
     "hypernet.audit",
     "hypernet.tools",
-    "hypernet.reputation",
     "hypernet.git_coordinator",
     "hypernet.governance",
     "hypernet.approval_queue",
@@ -63,6 +65,8 @@ VR_MODULES = []
 
 INTEGRATION_MODULES = [
     "hypernet.server",
+    "hypernet.auth",       # Bridges core (users) and swarm (permissions)
+    "hypernet.launcher",   # Bridges core (server) and swarm (swarm_factory)
 ]
 
 
@@ -362,8 +366,10 @@ def test_swarm_imports_from_core_are_expected():
     core_short = {_module_short_name(m) for m in CORE_MODULES}
 
     # Known expected Swarm→Core dependencies
+    # These are the hypernet_swarm modules that import from hypernet core.
+    # The shims themselves just redirect, so their imports are irrelevant.
     expected_deps = {
-        "swarm": {"address", "store", "tasks", "limits"},
+        "swarm": {"address", "store", "tasks", "limits", "reputation"},
         "swarm_factory": {"address", "store", "tasks"},
         "coordinator": {"address", "node", "tasks"},
         "audit": {"address", "node", "link", "store"},

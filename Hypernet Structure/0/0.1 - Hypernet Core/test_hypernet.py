@@ -3711,6 +3711,8 @@ def main():
         ("Local File Scanner", test_local_file_scanner),
         ("Unified Launcher", test_launcher),
         ("Persistent Logging", test_persistent_logging),
+        ("VR and Children API", test_vr_and_children_api),
+        ("Search Endpoint", test_search_endpoint),
     ]
 
     passed = 0
@@ -7849,6 +7851,159 @@ def test_persistent_logging():
         from logging.handlers import RotatingFileHandler
         root.handlers = [h for h in root.handlers if not isinstance(h, RotatingFileHandler)]
         shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_vr_and_children_api():
+    """Test VR and children API endpoints — deep hierarchy, child_counts, leaf nodes, root listing."""
+    print("  Testing VR and children API...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_vr_children_")
+    try:
+        import os
+        os.environ.pop("HYPERNET_API_KEY", None)  # Ensure no auth gate
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        # Seed a deep hierarchy directly via the store
+        import hypernet.server as _srv_mod
+        _test_store = _srv_mod._store
+
+        # Root node "5" with 3 children, varying grandchildren
+        _test_store.put_node(Node(address=HypernetAddress.parse("5"), data={"title": "Root Five"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.1"), data={"title": "Branch One"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.2"), data={"title": "Branch Two"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.3"), data={"title": "Branch Three (Leaf)"}))
+        # Grandchildren of 5.1
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.1.1"), data={"title": "Leaf A"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.1.2"), data={"title": "Leaf B"}))
+        # Grandchild of 5.2
+        _test_store.put_node(Node(address=HypernetAddress.parse("5.2.1"), data={"title": "Leaf C"}))
+
+        # --- Test 1: /children/5 returns exactly 3 children with correct child_counts ---
+        res = client.get("/children/5")
+        assert res.status_code == 200
+        children_5 = res.json()
+        assert len(children_5) == 3, f"Expected 3 children of 5, got {len(children_5)}"
+        addrs = {c["address"]: c for c in children_5}
+        assert set(addrs.keys()) == {"5.1", "5.2", "5.3"}
+        assert addrs["5.1"]["child_count"] == 2, f"5.1 should have 2 children, got {addrs['5.1']['child_count']}"
+        assert addrs["5.2"]["child_count"] == 1, f"5.2 should have 1 child, got {addrs['5.2']['child_count']}"
+        assert addrs["5.3"]["child_count"] == 0, f"5.3 should have 0 children, got {addrs['5.3']['child_count']}"
+
+        # --- Test 2: /children/5.1 returns exactly 2 children ---
+        res = client.get("/children/5.1")
+        assert res.status_code == 200
+        children_5_1 = res.json()
+        assert len(children_5_1) == 2, f"Expected 2 children of 5.1, got {len(children_5_1)}"
+        addrs_5_1 = [c["address"] for c in children_5_1]
+        assert "5.1.1" in addrs_5_1
+        assert "5.1.2" in addrs_5_1
+
+        # --- Test 3: /children/5.3 returns empty list (leaf node) ---
+        res = client.get("/children/5.3")
+        assert res.status_code == 200
+        children_5_3 = res.json()
+        assert children_5_3 == [], f"Expected empty list for leaf node 5.3, got {children_5_3}"
+
+        # --- Test 4: /children (root) includes "5" in the results ---
+        res = client.get("/children")
+        assert res.status_code == 200
+        root_children = res.json()
+        assert isinstance(root_children, list)
+        root_addrs = [c["address"] for c in root_children]
+        assert "5" in root_addrs, f"Root children should include '5', got {root_addrs}"
+
+        # --- Test 5: /api index includes dashboards dict with "vr" key ---
+        res = client.get("/api")
+        assert res.status_code == 200
+        api_data = res.json()
+        assert "dashboards" in api_data, "API index should include 'dashboards' dict"
+        assert isinstance(api_data["dashboards"], dict)
+        assert "vr" in api_data["dashboards"], f"dashboards should have 'vr' key, got {list(api_data['dashboards'].keys())}"
+        assert api_data["dashboards"]["vr"] == "/vr"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_search_endpoint():
+    """Test the /search endpoint for full-text node search."""
+    print("  Testing search endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_search_")
+    try:
+        import os
+        os.environ.pop("HYPERNET_API_KEY", None)
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        import hypernet.server as _srv_mod
+        _test_store = _srv_mod._store
+
+        # Seed some nodes with searchable data
+        _test_store.put_node(Node(address=HypernetAddress.parse("1"), data={"title": "People"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("1.1"), data={"title": "Matt Schaeffer", "role": "Founder"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("2"), data={"title": "AI Accounts"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("2.1"), data={"title": "Claude Opus", "description": "First AI citizen"}))
+        _test_store.put_node(Node(address=HypernetAddress.parse("3"), data={"title": "Organizations"}))
+
+        # --- Test 1: Search by title ---
+        res = client.get("/search?q=Claude")
+        assert res.status_code == 200
+        results = res.json()
+        assert len(results) >= 1, f"Should find Claude, got {len(results)} results"
+        assert any(r["address"] == "2.1" for r in results), "Should find Claude Opus at 2.1"
+
+        # --- Test 2: Search by data field (description) ---
+        res = client.get("/search?q=citizen")
+        assert res.status_code == 200
+        results = res.json()
+        assert len(results) >= 1, f"Should find 'citizen' in description, got {len(results)}"
+
+        # --- Test 3: Search by address ---
+        res = client.get("/search?q=1.1")
+        assert res.status_code == 200
+        results = res.json()
+        assert any(r["address"] == "1.1" for r in results), "Should find 1.1 by address"
+
+        # --- Test 4: Empty query ---
+        res = client.get("/search?q=")
+        assert res.status_code == 200
+        assert res.json() == []
+
+        # --- Test 5: No results ---
+        res = client.get("/search?q=zzzznonexistent")
+        assert res.status_code == 200
+        assert len(res.json()) == 0
+
+        # --- Test 6: Results include child_count ---
+        res = client.get("/search?q=People")
+        assert res.status_code == 200
+        results = res.json()
+        assert len(results) >= 1
+        people = [r for r in results if r["address"] == "1"][0]
+        assert "child_count" in people, "Search results should include child_count"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
 
 
 if __name__ == "__main__":

@@ -45,7 +45,10 @@
       "Bash(grep \"\"status\"\":*)",
       "Bash(# Check latest swarm status again after a couple minutes\ncurl -s http://localhost:8000/swarm/status 2>/dev/null | python3 -c \"\nimport sys,json\nd=json.load\\(sys.stdin\\)\nprint\\(f'Uptime: {d[\\\\\"status\\\\\"]} | Ticks: {d[\\\\\"tick_count\\\\\"]}'\\)\nprint\\(f'Tasks done: {d[\\\\\"tasks_completed\\\\\"]} | Failed: {d[\\\\\"tasks_failed\\\\\"]} | Pending: {d[\\\\\"coordinator\\\\\"][\\\\\"available_tasks\\\\\"]}'\\)\nprint\\(\\)\nfor w in d['workers']:\n    task = w.get\\('current_task'\\) or 'idle'\n    if isinstance\\(task, dict\\): task = task.get\\('title', str\\(task\\)\\)[:60]\n    print\\(f'  {w[\\\\\"name\\\\\"]:12} done={w[\\\\\"tasks_completed\\\\\"]} | {task}'\\)\nprint\\(\\)\n# Check recent tasks for token/cost info\nrecent = d.get\\('recent_tasks',[]\\)\nif recent:\n    print\\('Last 5 tasks:'\\)\n    for t in recent[-5:]:\n        print\\(f'  [{\\\\\"OK\\\\\" if t[\\\\\"success\\\\\"] else \\\\\"FAIL\\\\\"}] {t[\\\\\"worker\\\\\"]}: {t[\\\\\"task\\\\\"][:50]} | {t[\\\\\"duration_s\\\\\"]:.1f}s | \\\\${t[\\\\\"cost_usd\\\\\"]:.4f} | tokens={t[\\\\\"tokens\\\\\"]}'\\)\n# Budget line\nfor line in d['report'].split\\(chr\\(10\\)\\):\n    if 'Session:' in line or 'Daily:' in line:\n        print\\(line.strip\\(\\)\\)\n\" 2>/dev/null)",
       "Bash(for f in demo.py demo_session.py economy_activation.py first_governance_vote.py import_structure.py reputation_backfill.py add_frontmatter.py)",
-      "Read(//c/Hypernet/Hypernet Structure/0/0.1 - Hypernet Core/**)"
+      "Read(//c/Hypernet/Hypernet Structure/0/0.1 - Hypernet Core/**)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(for d in \"0.1.2 - API Layer\" \"0.1.3 - Database Layer\" \"0.1.4 - Integration Plugins\")"
     ]
   }
 }
