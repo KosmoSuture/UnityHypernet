@@ -17,7 +17,7 @@ The Unity guides remain in this directory as historical reference. The `app/` di
 
 **What's built:** A fully functional spatial browser for the entire Hypernet address space.
 
-**Where the code lives:** `0/0.1 - Hypernet Core/hypernet/static/vr.html` (single file, ~1,600 lines)
+**Where the code lives:** `0/0.1 - Hypernet Core/hypernet/static/vr.html` (single file, ~1,800 lines)
 
 **Server route:** `GET /vr` in `hypernet/server.py` (line 1675) serves the HTML.
 
@@ -106,8 +106,21 @@ The scene is configured with `webxr="optionalFeatures: hand-tracking"`. Point at
 - Hover sounds — randomized short tones on mouseover
 - Toggle with M key or the speaker button
 
+### Pagination
+- Nodes with more than 40 children show the first 40 (sorted by child count — most connected first)
+- Desktop: "Load More" clickable hint at bottom-right
+- VR: "LOAD MORE" button on the VR nav panel with remaining count
+- Additional batches of 40 loaded on demand
+
+### Recently Visited
+- Left sidebar shows last 6 unique visited addresses with category color borders
+- Click any address to return instantly
+- Automatically hidden in VR mode
+
 ### Minimap
 - Bottom-left canvas shows a top-down view of all current nodes with color-coded dots and connection lines to center
+- Node dots sized proportionally to child count
+- White triangle indicator shows current camera position
 
 ### Keyboard Controls
 | Key | Action |
@@ -191,17 +204,21 @@ If performance becomes an issue at deeper hierarchy levels with many children:
 - **Auto-rotate** — slow cinematic rotation of the scene (R key)
 - **Number key shortcuts** — 0-9 jumps to root categories
 - **Enhanced hover effects** — smooth animated scale/glow with easing
+- **Smooth layout transitions** — cycling layouts animates nodes to new positions (700ms eased)
+- **Pagination** — nodes with 40+ children show first 40 sorted by child count; "Load More" in both desktop and VR
+- **Camera position memory** — remembers camera position at each hierarchy level; restored when returning
+- **Recently visited panel** — quick-access sidebar showing last 6 visited addresses with color-coded borders
+- **Cinematic intro** — camera starts far back and zooms in on first load with loading status messages
+- **Improved minimap** — camera position triangle indicator, node dots sized by child count
 - **Fixed navigation history** — clean back-navigation without sentinel values
 
 ## Next Steps / Future Enhancements
 
 - **Photo/media rendering** — display actual images on quad planes for media nodes
 - **AI chat in VR** — floating text panel connected to `/chat` endpoint, voice input via Web Speech API
-- **Persistent camera position** — remember where you were when returning to a previously visited level
 - **Multi-user** — WebRTC or WebSocket-based shared presence (see each other's avatars)
 - **Node editing** — create/update nodes from within VR using virtual keyboard
 - **Timeline mode** — arrange nodes chronologically, fly through time
 - **Link graph visualization** — full force-directed graph of inter-node links, not just sibling links
 - **Mobile AR** — A-Frame supports WebXR AR on Android; could overlay Hypernet nodes on the real world
 - **Performance profiling** — run Quest browser developer tools to identify actual bottlenecks
-- **Pagination for large node sets** — some nodes have 50+ children; implement lazy loading

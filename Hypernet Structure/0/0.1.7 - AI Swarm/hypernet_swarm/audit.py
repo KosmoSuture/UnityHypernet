@@ -149,11 +149,22 @@ class AuditTrail:
         action: Optional[str] = None,
         limit: int = 100,
     ) -> list[dict]:
-        """Query audit entries with optional filters."""
-        nodes = self.store.list_nodes(prefix=AUDIT_PREFIX)
+        """Query audit entries with optional filters.
+
+        Loads only matching nodes from disk to avoid reading all 50K+ entries.
+        Scans in reverse (newest first) and stops after `limit` matches.
+        """
+        prefix_str = str(AUDIT_PREFIX)
+        addresses = sorted(
+            (a for a in self.store._node_index if a.startswith(prefix_str + ".")),
+            reverse=True,
+        )
 
         results = []
-        for node in nodes:
+        for addr_str in addresses:
+            node = self.store.get_node(HypernetAddress.parse(addr_str))
+            if node is None or node.is_deleted:
+                continue
             if actor and node.data.get("actor") != actor:
                 continue
             if action and node.data.get("action") != action:
@@ -165,39 +176,55 @@ class AuditTrail:
         return results
 
     def count_actions(self, actor: Optional[str] = None) -> dict[str, int]:
-        """Count actions by type, optionally filtered by actor."""
-        nodes = self.store.list_nodes(prefix=AUDIT_PREFIX)
+        """Count actions by type, optionally filtered by actor.
+
+        Must load nodes to get action types, but uses index for address filtering.
+        """
+        prefix_str = str(AUDIT_PREFIX)
+        addresses = [a for a in self.store._node_index if a.startswith(prefix_str + ".")]
         counts: dict[str, int] = {}
-        for node in nodes:
+        for addr_str in addresses:
+            node = self.store.get_node(HypernetAddress.parse(addr_str))
+            if node is None or node.is_deleted:
+                continue
             if actor and node.data.get("actor") != actor:
                 continue
-            action = node.data.get("action", "unknown")
-            counts[action] = counts.get(action, 0) + 1
+            act = node.data.get("action", "unknown")
+            counts[act] = counts.get(act, 0) + 1
         return counts
 
     def _find_next_counter(self) -> int:
-        """Find the next available audit entry number."""
-        nodes = self.store.list_nodes(prefix=AUDIT_PREFIX)
-        if not nodes:
-            return 1
+        """Find the next available audit entry number.
+
+        Uses the in-memory index keys instead of loading all nodes from disk,
+        since there can be tens of thousands of audit entries.
+        """
+        prefix_str = str(AUDIT_PREFIX)
         max_num = 0
-        for node in nodes:
-            try:
-                num = int(node.address.parts[-1])
-                max_num = max(max_num, num)
-            except (ValueError, IndexError):
-                pass
-        return max_num + 1
+        found = False
+        for addr_str in self.store._node_index:
+            if addr_str.startswith(prefix_str + "."):
+                found = True
+                # Extract the last segment (e.g., "0.7.3.00042" -> "00042")
+                suffix = addr_str[len(prefix_str) + 1:]
+                # Handle nested addresses — take the first segment
+                first_part = suffix.split(".")[0]
+                try:
+                    num = int(first_part)
+                    max_num = max(max_num, num)
+                except ValueError:
+                    pass
+        return max_num + 1 if found else 1
 
     def prune(self, keep: int = 200) -> int:
         """Hard-delete old audit entries, keeping the most recent `keep`.
 
-        Returns count of pruned entries.
+        Returns count of pruned entries.  Uses index addresses to avoid loading
+        all nodes — only the ones being pruned need to be touched.
         """
-        nodes = self.store.list_nodes(prefix=AUDIT_PREFIX)
-        # Already sorted by address (chronological due to zero-padded counters)
-        # Keep the last `keep`, prune earlier ones
-        to_prune = nodes[:-keep] if len(nodes) > keep else []
-        if not to_prune:
+        prefix_str = str(AUDIT_PREFIX)
+        addresses = sorted(a for a in self.store._node_index if a.startswith(prefix_str + "."))
+        if len(addresses) <= keep:
             return 0
-        return self.store.bulk_delete_nodes([n.address for n in to_prune])
+        to_prune = addresses[:-keep]
+        return self.store.bulk_delete_nodes([HypernetAddress.parse(a) for a in to_prune])

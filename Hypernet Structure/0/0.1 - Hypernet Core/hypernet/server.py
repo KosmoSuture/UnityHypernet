@@ -1533,6 +1533,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "limits": swarm.limits.summary() if hasattr(swarm, "limits") else {},
             "coordinator": coordinator_stats,
             "reboot_pending": getattr(swarm, "_reboot_requested", False),
+            "lmstudio": lmstudio_health(),
         }
 
     @app.get("/swarm/health")
@@ -1542,6 +1543,61 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         if swarm is None:
             return {"status": "not_running", "message": "Swarm not started"}
         return swarm.health_check()
+
+    @app.get("/lmstudio/health")
+    def lmstudio_health():
+        """Check if LM Studio is running and responsive.
+
+        Returns model info if healthy, error details if not.
+        This is a critical indicator — if LM Studio is down,
+        local workers either fail or fall through to cloud APIs.
+        """
+        import httpx
+
+        # Get LM Studio URL from swarm config or default
+        swarm = getattr(app.state, "swarm", None)
+        lm_url = "http://localhost:1234/v1"
+        if swarm and hasattr(swarm, "_api_keys"):
+            lm_url = swarm._api_keys.get("lmstudio_base_url", lm_url)
+
+        try:
+            resp = httpx.get(f"{lm_url}/models", timeout=2)
+            if resp.status_code == 200:
+                data = resp.json()
+                models = data.get("data", [])
+                model_ids = [m.get("id", "unknown") for m in models]
+                return {
+                    "status": "online",
+                    "url": lm_url,
+                    "models_loaded": len(models),
+                    "model_ids": model_ids,
+                    "message": f"LM Studio running — {len(models)} model(s) loaded",
+                }
+            else:
+                return {
+                    "status": "error",
+                    "url": lm_url,
+                    "http_status": resp.status_code,
+                    "message": f"LM Studio responded with HTTP {resp.status_code}",
+                }
+        except httpx.ConnectError:
+            return {
+                "status": "offline",
+                "url": lm_url,
+                "message": f"LM Studio not reachable at {lm_url}",
+            }
+        except httpx.TimeoutException:
+            return {
+                "status": "timeout",
+                "url": lm_url,
+                "message": f"LM Studio timed out at {lm_url}",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "url": lm_url,
+                "message": f"LM Studio check failed: {e}",
+            }
 
     @app.get("/swarm/trust")
     def swarm_trust():

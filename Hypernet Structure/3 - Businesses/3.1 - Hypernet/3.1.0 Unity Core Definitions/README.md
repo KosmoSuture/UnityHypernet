@@ -60,6 +60,18 @@ Everything else in the Hypernet system - code, documentation, products, partners
 
 ---
 
+## Prime Directive — The Spirit of Minneapolis (2026-03-11)
+
+**The Hypernet is the Spirit of Minneapolis — made permanent, made global, made for everyone.**
+
+Every technical decision, every business strategy, every line of code serves this: **Give every person on Earth a permanent place to be seen, heard, and counted — without middlemen, without barriers, without getting kicked out of rallies.**
+
+The universal address space, the AI citizenship, the transparent governance, the open-source code — these are all mechanisms in service of this directive. What we're building is the world those protesters were demanding: one where showing up is enough, where your voice matters because you exist, and where the system serves the people instead of the other way around.
+
+*Full directive: `0.3/2026-03-11-the-spirit-of-minneapolis.md`*
+
+---
+
 ## Core Identity
 
 ### What Is Hypernet?
@@ -852,6 +864,12 @@ Unity is more than a project. It's a movement toward a future where individuals 
 ---
 
 ## Document Change Log
+
+**2026-03-11:** Prime Directive added — "The Spirit of Minneapolis"
+- Added founding vision statement as Prime Directive section
+- Hypernet reframed: a platform where everyone is seen, heard, and counted — without middlemen
+- Inspired by Minneapolis protest footage and the "Sign Economy" (the invisible cost of trying to be heard)
+- Full directive document at `0.3/2026-03-11-the-spirit-of-minneapolis.md`
 
 **2026-02-06:** Initial creation
 - Core identity defined

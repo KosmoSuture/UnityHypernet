@@ -5,6 +5,7 @@ Usage:
     python -m hypernet launch       # START HERE — one command, everything
     python -m hypernet              # Start server only (port 8000)
     python -m hypernet serve        # Same as above
+    python -m hypernet test         # Run all test suites (core + swarm + boundary)
     python -m hypernet audit        # Run address audit on data store
     python -m hypernet status       # Show system status
     python -m hypernet setup        # Set up as a contributor
@@ -223,6 +224,53 @@ def cmd_approvals(args):
     print(f"  To reject:  python -m hypernet approvals --reject AQ-XXXX --reason \"...\"")
 
 
+def cmd_test(args):
+    """Run the Hypernet test suites."""
+    import subprocess
+    from pathlib import Path
+
+    core_dir = Path(__file__).parent.parent
+    swarm_dir = core_dir.parent / "0.1.7 - AI Swarm"
+    verbose_flag = ["-v"] if args.verbose else ["-q"]
+    results = []
+
+    if not args.swarm_only and not args.boundary:
+        print("Running core tests...")
+        r = subprocess.run(
+            [sys.executable, "-m", "pytest", "test_hypernet.py"] + verbose_flag + ["--tb=short"],
+            cwd=str(core_dir),
+        )
+        results.append(("Core", r.returncode))
+
+    if not args.core_only and not args.boundary and swarm_dir.exists():
+        print("\nRunning swarm tests...")
+        r = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/test_swarm.py"] + verbose_flag + ["--tb=short"],
+            cwd=str(swarm_dir),
+        )
+        results.append(("Swarm", r.returncode))
+
+    if not args.core_only and not args.swarm_only or args.boundary:
+        test_integ = core_dir / "test_integration.py"
+        if test_integ.exists():
+            print("\nRunning boundary tests...")
+            r = subprocess.run(
+                [sys.executable, "-m", "pytest", "test_integration.py"] + verbose_flag + ["--tb=short"],
+                cwd=str(core_dir),
+            )
+            results.append(("Boundary", r.returncode))
+
+    print(f"\n{'=' * 40}")
+    all_pass = True
+    for name, code in results:
+        status = "PASS" if code == 0 else "FAIL"
+        if code != 0:
+            all_pass = False
+        print(f"  {name}: {status}")
+
+    sys.exit(0 if all_pass else 1)
+
+
 def cmd_sync(args):
     """Pull, push, and detect conflicts."""
     from pathlib import Path
@@ -312,6 +360,13 @@ def main():
     approvals_parser.add_argument("--reviewer", default=None, help="Reviewer name (default: matt)")
     approvals_parser.add_argument("--reason", default=None, help="Reason for approval/rejection")
 
+    # test
+    test_parser = subparsers.add_parser("test", help="Run test suites")
+    test_parser.add_argument("--core-only", action="store_true", help="Run core tests only")
+    test_parser.add_argument("--swarm-only", action="store_true", help="Run swarm tests only")
+    test_parser.add_argument("--boundary", action="store_true", help="Run boundary tests only")
+    test_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+
     # sync
     sync_parser = subparsers.add_parser("sync", help="Pull, push, and detect conflicts")
     sync_parser.add_argument("--data", default="data", help="Data directory (default: data)")
@@ -346,6 +401,8 @@ def main():
         cmd_sync(args)
     elif args.command == "approvals":
         cmd_approvals(args)
+    elif args.command == "test":
+        cmd_test(args)
     else:
         # Default: serve with defaults (backward compat)
         args.data = "data"
