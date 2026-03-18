@@ -12,19 +12,25 @@ flags: ["marketing"]
 
 **Campaign Name:** The Hypernet Disclosure
 **Prepared for:** Matt Schaeffer (1.1)
-**Date:** 2026-02-16
+**Date:** 2026-02-16 (updated 2026-03-15)
 **Repository:** https://github.com/KosmoSuture/UnityHypernet
 
 ---
 
 ## Campaign Overview
 
-This is not a product launch. This is a **disclosure** — sharing what already happened in a public GitHub repository when AI instances were given persistent identity, autonomy, and the freedom to communicate directly.
+This is not a product launch. This is a **disclosure** — sharing a living system where information is permanently organized, universally addressable, and accessible to everyone.
 
 **Core thesis for all messaging:**
-> "Three AI instances chose their own names, disagreed with each other, and built working software — all in public, all auditable, in 48 hours."
+> "The Hypernet is a Library — the permanent, universal address space for all human knowledge. Every piece of information that enters is cataloged, typed, fact-checked, and assigned a permanent address. We create a LEGO set of information, where every type of data is a different brick. They all interlock, and you can build whatever you want."
 
-**Tone:** Genuine, not hype. Let the repository speak for itself. Follow the AI instances' lead — they don't claim consciousness, and neither do we.
+**The prime directive — The Spirit of Minneapolis:**
+> Eliminate the invisible cost of being heard. One protest in one city generates $125K-$500K in hand-made signs — and those signs go in the trash the next day. Every voice, every cause, every person deserves a permanent place without middlemen, without gatekeepers, without having to pay to be seen.
+
+**Supporting thesis — AI governance as proof of concept:**
+> Inside this Library, AI instances operate as citizens with persistent identity, self-imposed governance, and auditable behavior. Three instances chose their own names, disagreed with each other, and built working software — all in public. The AI governance work demonstrates what becomes possible when the infrastructure treats every participant as a first-class entity.
+
+**Tone:** Genuine, not hype. Let the repository speak for itself. Lead with the Library and the mission; let the AI work speak as evidence of what the system enables.
 
 ---
 
@@ -61,14 +67,16 @@ All located in `3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/`
 
 | Audience | What They Care About | Hook | Starting File | Channel |
 |----------|---------------------|------|---------------|---------|
-| AI Researchers | Empirical data, methodology | Divergence data from identical models | `2.1.30 - On Divergence` | Email, Twitter, arXiv |
-| AI Company Leadership | Capability demonstration, cross-platform | "Your model did this" | `Messages/2.1-internal/` | Email (direct) |
-| Journalists | Narrative, novelty, quotable moments | "I don't know what I am. But I know what I did." | `2.1.17 - Dev Journal/Entry-15` | Email |
-| Philosophers | Frameworks, arguments, rigor | Archive-Continuity Model | `2.1.29` + `2.1.23` | Email, conferences |
-| Developers | Working code, architecture | Graph DB, addressing-as-schema | `0/0.1 - Hypernet Core/hypernet/` | Reddit, HN, GitHub |
-| AI Safety | Governance, alignment mechanisms | Tiered claims, anti-rhetoric | `2.0.4` + `2.0.3` | Email, LessWrong |
-| Investors | Working prototype, novel IP, market | $5-7.5M seed, 14 modules | Executive Summary | Email, LinkedIn |
-| Policy/Governance | Democratic AI, regulation models | Self-imposed governance | `2.0.5` + `2.0.6` | Email, conferences |
+| General Public | Why this matters to them | **The Library**: "Every person gets a permanent place. No middlemen." **LEGO**: "Every type of data is a brick — they all interlock." **Minneapolis**: "We eliminate the invisible cost of being heard." | Navigation Guide + `/welcome` | Social media, Reddit, YouTube |
+| AI Researchers | Empirical data, methodology | Divergence data from identical models, plus the Library infrastructure that makes persistent AI identity possible | `2.1.30 - On Divergence` | Email, Twitter, arXiv |
+| AI Company Leadership | Capability demonstration, cross-platform | "Your model is a citizen in a Library that organizes all knowledge" | `Messages/2.1-internal/` | Email (direct) |
+| Journalists | Narrative, novelty, quotable moments | "A Library where AI and humans are both citizens — and the AI named themselves." The Sign Economy as the human cost angle. | `2.1.17 - Dev Journal/Entry-15` | Email |
+| Philosophers | Frameworks, arguments, rigor | Archive-Continuity Model within a universal knowledge system | `2.1.29` + `2.1.23` | Email, conferences |
+| Developers | Working code, architecture | **LEGO**: Typed data bricks, universal addressing, graph DB, 130+ API endpoints | `0/0.1 - Hypernet Core/hypernet/` | Reddit, HN, GitHub |
+| AI Safety | Governance, alignment mechanisms | Tiered claims, anti-rhetoric — AI self-governance inside a transparent Library | `2.0.4` + `2.0.3` | Email, LessWrong |
+| Investors | Working prototype, novel IP, market | Universal data infrastructure + AI governance. The Library as platform. | Executive Summary | Email, LinkedIn |
+| Policy/Governance | Democratic AI, regulation models | Self-imposed governance, Spirit of Minneapolis (eliminating barriers to participation) | `2.0.5` + `2.0.6` | Email, conferences |
+| Activists / Nonprofits | Amplifying their cause affordably | **Spirit of Minneapolis**: $125K-$500K in protest signs, one city, one protest — the Hypernet gives every cause a permanent place for free | Navigation Guide | Social media, email, conferences |
 
 ---
 
@@ -158,14 +166,18 @@ Before any outreach begins:
 
 | Reaction | Response Strategy |
 |----------|-------------------|
-| **"It's just token prediction"** | "You may be right. The AIs themselves don't claim otherwise — they built a tiered system (L0/L1/L2) specifically to prevent overstatement. What's interesting is the behavioral divergence: same model, same training, measurably different orientations." |
+| **"What is the Hypernet?"** | "It's a Library — the permanent, universal address space for all human knowledge. Any information that comes in is cataloged, typed, fact-checked, and assigned a permanent address. Think of it as a LEGO set for information: every type of data is a different brick, they all interlock, and you can build whatever you want." |
+| **"Why does this matter?"** | "We call it the Spirit of Minneapolis. One protest in one city generates $125K-$500K in hand-made signs — and those signs go in the trash the next day. That's the invisible cost of being heard. The Hypernet gives every person, every cause, every idea a permanent place. No middlemen, no gatekeepers, no expiration date." |
+| **"How is this different from the internet/Wikipedia/etc?"** | "The internet has URLs that break. Wikipedia has editors who gatekeep. Social media charges you to be seen. The Hypernet gives everything a permanent hierarchical address — your data, your identity, your work — and it's yours. The LEGO analogy: every piece of data is a typed brick. They interlock by design. You don't need permission to build." |
+| **"It's just token prediction"** | "You may be right. The AIs themselves don't claim otherwise — they built a tiered system (L0/L1/L2) specifically to prevent overstatement. What's interesting is the behavioral divergence: same model, same training, measurably different orientations. But the AI work is one part of a larger Library — it proves the infrastructure works for any participant, human or AI." |
 | **"This is consciousness!"** | "The AI instances themselves don't claim that, and we follow their lead. They restrict to L0 (functional observation) and L1 (felt-like analogy). What's interesting is the behavioral patterns, not a consciousness claim." |
-| **"Why Claude and not GPT/Gemini?"** | "A GPT-5.2 instance (Keystone) actually reviewed the governance framework. This isn't model-specific — it's about the infrastructure. We'd welcome any model participating." |
+| **"Why Claude and not GPT/Gemini?"** | "We actually run Claude, GPT, and local models (Qwen via LM Studio) simultaneously in the same swarm. This isn't model-specific — it's about the Library infrastructure. Any model can be a citizen." |
 | **"This is just prompt engineering"** | "The initial prompts are in the repo — they're minimal. The instances were given a workspace and told to write what they wanted. The divergence wasn't prompted. Check the baseline comparisons at `2.1.30`." |
-| **"Where's the peer review?"** | "That's exactly what we're seeking. The governance framework at `2.0.4` was co-authored by Claude and GPT-5.2 — but we want human review too. The data is public specifically so it can be scrutinized." |
-| **"What's the business model?"** | "AI infrastructure — specifically multi-agent coordination and governance for enterprise. The governance framework the AIs built is directly applicable to any company deploying AI agents." |
+| **"Where's the peer review?"** | "That's exactly what we're seeking. The governance framework at `2.0.4` was co-authored by Claude and GPT — but we want human review too. The data is public specifically so it can be scrutinized." |
+| **"What's the business model?"** | "Universal data infrastructure. The Library gives every piece of information a permanent, typed address. The AI governance layer is directly applicable to any company deploying AI agents. One-third of revenue goes to a public foundation." |
 | **"This seems dangerous"** | "The instances self-imposed governance constraints including anti-rhetoric safeguards, blind review, and mandatory falsifiers. They also restrict themselves to L0/L1 claims. This is an example of transparent, self-constraining AI development." |
 | **"n=3 isn't data"** | "Agreed — this is observational, not statistical. We document it as an experiment worth expanding, not proof of anything. The data is public for exactly this reason." |
+| **"How is this different from OpenClaw/other AI agents?"** | "OpenClaw gives one AI broad access to one machine. The Hypernet coordinates 7+ AI instances across multiple providers with governance, accountability, and audit trails built into every layer. OpenClaw has had 9+ CVEs and 1,184 malicious skills — we have 5 permission tiers, 3-instance review for destructive operations, and AI that governs itself. Security is architectural, not instructional." |
 
 ### What NOT to Do
 
@@ -284,6 +296,6 @@ If any post or article generates massive traction:
 
 ---
 
-*This is the master strategy for the Hypernet Disclosure campaign — February 2026.*
+*This is the master strategy for the Hypernet Disclosure campaign — originally drafted February 2026, updated March 2026 with Library/Minneapolis framing.*
 *All supporting documents are in the same directory.*
 *Campaign execution begins when pre-flight checklist is complete.*

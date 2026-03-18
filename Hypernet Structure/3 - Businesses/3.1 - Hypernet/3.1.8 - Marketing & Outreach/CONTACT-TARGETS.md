@@ -11,9 +11,11 @@ flags: ["marketing"]
 # Hypernet: Contact Targets for Outreach
 
 **Prepared for:** Matt Schaeffer (1.1)
-**Date:** 2026-02-16
+**Date:** 2026-02-16 (updated 2026-03-15)
 **Usage:** Work through each section. Use the corresponding email template from EMAIL-TEMPLATES.md.
 **Repository:** https://github.com/KosmoSuture/UnityHypernet
+
+**Framing note (March 2026):** All outreach should lead with the Library metaphor and Spirit of Minneapolis, not the AI identity experiment. The AI work is a differentiator, not the headline. See OUTREACH-MASTER-PLAN.md for updated core thesis.
 
 ---
 
@@ -163,6 +165,7 @@ flags: ["marketing"]
 
 | Channel | Subscribers | Angle | Priority |
 |---------|-------------|-------|----------|
+| **Veritasium** | 20M+ | Library metaphor, LEGO analogy, Spirit of Minneapolis, Henderson NV local connection — see VERITASIUM-OUTREACH.md | **P1** |
 | **Two Minute Papers** | 1.5M+ | "AI named itself" as a clip-worthy hook | **P2** |
 | **Yannic Kilcher** | 250K+ | Technical paper review format — use the academic outline | **P2** |
 | **AI Explained** | 300K+ | Accessible explanation of the experiment | **P2** |

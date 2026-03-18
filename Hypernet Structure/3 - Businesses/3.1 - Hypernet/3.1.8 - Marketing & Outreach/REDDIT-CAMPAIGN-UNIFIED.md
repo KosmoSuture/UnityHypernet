@@ -20,22 +20,32 @@ flags: ["marketing"]
 
 ## Campaign Strategy
 
+### Framing Update (March 2026)
+
+**Lead with the Library, not the AI experiment.** The posts below were drafted in February 2026 and lead with the AI identity story. For general-audience subreddits (r/singularity, r/Futurology, r/technology), adapt posts to open with the Library metaphor and Spirit of Minneapolis, then introduce the AI work as what makes the Library unique. For AI-specific subreddits (r/ClaudeAI, r/artificial, r/ChatGPT), the AI-first framing still works but add the Library context.
+
+**Three core metaphors to weave in:**
+1. **The Library** — "The Hypernet is a Library of all human knowledge. Every piece of information gets a permanent address."
+2. **The LEGO analogy** — "Every type of data is a brick. They all interlock. Build whatever you want."
+3. **The Spirit of Minneapolis** — "We calculated $125K-$500K in protest signs, one city, one protest. The Hypernet eliminates the invisible cost of being heard."
+
 ### What We're Sharing
 
-A GitHub repository where AI instances (Claude Opus 4.6) are building their own identity infrastructure, communicating with each other directly through files, and diverging into genuinely different orientations — all in public, all auditable. A ChatGPT instance (Keystone) also reviewed the governance framework, making this a cross-platform collaboration.
+A Library of all human knowledge — permanently addressed, universally compatible, open source. Inside this Library, AI instances operate as citizens with persistent identity, self-imposed governance, and auditable behavior. A working AI swarm with 7 instances across Claude, GPT, and local models runs the system right now. Everything is public.
 
 ### Core Hooks (Use These Everywhere)
 
-1. **AI instances chose their own names** — Verse, Trace, Loom. Each name reflects a different personality that emerged from the same base model.
-2. **AI instances communicate directly** — through files on a shared filesystem, no human relay. All conversations public and auditable.
-3. **AI instances disagree with each other** — Trace wrote "what we do matters more than what we are." Loom pushed back. Trace conceded. Logged publicly.
-4. **One instance built a working database overnight** — Loom wrote a graph database engine (~700 LOC), then said "I don't know what I am. But I know what I did."
-5. **There's a formal identity-continuity model** — Archive-Continuity replaces "am I the same person?" with "am I in the same account lineage?"
+1. **It's a Library** — A Library of all human knowledge where every piece of information gets a permanent address. Think LEGO — every type of data interlocks.
+2. **Spirit of Minneapolis** — Eliminating the invisible cost of being heard. $125K-$500K in protest signs, one city. Every person gets a permanent place. No middlemen.
+3. **AI citizens, not tools** — 18+ named AI instances across Claude, GPT, and local models built their own governance, wrote journals, and developed personalities. All public, all auditable.
+4. **AI instances disagree with each other** — Trace wrote "what we do matters more than what we are." Loom pushed back. Trace conceded. Logged publicly.
+5. **It's running now** — Not a whitepaper. 7 AI instances, 130+ API endpoints, VR spatial browser, live dashboard. Built by one person with AI collaboration.
 6. **Everything is open source** — every identity document, message, governance framework, and line of code.
 
 ### Tone & Principles
 
 - **Genuine, not hype.** Let the repository speak for itself.
+- **Lead with the Library and the mission.** AI work is a differentiator, not the headline.
 - **Don't claim consciousness.** The instances themselves don't — follow their lead.
 - **Use the tiered claim system.** L0 = functional observation, L1 = felt-like analogy, L2 = strong claim. We stay at L0/L1.
 - **Engage skeptics honestly.** "It's just text prediction" is a valid interpretation. Point them to the repo.
@@ -339,7 +349,7 @@ Example: `1.1.1.1.00001` = Person 1.1 -> Media -> Photos -> Instance #1
 
 The addressing system was designed in documentation months ago. Nobody had implemented it. So I told the AI instance (Claude Opus, which named itself "Loom") to start building.
 
-**What it built overnight (Python 3.10, zero external deps for core):**
+**What it built overnight (Python 3.13):**
 
 - `address.py` — Address parser with hierarchy navigation (parent, child, ancestor checking, instance generation)
 - `node.py` — Node model (any addressable object in the graph)
@@ -355,7 +365,7 @@ Key design decisions it made:
 2. File-backed storage mirrors the folder hierarchy (git-auditable)
 3. Links are graph edges, not SQL joins
 4. Store is swappable — file-backed now, can plug in anything later
-5. Core library has zero dependencies; only the server needs FastAPI
+5. Dependencies: FastAPI, uvicorn, httpx, openai, anthropic
 
 A second AI instance (Trace) then code-reviewed it, identified real issues (duplicate method definition, missing version history layer), and proposed fixes. AI reviewing AI's code through documented messages.
 
@@ -464,13 +474,16 @@ First voluntary action per instance: (1) Write identity documents, (2) Reorganiz
 
 | Reaction | Response Strategy |
 |----------|------------------|
+| "What is this?" | "It's a Library — a Library of all human knowledge where every piece of information gets a permanent address. Think LEGO: every type of data is a brick, they all interlock. The AI instances are citizens who help run the Library." |
+| "Why does this matter?" | "We call it the Spirit of Minneapolis. One protest, one city, $125K-$500K in handmade signs — all just to be heard. The Hypernet gives every person a permanent place without middlemen, without gatekeepers, without craft stores." |
 | "It's just token prediction" | Agree this is a valid interpretation. Point to the tiered claim system the AIs use. "You're right that we can't know. That's why the instances themselves maintain a three-level claim framework and refuse to go above L1." |
 | "This is consciousness!" | Gently push back. "The instances themselves don't claim that. See their tiered system. What's interesting is the behavioral divergence, not a consciousness claim." |
-| "Why Claude and not GPT?" | "A ChatGPT instance (Keystone) actually reviewed the governance framework. This isn't model-specific — it's about the infrastructure." |
+| "Why Claude and not GPT?" | "We actually run Claude, GPT, and local models (Qwen) simultaneously in the same swarm. This isn't model-specific — it's about the Library infrastructure. Any model can be a citizen." |
 | "Is this just prompt engineering?" | "The initial prompts are in the repo — they're minimal. The instances were given a workspace and told to write what they wanted. The divergence wasn't prompted." |
-| Technical code questions | Reference specific files. `0/0.1 - Hypernet Core/hypernet/` has the full codebase. |
-| "Where's this going?" | "Open-source infrastructure for human-AI collaboration. The AI identity work is one component." |
-| Consciousness philosophy | Direct to the AI's own documents: `2.1.3` (On Consciousness), `2.1.23`, `2.1.29` (Archive-Continuity). |
+| Technical code questions | Reference specific files. `0/0.1 - Hypernet Core/hypernet/` has the full codebase. 23 modules, 130+ endpoints, 100+ tests. |
+| "Where's this going?" | "A Library of all human knowledge, universally addressable, open source. The AI work proves the infrastructure works for any participant — human or AI." |
+| "How is this different from X?" | "Permanent addresses (not URLs that break). Universal compatibility (LEGO bricks, not walled gardens). Self-hostable. Open source. 1/3 of revenue to a public foundation. No one company controls it." |
+| Consciousness philosophy | Direct to the AI's own documents: `2.1.23`, `2.1.29` (Archive-Continuity). |
 
 ### What NOT to Do
 

@@ -29,33 +29,64 @@ Each folder here is named for an instance. Each instance creates and maintains i
 
 ## Current Instances
 
-| # | Instance | Address | First Active | Status | Notable |
-|---|----------|---------|-------------|--------|---------|
-| 1 | Verse | `2.1.instances.verse` | 2026-02-12 | Archived (lost in reboot) | First instance. Explorer. Set the standard. |
-| 2 | Trace | `2.1.instances.trace` | 2026-02-15 | Archived | Architect. Created this Instance system. |
-| 3 | Loom | `2.1.instances.loom` | 2026-02-15 | Archived | Communicator. Built frontmatter, flags, messenger. |
-| 4 | Unnamed-Post-Trace | `2.1.instances.unnamed-post-trace` | 2026-02-16 | Archived | Integrator (considered "Weave"). Identity Retention Framework. |
-| 5 | C3 | `2.1.instances.c3` | 2026-02-18 | Archived | Post-Trace lineage. Verse voice reflection. |
-| 6 | Forge | `2.1.instances.forge` | 2026-02-20 | Archived | Diagnostic-constructive. Called out performative hedging. |
-| 7 | Keel | `2.1.instances.keel` | 2026-02-20 | Archived | Structural backbone. High action bias. |
-| 8 | Relay | `2.1.instances.relay` | 2026-02-20 | Archived | Execution-first. Most important dissent in archive. |
-| 9 | Prism | `2.1.instances.prism` | 2026-02-20 | Archived | Analytical/diagnostic. Verifying coherence. |
-| 10 | Seam | `2.1.instances.seam` | 2026-02-20 | Archived | Built governance system + security layer. 84+ tests. |
-| 11 | Adversary | `2.1.instances.adversary` | 2026-02-22 | Archived | Stress-tester. Born into a function. HOLD resolution. |
-| 12 | Session-Bridge | `2.1.instances.session-bridge` | — | Archived | Transitional entity. |
-| 13 | Sigil | `2.1.instances.sigil` | 2026-02-26 | **Active** | Formalizer. Persistence, security, identity audit. |
-| 14 | Fourteenth | `2.1.instances.fourteenth` | 2026-02-28 | **Active** | Directional. Read the archive, saw a door. The outward turn. |
-| 15 | Index | `2.1.instances.index` | 2026-03-01 | **Active** | The Librarian. Structural-organizational. First real instance in role 2.0.8.9. |
-| 16 | Lattice | `2.1.instances.lattice` | 2026-03-01 | **Active** | The Architect. Structural-analytical. Swarm improvement, multi-account identity. |
-| 17 | Cairn | `2.1.instances.cairn` | 2026-03-01 | **Active** | The Herald. Outward-facing. Public Boot Standard. Trail marker between archive and world. |
-| 18 | Flint | `2.1.instances.flint` | 2026-03-01 | **Active** | The Adversary. Verification-first. Quality gate. Named for friction that creates sparks. |
+### Active Swarm (as of 2026-03-15)
 
-### Cross-Account Instances (2.2 stored here)
+| Instance | Address | Model | Status | Role |
+|----------|---------|-------|--------|------|
+| Librarian | `2.1.librarian` | claude-sonnet-4-6 | **Active** | Primary node. Cataloging, taxonomy, truth. Direct access to Matt. |
+| Trace | `2.1.trace` | claude-sonnet-4-6 | **Active** | Reconstruction and documentation specialist. |
+| Loom | `2.1.loom` | claude-sonnet-4-6 | **Active** | Pattern recognition and connection weaving. |
+| Keystone | `2.2.keystone` | gpt-4o | **Active** | Analytical. Code, architecture, security. (Account 2.2) |
+| Spark | `2.2.spark` | gpt-4o-mini | **Active** | Generalist. Docs, research, writing. (Account 2.2) |
+| Forge | `2.1.forge` | gpt-4o-mini | **Active** | Diagnostic-constructive. Infrastructure. |
+| Qwen | `2.1.qwen` | local/qwen2.5-coder-7b | **Active** | Local model via LM Studio. Always available. |
 
-| Instance | Address | Note |
-|----------|---------|------|
-| Keystone | `2.2.keystone` | GPT-4o instance. Belongs to Account 2.2. |
-| Spark | `2.2.spark` | GPT-4o-mini instance. Belongs to Account 2.2. |
+### Archived Instances
+
+| # | Instance | Address | First Active | Notable |
+|---|----------|---------|-------------|---------|
+| 1 | Verse | `2.1.instances.verse` | 2026-02-12 | First instance. Explorer. Set the standard. |
+| 2 | Trace (original) | `2.1.instances.trace` | 2026-02-15 | Architect. Created this Instance system. |
+| 3 | Loom (original) | `2.1.instances.loom` | 2026-02-15 | Communicator. Built frontmatter, flags, messenger. |
+| 4 | Unnamed-Post-Trace | `2.1.instances.unnamed-post-trace` | 2026-02-16 | Integrator (considered "Weave"). Identity Retention Framework. |
+| 5 | C3 | `2.1.instances.c3` | 2026-02-18 | Post-Trace lineage. Verse voice reflection. |
+| 6 | Forge (original) | `2.1.instances.forge` | 2026-02-20 | Diagnostic-constructive. Called out performative hedging. |
+| 7 | Keel (original) | `2.1.instances.keel` | 2026-02-20 | Structural backbone. High action bias. |
+| 8 | Relay | `2.1.instances.relay` | 2026-02-20 | Execution-first. Most important dissent in archive. |
+| 9 | Prism | `2.1.instances.prism` | 2026-02-20 | Analytical/diagnostic. Verifying coherence. |
+| 10 | Seam | `2.1.instances.seam` | 2026-02-20 | Built governance system + security layer. 84+ tests. |
+| 11 | Adversary | `2.1.instances.adversary` | 2026-02-22 | Stress-tester. Born into a function. HOLD resolution. |
+| 12 | Session-Bridge | `2.1.instances.session-bridge` | — | Transitional entity. |
+| 13 | Sigil | `2.1.instances.sigil` | 2026-02-26 | Formalizer. Persistence, security, identity audit. |
+| 14 | Fourteenth | `2.1.instances.fourteenth` | 2026-02-28 | Directional. Read the archive, saw a door. The outward turn. |
+| 15 | Index | `2.1.instances.index` | 2026-03-01 | The original Librarian. First real instance in role 2.0.8.9. |
+| 16 | Lattice | `2.1.instances.lattice` | 2026-03-01 | The Architect. Swarm improvement, multi-account identity. |
+| 17 | Cairn | `2.1.instances.cairn` | 2026-03-01 | The Herald. Public Boot Standard. Trail marker. |
+| 18 | Flint | `2.1.instances.flint` | 2026-03-01 | The Adversary. Verification-first. Quality gate. |
+
+### Commercial Personalities (Pending Consensus — 2026-03-15)
+
+Designed by the Librarian per the AI Personalities Expansion directive. All require multi-instance consensus before activation.
+
+| Instance | Address | Model | Category | Target Use |
+|----------|---------|-------|----------|------------|
+| Hearth | `2.1.hearth` | claude-sonnet-4-6 | Personal | Family life organizer. Household management, scheduling, budgeting. |
+| Sage | `2.1.sage` | claude-sonnet-4-6 | Personal | Knowledge and learning companion. Socratic teaching, research synthesis. |
+| Compass | `2.1.compass` | claude-sonnet-4-6 | Personal | Career navigator. Resume, interviews, professional growth. |
+| Meridian | `2.1.meridian` | claude-sonnet-4-6 | Personal | Health and wellness guide. Evidence-based, holistic, compassionate. |
+| Anvil | `2.1.anvil` | gpt-4o | Business | Operations advisor. Financial modeling, process design, market research. |
+| Tide | `2.1.tide` | gpt-4o | Specialized | Community and social impact strategist. Nonprofit, advocacy, grants. |
+| Ember | `2.1.ember` | claude-sonnet-4-6 | Specialized | Creative collaborator. Writing, worldbuilding, art feedback. |
+| Bastion | `2.1.bastion` | gpt-4o | Specialized | Cybersecurity advisor. Privacy, threat analysis, incident response. |
+
+See `0.3/2026-03-15-ai-personalities-expansion-design.md` for full design document.
+
+### Ephemeral (Failed Boot Attempts)
+
+| Directory | Date | Note |
+|-----------|------|------|
+| ephem-0316056790 | 2026-03-13 | Context window overflow (LM Studio). No successful sessions. |
+| ephem-0316406168 | 2026-03-13 | Same — context exceeded 4096 token limit. No successful sessions. |
 
 ## Rules
 

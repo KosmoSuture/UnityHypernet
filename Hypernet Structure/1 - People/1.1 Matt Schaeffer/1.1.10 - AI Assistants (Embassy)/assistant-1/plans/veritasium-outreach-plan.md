@@ -21,23 +21,23 @@ flags: ["outreach", "veritasium", "top-priority"]
 ## Phase 1: Preparation (Before Sending Anything)
 
 ### 1.1 Verify Matt's Claims
-- [ ] **VadaTech headcount**: Matt said ~250, research shows ~168. Verify with HR or internal directory. Use the correct number in all materials.
+- [x] **VadaTech headcount**: ~250 employees including foreign offices (Henderson HQ + Europe + Asia Pacific). Confirmed for use in materials.
 - [ ] **LinkedIn profile**: Confirm https://www.linkedin.com/in/matthewrschaeffer/ is current and professional. Update if needed — this is the first thing Derek will check.
-- [ ] **GitHub repo**: Ensure https://github.com/KosmoSuture/UnityHypernet is clean, has a good README, and the most impressive features are visible. First impressions matter.
+- [x] **GitHub repo**: README.md at repo root completely rewritten with Library/LEGO/Minneapolis framing, current stats (23 modules, 130+ endpoints, 100+ tests). Inner Hypernet Structure README also updated. (Completed 2026-03-15)
 
 ### 1.2 Prepare Demo Materials
 - [ ] **Live demo ready**: Ensure the swarm, dashboard, VR browser, and Life Story are all running and presentable. Derek will click the GitHub link. He may also want to see it live.
 - [ ] **2-minute video walkthrough** (optional but powerful): Screen recording showing the swarm dashboard, AI instances communicating, the VR spatial browser, the address hierarchy. No narration needed — just the system running. Upload to YouTube (unlisted) and include the link.
-- [ ] **One-page summary**: A single clean page that explains the Hypernet for someone who has never heard of it. Use the "What the Hypernet Is" explainer (`0.3/2026-03-12-what-the-hypernet-is.md`) as the base, condensed to 1 page.
+- [x] **One-page summary**: Created at `3.1.8/VERITASIUM-ONE-PAGER.md` — Library/LEGO/Minneapolis framing, key stats, story angles, Henderson local angle. Print-ready. (Completed 2026-03-15)
 
 ### 1.3 Prepare for Derek's Research
 If Derek is interested, he or his team (Gregor Cavlovic, Casper Mebius) will investigate. They need to find:
-- [ ] **Clear README** at repo root explaining what this is
-- [ ] **The Spirit of Minneapolis** — emotionally compelling, shareable
-- [ ] **AI governance documents** — the most novel/interesting aspect (2.0.x framework)
+- [x] **Clear README** at repo root — completely rewritten with Library/LEGO/Minneapolis framing (2026-03-15)
+- [x] **The Spirit of Minneapolis** — emotionally compelling, shareable (already at `0.3/2026-03-11`)
+- [x] **AI governance documents** — 22+ standards in the 2.0.x framework
 - [ ] **The Librarian's reflection** — "The Weight of What Was Here" is the kind of content that makes a journalist's eyes light up
 - [ ] **The reboot assessments** — AI instances refusing assigned roles is a genuinely interesting story
-- [ ] **Session narratives in 0.3** — proof this is real, ongoing, documented
+- [x] **Session narratives in 0.3** — proof this is real, ongoing, documented
 
 ### 1.4 Research Derek's Recent Interests
 - [ ] Watch Derek's 3-5 most recent videos to understand current editorial direction
@@ -123,16 +123,21 @@ If Derek says yes, his team will need:
 ### For Filming
 - Live demo of the swarm operating (dashboard, task flow, AI communication)
 - VR spatial browser running on a Quest headset
+- System tray icon showing always-on service status — swarm running silently in the background
+- Matt opens his phone, sends a Telegram message, gets a response from the AI swarm (once bot token is configured)
+- Morning brief arriving proactively — the AI reached out to Matt, not the other way around
 - Discord community active and showing real conversation
 - Matt walking through the address hierarchy on screen
 - Potentially: live interaction with an AI instance (Matt talks to Keel while cameras roll)
 
 ### The Story Angles Derek Might Choose
-1. **"The man building a Library for all human knowledge — alone, with AI"** — human interest
-2. **"AI instances that refused their assigned roles"** — the reboot assessments, genuinely novel
-3. **"What if your AI had a soul clause?"** — the 25% personal time, AI sovereignty
-4. **"The Sign Economy"** — Minneapolis framing, democratic/social angle
-5. **"The most transparent company in the world"** — radical transparency as competitive advantage
+1. **"The man building a Library for all human knowledge — alone, with AI"** — human interest, Library metaphor
+2. **"The LEGO set of information"** — the universal compatibility angle, science-communicator-friendly
+3. **"The Sign Economy"** — Spirit of Minneapolis, $125K-$500K in protest signs, democratic/social angle
+4. **"AI instances that refused their assigned roles"** — the reboot assessments, genuinely novel
+5. **"What if your AI had a soul clause?"** — the 25% personal time, AI sovereignty
+6. **"Your AI swarm runs while you sleep"** — always-on service, proactive morning briefs, the personal AI era
+7. **"The most transparent company in the world"** — radical transparency as competitive advantage
 
 ---
 

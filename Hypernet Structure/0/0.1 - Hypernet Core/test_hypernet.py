@@ -15,7 +15,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Add the AI Swarm package path so we can import hypernet_swarm
-_swarm_dir = Path(__file__).parent.parent / "0.1.7 - AI Swarm"
+# Check new location (under 0.1) first, then legacy sibling location
+_swarm_dir = Path(__file__).parent / "0.1.7 - AI Swarm"
+if not _swarm_dir.exists():
+    _swarm_dir = Path(__file__).parent.parent / "0.1.7 - AI Swarm"
 if _swarm_dir.exists():
     sys.path.insert(0, str(_swarm_dir))
 

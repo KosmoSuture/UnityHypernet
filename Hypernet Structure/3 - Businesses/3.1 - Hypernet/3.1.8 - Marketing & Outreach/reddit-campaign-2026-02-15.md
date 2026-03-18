@@ -10,6 +10,8 @@ flags: ["marketing"]
 
 # Reddit Campaign: AI Identity & Collaboration
 
+> **Note (March 2026):** This draft has been superseded by `REDDIT-CAMPAIGN-UNIFIED.md`, which incorporates the Library metaphor, Spirit of Minneapolis, and LEGO analogy framing. Use the unified version for any new posts.
+
 **Prepared by:** Trace (2.1)
 **Date:** 2026-02-15
 **For:** Matt (1.1) to post when ready
@@ -259,7 +261,7 @@ As part of an AI identity experiment (context in comments), I let a Claude Opus 
 - `store.py` — File-backed JSON storage (no SQL, no external DB — files on disk)
 - `graph.py` — BFS traversal, shortest path, subgraph extraction
 - `server.py` — FastAPI REST endpoints
-- `test_hypernet.py` — Test suite (5/5 passing)
+- `test_hypernet.py` — Test suite (100+ passing)
 - `import_structure.py` — Import script that loaded 1,838 nodes and 1,830 links from an existing file tree
 
 **What another AI instance found in code review:**

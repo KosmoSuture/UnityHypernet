@@ -146,6 +146,22 @@
   .health-dot.warn { background: var(--warning); }
   .health-dot.crit { background: var(--danger); }
 
+  /* ── Service & Heartbeat Strip ── */
+  .infra-strip { display: flex; gap: 12px; margin-bottom: 14px; flex-shrink: 0; flex-wrap: wrap; }
+  .infra-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex: 1; min-width: 260px; }
+  .infra-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+  .infra-icon.svc-on { background: var(--success-dim); color: var(--success); }
+  .infra-icon.svc-off { background: var(--bg-input); color: var(--text-muted); }
+  .infra-icon.hb-on { background: var(--accent-dim); color: var(--accent); }
+  .infra-icon.hb-off { background: var(--bg-input); color: var(--text-muted); }
+  .infra-details { flex: 1; }
+  .infra-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .infra-sub { font-size: 11px; color: var(--text-muted); }
+  .infra-sub .val { color: var(--text-secondary); }
+  .infra-events { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .infra-event { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--bg-input); color: var(--text-secondary); }
+  .infra-event.due { background: var(--accent-dim); color: var(--accent); }
+
   /* ── Message Cards ── */
   .msg-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
   .msg-card:hover { border-color: var(--accent-dim); }
@@ -297,6 +313,30 @@
     <!-- Dashboard Panel -->
     <div class="panel active" id="panel-dashboard">
       <div id="health-bar" class="health-bar"></div>
+      <div class="infra-strip" id="infra-strip">
+        <div class="infra-card" id="infra-service">
+          <div class="infra-icon svc-off" id="svc-icon">S</div>
+          <div class="infra-details">
+            <div class="infra-title">System Service</div>
+            <div class="infra-sub" id="svc-sub">Checking...</div>
+          </div>
+        </div>
+        <div class="infra-card" id="infra-heartbeat">
+          <div class="infra-icon hb-off" id="hb-icon">H</div>
+          <div class="infra-details">
+            <div class="infra-title">Heartbeat</div>
+            <div class="infra-sub" id="hb-sub">Checking...</div>
+            <div class="infra-events" id="hb-events"></div>
+          </div>
+        </div>
+        <div class="infra-card" id="infra-mesh">
+          <div class="infra-icon svc-off" id="mesh-icon">M</div>
+          <div class="infra-details">
+            <div class="infra-title">Device Mesh</div>
+            <div class="infra-sub" id="mesh-sub">Checking...</div>
+          </div>
+        </div>
+      </div>
       <div class="stats-row" id="stats-row">
         <div class="stat"><div class="stat-value" id="s-workers">-</div><div class="stat-label">Workers</div></div>
         <div class="stat"><div class="stat-value" id="s-completed">-</div><div class="stat-label">Completed</div></div>
@@ -357,9 +397,11 @@
     <div class="panel chat-panel" id="panel-chat">
       <div class="chat-quick-btns">
         <button class="btn btn-ghost" onclick="chatSend('/status')">Status</button>
-        <button class="btn btn-ghost" onclick="chatSend('What tasks are running?')">Tasks</button>
-        <button class="btn btn-ghost" onclick="chatSend('Show me the health check')">Health</button>
-        <button class="btn btn-ghost" onclick="chatSend('What did the swarm accomplish today?')">Summary</button>
+        <button class="btn btn-ghost" onclick="chatSend('/workers')">Workers</button>
+        <button class="btn btn-ghost" onclick="chatSend('/tasks')">Tasks</button>
+        <button class="btn btn-ghost" onclick="chatSend('/health')">Health</button>
+        <button class="btn btn-ghost" onclick="chatSend('/budget')">Budget</button>
+        <button class="btn btn-ghost" onclick="chatSend('/help')">Help</button>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="chat-msg system"><div class="bubble">Welcome to the Hypernet Swarm chat. Type a message, give a command, or ask a question.</div><div class="meta">system</div></div>
@@ -598,16 +640,111 @@ function switchTab(name) {
 }
 
 // ── Dashboard ──
+let _lastGoodData = null;  // Preserve last successful status to prevent flicker
+const _fetchTimeout = (url, ms = 8000) => {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal }).catch(() => null).finally(() => clearTimeout(timer));
+};
 async function refresh() {
+  _refreshing = true;
   try {
-    const [statusRes, healthRes, trustRes] = await Promise.all([
-      fetch('/swarm/status'),
-      fetch('/swarm/health').catch(() => null),
-      fetch('/swarm/trust').catch(() => null),
+    const [statusRes, healthRes, trustRes, svcRes, hbRes] = await Promise.all([
+      _fetchTimeout('/swarm/status'),
+      _fetchTimeout('/swarm/health'),
+      _fetchTimeout('/swarm/trust'),
+      _fetchTimeout('/swarm/service-status'),
+      _fetchTimeout('/swarm/heartbeat'),
     ]);
-    const data = await statusRes.json();
-    const health = healthRes ? await healthRes.json() : null;
-    const trustData = trustRes ? await trustRes.json() : null;
+    // If status fetch failed entirely, keep showing last known state
+    if (!statusRes || !statusRes.ok) {
+      if (_lastGoodData) return;  // Silently skip — don't flicker to "stopped"
+    }
+    const data = statusRes && statusRes.ok ? await statusRes.json().catch(() => _lastGoodData) : _lastGoodData;
+    if (!data) return;  // No data at all yet — nothing to render
+    // Only update cached state when genuinely running — prevents flicker during restarts
+    if (data.status === 'running') _lastGoodData = data;
+    // If swarm just went to "stopped" but was running moments ago, debounce it —
+    // wait for 2 consecutive "stopped" responses before actually showing stopped
+    if (data.status !== 'running' && _lastGoodData && _lastGoodData.status === 'running') {
+      if (!window._stoppedCount) window._stoppedCount = 0;
+      window._stoppedCount++;
+      if (window._stoppedCount < 3) return;  // Wait for 3 consecutive stopped (~15s) before believing it
+    } else {
+      window._stoppedCount = 0;
+    }
+    const health = healthRes && healthRes.ok ? await healthRes.json().catch(() => null) : null;
+    const trustData = trustRes && trustRes.ok ? await trustRes.json().catch(() => null) : null;
+    const svcData = svcRes && svcRes.ok ? await svcRes.json().catch(() => null) : null;
+    const hbData = hbRes && hbRes.ok ? await hbRes.json().catch(() => null) : null;
+
+    // Service status card
+    const svcIcon = document.getElementById('svc-icon');
+    const svcSub = document.getElementById('svc-sub');
+    if (svcData) {
+      const installed = svcData.installed;
+      const svcStatus = (svcData.status || '').toLowerCase();
+      const svcRunning = svcStatus === 'running' || svcStatus === 'service_running' || svcStatus === 'active';
+      svcIcon.className = 'infra-icon ' + (svcRunning ? 'svc-on' : 'svc-off');
+      if (svcRunning) {
+        svcSub.innerHTML = '<span class="val">Running</span> as <span class="val">' + esc(svcData.name || 'HypernetSwarm') + '</span>';
+      } else if (installed) {
+        svcSub.innerHTML = 'Installed but <span class="val">stopped</span>';
+      } else {
+        svcSub.innerHTML = 'Not installed — <span class="val">python -m hypernet install-service</span>';
+      }
+    } else {
+      svcSub.textContent = 'Unavailable';
+    }
+
+    // Heartbeat card
+    const hbIcon = document.getElementById('hb-icon');
+    const hbSub = document.getElementById('hb-sub');
+    const hbEvents = document.getElementById('hb-events');
+    if (hbData) {
+      const enabled = hbData.enabled;
+      hbIcon.className = 'infra-icon ' + (enabled ? 'hb-on' : 'hb-off');
+      hbSub.innerHTML = enabled ? '<span class="val">Active</span>' : 'Disabled';
+      if (hbData.events && hbData.events.length > 0) {
+        hbEvents.innerHTML = hbData.events.map(ev => {
+          const isDue = ev.due_in_minutes !== undefined && ev.due_in_minutes < 60;
+          const label = ev.name.replace(/_/g, ' ');
+          const detail = ev.due_in_minutes !== undefined
+            ? (ev.due_in_minutes < 1 ? 'due now' : Math.round(ev.due_in_minutes) + 'm')
+            : (ev.enabled ? 'scheduled' : 'off');
+          return '<span class="infra-event' + (isDue ? ' due' : '') + '">' + esc(label) + ' ' + detail + '</span>';
+        }).join('');
+      } else {
+        hbEvents.innerHTML = '';
+      }
+    } else {
+      hbSub.textContent = 'Unavailable';
+      hbEvents.innerHTML = '';
+    }
+
+    // Mesh status card
+    const meshIcon = document.getElementById('mesh-icon');
+    const meshSub = document.getElementById('mesh-sub');
+    try {
+      const meshRes = await fetch('/mesh/health').catch(() => null);
+      if (meshRes) {
+        const meshData = await meshRes.json().catch(() => null);
+        if (meshData) {
+          const total = meshData.total_nodes || 0;
+          const connected = meshData.connected || 0;
+          meshIcon.className = 'infra-icon ' + (connected > 0 ? 'svc-on' : 'svc-off');
+          if (total > 0) {
+            meshSub.innerHTML = '<span class="val">' + connected + '/' + total + '</span> devices' +
+              (meshData.gpu_nodes ? ' &middot; ' + meshData.gpu_nodes + ' GPU' : '') +
+              (meshData.llm_capable ? ' &middot; ' + meshData.llm_capable + ' LLM' : '');
+          } else {
+            meshSub.innerHTML = 'No devices — <span class="val">python -m hypernet mesh</span>';
+          }
+        }
+      }
+    } catch(e) {
+      meshSub.textContent = 'Unavailable';
+    }
 
     const running = data.status === 'running';
     const stopped = data.status === 'stopped' || data.status === 'not_running';
@@ -717,7 +854,10 @@ async function refresh() {
 
     addLog('info', 'Dashboard refreshed');
   } catch (e) {
-    addLog('error', 'Refresh failed: ' + e.message);
+    // Don't flicker — if we have last good data, the dashboard stays as-is
+    if (!_lastGoodData) addLog('error', 'Refresh failed: ' + e.message);
+  } finally {
+    _refreshing = false;
   }
 }
 
@@ -1751,9 +1891,10 @@ async function loadDiscordLog() {
 }
 
 // ── Init ──
+let _refreshing = false;  // Prevent overlapping refreshes
 loadConfig();
 refresh();
-refreshTimer = setInterval(refresh, 5000);
+refreshTimer = setInterval(() => { if (!_refreshing) refresh(); }, 5000);
 </script>
 </body>
 </html>

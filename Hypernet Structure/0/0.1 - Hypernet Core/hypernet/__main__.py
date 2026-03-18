@@ -2,15 +2,21 @@
 Run the Hypernet server or management commands.
 
 Usage:
-    python -m hypernet launch       # START HERE — one command, everything
-    python -m hypernet              # Start server only (port 8000)
-    python -m hypernet serve        # Same as above
-    python -m hypernet test         # Run all test suites (core + swarm + boundary)
-    python -m hypernet audit        # Run address audit on data store
-    python -m hypernet status       # Show system status
-    python -m hypernet setup        # Set up as a contributor
-    python -m hypernet sync         # Pull, push, and detect conflicts
-    python -m hypernet approvals    # Review pending external action approvals
+    python -m hypernet launch            # START HERE — one command, everything
+    python -m hypernet                   # Start server only (port 8000)
+    python -m hypernet serve             # Same as above
+    python -m hypernet test              # Run all test suites (core + swarm + boundary)
+    python -m hypernet audit             # Run address audit on data store
+    python -m hypernet status            # Show system status
+    python -m hypernet setup             # Set up as a contributor
+    python -m hypernet sync              # Pull, push, and detect conflicts
+    python -m hypernet approvals         # Review pending external action approvals
+    python -m hypernet install-service   # Install as system service (auto-start on boot)
+    python -m hypernet uninstall-service # Remove system service
+    python -m hypernet service-status    # Check service status
+    python -m hypernet tray              # System tray companion (notification area icon)
+    python -m hypernet mesh              # Run this device as a mesh node agent
+    python -m hypernet mesh --detect     # Print device capabilities and exit
 """
 
 import argparse
@@ -230,7 +236,10 @@ def cmd_test(args):
     from pathlib import Path
 
     core_dir = Path(__file__).parent.parent
-    swarm_dir = core_dir.parent / "0.1.7 - AI Swarm"
+    # Check new location (under 0.1) first, then legacy sibling location
+    swarm_dir = core_dir / "0.1.7 - AI Swarm"
+    if not swarm_dir.exists():
+        swarm_dir = core_dir.parent / "0.1.7 - AI Swarm"
     verbose_flag = ["-v"] if args.verbose else ["-q"]
     results = []
 
@@ -374,6 +383,30 @@ def main():
     sync_parser.add_argument("--contributor-id", default=None, help="Contributor ID")
     sync_parser.add_argument("--message", "-m", default=None, help="Commit message")
 
+    # install-service
+    install_svc = subparsers.add_parser("install-service", help="Install swarm as a system service (auto-start on boot)")
+    install_svc.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
+    install_svc.add_argument("--working-dir", default=None, help="Working directory (default: auto-detect)")
+    install_svc.add_argument("--log-dir", default=None, help="Log directory (Windows only)")
+    install_svc.add_argument("--user", default=None, help="Service user (Linux only)")
+
+    # uninstall-service
+    subparsers.add_parser("uninstall-service", help="Remove swarm system service")
+
+    # service-status
+    subparsers.add_parser("service-status", help="Check swarm service status")
+
+    # tray
+    tray_parser = subparsers.add_parser("tray", help="System tray companion (notification area icon)")
+    tray_parser.add_argument("--port", type=int, default=8000, help="Port to monitor (default: 8000)")
+
+    # mesh (Phase 3 — device mesh node agent)
+    mesh_parser = subparsers.add_parser("mesh", help="Run this device as a mesh node agent")
+    mesh_parser.add_argument("--coordinator", default="ws://localhost:8000/ws/mesh", help="Coordinator WebSocket URL")
+    mesh_parser.add_argument("--name", default="", help="Device name (e.g. 'Matt Laptop')")
+    mesh_parser.add_argument("--state", default="data/mesh/node.json", help="State file path")
+    mesh_parser.add_argument("--detect", action="store_true", help="Just detect and print device capabilities")
+
     args = parser.parse_args()
 
     if args.command == "launch":
@@ -403,6 +436,59 @@ def main():
         cmd_approvals(args)
     elif args.command == "test":
         cmd_test(args)
+    elif args.command == "install-service":
+        from .service import install_service
+        kwargs = {}
+        if args.working_dir:
+            kwargs["working_dir"] = args.working_dir
+        if args.port != 8000:
+            kwargs["port"] = args.port
+        if sys.platform == "win32" and args.log_dir:
+            kwargs["log_dir"] = args.log_dir
+        if sys.platform.startswith("linux") and args.user:
+            kwargs["user"] = args.user
+        success = install_service(**kwargs)
+        sys.exit(0 if success else 1)
+    elif args.command == "uninstall-service":
+        from .service import uninstall_service
+        success = uninstall_service()
+        sys.exit(0 if success else 1)
+    elif args.command == "service-status":
+        from .service import print_status
+        print_status()
+    elif args.command == "tray":
+        from .tray import run_tray
+        run_tray(port=args.port)
+    elif args.command == "mesh":
+        from .mesh import detect_capabilities, NodeAgent
+        from .mesh.agent import NodeConfig
+
+        if args.detect:
+            # Just print capabilities and exit
+            caps = detect_capabilities()
+            print("Device Capabilities:")
+            for key, val in caps.to_dict().items():
+                if val is not None and val != "" and val != 0 and val is not False:
+                    print(f"  {key}: {val}")
+            sys.exit(0)
+
+        config = NodeConfig.load(args.state)
+        config.coordinator_url = args.coordinator
+        if args.name:
+            config.device_name = args.name
+        agent = NodeAgent(config)
+        print(f"Starting mesh node agent...")
+        print(f"  Coordinator: {config.coordinator_url}")
+        print(f"  Device:      {config.device_address or '(will be assigned)'}")
+        print(f"  Compute:     {agent.capabilities.compute_tier}")
+        print(f"  GPU:         {agent.capabilities.gpu_model or 'none'}")
+        print(f"  LLM capable: {agent.capabilities.can_run_llm}")
+        print()
+        try:
+            import asyncio
+            asyncio.run(agent.run())
+        except KeyboardInterrupt:
+            print("\nNode agent stopped.")
     else:
         # Default: serve with defaults (backward compat)
         args.data = "data"

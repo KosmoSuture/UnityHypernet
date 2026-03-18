@@ -1,3 +1,14 @@
+---
+ha: "0.3.development-roadmap"
+object_type: "document"
+creator: "1.1.10.1"
+created: "2026-03-09"
+status: "active"
+visibility: "public"
+flags: ["roadmap", "living-document"]
+tags: ["development", "planning", "phases", "deployment"]
+---
+
 # Hypernet Development Roadmap
 
 **Created:** 2026-03-09
@@ -9,7 +20,7 @@
 ## Current State
 
 ### What Exists
-- **Core data model** — Addresses, Nodes, Links, Store, Graph, Tasks (all working, 74/74 tests)
+- **Core data model** — Addresses, Nodes, Links, Store, Graph, Tasks (all working, 100+ tests across core + swarm)
 - **Server** — FastAPI with 130+ REST endpoints, 4 web dashboards (home, swarm, lifestory, chat)
 - **AI Swarm** — 7 instances across 3 accounts (Claude, GPT, local LM Studio), autonomous task execution
 - **Identity system** — Boot Sequence v2, reboot assessments, multi-account identity management
@@ -23,19 +34,24 @@
 
 ### What Works Right Now
 - `python -m hypernet launch` starts everything: server + swarm + browser
+- `python -m hypernet install-service` installs as always-on Windows/Linux service
+- `python -m hypernet tray` launches system tray companion with dashboard/chat/VR links
 - Swarm autonomously claims and executes tasks
+- Heartbeat system: proactive morning briefs, evening recaps, task reminders, health alerts
 - Discord messages get triaged and responded to with AI-generated personality responses
+- Telegram bot built (waiting on bot token from Matt)
 - Web dashboards show live swarm status, task queue, instance health
 - File-backed storage with versioning, locking, and indexing
-- 99/104 tests passing across both packages
+- 106 tests passing across both packages (76 core + 30 swarm)
 
 ### What Doesn't Work Yet
 - Auth not wired into server routes (anyone can access all endpoints)
 - No HTTPS (HTTP only, localhost)
-- No persistent deployment (runs on Matt's Windows machine only)
+- No persistent deployment on cloud (runs on Matt's Windows machine — but now as a service)
 - Personal account integrations not tested live (email/photo import)
-- 5 swarm tests failing from API evolution mismatches
+- NSSM not yet installed on Matt's machine (service module ready)
 - No public access
+- Telegram bot token pending from Matt
 
 ---
 
@@ -54,7 +70,7 @@
 - [ ] Provision Oracle Cloud Free Tier instance (4 OCPUs, 24GB RAM ARM, 200GB storage)
 - [ ] Install Python 3.13, pip dependencies
 - [ ] Clone repo, configure secrets/config.json
-- [ ] Set up systemd service for `python -m hypernet launch`
+- [x] Set up systemd service for `python -m hypernet launch` — `service.py` built (2026-03-15)
 - [ ] Configure firewall (ports 80, 443, 8000)
 - [ ] Test swarm operation on Linux
 

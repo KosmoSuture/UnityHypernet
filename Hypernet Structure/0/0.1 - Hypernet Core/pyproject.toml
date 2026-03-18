@@ -10,6 +10,8 @@ requires-python = ">=3.9"
 
 [project.optional-dependencies]
 server = ["fastapi", "uvicorn"]
+tray = ["pystray>=0.19.0", "Pillow>=10.0.0"]
+swarm = ["anthropic>=0.40.0", "openai>=1.0.0"]
 
 [tool.setuptools.packages.find]
 include = ["hypernet*"]

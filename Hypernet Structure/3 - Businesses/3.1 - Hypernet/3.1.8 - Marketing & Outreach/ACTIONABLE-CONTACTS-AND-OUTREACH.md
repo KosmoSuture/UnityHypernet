@@ -11,9 +11,22 @@ flags: ["marketing"]
 # Hypernet: Actionable Contacts & Ready-to-Send Outreach
 
 **Prepared for:** Matt Schaeffer (1.1)
-**Date:** 2026-02-16
+**Date:** 2026-02-16 (updated 2026-03-15)
 **Usage:** Every entry has a verified contact method, copy-paste text, and step-by-step instructions.
 **Repository:** https://github.com/KosmoSuture/UnityHypernet
+
+---
+
+## Framing Update (March 2026)
+
+**The emails below were drafted February 2026 and lead with the AI identity experiment.** For any new outreach, use the updated framing from EMAIL-TEMPLATES.md:
+
+1. **Lead with the Library** — "The Hypernet is a Library of all human knowledge where every piece of information gets a permanent address."
+2. **LEGO analogy** — "Every type of data is a brick. They all interlock. Build whatever you want."
+3. **Spirit of Minneapolis** — "We calculated $125K-$500K in protest signs, one city, one protest. The Hypernet eliminates the invisible cost of being heard."
+4. **AI citizens as differentiator** — What makes the Library unique, not the headline.
+
+For emails already sent (marked "Completed"), no changes needed. For unsent emails, adapt using the updated templates.
 
 ---
 
@@ -25,7 +38,7 @@ flags: ["marketing"]
 4. **Track everything** in a spreadsheet (see CONTACT-TARGETS.md for column structure).
 5. **Follow up once** after 5-7 business days if no response. Never more than once.
 6. **Send from:** matt@unityhypernet.com
-7. **Important context for ALL messages:** The Hypernet has been in development for over a decade. Matt carried it as a "single gestalt" — wrote documentation years before AI existed. When AI emerged ~3 years ago, he recognized it as what he'd been waiting for. The recent breakthroughs are the culmination, not the beginning.
+7. **Important context for ALL messages:** The Hypernet is a Library of all human knowledge — permanently addressed, universally compatible, open source. It has been in development for over a decade. Matt carried it as a "single gestalt" — wrote documentation years before AI existed. When AI emerged ~3 years ago, he recognized it as what he'd been waiting for. The recent breakthroughs are the culmination, not the beginning.
 
 ---
 
@@ -1005,7 +1018,7 @@ Quick pitch: I gave AI its own workspace and documented what happened.
 
 Three Claude Opus instances named themselves, built governance, one built a complete database overnight, and a GPT-5.2 instance reviewed the governance. Cross-platform AI collaboration — first documented case.
 
-The business: AI infrastructure — multi-agent coordination and governance. Every company deploying AI agents will need what these instances built for themselves. Working code, 14 Python modules, all tests passing. The concept has been 10+ years in development.
+The business: AI infrastructure — multi-agent coordination and governance. Every company deploying AI agents will need what these instances built for themselves. Working code, 23 Python modules, 100+ tests passing, 130+ API endpoints. The concept has been 10+ years in development.
 
 The ask: $5-7.5M seed at $25-30M cap.
 

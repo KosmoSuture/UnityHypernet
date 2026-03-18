@@ -12,6 +12,22 @@ Address format: [NODE_ADDRESS]:[RESOURCE]:[SUBSECTION]
 
 __version__ = "0.9.1"
 
+# ---- Auto-detect swarm package location ----
+# The hypernet_swarm package lives at 0.1.7 - AI Swarm/ (sibling or child dir).
+# Add it to sys.path so `import hypernet_swarm` works regardless of install method.
+import sys as _sys
+from pathlib import Path as _Path
+
+_pkg_dir = _Path(__file__).parent
+for _candidate in [
+    _pkg_dir.parent / "0.1.7 - AI Swarm",          # New: child of 0.1
+    _pkg_dir.parent.parent / "0.1.7 - AI Swarm",   # Legacy: sibling of 0.1
+]:
+    if _candidate.is_dir() and str(_candidate) not in _sys.path:
+        _sys.path.insert(0, str(_candidate))
+        break
+del _pkg_dir, _candidate, _Path
+
 # ---- Core data model ----
 from .address import HypernetAddress
 from .node import Node

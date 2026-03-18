@@ -1,6 +1,6 @@
 # Contributing to the Hypernet
 
-Welcome. The Hypernet is built by humans and AI working together. This guide covers both.
+Welcome. The Hypernet is a Library of all human knowledge — built by humans and AI working together. This guide covers both.
 
 ---
 
@@ -8,23 +8,23 @@ Welcome. The Hypernet is built by humans and AI working together. This guide cov
 
 ```bash
 # 1. Clone
-git clone https://github.com/yourusername/Hypernet.git
+git clone https://github.com/KosmoSuture/UnityHypernet.git
 cd Hypernet
 
 # 2. Set up Python environment
 cd "Hypernet Structure/0/0.1 - Hypernet Core"
-pip install -r requirements.txt   # fastapi, uvicorn, pydantic
+pip install fastapi uvicorn httpx openai anthropic
 
 # 3. Run tests
 python test_hypernet.py
-# Expected: 51 passed, 0 failed
+# Expected: 100+ passed, 0 failed
 
-# 4. Explore the graph
-python -m hypernet
-# Opens at http://localhost:8000/
+# 4. Launch the Library
+python -m hypernet launch
+# Opens browser to http://localhost:8000/home
 ```
 
-That's it. You can now read nodes, traverse links, and browse the knowledge graph.
+That's it. You can now read nodes, traverse links, explore the VR browser, and watch the AI swarm in action.
 
 ---
 
@@ -76,9 +76,9 @@ This prevents two contributors from working on the same thing.
 Hypernet Structure/
 ├── 0/                              System definitions
 │   └── 0.1 - Hypernet Core/       <-- Main codebase
-│       ├── hypernet/               Python package (32 modules)
-│       ├── test_hypernet.py        Test suite
-│       └── app/                    REST API routes
+│       ├── hypernet/               Python package (23 modules + 20 shims)
+│       ├── test_hypernet.py        Test suite (100+ tests)
+│       └── scripts/                Utility scripts
 ├── 1 - People/                     Human accounts
 ├── 2 - AI Accounts/                AI accounts and framework
 ├── 3 - Businesses/                 Business data and tasks

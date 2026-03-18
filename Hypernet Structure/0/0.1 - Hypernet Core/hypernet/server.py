@@ -256,7 +256,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/health",
             "/api/auth/",
             "/home",
-            "/swarm/dashboard",
+            "/swarm/",
             "/lifestory",
             "/chat",
             "/vr",
@@ -264,6 +264,16 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/docs",
             "/openapi.json",
             "/redoc",
+            "/messages",
+            "/tasks",
+            "/approvals",
+            "/governance/",
+            "/query",
+            "/reputation/",
+            "/tools",
+            "/permissions/",
+            "/discord/",
+            "/mesh/",
         )
 
         @app.middleware("http")
@@ -1615,6 +1625,23 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         if swarm is None:
             return {"status": "not_running", "workers": []}
 
+        # Pre-compute expensive values ONCE (not per-worker)
+        tool_exec = getattr(swarm, "_tool_executor", None)
+        perm_tier = "unknown"
+        if tool_exec and tool_exec.permission_mgr:
+            perm_tier = tool_exec.permission_mgr.default_tier.name
+
+        # Audit count: use index size instead of loading every node
+        audit_count = 0
+        if tool_exec and tool_exec.audit_trail:
+            try:
+                prefix_str = "0.7.3."
+                audit_count = sum(1 for a in tool_exec.audit_trail.store._node_index if a.startswith(prefix_str))
+            except Exception:
+                pass
+
+        iso_stats = swarm.context_isolator.stats()
+
         workers_trust = []
         for name, worker in swarm.workers.items():
             # Identity verification
@@ -1650,29 +1677,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             active_key = swarm.key_manager.get_active_key_id(entity)
             entity_keys = swarm.key_manager.list_entity_keys(entity)
 
-            # Permission tier
-            perm_tier = "unknown"
-            tool_exec = getattr(swarm, "_tool_executor", None)
-            if tool_exec and tool_exec.permission_mgr:
-                perm_tier = tool_exec.permission_mgr.default_tier.name
-
-            # Audit trail
-            audit_count = 0
-            if tool_exec and tool_exec.audit_trail:
-                audit_stats = tool_exec.audit_trail.stats()
-                audit_count = audit_stats.get("total_actions", 0)
-
-            # Context isolation stats
-            iso_stats = swarm.context_isolator.stats()
-
             # Reputation
             rep_scores = {}
             try:
                 rep_profile = swarm.reputation.get_profile(entity)
-                if rep_profile:
+                if rep_profile and isinstance(rep_profile, dict):
                     rep_scores = {d: s for d, s in rep_profile.items() if isinstance(s, (int, float))}
-            except Exception as e:
-                log.warning(f"Could not load reputation for {entity}: {e}")
+            except Exception:
+                pass  # ReputationProfile may not be a dict — skip silently
 
             # Determine trust level
             trust_issues = []
@@ -1968,6 +1980,66 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         swarm._running = False
         return {"status": "stopping"}
 
+    @app.get("/swarm/service-status")
+    async def swarm_service_status():
+        """Check system service status (NSSM on Windows, systemd on Linux)."""
+        try:
+            from .service import service_status
+            return service_status()
+        except Exception as e:
+            return {"installed": False, "status": f"error: {e}", "name": "unknown"}
+
+    @app.get("/swarm/archive-resolver")
+    async def swarm_archive_resolver_status():
+        """Get archive resolver stats — local hit rate, GitHub fallbacks."""
+        swarm = getattr(app.state, "swarm", None)
+        if swarm and hasattr(swarm, "identity_mgr") and hasattr(swarm.identity_mgr, "resolver"):
+            resolver = swarm.identity_mgr.resolver
+            if resolver:
+                return resolver.get_stats()
+        return {"status": "no resolver configured"}
+
+    @app.get("/swarm/heartbeat")
+    async def swarm_heartbeat_status():
+        """Get heartbeat system status and upcoming events."""
+        swarm = getattr(app.state, "swarm", None)
+        heartbeat = getattr(swarm, "heartbeat", None) if swarm else None
+        if not heartbeat:
+            return {"enabled": False}
+
+        import time as _time
+        from datetime import datetime as _dt
+        now = _time.time()
+        now_dt = _dt.now()
+        events_list = []
+        for name, event in heartbeat._events.items():
+            # Estimate minutes until next firing
+            due_in = None
+            if event.enabled and name == "task_reminder" and hasattr(heartbeat, '_task_reminder_interval'):
+                # Interval-based: next fire = last_fired + interval
+                interval_secs = heartbeat._task_reminder_interval * 3600
+                if event.last_fired:
+                    due_in = (event.last_fired + interval_secs - now) / 60
+                else:
+                    due_in = 0  # Never fired — fires on next tick during waking hours
+            elif event.enabled and event.hour is not None and name != "health_alert":
+                today_fire = now_dt.replace(hour=event.hour, minute=event.minute or 0, second=0, microsecond=0)
+                if today_fire <= now_dt:
+                    from datetime import timedelta
+                    today_fire += timedelta(days=1)
+                due_in = (today_fire.timestamp() - now) / 60
+            events_list.append({
+                "name": name,
+                "enabled": event.enabled,
+                "hour": event.hour,
+                "minute": event.minute,
+                "days": event.days,
+                "last_fired": event.last_fired,
+                "minutes_since_fired": int((now - event.last_fired) / 60) if event.last_fired else None,
+                "due_in_minutes": round(due_in, 1) if due_in is not None else None,
+            })
+        return {"enabled": True, "events": events_list}
+
     @app.get("/chat")
     def chat_page():
         """Serve the web chat UI."""
@@ -2006,6 +2078,104 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         finally:
             if web_messenger:
                 web_messenger.unregister_connection(websocket)
+
+    # === Device Mesh endpoints (Phase 3) ===
+
+    # In-memory registry of connected mesh nodes
+    _mesh_nodes: dict[str, dict] = {}  # address -> {ws, capabilities, last_heartbeat, ...}
+    _mesh_node_counter = 0
+
+    @app.get("/mesh/nodes")
+    async def mesh_list_nodes():
+        """List all registered mesh nodes."""
+        nodes = []
+        for addr, info in _mesh_nodes.items():
+            nodes.append({
+                "address": addr,
+                "name": info.get("name", ""),
+                "capabilities": info.get("capabilities", {}),
+                "connected": info.get("ws") is not None,
+                "last_heartbeat": info.get("last_heartbeat"),
+                "tasks_completed": info.get("tasks_completed", 0),
+            })
+        return {"nodes": nodes, "count": len(nodes)}
+
+    @app.get("/mesh/health")
+    async def mesh_health():
+        """Mesh-wide health summary."""
+        total = len(_mesh_nodes)
+        connected = sum(1 for n in _mesh_nodes.values() if n.get("ws") is not None)
+        gpu_nodes = sum(1 for n in _mesh_nodes.values()
+                       if n.get("capabilities", {}).get("has_gpu"))
+        llm_nodes = sum(1 for n in _mesh_nodes.values()
+                       if n.get("capabilities", {}).get("can_run_llm"))
+        return {
+            "total_nodes": total,
+            "connected": connected,
+            "gpu_nodes": gpu_nodes,
+            "llm_capable": llm_nodes,
+        }
+
+    @app.websocket("/ws/mesh")
+    async def websocket_mesh(websocket: _Starlette_WebSocket):
+        """WebSocket endpoint for mesh node agents."""
+        nonlocal _mesh_node_counter
+        await websocket.accept()
+
+        import time as _mesh_time
+        node_address = None
+
+        try:
+            while True:
+                data = await websocket.receive_text()
+                msg = json.loads(data)
+                msg_type = msg.get("type", "")
+
+                if msg_type == "register":
+                    addr = msg.get("address", "")
+                    if not addr:
+                        # Assign a new address
+                        _mesh_node_counter += 1
+                        addr = f"1.1.device.node-{_mesh_node_counter:04d}"
+
+                    node_address = addr
+                    _mesh_nodes[addr] = {
+                        "ws": websocket,
+                        "name": msg.get("name", ""),
+                        "capabilities": msg.get("capabilities", {}),
+                        "last_heartbeat": _mesh_time.time(),
+                        "registered_at": _mesh_time.time(),
+                        "tasks_completed": 0,
+                    }
+                    await websocket.send_json({
+                        "type": "registered",
+                        "address": addr,
+                    })
+                    log.info("Mesh node registered: %s", addr)
+
+                elif msg_type == "heartbeat":
+                    addr = msg.get("address", node_address)
+                    if addr and addr in _mesh_nodes:
+                        _mesh_nodes[addr]["last_heartbeat"] = _mesh_time.time()
+                        _mesh_nodes[addr]["resources"] = msg.get("resources", {})
+
+                elif msg_type == "result":
+                    addr = node_address
+                    if addr and addr in _mesh_nodes:
+                        _mesh_nodes[addr]["tasks_completed"] = (
+                            _mesh_nodes[addr].get("tasks_completed", 0) + 1
+                        )
+                    log.info("Mesh task result from %s: %s", addr, msg.get("task_id"))
+
+        except _Starlette_WebSocketDisconnect:
+            pass
+        except Exception as e:
+            log.debug("Mesh WebSocket error: %s", e)
+        finally:
+            # Mark node as disconnected (don't remove — keep history)
+            if node_address and node_address in _mesh_nodes:
+                _mesh_nodes[node_address]["ws"] = None
+                log.info("Mesh node disconnected: %s", node_address)
 
     # === Governance endpoints ===
 

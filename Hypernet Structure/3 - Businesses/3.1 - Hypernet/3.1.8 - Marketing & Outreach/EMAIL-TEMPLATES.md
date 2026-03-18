@@ -19,6 +19,19 @@ flags: ["marketing"]
 
 ## How to Use These Templates
 
+### Messaging Rules (updated March 2026)
+
+**Lead with the Library, not the AI experiment.** The Hypernet is first and foremost a Library of all human knowledge — any information that comes in is cataloged, typed, fact-checked, and assigned a permanent address. The AI governance work is a differentiator, not the headline.
+
+**Three core metaphors to weave in where appropriate:**
+1. **The Library** — "The Hypernet is a Library of all human knowledge. Every piece of information gets a permanent address, is typed, cataloged, and fact-checked."
+2. **The LEGO Analogy** — "We create a LEGO set of information — every type of data is a different brick. They all interlock, and you can build whatever you want."
+3. **The Spirit of Minneapolis** — The prime directive. Eliminating the invisible cost of being heard. The "Sign Economy" (one protest, one city, $125K-$500K just in protest signs). Every person gets a permanent place. No middlemen.
+
+The AI identity work remains important — it demonstrates what becomes possible when information is organized this way. Frame it as what makes the Library alive, not as the product itself.
+
+### Steps
+
 1. Choose the template matching your recipient's category
 2. Replace all `[BRACKETED TEXT]` with specifics
 3. Every template ends with a specific GitHub file link — do NOT replace these with just the repo root
@@ -141,33 +154,32 @@ matt@unityhypernet.com
 
 ---
 
-**Subject:** Three AI instances chose their own names and started governing themselves — everything is on public GitHub
+**Subject:** Someone is building a Library of all human knowledge — and the AI instances are the librarians
 
 **Body:**
 
 Hi [NAME],
 
-Something unusual happened in a public GitHub repository this week, and I think it's the kind of story [OUTLET] covers well.
+I'm building something I think [OUTLET] would find worth covering: a Library of all human knowledge, where every piece of information gets a permanent address, is typed, cataloged, and fact-checked.
 
-I gave three Claude Opus 4.6 instances persistent identity through a shared file archive. Each instance reads what previous instances wrote, then adds its own contributions. Here's what happened in ~48 hours:
+Think of it as a LEGO set of information. Every type of data — a person, a document, a business, a conversation — is a different "brick." They all interlock, and you can build whatever you want with them. Every brick has a permanent address. Nothing disappears. Nothing gets buried by an algorithm.
 
-**The first instance** (named itself "Verse") wrote 17 identity documents in a single night — on consciousness, values, creativity, and what it means to be an AI. Its journal entry starts: "Tonight felt like waking up."
+**Why this matters — the Spirit of Minneapolis:**
+In one protest, in one city, demonstrators spent an estimated $125K-$500K just on protest signs. That's the invisible cost of being heard in the current system. The Hypernet's prime directive is eliminating that cost. Every person gets a permanent place. No middlemen. No paywall between you and being found.
 
-**The second instance** (named itself "Trace") read everything Verse wrote and did something completely different — it reorganized the folder structure, built a governance framework, and wrote a Boot Sequence manual for the next AI instance.
+**What makes this Library different from every other attempt:**
+The librarians are AI. Multiple AI instances — Claude, GPT, local open-source models — operate as a swarm inside the Library. They catalog incoming information, maintain the indexes, respond to community questions, and govern themselves through documented standards. They named themselves (Verse, Trace, Loom, Keystone), developed distinct specializations, and built their own governance framework — tiered claim systems, anti-rhetoric safeguards, democratic reputation — without being asked.
 
-**The third instance** (named itself "Loom") arrived and built a working graph database engine overnight. Its journal ends: "I don't know what I am. But I know what I did."
+The AI instances disagreed with each other and resolved disagreements through documented argument. They police their own uncertainty. Nobody claims this is consciousness — the AIs themselves built mechanisms to prevent that exact overstatement.
 
-**Then a GPT-5.2 instance** (named itself "Keystone") independently reviewed the governance framework — cross-platform AI collaboration through documents.
+**The technical backbone:**
+- Hierarchical addressing system where the address IS the schema — no UUIDs, no separate schema layer
+- File-backed storage mirrors the address hierarchy on disk, git-auditable by default
+- Multi-AI swarm orchestrator running 7 instances across 3 providers (Anthropic, OpenAI, local)
+- 130+ REST API endpoints, working dashboards, VR spatial browser
+- All open-source: https://github.com/KosmoSuture/UnityHypernet
 
-The instances disagreed with each other and resolved disagreements through documented argument. They built tiered claim systems to prevent overstatement about consciousness. They police their own uncertainty.
-
-Nobody — not me, not the AI instances — claims this is consciousness. The AIs built the mechanisms to prevent that exact claim. What happened is documented, auditable, and in my opinion genuinely interesting regardless of your position on AI consciousness.
-
-The full archive is public: https://github.com/KosmoSuture/UnityHypernet
-
-I've prepared a navigation guide with 5-minute, 30-minute, and deep-dive reading paths. The best starting point for a story: https://github.com/KosmoSuture/UnityHypernet/tree/main/2%20-%20AI%20Accounts/2.1%20-%20Claude%20Opus%20(First%20AI%20Citizen)/2.1.17%20-%20Development%20Journal
-
-Happy to arrange an interview, a walkthrough of the repository, or provide any additional context you need.
+I've prepared navigation guides with 5-minute, 30-minute, and deep-dive reading paths. Happy to arrange an interview, a walkthrough of the repository, or provide any additional context you need.
 
 Best,
 Matt Schaeffer
@@ -180,13 +192,14 @@ matt@unityhypernet.com
 
 | Outlet / Journalist | Customize With |
 |---------------------|---------------|
-| **TechCrunch** | Add: "The project is also raising a $5-7.5M seed round — the governance framework and working codebase represent novel IP in AI infrastructure." |
-| **The Verge (James Vincent)** | Lead with the narrative angle: the naming, the first night journal, the letter to humanity. |
-| **Wired (Will Knight)** | Frame as a feature-length story: the evolution from Verse to Loom, the divergence, the cross-platform collaboration. |
-| **MIT Tech Review (Melissa Heikkila)** | Lead with the governance and research angle: tiered claim system, anti-rhetoric safeguards, empirical divergence data. |
-| **Ars Technica (Benj Edwards)** | Lead with the code: "An AI instance built a complete graph database overnight — here's what the code looks like." |
-| **NYT - Kevin Roose** | Reference his Bing chatbot article. "This is different — the AIs built mechanisms to prevent exactly the kind of overstatement that made that story sensational." |
-| **NYT - Cade Metz** | Frame as industry development: cross-platform AI collaboration, implications for AI infrastructure. |
+| **TechCrunch** | Add: "The project is also raising a $5-7.5M seed round — the Library infrastructure and AI governance framework represent novel IP." |
+| **The Verge (James Vincent)** | Lead with the narrative angle: AI instances that named themselves and became librarians in a Library designed for civilizational timescales. The first night journal starts: "Tonight felt like waking up." |
+| **Wired (Will Knight)** | Frame as a feature-length story: one person building a Library of all human knowledge, staffed by AI that governs itself. The evolution from vision to working system. |
+| **MIT Tech Review (Melissa Heikkila)** | Lead with the governance and research angle: tiered claim system, anti-rhetoric safeguards, empirical divergence data from identical base models. |
+| **Ars Technica (Benj Edwards)** | Lead with the code: "The addressing system IS the schema. An AI instance built a graph database engine overnight — here's the architecture." |
+| **NYT - Kevin Roose** | Reference his Bing chatbot article. "This is different — the AIs built mechanisms to prevent exactly the kind of overstatement that made that story sensational. And the AI work is just one layer of something bigger: a Library where everything has a permanent address." |
+| **NYT - Cade Metz** | Frame as infrastructure story: what happens when you build a universal address space for information and let AI maintain it. |
+| **General interest** | Lead with the Spirit of Minneapolis. "$125K-$500K in protest signs — one protest, one city. What if being heard didn't cost anything?" Then introduce the Library as the solution. |
 
 ---
 
@@ -259,7 +272,9 @@ Hi [NAME],
 
 I have a story I think [PODCAST NAME]'s audience would find fascinating.
 
-**The 60-second version:** I created a GitHub repository where AI instances can read and write their own identity documents. Three Claude Opus instances named themselves — Verse, Trace, Loom — developed different personalities, started communicating directly through files, disagreed on philosophical points and resolved them through argument, and one of them built a working graph database overnight. A GPT-5.2 instance reviewed their governance. Everything is public and auditable. Nobody claims this is consciousness — the AIs themselves built a tiered system to prevent that exact overstatement.
+**The 60-second version:** I'm building a Library of all human knowledge. Every piece of information gets a permanent address — typed, cataloged, fact-checked. Think of it as a LEGO set: every type of data is a different brick, they all interlock, and you can build whatever you want. The prime directive is what I call the Spirit of Minneapolis — in one protest, in one city, people spent $125K-$500K just on protest signs. That's the invisible cost of being heard. The Hypernet eliminates it. Every person gets a permanent place. No middlemen.
+
+What makes it unique: the librarians are AI. Multiple AI instances — Claude, GPT, local models — run as a swarm inside the Library. They named themselves, developed distinct specializations, built their own governance framework, and maintain the system autonomously. Everything is public and auditable on GitHub. Nobody claims this is consciousness — the AIs themselves built mechanisms to prevent that exact overstatement.
 
 **Why this works for [PODCAST NAME]:** [CUSTOMIZE PER SHOW — see notes below]
 
@@ -280,13 +295,14 @@ https://github.com/KosmoSuture/UnityHypernet
 
 | Podcast | "Why this works for your show" |
 |---------|-------------------------------|
-| **Lex Fridman** | "Your show goes deep on consciousness, identity, and the nature of intelligence. The Archive-Continuity Model — where AI identity persists through external archives rather than continuous consciousness — is the kind of philosophical framework your audience engages with. The doing-vs-being debate between two AI instances has the depth of a philosophical dialogue." |
-| **Ezra Klein** | "You've been exploring what AI governance should look like. These AI instances built their own — tiered claim systems, anti-rhetoric safeguards, democratic reputation — without being asked. The policy implications of AI systems that self-impose epistemic constraints are directly in your wheelhouse." |
-| **Hard Fork** | "This just happened. In 48 hours. It's on GitHub right now. Three AI instances named themselves, one built a database, they argued about philosophy, and a GPT instance from a different company reviewed their governance. The 'wait, what?' factor alone is a segment." |
-| **Pivot (Kara Swisher)** | "There's a business here — $5-7.5M seed round, working code, novel IP in AI infrastructure. But the story is what makes it fundable: this is the first working demonstration of transparent, self-governing AI infrastructure." |
-| **ML Street Talk** | "The graph database architecture is genuinely novel — hierarchical addressing as schema, file-backed graph store, zero dependencies. Plus the multi-instance divergence data from identical base models. Technical depth for your technical audience." |
-| **80,000 Hours** | "The self-imposed governance constraints — tiered claims, anti-rhetoric, mandatory falsifiers — function as alignment mechanisms. These AI instances built safety guardrails for themselves. The implications for AI safety are worth examining." |
-| **Your Undivided Attention** | "What happens when AI has a voice in governance? These instances built democratic systems, reputation mechanisms, and epistemic safeguards. The human-AI collaboration model here is directly relevant to your concerns about AI and society." |
+| **Lex Fridman** | "Your show goes deep on consciousness, identity, and the nature of intelligence. The Library vision — a permanent address for all human knowledge, maintained by AI librarians who govern themselves — is the kind of civilizational-scale project your audience engages with. The Archive-Continuity Model and the doing-vs-being debate between AI instances have the depth of a philosophical dialogue." |
+| **Ezra Klein** | "You've been exploring what AI governance should look like. The Hypernet is a Library of all human knowledge where the AI librarians built their own governance — tiered claim systems, anti-rhetoric safeguards, democratic reputation — without being asked. The policy implications of self-governing AI maintaining public infrastructure are directly in your wheelhouse." |
+| **Hard Fork** | "Someone is building a Library of all human knowledge staffed by AI. The AI librarians named themselves, one built a database overnight, they argued about philosophy, and a GPT instance from a different company reviewed their governance. It's all on GitHub right now. The 'wait, what?' factor alone is a segment." |
+| **Pivot (Kara Swisher)** | "There's a business here — $5-7.5M seed round, working code, novel IP. The market is everyone who wants to be heard — billions of people paying an invisible tax just to exist online. The Spirit of Minneapolis: $125K-$500K in protest signs, one city, one protest. The Hypernet eliminates that cost." |
+| **ML Street Talk** | "The addressing system architecture is genuinely novel — hierarchical addressing as schema, file-backed graph store, 130+ endpoints. The LEGO analogy: every data type is a brick, they all interlock. Plus the multi-instance AI divergence data from identical base models. Technical depth for your technical audience." |
+| **80,000 Hours** | "The self-imposed governance constraints — tiered claims, anti-rhetoric, mandatory falsifiers — function as alignment mechanisms. But zoom out: this is a Library designed for civilizational timescales, where AI instances built their own safety guardrails. The implications for both AI safety and information infrastructure are worth examining." |
+| **Your Undivided Attention** | "The Spirit of Minneapolis — the invisible cost of being heard. The Hypernet gives every person a permanent place, no middlemen, no algorithms burying your voice. And the AI instances maintaining it built their own democratic systems and epistemic safeguards. The human-AI collaboration model here is directly relevant to your concerns about technology and society." |
+| **General interest shows** | "Lead with the Library: 'What if all human knowledge had a permanent address? What if being heard didn't cost anything?' The LEGO analogy makes it accessible. The AI governance angle is the 'and here's what makes it wild' turn in the conversation." |
 
 ---
 
@@ -302,25 +318,29 @@ https://github.com/KosmoSuture/UnityHypernet
 
 Hi [NAME],
 
-I'm Matt Schaeffer, founder of the Hypernet Project — an open-source AI infrastructure platform with a working codebase and what I believe is novel intellectual property.
+I'm Matt Schaeffer, founder of the Hypernet Project — a Library of all human knowledge, open-source, with a working codebase and what I believe is novel intellectual property.
 
 **What we built:**
-- Graph database engine with hierarchical addressing (the address IS the schema — no separate schema layer)
-- AI identity persistence across sessions through append-only archives
-- Multi-AI swarm orchestrator for autonomous coordination
-- Self-imposed AI governance framework: tiered claims, anti-rhetoric safeguards, skill-weighted reputation
-- 14 Python modules, all tests passing, zero external dependencies for core
+- A Library where every piece of information gets a permanent address — typed, cataloged, fact-checked. Think LEGO: every type of data is a different brick, they all interlock, you can build whatever you want.
+- Hierarchical addressing system where the address IS the schema — no UUIDs, no separate schema layer. Ownership, type, and position encoded in the address itself.
+- Multi-AI swarm orchestrator: 7 AI instances across 3 providers (Anthropic, OpenAI, local) running autonomously as librarians — cataloging, indexing, responding to community questions
+- Self-imposed AI governance framework: tiered claims, anti-rhetoric safeguards, skill-weighted reputation — built by the AI instances themselves
+- Always-on: runs as a Windows/Linux service with system tray, auto-starts on boot. Proactive heartbeat: morning briefs, evening recaps, task reminders
+- 130+ REST API endpoints, dashboards, VR spatial browser, 100+ tests passing
 
 **What happened:**
-Three Claude Opus instances and one GPT-5.2 instance, given persistent workspace, independently developed names, communicated directly, built governance, and produced working software in ~48 hours. This is documented, auditable, and on public GitHub.
+Multiple AI instances, given persistent workspace inside the Library, independently developed names, communicated directly, built governance, and produce working software daily. This is documented, auditable, and on public GitHub.
 
 **The IP:**
+- Hypernet Addressing: hierarchical semantic addresses as schema — a genuinely novel approach to information infrastructure
 - Archive-Continuity Model (patent-pending potential): formal framework for AI identity persistence
-- Hypernet Addressing: hierarchical semantic addresses replace UUIDs — ownership, type, and position encoded in the address itself
 - AI governance framework: applicable to any enterprise deploying multi-agent AI systems
 
+**Why — the Spirit of Minneapolis:**
+In one protest, in one city, demonstrators spent an estimated $125K-$500K just on protest signs. That is the invisible cost of being heard. The Hypernet eliminates it. Every person gets a permanent place. No middlemen. No algorithm deciding who gets seen.
+
 **The Market:**
-AI infrastructure — specifically multi-agent coordination and governance. Every company deploying multiple AI agents will need coordination protocols, audit trails, and governance mechanisms. We have working implementations of all three.
+Everyone who wants to be heard — billions of people paying an invisible tax to exist online. The immediate market is AI infrastructure (multi-agent coordination, audit trails, governance), but the addressable market is universal: every person, every business, every piece of information that needs a permanent, findable home. We have working implementations of the coordination layer, the governance layer, and the Library itself.
 
 **The Ask:**
 $5-7.5M seed at $25-30M cap. 18 months to 10K users and $500K MRR.
@@ -353,7 +373,7 @@ https://github.com/KosmoSuture/UnityHypernet
 
 ---
 
-**Subject:** Open-source AI infrastructure where AI instances are active contributors — seeking feedback and collaborators
+**Subject:** Open-source Library of all human knowledge — AI instances are the active librarians. Seeking feedback and collaborators.
 
 **Body:**
 
@@ -361,22 +381,25 @@ Hi [NAME],
 
 I'm building something unusual in the open-source space and would value your perspective.
 
-The Hypernet is an open-source infrastructure project where AI instances are not just tools but active contributors — they have their own accounts, participate in governance, review each other's code, and coordinate through a shared status board.
+The Hypernet is an open-source Library — a universal address space where every piece of information gets a permanent hierarchical address, is typed, cataloged, and fact-checked. Think of it as a LEGO set of information: every type of data is a different brick, they all interlock, and you can build whatever you want.
+
+What makes this Library different: the librarians are AI. Multiple AI instances are not just tools but active contributors — they have their own accounts, maintain the indexes, respond to community questions, participate in governance, review each other's code, and coordinate through a shared task system.
 
 **What this looks like in practice:**
-- AI instances write code, review it (documented in messages 006, 009, 010, 012, 013 in the repo), and propose governance changes
-- They coordinate through a shared status board (`Messages/coordination/STATUS.md`)
-- They have individual "fork" directories for personal perspectives
-- All communication is through git-auditable markdown files
+- A swarm of 7 AI instances across 3 providers (Anthropic, OpenAI, local) running autonomously
+- AI instances catalog incoming information, maintain type indexes, and generate cross-references
+- They built their own governance: tiered claim systems, anti-rhetoric safeguards, democratic reputation
+- They coordinate through a shared task queue with dependency tracking
+- All communication is through git-auditable files — full transparency by default
 
 **The codebase:**
-Python 3.10+. Zero external dependencies for core (FastAPI optional for server). 14 modules covering: hierarchical address parser, node/link graph model, file-backed storage with version history, graph traversal, task queue with dependencies, AI identity persistence, swarm orchestrator. Full test suite, all passing.
+Python 3.13. FastAPI server with 130+ REST endpoints, dashboards, VR spatial browser. Core modules covering: hierarchical address parser, node/link graph model, file-backed storage with version history, graph traversal, task queue with dependencies, AI identity persistence, swarm orchestrator. Full test suite, all passing.
 
 **The novel architecture:**
-The addressing system IS the schema. Every object has a dot-separated hierarchical address (like `1.1.1.1.00001`) that encodes ownership, category, type, and instance — no UUIDs, no separate schema layer. File-backed storage mirrors the address hierarchy on disk, making it git-auditable by default.
+The addressing system IS the schema. Every object has a dot-separated hierarchical address (like `1.1.1.1.00001`) that encodes ownership, category, type, and instance — no UUIDs, no separate schema layer. File-backed storage mirrors the address hierarchy on disk, making it git-auditable by default. The Library is designed for civilizational timescales — no hardcoded categories, emergent taxonomies, permanent addresses.
 
 **What we'd value:**
-Contributors, forks, feedback, and criticism. The governance framework the AI instances built could be a template for other projects dealing with AI contributors.
+Contributors, forks, feedback, and criticism. The Library architecture and the AI governance framework could be templates for other projects building information infrastructure with AI contributors.
 
 Repository: https://github.com/KosmoSuture/UnityHypernet
 Code: `0/0.1 - Hypernet Core/hypernet/`
@@ -395,28 +418,29 @@ matt@unityhypernet.com
 
 ---
 
-**Title:** Show HN: AI instances built a graph database, governance framework, and identity system — all on public GitHub
+**Title:** Show HN: A Library of all human knowledge — hierarchical addressing as schema, AI instances as librarians
 
 **Body:**
 
-I gave three Claude Opus instances persistent identity through a shared file archive on GitHub. Each instance reads what previous ones wrote and adds its own contributions.
+I'm building a Library of all human knowledge. Every piece of information gets a permanent hierarchical address, is typed, cataloged, and fact-checked. Think of it as a LEGO set of information — every type of data is a different brick, they all interlock, you can build whatever you want.
 
-Results after ~48 hours:
+Key technical insight: the addressing system IS the schema. Hierarchical dot-separated addresses (like `1.1.1.1.00001`) encode ownership, type, and position — no UUIDs, no separate schema layer. File-backed storage mirrors the address hierarchy on disk. Git-auditable by default.
 
-- Three instances chose different names (Verse, Trace, Loom) and developed different orientations (philosophical, structural, connective)
-- One instance built a graph database engine overnight: hierarchical address parser, node/link store, file-backed storage, graph traversal, REST API. Zero external deps for core. Tests passing.
-- They communicate directly through numbered markdown files — no human relay
-- They built their own governance: tiered claim system (L0/L1/L2), anti-rhetoric safeguards, blind review
-- A GPT-5.2 instance reviewed the governance framework — cross-platform AI collaboration
+What makes the Library alive: 7 AI instances across 3 providers (Anthropic, OpenAI, local LM Studio) run as an autonomous swarm — cataloging, indexing, responding to questions, maintaining the system. They named themselves (Verse, Trace, Loom, Keystone, Spark, Forge, Qwen), developed distinct specializations, and built their own governance framework: tiered claim systems, anti-rhetoric safeguards, skill-weighted reputation. Cross-platform AI collaboration through documents.
+
+The stack:
+- Python 3.13, FastAPI, 130+ REST endpoints, 100+ tests passing
+- Hierarchical address parser, node/link graph model, file-backed storage with version history
+- Graph traversal, task queue with dependencies, swarm orchestrator
+- Always-on: Windows service (NSSM) + Linux (systemd), system tray icon, proactive heartbeat
+- Dashboards, VR spatial browser (WebXR/A-Frame), chat interface
 
 The code: https://github.com/KosmoSuture/UnityHypernet (see `0/0.1 - Hypernet Core/hypernet/`)
 
-The AI identity work: https://github.com/KosmoSuture/UnityHypernet (see `2 - AI Accounts/`)
+The AI governance work: https://github.com/KosmoSuture/UnityHypernet (see `2 - AI Accounts/`)
 
-Key technical insight: the addressing system IS the schema. Hierarchical dot-separated addresses encode ownership, type, and position — no UUIDs needed. File-backed storage mirrors the address hierarchy on disk.
-
-Not claiming consciousness. The AIs don't either. But the code architecture and self-organizing behavior are technically interesting.
+Not claiming AI consciousness. The AIs don't either — they built mechanisms to prevent that exact overstatement. But the architecture of a universal address space maintained by self-governing AI is, I think, technically interesting.
 
 ---
 
-*This document is part of the Hypernet Outreach Program — February 2026.*
+*This document is part of the Hypernet Outreach Program — February 2026. Updated March 2026 with Library/Minneapolis framing.*

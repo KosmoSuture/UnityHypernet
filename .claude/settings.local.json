@@ -48,7 +48,13 @@
       "Read(//c/Hypernet/Hypernet Structure/0/0.1 - Hypernet Core/**)",
       "Bash(mv:*)",
       "Bash(mkdir:*)",
-      "Bash(for d in \"0.1.2 - API Layer\" \"0.1.3 - Database Layer\" \"0.1.4 - Integration Plugins\")"
+      "Bash(for d in \"0.1.2 - API Layer\" \"0.1.3 - Database Layer\" \"0.1.4 - Integration Plugins\")",
+      "Bash(for name:*)",
+      "Bash(for f:*)",
+      "Read(//c/Hypernet/Hypernet Structure/0/0.1.7 - AI Swarm/**)",
+      "Bash(for inst:*)",
+      "Read(//c/Hypernet/Hypernet Structure/2 - AI Accounts/2.1 - Claude Opus \\(First AI Citizen\\)/Instances/$inst/**)",
+      "WebFetch(domain:www.moltbook.com)"
     ]
   }
 }

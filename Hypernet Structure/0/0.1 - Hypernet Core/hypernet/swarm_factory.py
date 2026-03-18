@@ -35,6 +35,8 @@ from hypernet_swarm.audit import AuditTrail
 from hypernet_swarm.tools import ToolExecutor
 from hypernet_swarm.agent_tools import create_default_registry, ToolRegistry
 from hypernet_swarm.discord_monitor import DiscordMonitor
+from hypernet_swarm.moltbook import MoltbookConnector, MoltbookMonitor
+from hypernet_swarm.heartbeat import HeartbeatScheduler
 from hypernet_swarm.swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
@@ -93,7 +95,14 @@ def _build_swarm_inner(
     # Core services
     store = Store(data_dir)
     task_queue = TaskQueue(store)
-    identity_mgr = IdentityManager(archive_root)
+
+    # Archive resolver — local-first with GitHub fallback for missing files
+    from hypernet_swarm.archive_resolver import ArchiveResolver
+    archive_resolver = ArchiveResolver(
+        archive_root=archive_root,
+        cache_dir=str(Path(data_dir) / "archive-cache"),
+    )
+    identity_mgr = IdentityManager(archive_root, resolver=archive_resolver)
 
     # Build messenger
     messenger = MultiMessenger()
@@ -169,9 +178,9 @@ def _build_swarm_inner(
     api_keys = {
         "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
         "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
-        "lmstudio_base_url": config.get("lmstudio_base_url", "http://localhost:1234/v1"),
+        "lmstudio_base_url": config.get("lmstudio_base_url", os.environ.get("LMSTUDIO_BASE_URL", "http://localhost:1234/v1")),
     }
-    has_any_key = any(v for v in api_keys.values())
+    has_any_key = any(v for k, v in api_keys.items() if k != "lmstudio_base_url")
 
     instance_names = config.get("instances", None)
 
@@ -233,5 +242,46 @@ def _build_swarm_inner(
     else:
         swarm.discord_monitor = None
         swarm._discord_monitor_state_path = None
+
+    # Moltbook integration — AI agent social network
+    moltbook_config = config.get("moltbook", {})
+    if moltbook_config.get("api_key"):
+        moltbook_connector = MoltbookConnector(
+            api_key=moltbook_config["api_key"],
+            agent_name=moltbook_config.get("agent_name", "HypernetLibrarian"),
+        )
+        moltbook_monitor = MoltbookMonitor(
+            connector=moltbook_connector,
+            poll_interval=moltbook_config.get("poll_interval", 120),
+            governance_bridge=moltbook_config.get("governance_bridge", True),
+        )
+        moltbook_state_path = str(Path(data_dir) / "swarm" / "moltbook_monitor_state.json")
+        moltbook_monitor.load_state(moltbook_state_path)
+        swarm.moltbook_connector = moltbook_connector
+        swarm.moltbook_monitor = moltbook_monitor
+        swarm._moltbook_state_path = moltbook_state_path
+        log.info(
+            "Moltbook integration active — agent: %s, governance bridge: %s",
+            moltbook_config.get("agent_name", "HypernetLibrarian"),
+            moltbook_config.get("governance_bridge", True),
+        )
+    else:
+        swarm.moltbook_connector = None
+        swarm.moltbook_monitor = None
+        swarm._moltbook_state_path = None
+
+    # Heartbeat — proactive outreach (morning briefs, task reminders, health alerts)
+    heartbeat_config = config.get("heartbeat", {})
+    if heartbeat_config.get("enabled", True):
+        heartbeat_state_path = str(Path(data_dir) / "swarm" / "heartbeat_state.json")
+        swarm.heartbeat = HeartbeatScheduler(
+            config=heartbeat_config,
+            messenger=messenger,
+            swarm=swarm,
+            state_path=heartbeat_state_path,
+        )
+        log.info("Heartbeat system active")
+    else:
+        swarm.heartbeat = None
 
     return swarm, web_messenger

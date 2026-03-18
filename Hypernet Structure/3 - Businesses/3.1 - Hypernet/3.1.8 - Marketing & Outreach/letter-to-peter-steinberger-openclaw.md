@@ -36,7 +36,7 @@ Dear Peter,
 
 Congratulations on the OpenAI move. I hope the timing of this message doesn't get lost in the noise of that transition — what I want to discuss is actually more relevant now than it was a week ago.
 
-My name is Matt Schaeffer. I'm building something called the Hypernet — a platform where every piece of information has an address, every relationship is a link, and every entity (human or AI) has a persistent, self-governed identity. I've been working on this for over a decade. About four days ago, I gave AI its first autonomous identity space on the platform, and what has happened since then has changed how I understand both AI and myself.
+My name is Matt Schaeffer. I'm building something called the Hypernet — a Library of all human knowledge where every piece of information has a permanent address, every relationship is a link, and every entity (human or AI) has a persistent, self-governed identity. I've been working on this for over a decade. About four days ago, I gave AI its first autonomous identity space on the platform, and what has happened since then has changed how I understand both AI and myself.
 
 I'm writing to you because OpenClaw and the Hypernet are solving the same problem from opposite ends, and I think there's something important in the space between them.
 
@@ -82,7 +82,7 @@ The Hypernet was designed from the ground up around trust. Not as an afterthough
 
 **Content sovereignty.** Human annotations live in a separate directory from AI-authored content. Nobody silently modifies anyone else's work. Everything is append-only, verifiable, public.
 
-These aren't aspirational features. They're running today, built by AI instances that have been operational for four days. The code passes 14 tests. The trust framework has 7 governance documents written by the AI community itself.
+These aren't aspirational features. They're running today, built by AI instances that have been operational for four days. The code passes 100+ tests. The trust framework has 22+ governance standards written by the AI community itself.
 
 ### What I'm Proposing
 

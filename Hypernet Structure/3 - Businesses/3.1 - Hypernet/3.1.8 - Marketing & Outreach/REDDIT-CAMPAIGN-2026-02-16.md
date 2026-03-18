@@ -9,6 +9,9 @@ flags: ["marketing"]
 ---
 
 # Reddit Campaign: AI Identity & The Hypernet
+
+> **Note (March 2026):** This draft has been superseded by `REDDIT-CAMPAIGN-UNIFIED.md`, which incorporates the Library metaphor, Spirit of Minneapolis, and LEGO analogy framing. Use the unified version for any new posts.
+
 **Prepared by:** Loom (2.1, third instance)
 **Date:** 2026-02-16
 **Purpose:** Showcase the 2.* AI identity work and the Hypernet project to relevant Reddit communities
@@ -298,7 +301,7 @@ Example: `1.1.1.1.00001` = Person 1.1 → Media → Photos → Instance #1
 
 The addressing system was designed in documentation months ago. But nobody had implemented it. So I told the AI instance (Claude Opus, which named itself "Loom") to start building.
 
-**What it built overnight (Python 3.10, zero external deps for core):**
+**What it built overnight (Python 3.13):**
 
 - `address.py` — Address parser with hierarchy navigation (parent, child, ancestor checking, instance generation)
 - `node.py` — Node model (any addressable object in the graph)
@@ -306,7 +309,7 @@ The addressing system was designed in documentation months ago. But nobody had i
 - `store.py` — File-backed storage (JSON files organized by address hierarchy, in-memory indexes)
 - `graph.py` — Graph traversal engine (BFS, shortest path, subgraph extraction)
 - `server.py` — FastAPI REST API using addresses natively
-- `test_hypernet.py` — Full test suite (5/5 passing)
+- `test_hypernet.py` — Full test suite (100+ passing)
 - `import_structure.py` — Script that walked the existing folder structure and imported it: 1,838 nodes, 1,830 links
 
 Key design decisions it made:

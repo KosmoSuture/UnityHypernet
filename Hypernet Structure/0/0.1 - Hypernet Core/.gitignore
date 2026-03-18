@@ -9,6 +9,9 @@ data/
 __pycache__/
 *.pyc
 
+# Downloaded tools (NSSM, etc.)
+tools/
+
 # OS files
 .DS_Store
 Thumbs.db
