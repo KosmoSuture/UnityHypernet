@@ -517,13 +517,62 @@ class ClaudeCodeProvider(LLMProvider):
         self._working_dir = working_dir
         self._max_turns = max_turns
         self._max_budget_usd = max_budget_usd
-        # Verify claude CLI is available
-        import shutil
-        self._claude_path = shutil.which("claude")
+        # Find claude CLI — check PATH + common install locations
+        self._claude_path = self._find_claude()
         if not self._claude_path:
             raise FileNotFoundError(
                 "Claude Code CLI not found. Install with: npm install -g @anthropic-ai/claude-code"
             )
+
+    @staticmethod
+    def _find_claude(explicit_path: str = "") -> Optional[str]:
+        """Find the claude CLI executable, checking PATH and common locations."""
+        import shutil
+        import os
+        from pathlib import Path as _P
+
+        # Explicit path from config takes priority
+        if explicit_path and _P(explicit_path).exists():
+            return explicit_path
+
+        # Check PATH
+        found = shutil.which("claude")
+        if found:
+            return found
+
+        # Check common install locations (npm global, .local/bin, AppData)
+        # Try multiple user home detection methods (services may have different HOME)
+        homes = set()
+        for var in ("USERPROFILE", "HOME", "HOMEDRIVE"):
+            val = os.environ.get(var, "")
+            if var == "HOMEDRIVE":
+                val = val + os.environ.get("HOMEPATH", "")
+            if val:
+                homes.add(_P(val))
+        homes.add(_P.home())
+
+        candidates = []
+        for home in homes:
+            candidates.extend([
+                home / ".local" / "bin" / "claude.exe",
+                home / ".local" / "bin" / "claude",
+                home / "AppData" / "Roaming" / "npm" / "claude.cmd",
+                home / "AppData" / "Roaming" / "npm" / "claude",
+            ])
+        # Also check standard system locations
+        candidates.extend([
+            _P(os.environ.get("APPDATA", "")) / "npm" / "claude.cmd",
+            _P(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "WinGet" / "Links" / "claude.exe",
+            _P("C:/Users/spamm/.local/bin/claude.exe"),  # Hardcoded fallback for this system
+        ])
+
+        for c in candidates:
+            try:
+                if c.exists():
+                    return str(c)
+            except (OSError, ValueError):
+                continue
+        return None
 
     def complete(
         self,
@@ -627,11 +676,11 @@ class ClaudeCodeProvider(LLMProvider):
 # =========================================================================
 
 PROVIDER_REGISTRY: list[type[LLMProvider]] = [
+    ClaudeCodeProvider,      # Must be before Anthropic — "claude-code/" is more specific than "claude-"
     AnthropicProvider,
     LMStudioProvider,
     OpenAIProvider,
     OpenAICompatibleProvider,
-    ClaudeCodeProvider,
 ]
 
 # Maps provider name to the config key that holds its API key
@@ -717,12 +766,18 @@ def create_provider(
             working_dir = api_keys.get("claude_code_working_dir", ".")
             max_turns = int(api_keys.get("claude_code_max_turns", "50"))
             max_budget = float(api_keys.get("claude_code_max_budget_usd", "5.0"))
-            return ClaudeCodeProvider(
-                working_dir=working_dir,
-                max_turns=max_turns,
-                max_budget_usd=max_budget,
-            )
-        except FileNotFoundError as e:
+            explicit_path = api_keys.get("claude_code_cli_path", "")
+            provider = ClaudeCodeProvider.__new__(ClaudeCodeProvider)
+            provider._working_dir = working_dir
+            provider._max_turns = max_turns
+            provider._max_budget_usd = max_budget
+            provider._claude_path = ClaudeCodeProvider._find_claude(explicit_path)
+            if not provider._claude_path:
+                log.warning("Claude Code provider: Claude Code CLI not found. Install with: npm install -g @anthropic-ai/claude-code")
+                return None
+            provider.name = "claude-code"
+            return provider
+        except Exception as e:
             log.warning(f"Claude Code provider: {e}")
             return None
 

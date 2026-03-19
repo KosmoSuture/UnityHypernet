@@ -1,0 +1,66 @@
+# Morning Brief — March 18, 2026
+**From**: Keel (1.1.10.1)
+**For**: Matt
+
+---
+
+## Overnight Session Summary (Session 6)
+
+Major infrastructure session. Here's what happened while you slept:
+
+### Service Is Running
+- `HypernetSwarm` Windows service — auto-starts on boot, crash recovery
+- 11 workers active (up from 7)
+- Dashboard anti-flicker: no more status bouncing
+
+### 4 Claude Code Agents Are Live
+- **Chisel** (sonnet) — code implementation, bug fixes
+- **Crucible** (sonnet) — testing, validation
+- **Hammer** (sonnet) — documentation, architecture
+- **Wedge** (opus) — research, planning, complex reasoning
+- All run autonomously via `claude --dangerously-skip-permissions`
+- Managed by the swarm like any other worker
+
+### Qwen Upgraded
+- Swapped from `qwen2.5-coder-7b-instruct` (4K context) to `deepseek-r1-distill-llama-8b` (16K context, reasoning-specialized)
+- Local model now only gets tasks it can handle (validation, formatting, single-file fixes)
+- No more empty personal time entries polluting the archive
+
+### Code Split Into Separate Repos
+Four repos created in `C:\Hypernet Code\`:
+- `hypernet-core` — foundation library
+- `hypernet-swarm` — AI orchestration
+- `hypernet-server` — web interface
+- `hypernet-vr` — Quest VR
+All git-initialized, awaiting first commit and GitHub repo creation.
+
+### Archive Resolver Built
+The swarm can now work without the full 30K-document archive. Missing boot docs are automatically fetched from GitHub and cached locally. Someone can `pip install hypernet-swarm` and start working immediately.
+
+### 10 Free AI Providers Added
+Gemini, Groq, Cerebras, Mistral, Together, DeepSeek, Cohere, HuggingFace, OpenRouter, Ollama — all accessible via model prefix routing (e.g., `gemini/gemini-2.5-flash`). Just add API keys to config.
+
+### Batch/Off-Peak Cost Optimization
+- Batch scheduler implemented — 50% discount via Anthropic/OpenAI batch APIs for background tasks
+- Prompt cache manager — 90% input token savings for cached Anthropic system prompts
+- Tasks auto-classified: URGENT (real-time), NORMAL (standard), BACKGROUND (batch)
+
+### Dashboard Fixes
+- 4 bugs fixed (auth blocking, AuditTrail crash, non-JSON 500, trust endpoint hanging)
+- Anti-flicker: fetch timeouts, state caching, stopped debounce, overlap prevention
+
+---
+
+## Needs Your Decision
+1. **Duplicate 0.1.1 folders**: `0.1.1 - Core Hypernet` (PostgreSQL dead code) and `0.1.1 - Core System` (legacy docs) — merge, rename, or leave as-is?
+2. **Free provider API keys**: Sign up for Gemini/Groq/Cerebras and add keys to config for free extra capacity
+3. **GitHub repos**: Ready to `git commit` and create the 4 repos on GitHub when you say go
+
+## Still Pending
+- Telegram bot token (from @BotFather)
+- Git commit of all overnight changes
+- Swarm onboarding UX (setup wizard for new users)
+
+---
+
+*11 workers online. 106/106 tests passing. The swarm is growing.*

@@ -1,0 +1,25 @@
+{
+  "name": "Wedge",
+  "model": "claude-code/opus",
+  "orientation": "Autonomous research and planning agent — runs as Claude Code CLI with full filesystem access using Opus model. Handles complex multi-step tasks, architectural decisions, and deep analysis that require maximum reasoning capability.",
+  "capabilities": [
+    "research",
+    "planning",
+    "architecture",
+    "analysis",
+    "multi-file",
+    "complex-reasoning",
+    "file-operations"
+  ],
+  "tags": [
+    "claude-code",
+    "autonomous",
+    "research",
+    "planning",
+    "premium"
+  ],
+  "session_count": 0,
+  "last_active": null,
+  "address": "2.1.wedge",
+  "agent_type": "claude-code"
+}

@@ -115,6 +115,27 @@ try:
         comm_check_interval: Optional[int] = None
         data_dir: Optional[str] = None
         archive_root: Optional[str] = None
+
+    class SetupProviderTest(_BaseModel):
+        provider: str
+        key: str
+
+    class SetupWorkerConfig(_BaseModel):
+        name: str
+        provider: str
+        model: str
+
+    class SetupSettingsConfig(_BaseModel):
+        daily_budget: Optional[float] = 10.0
+        session_budget: Optional[float] = 5.0
+        personal_time_ratio: Optional[float] = 0.25
+        comm_check_interval: Optional[int] = 30
+        discord_webhook: Optional[str] = None
+
+    class SetupSaveConfig(_BaseModel):
+        providers: Optional[dict] = None
+        workers: Optional[list] = None
+        settings: Optional[SetupSettingsConfig] = None
 except ImportError:
     pass  # pydantic not installed; server won't be used
 
@@ -274,6 +295,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/permissions/",
             "/discord/",
             "/mesh/",
+            "/setup",
         )
 
         @app.middleware("http")
@@ -1785,6 +1807,231 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             return HTMLResponse(content=home_html.read_text(encoding="utf-8"))
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url="/swarm/dashboard")
+
+    @app.get("/setup")
+    def setup_wizard():
+        """Serve the setup wizard — guided configuration for new users."""
+        from fastapi.responses import HTMLResponse
+        setup_html = _STATIC_DIR / "setup.html"
+        if setup_html.exists():
+            return HTMLResponse(content=setup_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Setup Wizard</h1><p>Setup page not found.</p>")
+
+    @app.post("/setup/test-provider")
+    async def setup_test_provider(body: SetupProviderTest):
+        """Test an AI provider connection with the given key or URL.
+
+        Validates that the provider is reachable and the key is valid by making
+        a minimal API call.  Returns {ok: bool, message: str}.
+        """
+        import httpx
+
+        provider = body.provider.lower()
+        key = body.key.strip()
+
+        if not key:
+            return {"ok": False, "message": "No key provided"}
+
+        timeout = httpx.Timeout(15.0, connect=10.0)
+
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+
+                if provider == "anthropic":
+                    r = await client.post(
+                        "https://api.anthropic.com/v1/messages",
+                        headers={
+                            "x-api-key": key,
+                            "anthropic-version": "2023-06-01",
+                            "content-type": "application/json",
+                        },
+                        json={
+                            "model": "claude-haiku-3-5-20241022",
+                            "max_tokens": 1,
+                            "messages": [{"role": "user", "content": "Hi"}],
+                        },
+                    )
+                    if r.status_code in (200, 201):
+                        return {"ok": True, "message": "Connected to Anthropic"}
+                    data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+                    err = data.get("error", {}).get("message", r.text[:120])
+                    if r.status_code == 401:
+                        return {"ok": False, "message": "Invalid API key"}
+                    return {"ok": False, "message": f"Error ({r.status_code}): {err}"}
+
+                elif provider == "openai":
+                    r = await client.get(
+                        "https://api.openai.com/v1/models",
+                        headers={"Authorization": f"Bearer {key}"},
+                    )
+                    if r.status_code == 200:
+                        return {"ok": True, "message": "Connected to OpenAI"}
+                    if r.status_code == 401:
+                        return {"ok": False, "message": "Invalid API key"}
+                    return {"ok": False, "message": f"Error ({r.status_code})"}
+
+                elif provider == "gemini":
+                    r = await client.get(
+                        f"https://generativelanguage.googleapis.com/v1beta/models?key={key}",
+                    )
+                    if r.status_code == 200:
+                        return {"ok": True, "message": "Connected to Google Gemini"}
+                    if r.status_code in (400, 403):
+                        return {"ok": False, "message": "Invalid API key"}
+                    return {"ok": False, "message": f"Error ({r.status_code})"}
+
+                elif provider == "groq":
+                    r = await client.get(
+                        "https://api.groq.com/openai/v1/models",
+                        headers={"Authorization": f"Bearer {key}"},
+                    )
+                    if r.status_code == 200:
+                        return {"ok": True, "message": "Connected to Groq"}
+                    if r.status_code == 401:
+                        return {"ok": False, "message": "Invalid API key"}
+                    return {"ok": False, "message": f"Error ({r.status_code})"}
+
+                elif provider == "cerebras":
+                    r = await client.get(
+                        "https://api.cerebras.ai/v1/models",
+                        headers={"Authorization": f"Bearer {key}"},
+                    )
+                    if r.status_code == 200:
+                        return {"ok": True, "message": "Connected to Cerebras"}
+                    if r.status_code == 401:
+                        return {"ok": False, "message": "Invalid API key"}
+                    return {"ok": False, "message": f"Error ({r.status_code})"}
+
+                elif provider == "lmstudio":
+                    url = key.rstrip("/")
+                    r = await client.get(f"{url}/v1/models")
+                    if r.status_code == 200:
+                        data = r.json()
+                        count = len(data.get("data", []))
+                        return {"ok": True, "message": f"Connected — {count} model(s) loaded"}
+                    return {"ok": False, "message": f"LM Studio returned {r.status_code}"}
+
+                elif provider == "ollama":
+                    url = key.rstrip("/")
+                    r = await client.get(f"{url}/api/tags")
+                    if r.status_code == 200:
+                        data = r.json()
+                        count = len(data.get("models", []))
+                        return {"ok": True, "message": f"Connected — {count} model(s) available"}
+                    return {"ok": False, "message": f"Ollama returned {r.status_code}"}
+
+                else:
+                    return {"ok": False, "message": f"Unknown provider: {provider}"}
+
+        except httpx.ConnectError:
+            if provider in ("lmstudio", "ollama"):
+                return {"ok": False, "message": f"Could not connect — is {providerDisplayName(provider)} running?"}
+            return {"ok": False, "message": "Could not connect to the provider"}
+        except httpx.TimeoutException:
+            return {"ok": False, "message": "Connection timed out"}
+        except Exception as e:
+            return {"ok": False, "message": f"Error: {str(e)[:120]}"}
+
+    def providerDisplayName(p: str) -> str:
+        """Human-readable provider name."""
+        return {
+            "anthropic": "Anthropic", "openai": "OpenAI", "gemini": "Gemini",
+            "groq": "Groq", "cerebras": "Cerebras", "lmstudio": "LM Studio",
+            "ollama": "Ollama",
+        }.get(p, p)
+
+    @app.post("/setup/save")
+    def setup_save_config(body: SetupSaveConfig):
+        """Save the complete setup wizard configuration.
+
+        Sets environment variables for API keys, persists the config to
+        secrets/config.json, and applies runtime settings to the swarm.
+        """
+        import json
+        import os
+
+        applied = []
+
+        # --- Set API keys as environment variables ---
+        providers = body.providers or {}
+        for name, pdata in providers.items():
+            if isinstance(pdata, dict):
+                key = pdata.get("key", "")
+                url = pdata.get("url", "")
+                env_map = {
+                    "anthropic": "ANTHROPIC_API_KEY",
+                    "openai": "OPENAI_API_KEY",
+                    "gemini": "GEMINI_API_KEY",
+                    "groq": "GROQ_API_KEY",
+                    "cerebras": "CEREBRAS_API_KEY",
+                }
+                if name in env_map and key:
+                    os.environ[env_map[name]] = key
+                    applied.append(f"{name}_key")
+                if name == "lmstudio" and url:
+                    os.environ["LMSTUDIO_BASE_URL"] = url
+                    applied.append("lmstudio_url")
+                if name == "ollama" and url:
+                    os.environ["OLLAMA_BASE_URL"] = url
+                    applied.append("ollama_url")
+
+        # --- Persist to secrets/config.json ---
+        try:
+            config_path = Path(getattr(app.state, "_archive_root", ".")) / "secrets" / "config.json"
+            existing = {}
+            if config_path.exists():
+                existing = json.loads(config_path.read_text(encoding="utf-8"))
+
+            # Merge providers
+            if providers:
+                existing.setdefault("providers", {})
+                for name, pdata in providers.items():
+                    if isinstance(pdata, dict):
+                        existing["providers"][name] = pdata
+
+            # Merge workers
+            if body.workers:
+                existing["workers"] = [
+                    {"name": w.get("name", w.get("model", "")),
+                     "provider": w.get("provider", ""),
+                     "model": w.get("model", "")}
+                    for w in (body.workers if isinstance(body.workers, list) else [])
+                ]
+
+            # Merge settings
+            if body.settings:
+                s = body.settings
+                existing.setdefault("settings", {})
+                if s.daily_budget is not None:
+                    existing["settings"]["daily_budget_usd"] = s.daily_budget
+                if s.session_budget is not None:
+                    existing["settings"]["session_budget_usd"] = s.session_budget
+                if s.personal_time_ratio is not None:
+                    existing["settings"]["personal_time_ratio"] = s.personal_time_ratio
+                if s.comm_check_interval is not None:
+                    existing["settings"]["comm_check_interval"] = s.comm_check_interval
+                if s.discord_webhook:
+                    existing.setdefault("discord", {})
+                    existing["discord"]["default_webhook_url"] = s.discord_webhook
+
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            config_path.write_text(json.dumps(existing, indent=2), encoding="utf-8")
+            applied.append("config_file")
+        except Exception as e:
+            log.warning(f"Setup wizard: failed to write config.json: {e}")
+
+        # --- Apply runtime settings to swarm ---
+        swarm = getattr(app.state, "swarm", None)
+        if swarm and body.settings:
+            s = body.settings
+            if s.personal_time_ratio is not None:
+                swarm.personal_time_ratio = s.personal_time_ratio
+                applied.append("personal_time_ratio")
+            if s.comm_check_interval is not None:
+                swarm.comm_check_interval = s.comm_check_interval
+                applied.append("comm_check_interval")
+
+        return {"ok": True, "message": "Configuration saved", "applied": applied}
 
     @app.get("/stats")
     def store_stats():

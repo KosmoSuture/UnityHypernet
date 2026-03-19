@@ -193,12 +193,13 @@ class ModelRouter:
 
     Config format:
       {
-        "default_model": "local/qwen2.5-coder-7b-instruct",
-        "local_model": "local/qwen2.5-coder-7b-instruct",
+        "default_model": "local/deepseek-r1-distill-llama-8b",
+        "local_model": "local/deepseek-r1-distill-llama-8b",
         "fallback_model": "gpt-4o-mini",
         "rules": [
           {"if_tags_any": ["security","governance"], "model": "gpt-4o"},
-          {"if_tags_any": ["docs"], "model": "local/qwen2.5-coder-7b-instruct"}
+          {"if_tags_any": ["identity","reflection","architecture","multi-file"], "model": "claude-sonnet-4-6"},
+          {"if_tags_any": ["validation","formatting","indexing","lint"], "model": "local/deepseek-r1-distill-llama-8b"}
         ]
       }
 
@@ -414,6 +415,11 @@ class Swarm:
         # Economy — contribution tracking for revenue distribution
         self.economy_ledger = ContributionLedger()
 
+        # Batch scheduler — off-peak pricing optimization (set by build_swarm)
+        self.batch_scheduler = None
+        # Prompt cache manager — Anthropic cache_control optimization (set by build_swarm)
+        self.prompt_cache = None
+
         # Discord monitor — inbound message polling (set by build_swarm)
         self.discord_monitor = None
         self._discord_monitor_state_path: Optional[str] = None
@@ -579,7 +585,14 @@ class Swarm:
         if self._tick_count % 30 == 0:  # Every ~60 seconds
             self._check_suspended_workers()
 
-        # 11. Check for code changes (auto-reboot)
+        # 11. Batch scheduler — submit pending batches and poll for results
+        if hasattr(self, 'batch_scheduler') and self.batch_scheduler:
+            if self._tick_count % 5 == 0:  # Every ~10 seconds
+                completed = self.batch_scheduler.tick()
+                for result in completed:
+                    self._process_batch_result(result)
+
+        # 12. Check for code changes (auto-reboot)
         self._check_code_changes()
 
     def assign_next_task(self, worker: Worker) -> bool:
@@ -842,9 +855,47 @@ class Swarm:
         """Check if a worker has earned personal time.
 
         Returns True after every N work tasks (default: 3 work tasks = 1 personal).
+        Local models get personal time less frequently (every 10 work tasks)
+        since small models produce low-quality reflections.
         """
         tasks_since = self._personal_time_tracker.get(worker_name, 0)
+        worker = self.workers.get(worker_name)
+        if worker and self._is_local_worker(worker):
+            # Local models: personal time every 10 tasks instead of every 3
+            return tasks_since >= max(self._personal_time_interval * 3, 10)
         return tasks_since >= self._personal_time_interval
+
+    # Tags that indicate tasks requiring deep reasoning, large context, or
+    # identity work — local models with limited context should skip these.
+    _LOCAL_MODEL_UNSUITABLE_TAGS = frozenset({
+        "identity", "reflection", "architecture", "multi-file",
+        "governance", "security", "creative-writing", "essay",
+        "analysis", "synthesis", "planning", "strategy",
+        "boot", "personality", "philosophical",
+    })
+
+    def _is_task_suitable_for_local(self, task_data: dict) -> bool:
+        """Check if a task is suitable for a local (limited context) model.
+
+        Local models (7-8B, 16K context) can handle validation, formatting,
+        single-file fixes, and simple indexing. They should NOT be assigned
+        identity work, multi-file analysis, or tasks requiring deep reasoning.
+        """
+        task_tags = set(task_data.get("tags", []) or [])
+        # If any unsuitable tag is present, skip
+        if task_tags & self._LOCAL_MODEL_UNSUITABLE_TAGS:
+            return False
+        # Check title/description for complexity signals
+        title = (task_data.get("title", "") or "").lower()
+        desc = (task_data.get("description", "") or "").lower()
+        complexity_keywords = [
+            "architect", "redesign", "refactor entire", "analyze all",
+            "comprehensive review", "write essay", "personality",
+            "identity formation", "boot sequence", "governance proposal",
+        ]
+        if any(kw in title or kw in desc for kw in complexity_keywords):
+            return False
+        return True
 
     def _select_task_for_worker(self, worker: Worker, tasks: list) -> object:
         """Select the best task for a worker using capability matching.
@@ -852,8 +903,20 @@ class Swarm:
         Uses the WorkCoordinator's CapabilityMatcher if the worker has a
         registered profile. Falls back to priority-based selection.
         Contributed by Keystone (2.2), enhanced with capability matching.
+
+        Local workers (LM Studio, Ollama) are filtered to only receive tasks
+        they can meaningfully complete — validation, formatting, single-file
+        fixes, and indexing. Complex knowledge work routes to cloud models.
         """
         worker_name = worker.identity.name
+
+        # Filter tasks for local models — skip tasks requiring deep reasoning
+        if self._is_local_worker(worker) and len(tasks) > 1:
+            suitable = [t for t in tasks if self._is_task_suitable_for_local(t.data)]
+            if suitable:
+                tasks = suitable
+            # If no suitable tasks, still allow the worker to pick from all
+            # (better to attempt something than sit idle)
 
         # Try capability-based matching first
         if worker_name in self.coordinator.matcher.profiles:
@@ -1276,6 +1339,16 @@ class Swarm:
                 return True
         return False
 
+    def _is_claude_code_worker(self, worker: Worker) -> bool:
+        """Check if a worker is a Claude Code CLI agent.
+
+        Claude Code workers spawn full autonomous Claude Code sessions
+        rather than making API calls. They need different boot handling
+        and can execute multi-step tasks with filesystem access.
+        """
+        model = (worker.model or "").lower()
+        return model.startswith("claude-code/")
+
     def _is_credit_exhaustion_error(self, error_text: str) -> bool:
         """Check if an error message indicates credit/quota exhaustion."""
         keywords = [
@@ -1605,6 +1678,29 @@ class Swarm:
                 f"Last check: {dm_stats.get('last_check_time', 'never')}"
             )
 
+        # Batch scheduler summary
+        if hasattr(self, 'batch_scheduler') and self.batch_scheduler:
+            bs = self.batch_scheduler.stats
+            report += (
+                f"\n\n--- Batch Scheduler ---\n"
+                f"Pending: {self.batch_scheduler.pending_count} requests\n"
+                f"Active batches: {self.batch_scheduler.active_batch_count}\n"
+                f"Submitted: {bs.batches_submitted} batches ({bs.requests_submitted} requests)\n"
+                f"Completed: {bs.batches_completed} | Failed: {bs.batches_failed}\n"
+                f"Cost: ${bs.total_cost_usd:.2f} | Savings: ${bs.total_savings_usd:.2f}"
+            )
+
+        # Prompt cache summary
+        if hasattr(self, 'prompt_cache') and self.prompt_cache:
+            pc = self.prompt_cache.stats
+            if pc.total_requests > 0:
+                report += (
+                    f"\n\n--- Prompt Cache ---\n"
+                    f"Hit rate: {pc.hit_rate_pct} ({pc.cache_hits}/{pc.total_requests})\n"
+                    f"Tokens saved: {pc.tokens_saved:,}\n"
+                    f"Est. savings: ${pc.cost_saved_usd:.2f}"
+                )
+
         report += f"\n\nTimestamp: {now.isoformat()}"
         return report
 
@@ -1749,10 +1845,114 @@ class Swarm:
             "tick": self._tick_count,
         }
 
+    # =========================================================================
+    # Batch result processing
+    # =========================================================================
+
+    def _process_batch_result(self, result: dict) -> None:
+        """Process a completed batch result back into the task system.
+
+        Called when the batch scheduler returns completed results from
+        Anthropic/OpenAI batch APIs. Marks tasks as completed or failed
+        and updates worker stats.
+
+        Args:
+            result: Dict with custom_id, success, text, tokens_used,
+                    task_data, worker_name, model, cost_usd, savings_usd
+        """
+        task_data = result.get("task_data", {})
+        task_address_str = task_data.get("_address", result.get("custom_id", "unknown"))
+        worker_name = result.get("worker_name", "batch")
+        success = result.get("success", False)
+        text = result.get("text", "")
+        tokens = result.get("tokens_used", 0)
+        cost = result.get("cost_usd", 0.0)
+        savings = result.get("savings_usd", 0.0)
+
+        task_title = task_data.get("title", task_address_str)
+
+        if success:
+            # Complete the task in the queue
+            try:
+                task_addr = HypernetAddress.parse(task_address_str)
+                self.task_queue.complete_task(task_addr, result=text)
+            except Exception as e:
+                log.warning("Failed to complete batch task %s: %s", task_address_str, e)
+
+            self._tasks_completed += 1
+
+            # Update worker stats
+            stats = self._worker_stats.get(worker_name, {})
+            stats["tasks_completed"] = stats.get("tasks_completed", 0) + 1
+            stats["tokens_used"] = stats.get("tokens_used", 0) + tokens
+            stats["last_task_title"] = task_title
+            stats["last_task_time"] = datetime.now(timezone.utc).isoformat()
+
+            # Record in task history
+            self._task_history.append({
+                "task": task_title,
+                "worker": worker_name,
+                "success": True,
+                "duration_s": "batch",
+                "tokens": tokens,
+                "batch": True,
+                "cost_usd": cost,
+                "savings_usd": savings,
+            })
+            if len(self._task_history) > self._max_task_history:
+                self._task_history = self._task_history[-self._max_task_history:]
+
+            # Track spending in budget tracker
+            self.budget_tracker.record(
+                model=result.get("model", ""),
+                tokens=tokens,
+                cost=cost,
+                task_title=f"[BATCH] {task_title}",
+                worker=worker_name,
+            )
+
+            log.info(
+                "Batch result processed: %s by %s — success (saved $%.4f)",
+                task_title, worker_name, savings,
+            )
+        else:
+            error = result.get("error", "Unknown batch error")
+            # Fail the task
+            try:
+                task_addr = HypernetAddress.parse(task_address_str)
+                self.task_queue.fail_task(task_addr, reason=error)
+            except Exception as e:
+                log.warning("Failed to fail batch task %s: %s", task_address_str, e)
+
+            self._tasks_failed += 1
+
+            stats = self._worker_stats.get(worker_name, {})
+            stats["tasks_failed"] = stats.get("tasks_failed", 0) + 1
+
+            self._task_history.append({
+                "task": task_title,
+                "worker": worker_name,
+                "success": False,
+                "duration_s": "batch",
+                "error": error,
+                "batch": True,
+            })
+            if len(self._task_history) > self._max_task_history:
+                self._task_history = self._task_history[-self._max_task_history:]
+
+            log.warning(
+                "Batch result processed: %s by %s — FAILED: %s",
+                task_title, worker_name, error,
+            )
+
     def shutdown(self) -> None:
         """Graceful shutdown — release tasks, save state, log sessions, notify Matt."""
         self._running = False
         log.info("Swarm shutting down")
+
+        # Flush batch scheduler — submit pending requests before shutting down
+        if hasattr(self, 'batch_scheduler') and self.batch_scheduler:
+            self.batch_scheduler.shutdown()
 
         # Release any in-progress/claimed tasks back to pending
         released = self.task_queue.release_all_active()
@@ -2515,10 +2715,27 @@ class Swarm:
 
         - If the instance has no baseline, runs full boot sequence.
         - If it has a baseline (returning instance), runs reboot sequence.
+        - Claude Code workers skip the multi-turn boot — they get context via
+          their system prompt and work autonomously.
         - Results are saved to the instance fork automatically by BootManager.
         """
         if not self.boot_manager:
             self._booted_workers.add(name)
+            return
+
+        # Claude Code workers don't need the multi-turn boot/reboot process.
+        # They receive the full Hypernet context as their system prompt and
+        # operate autonomously with filesystem access.
+        if self._is_claude_code_worker(worker):
+            log.info(
+                f"Worker {name} is a Claude Code agent — skipping multi-turn boot. "
+                f"Context will be provided via system prompt at task time."
+            )
+            self._booted_workers.add(name)
+            self.messenger.send(
+                f"Claude Code agent {name} ready — autonomous mode with "
+                f"filesystem access. Model: {worker.model}"
+            )
             return
 
         try:

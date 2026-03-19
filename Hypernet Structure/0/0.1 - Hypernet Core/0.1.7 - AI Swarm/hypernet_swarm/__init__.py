@@ -73,6 +73,13 @@ from .git_coordinator import (
 # --- Proactive Outreach ---
 from .heartbeat import HeartbeatScheduler, ScheduledEvent
 
+# --- Cost Optimization ---
+from .batch_scheduler import (
+    BatchScheduler, BatchRequest, BatchJob, BatchStats,
+    TaskUrgency, classify_urgency,
+)
+from .prompt_cache import PromptCacheManager, CacheStats, CachedPrompt
+
 # --- Archive Access ---
 from .archive_resolver import ArchiveResolver
 

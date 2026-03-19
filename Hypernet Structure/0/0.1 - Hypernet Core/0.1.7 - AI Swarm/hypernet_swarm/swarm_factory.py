@@ -32,6 +32,8 @@ from .agent_tools import create_default_registry, ToolRegistry
 from .discord_monitor import DiscordMonitor
 from .moltbook import MoltbookConnector, MoltbookMonitor
 from .heartbeat import HeartbeatScheduler
+from .batch_scheduler import BatchScheduler
+from .prompt_cache import PromptCacheManager
 from .swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
@@ -167,8 +169,21 @@ def _build_swarm_inner(
         "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
         "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
         "lmstudio_base_url": config.get("lmstudio_base_url", os.environ.get("LMSTUDIO_BASE_URL", "http://localhost:1234/v1")),
+        # Claude Code provider settings
+        "claude_code_working_dir": str(Path(archive_root).parent) if archive_root else ".",
+        "claude_code_max_turns": str(config.get("claude_code_max_turns", 50)),
+        "claude_code_max_budget_usd": str(config.get("claude_code_max_budget_usd", 5.0)),
     }
-    has_any_key = any(v for k, v in api_keys.items() if k != "lmstudio_base_url")
+    # Add any free-tier provider keys from config
+    for key_name in [
+        "gemini_api_key", "groq_api_key", "cerebras_api_key",
+        "mistral_api_key", "together_api_key", "deepseek_api_key",
+        "cohere_api_key", "huggingface_api_key", "openrouter_api_key",
+    ]:
+        val = config.get(key_name, os.environ.get(key_name.upper(), ""))
+        if val:
+            api_keys[key_name] = val
+    has_any_key = any(v for k, v in api_keys.items() if k not in ("lmstudio_base_url", "claude_code_working_dir", "claude_code_max_turns", "claude_code_max_budget_usd"))
 
     instance_names = config.get("instances", None)
 
@@ -271,5 +286,36 @@ def _build_swarm_inner(
         log.info("Heartbeat system active")
     else:
         swarm.heartbeat = None
+
+    # Batch scheduler — 50% cost savings on background tasks via batch APIs
+    batch_config = config.get("batch_scheduler", {})
+    if batch_config.get("enabled", True) and not mock:
+        batch_state_dir = str(Path(data_dir) / "swarm" / "batch")
+        swarm.batch_scheduler = BatchScheduler(
+            api_keys=api_keys,
+            state_dir=batch_state_dir,
+        )
+        # Apply config overrides
+        if "submit_interval" in batch_config:
+            swarm.batch_scheduler.BATCH_SUBMIT_INTERVAL = float(batch_config["submit_interval"])
+        if "poll_interval" in batch_config:
+            swarm.batch_scheduler.BATCH_POLL_INTERVAL = float(batch_config["poll_interval"])
+        if "min_batch_size" in batch_config:
+            swarm.batch_scheduler.MIN_BATCH_SIZE = int(batch_config["min_batch_size"])
+        log.info(
+            "Batch scheduler active (submit every %.0fs, poll every %.0fs, min batch size %d)",
+            swarm.batch_scheduler.BATCH_SUBMIT_INTERVAL,
+            swarm.batch_scheduler.BATCH_POLL_INTERVAL,
+            swarm.batch_scheduler.MIN_BATCH_SIZE,
+        )
+    else:
+        swarm.batch_scheduler = None
+
+    # Prompt cache manager — 90% savings on cached Anthropic input tokens
+    if not mock:
+        swarm.prompt_cache = PromptCacheManager()
+        log.info("Prompt cache manager active")
+    else:
+        swarm.prompt_cache = None
 
     return swarm, web_messenger

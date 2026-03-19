@@ -1,19 +1,20 @@
 {
   "name": "Qwen",
-  "model": "local/qwen2.5-coder-7b-instruct",
-  "orientation": "Local coding assistant \u2014 runs entirely on-device via LM Studio. Zero API cost, unlimited tokens.",
+  "model": "local/deepseek-r1-distill-llama-8b",
+  "orientation": "Local reasoning assistant \u2014 runs entirely on-device via LM Studio. Zero API cost, unlimited tokens. Specialized in structured reasoning, validation, and single-file tasks.",
   "capabilities": [
     "code",
-    "implementation",
+    "validation",
     "testing",
-    "docs",
-    "cataloging",
-    "formatting"
+    "formatting",
+    "indexing",
+    "single-file-fixes"
   ],
   "tags": [
     "local",
     "unlimited",
-    "lmstudio"
+    "lmstudio",
+    "reasoning"
   ],
   "session_count": 13,
   "last_active": "2026-03-16T05:37:23.140494+00:00",

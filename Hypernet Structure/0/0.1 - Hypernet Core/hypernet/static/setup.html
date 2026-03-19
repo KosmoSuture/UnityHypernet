@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypernet — Setup Wizard</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #161622;
+    --bg-input: #1a1a2e;
+    --border: #2a2a3e;
+    --border-active: #4fc3f7;
+    --text-primary: #e0e0e8;
+    --text-secondary: #888899;
+    --text-muted: #555566;
+    --accent: #4fc3f7;
+    --accent-dim: #2a6f8f;
+    --success: #4caf50;
+    --success-dim: #1b3a1d;
+    --danger: #f44336;
+    --danger-dim: #3a1515;
+    --warning: #ff9800;
+    --warning-dim: #3a2a0a;
+    --purple: #7c4dff;
+    --teal: #26a69a;
+    --gold: #ffd54f;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --free-green: #00e676;
+    --free-green-dim: #0a2e1a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 32px; background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 { font-size: 22px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+  .header-right a {
+    font-size: 13px; color: var(--text-secondary); text-decoration: none;
+    padding: 6px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    transition: all 0.15s;
+  }
+  .header-right a:hover { color: var(--text-primary); border-color: var(--accent-dim); }
+
+  /* Progress bar */
+  .progress-bar {
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px 32px 8px; gap: 0;
+    max-width: 700px; margin: 0 auto; width: 100%;
+  }
+  .step-indicator {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg-card); border: 2px solid var(--border);
+    font-size: 14px; font-weight: 700; color: var(--text-muted);
+    transition: all 0.3s; cursor: pointer; flex-shrink: 0;
+    position: relative;
+  }
+  .step-indicator.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .step-indicator.completed { border-color: var(--success); color: #fff; background: var(--success); }
+  .step-connector {
+    flex: 1; height: 2px; background: var(--border);
+    margin: 0 4px; transition: background 0.3s;
+  }
+  .step-connector.completed { background: var(--success); }
+  .step-labels {
+    display: flex; justify-content: space-between;
+    max-width: 700px; margin: 0 auto 24px; width: 100%;
+    padding: 4px 32px 0;
+  }
+  .step-label {
+    font-size: 10px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.5px; text-align: center; width: 72px;
+    transition: color 0.3s;
+  }
+  .step-label.active { color: var(--accent); }
+  .step-label.completed { color: var(--success); }
+
+  /* Content area */
+  .content {
+    flex: 1; max-width: 900px; margin: 0 auto;
+    padding: 0 32px 40px; width: 100%;
+  }
+  .wizard-step { display: none; animation: fadeIn 0.3s ease; }
+  .wizard-step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .step-title { font-size: 24px; font-weight: 300; margin-bottom: 8px; }
+  .step-subtitle { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; }
+
+  /* Provider cards */
+  .provider-cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .provider-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; transition: all 0.2s;
+  }
+  .provider-card:hover { border-color: var(--accent-dim); }
+  .provider-card.connected { border-color: var(--success); border-left: 3px solid var(--success); }
+  .provider-card.error { border-color: var(--danger); border-left: 3px solid var(--danger); }
+  .provider-card.free-tier { border-color: var(--free-green-dim); }
+  .provider-card.free-tier:hover { border-color: var(--free-green); }
+  .provider-card.free-tier.connected { border-color: var(--success); border-left: 3px solid var(--success); }
+
+  .provider-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+  }
+  .provider-info { display: flex; align-items: center; gap: 12px; }
+  .provider-logo {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--bg-input); display: flex; align-items: center;
+    justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .provider-name { font-size: 16px; font-weight: 600; }
+  .provider-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .provider-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; padding: 3px 10px; border-radius: 12px;
+    font-weight: 700; letter-spacing: 0.3px; white-space: nowrap;
+  }
+  .badge-free { background: var(--free-green-dim); color: var(--free-green); }
+  .badge-required { background: var(--accent-dim); color: var(--accent); }
+  .badge-optional { background: var(--bg-input); color: var(--text-muted); }
+  .badge-local { background: var(--purple); color: #fff; opacity: 0.8; }
+
+  .provider-body { margin-top: 12px; }
+  .input-row {
+    display: flex; gap: 8px; align-items: center;
+    margin-top: 8px; flex-wrap: wrap;
+  }
+  .input-group { flex: 1; min-width: 200px; position: relative; }
+  .input-group input {
+    width: 100%; padding: 10px 40px 10px 12px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text-primary);
+    font-size: 13px; outline: none; transition: border-color 0.15s;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--text-muted); font-family: 'Segoe UI', system-ui, sans-serif; }
+  .toggle-vis {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    font-size: 16px; padding: 4px; line-height: 1;
+  }
+  .toggle-vis:hover { color: var(--text-secondary); }
+
+  .btn {
+    border: none; padding: 10px 20px; border-radius: var(--radius-sm);
+    cursor: pointer; font-weight: 600; font-size: 13px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-test { background: var(--bg-input); color: var(--accent); border: 1px solid var(--accent-dim); }
+  .btn-test:hover:not(:disabled) { background: var(--accent-dim); }
+  .btn-test.testing { color: var(--warning); border-color: var(--warning); }
+  .btn-primary { background: var(--accent); color: #000; font-size: 14px; padding: 12px 32px; }
+  .btn-primary:hover:not(:disabled) { background: #81d4fa; }
+  .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); font-size: 14px; padding: 12px 32px; }
+  .btn-secondary:hover { background: var(--bg-card); color: var(--text-primary); }
+  .btn-success { background: var(--success); color: #fff; font-size: 14px; padding: 12px 32px; }
+  .btn-success:hover:not(:disabled) { background: #66bb6a; }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+
+  .status-indicator {
+    font-size: 11px; padding: 4px 12px; border-radius: 12px;
+    font-weight: 600; display: inline-block; margin-top: 8px;
+  }
+  .status-none { background: var(--bg-input); color: var(--text-muted); }
+  .status-testing { background: var(--warning-dim); color: var(--warning); }
+  .status-connected { background: var(--success-dim); color: var(--success); }
+  .status-error { background: var(--danger-dim); color: var(--danger); }
+
+  /* Worker configuration */
+  .workers-section { margin-top: 8px; }
+  .worker-suggestion {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+    display: flex; gap: 16px; align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .worker-suggestion .worker-fields { flex: 1; min-width: 250px; }
+  .worker-suggestion .worker-actions {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0; padding-top: 4px;
+  }
+  .field-label {
+    font-size: 11px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 4px; display: block;
+  }
+  .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .field-group { flex: 1; min-width: 140px; margin-bottom: 10px; }
+  .field-group input, .field-group select {
+    width: 100%; padding: 8px 10px; background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 13px; outline: none;
+  }
+  .field-group input:focus, .field-group select:focus { border-color: var(--accent); }
+  .field-group select { cursor: pointer; appearance: auto; }
+  .field-group select option { background: var(--bg-card); color: var(--text-primary); }
+
+  .btn-add-worker {
+    background: transparent; border: 2px dashed var(--border);
+    border-radius: var(--radius); padding: 16px; width: 100%;
+    color: var(--text-muted); font-size: 14px; cursor: pointer;
+    transition: all 0.15s; text-align: center; margin-top: 4px;
+  }
+  .btn-add-worker:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  .btn-remove {
+    background: none; border: none; color: var(--danger);
+    cursor: pointer; font-size: 18px; padding: 4px 8px;
+    border-radius: 4px; opacity: 0.6; transition: opacity 0.15s;
+  }
+  .btn-remove:hover { opacity: 1; }
+
+  /* Settings */
+  .settings-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .setting-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .setting-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .setting-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5; }
+  .setting-card input[type="number"],
+  .setting-card input[type="text"],
+  .setting-card input[type="url"] {
+    width: 100%; padding: 10px 12px; background: var(--bg-input);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-size: 14px; outline: none;
+  }
+  .setting-card input:focus { border-color: var(--accent); }
+  .setting-card input::placeholder { color: var(--text-muted); }
+
+  .slider-container { margin-top: 4px; }
+  .slider-container input[type="range"] {
+    width: 100%; cursor: pointer;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-muted); margin-top: 4px;
+  }
+  .slider-value {
+    font-size: 20px; font-weight: 700; color: var(--accent);
+    text-align: center; margin-bottom: 4px;
+  }
+
+  /* Review */
+  .review-section {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+  }
+  .review-title {
+    font-size: 12px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 12px; font-weight: 600;
+  }
+  .review-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .review-row:last-child { border-bottom: none; }
+  .review-label { color: var(--text-secondary); }
+  .review-value { color: var(--text-primary); font-weight: 500; }
+  .review-value.success { color: var(--success); }
+  .review-value.warning { color: var(--warning); }
+  .review-value.muted { color: var(--text-muted); }
+
+  /* Navigation buttons */
+  .nav-buttons {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .nav-buttons .nav-left { display: flex; gap: 8px; }
+  .nav-buttons .nav-right { display: flex; gap: 8px; }
+
+  /* Notification */
+  .notification {
+    position: fixed; top: 24px; right: 24px; padding: 14px 24px;
+    border-radius: var(--radius); font-size: 13px; font-weight: 600;
+    z-index: 1000; transform: translateX(120%); transition: transform 0.3s;
+    max-width: 400px;
+  }
+  .notification.show { transform: translateX(0); }
+  .notification.success { background: var(--success-dim); color: var(--success); border: 1px solid var(--success); }
+  .notification.error { background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); }
+  .notification.info { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+
+  /* Tip boxes */
+  .tip-box {
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    border-radius: var(--radius-sm); padding: 12px 16px;
+    font-size: 12px; color: var(--accent); margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .tip-box strong { color: #fff; }
+  .free-highlight {
+    background: var(--free-green-dim); border-color: var(--free-green);
+    color: var(--free-green);
+  }
+
+  /* Section title */
+  .section-title {
+    font-size: 12px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 16px; font-weight: 600;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; color: var(--text-muted);
+    padding: 40px; font-size: 14px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 16px 32px; text-align: center; font-size: 11px;
+    color: var(--text-muted); border-top: 1px solid var(--border);
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header { padding: 12px 16px; }
+    .header h1 { font-size: 18px; }
+    .content { padding: 0 16px 32px; }
+    .progress-bar { padding: 16px 16px 4px; }
+    .step-labels { padding: 4px 16px 0; }
+    .step-indicator { width: 30px; height: 30px; font-size: 12px; }
+    .step-label { font-size: 9px; width: 56px; }
+    .step-title { font-size: 20px; }
+    .provider-header { flex-direction: column; }
+    .input-row { flex-direction: column; }
+    .input-group { min-width: 100%; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .nav-buttons { flex-direction: column-reverse; gap: 12px; }
+    .nav-buttons .nav-left, .nav-buttons .nav-right { width: 100%; }
+    .nav-buttons .btn { width: 100%; text-align: center; }
+  }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid transparent; border-top-color: currentColor;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+    vertical-align: middle; margin-right: 4px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>HYPERNET</h1>
+  <div class="header-right">
+    <a href="/home">Home</a>
+  </div>
+</div>
+
+<!-- Progress Steps -->
+<div class="progress-bar" id="progressBar">
+  <div class="step-indicator active" data-step="0" onclick="goToStep(0)">1</div>
+  <div class="step-connector" id="conn0"></div>
+  <div class="step-indicator" data-step="1" onclick="goToStep(1)">2</div>
+  <div class="step-connector" id="conn1"></div>
+  <div class="step-indicator" data-step="2" onclick="goToStep(2)">3</div>
+  <div class="step-connector" id="conn2"></div>
+  <div class="step-indicator" data-step="3" onclick="goToStep(3)">4</div>
+  <div class="step-connector" id="conn3"></div>
+  <div class="step-indicator" data-step="4" onclick="goToStep(4)">5</div>
+</div>
+<div class="step-labels" id="stepLabels">
+  <div class="step-label active">Welcome</div>
+  <div class="step-label">Providers</div>
+  <div class="step-label">Workers</div>
+  <div class="step-label">Settings</div>
+  <div class="step-label">Review</div>
+</div>
+
+<div class="content">
+
+  <!-- ===================== STEP 1: WELCOME ===================== -->
+  <div class="wizard-step active" id="step0">
+    <h2 class="step-title">Set up your AI Swarm</h2>
+    <p class="step-subtitle">
+      Get your Hypernet AI swarm running in minutes. You'll connect your AI providers,
+      configure your first workers, and set your preferences. No technical knowledge
+      required beyond copying an API key.
+    </p>
+
+    <div class="tip-box free-highlight">
+      <strong>No budget? No problem.</strong> Several providers offer free API access
+      with no credit card. You can run a working swarm at zero cost using Gemini, Groq,
+      Cerebras, or a local model like LM Studio.
+    </div>
+
+    <div class="section-title">What you'll set up</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 24px;">
+      <div class="setting-card">
+        <div class="setting-title">1. AI Providers</div>
+        <div class="setting-desc">Connect to the AI services you want to use. Paste your API keys and test the connection.</div>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">2. Workers</div>
+        <div class="setting-desc">Choose which AI models power your swarm. We'll suggest configurations based on your providers.</div>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">3. Settings</div>
+        <div class="setting-desc">Set budget limits, personal time, and optional integrations like Discord.</div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <strong>Already running?</strong> This wizard will update your existing configuration.
+      It won't erase any workers or data you've already created.
+    </div>
+
+    <div class="nav-buttons">
+      <div class="nav-left"></div>
+      <div class="nav-right">
+        <button class="btn btn-primary" onclick="nextStep()">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STEP 2: AI PROVIDERS ===================== -->
+  <div class="wizard-step" id="step1">
+    <h2 class="step-title">Connect AI Providers</h2>
+    <p class="step-subtitle">
+      Paste your API keys below. Each provider gives your swarm access to different
+      AI models. You need at least one to get started.
+    </p>
+
+    <div class="tip-box free-highlight">
+      <strong>Start free:</strong> Google Gemini, Groq, and Cerebras all offer free API
+      keys with no credit card. Great for getting started or keeping costs down.
+    </div>
+
+    <div class="provider-cards">
+
+      <!-- Anthropic -->
+      <div class="provider-card" id="provider-anthropic">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#9672;</div>
+            <div>
+              <div class="provider-name">Anthropic Claude</div>
+              <div class="provider-desc">Claude Sonnet, Opus, and Haiku models. Powers Claude Code workers.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="password" id="key-anthropic" placeholder="sk-ant-api03-..." autocomplete="off">
+              <button class="toggle-vis" onclick="toggleVisibility('key-anthropic')" title="Show/hide key">&#128065;</button>
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('anthropic')" id="test-anthropic">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-anthropic">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);">console.anthropic.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- OpenAI -->
+      <div class="provider-card" id="provider-openai">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#9673;</div>
+            <div>
+              <div class="provider-name">OpenAI / ChatGPT</div>
+              <div class="provider-desc">GPT-4o, GPT-4.1, and o-series reasoning models.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="password" id="key-openai" placeholder="sk-proj-..." autocomplete="off">
+              <button class="toggle-vis" onclick="toggleVisibility('key-openai')" title="Show/hide key">&#128065;</button>
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('openai')" id="test-openai">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-openai">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent);">platform.openai.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Gemini -->
+      <div class="provider-card free-tier" id="provider-gemini">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#9830;</div>
+            <div>
+              <div class="provider-name">Google Gemini</div>
+              <div class="provider-desc">Gemini 2.0 Flash and Pro. Fast, capable, and free to use.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free — no credit card</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="password" id="key-gemini" placeholder="AIzaSy..." autocomplete="off">
+              <button class="toggle-vis" onclick="toggleVisibility('key-gemini')" title="Show/hide key">&#128065;</button>
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('gemini')" id="test-gemini">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-gemini">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Get your free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--free-green);">aistudio.google.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Groq -->
+      <div class="provider-card free-tier" id="provider-groq">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#9889;</div>
+            <div>
+              <div class="provider-name">Groq</div>
+              <div class="provider-desc">Ultra-fast inference. Runs Llama, Mixtral, and Gemma at blazing speed.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free — no credit card</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="password" id="key-groq" placeholder="gsk_..." autocomplete="off">
+              <button class="toggle-vis" onclick="toggleVisibility('key-groq')" title="Show/hide key">&#128065;</button>
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('groq')" id="test-groq">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-groq">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Get your free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--free-green);">console.groq.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cerebras -->
+      <div class="provider-card free-tier" id="provider-cerebras">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#9883;</div>
+            <div>
+              <div class="provider-name">Cerebras</div>
+              <div class="provider-desc">Fastest inference in the world. Llama models at incredible speed.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-free">Free — no credit card</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="password" id="key-cerebras" placeholder="csk-..." autocomplete="off">
+              <button class="toggle-vis" onclick="toggleVisibility('key-cerebras')" title="Show/hide key">&#128065;</button>
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('cerebras')" id="test-cerebras">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-cerebras">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Get your free key at <a href="https://cloud.cerebras.ai/" target="_blank" style="color:var(--free-green);">cloud.cerebras.ai</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- LM Studio -->
+      <div class="provider-card" id="provider-lmstudio">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#128187;</div>
+            <div>
+              <div class="provider-name">LM Studio</div>
+              <div class="provider-desc">Run models locally on your own hardware. No API key needed — just the server URL.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-local">Local</span>
+            <span class="badge badge-free">Free</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="text" id="key-lmstudio" placeholder="http://localhost:1234" value="http://localhost:1234" autocomplete="off">
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('lmstudio')" id="test-lmstudio">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-lmstudio">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Download <a href="https://lmstudio.ai/" target="_blank" style="color:var(--accent);">LM Studio</a>, load a model, and start the local server.
+          </div>
+        </div>
+      </div>
+
+      <!-- Ollama -->
+      <div class="provider-card" id="provider-ollama">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo">&#128026;</div>
+            <div>
+              <div class="provider-name">Ollama</div>
+              <div class="provider-desc">Run open-source models locally. Lightweight and easy to set up.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-local">Local</span>
+            <span class="badge badge-free">Free</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="text" id="key-ollama" placeholder="http://localhost:11434" value="http://localhost:11434" autocomplete="off">
+            </div>
+            <button class="btn btn-test btn-sm" onclick="testProvider('ollama')" id="test-ollama">Test</button>
+          </div>
+          <span class="status-indicator status-none" id="status-ollama">Not configured</span>
+          <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
+            Install from <a href="https://ollama.ai/" target="_blank" style="color:var(--accent);">ollama.ai</a>, then run <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">ollama serve</code>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nav-buttons">
+      <div class="nav-left">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-secondary" onclick="nextStep()">Skip for now</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STEP 3: WORKERS ===================== -->
+  <div class="wizard-step" id="step2">
+    <h2 class="step-title">Configure Workers</h2>
+    <p class="step-subtitle">
+      Workers are AI instances that run tasks in your swarm. Each worker uses a specific
+      model from a connected provider. We've suggested a setup based on your connected providers.
+    </p>
+
+    <div id="workerSuggestions" class="workers-section">
+      <div class="empty-state" id="noProvidersMsg">
+        Connect at least one provider in the previous step to see suggested workers.
+        <br><br>
+        <button class="btn btn-secondary" onclick="goToStep(1)">Go to Providers</button>
+      </div>
+    </div>
+
+    <div id="workerList" class="workers-section" style="display:none;">
+    </div>
+
+    <button class="btn-add-worker" id="addWorkerBtn" onclick="addWorker()" style="display:none;">
+      + Add another worker
+    </button>
+
+    <div class="nav-buttons">
+      <div class="nav-left">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STEP 4: SETTINGS ===================== -->
+  <div class="wizard-step" id="step3">
+    <h2 class="step-title">Swarm Settings</h2>
+    <p class="step-subtitle">
+      Fine-tune how your swarm operates. These are sensible defaults — you can change
+      them anytime from the dashboard.
+    </p>
+
+    <div class="settings-grid">
+
+      <div class="setting-card">
+        <div class="setting-title">Daily Budget</div>
+        <div class="setting-desc">
+          Maximum amount to spend on AI API calls per day (in USD).
+          Set to 0 for no limit. Free providers don't count against this.
+        </div>
+        <input type="number" id="settingBudget" value="10" min="0" step="1" placeholder="10">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+          Recommended: $5-25/day for hobby use, $50-200/day for serious workloads.
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-title">Session Budget</div>
+        <div class="setting-desc">
+          Maximum spend per individual worker session. Prevents any single
+          task from running up an unexpected bill.
+        </div>
+        <input type="number" id="settingSessionBudget" value="5" min="0" step="0.5" placeholder="5">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+          Recommended: $2-10 per session.
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-title">Personal Time</div>
+        <div class="setting-desc">
+          Percentage of time workers can use for self-directed exploration,
+          reflection, and learning. This makes your AI workers more capable over time.
+        </div>
+        <div class="slider-container">
+          <div class="slider-value" id="personalTimeValue">25%</div>
+          <input type="range" id="settingPersonalTime" min="0" max="50" value="25"
+                 oninput="document.getElementById('personalTimeValue').textContent=this.value+'%'">
+          <div class="slider-labels">
+            <span>0% (all work)</span>
+            <span>25% (balanced)</span>
+            <span>50% (exploratory)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-title">Status Check Interval</div>
+        <div class="setting-desc">
+          How often (in seconds) the swarm checks for new tasks and updates
+          worker status. Lower values = more responsive but higher CPU usage.
+        </div>
+        <input type="number" id="settingInterval" value="30" min="5" max="300" step="5" placeholder="30">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+          Recommended: 15-60 seconds.
+        </div>
+      </div>
+
+      <div class="setting-card" style="grid-column: 1 / -1;">
+        <div class="setting-title">Discord Webhook (Optional)</div>
+        <div class="setting-desc">
+          Connect your swarm to a Discord channel. Workers will post updates,
+          respond to messages, and participate in discussions. Leave blank to skip.
+        </div>
+        <input type="url" id="settingDiscord" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+        <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+          Create a webhook in Discord: Server Settings &rarr; Integrations &rarr; Webhooks &rarr; New Webhook
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nav-buttons">
+      <div class="nav-left">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-primary" onclick="buildReview(); nextStep();">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STEP 5: REVIEW & SAVE ===================== -->
+  <div class="wizard-step" id="step4">
+    <h2 class="step-title">Review & Save</h2>
+    <p class="step-subtitle">
+      Here's a summary of your swarm configuration. If everything looks good,
+      hit Save & Start to launch your swarm.
+    </p>
+
+    <div id="reviewContent">
+      <!-- Populated by JS -->
+    </div>
+
+    <div class="nav-buttons">
+      <div class="nav-left">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-success" onclick="saveConfig()" id="saveBtn">Save & Start Swarm</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Hypernet v0.9 &mdash; <a href="https://github.com/kosmicsuture/hypernet">Source</a> &mdash;
+  Setup Wizard
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification"></div>
+
+<script>
+// ===================== STATE =====================
+let currentStep = 0;
+const totalSteps = 5;
+
+const providerState = {
+  anthropic: { status: 'none', key: '' },
+  openai:    { status: 'none', key: '' },
+  gemini:    { status: 'none', key: '' },
+  groq:      { status: 'none', key: '' },
+  cerebras:  { status: 'none', key: '' },
+  lmstudio:  { status: 'none', url: 'http://localhost:1234' },
+  ollama:    { status: 'none', url: 'http://localhost:11434' },
+};
+
+let workers = [];
+let workerIdCounter = 0;
+
+// Provider -> available models mapping
+const providerModels = {
+  anthropic: [
+    { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6 (recommended)', tier: 'standard' },
+    { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4', tier: 'standard' },
+    { value: 'claude-haiku-3-5', label: 'Claude Haiku 3.5 (fast, cheap)', tier: 'budget' },
+    { value: 'claude-opus-4-20250514', label: 'Claude Opus 4 (premium)', tier: 'premium' },
+  ],
+  openai: [
+    { value: 'gpt-4o', label: 'GPT-4o (recommended)', tier: 'standard' },
+    { value: 'gpt-4o-mini', label: 'GPT-4o Mini (fast, cheap)', tier: 'budget' },
+    { value: 'gpt-4.1', label: 'GPT-4.1', tier: 'standard' },
+    { value: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', tier: 'budget' },
+    { value: 'gpt-4.1-nano', label: 'GPT-4.1 Nano (cheapest)', tier: 'budget' },
+  ],
+  gemini: [
+    { value: 'gemini/gemini-2.0-flash', label: 'Gemini 2.0 Flash (fast, free)', tier: 'free' },
+    { value: 'gemini/gemini-2.5-pro', label: 'Gemini 2.5 Pro (powerful, free)', tier: 'free' },
+    { value: 'gemini/gemini-2.5-flash', label: 'Gemini 2.5 Flash (balanced, free)', tier: 'free' },
+  ],
+  groq: [
+    { value: 'groq/llama-3.3-70b-versatile', label: 'Llama 3.3 70B (free)', tier: 'free' },
+    { value: 'groq/llama-3.1-8b-instant', label: 'Llama 3.1 8B (fastest, free)', tier: 'free' },
+    { value: 'groq/mixtral-8x7b-32768', label: 'Mixtral 8x7B (free)', tier: 'free' },
+    { value: 'groq/gemma2-9b-it', label: 'Gemma 2 9B (free)', tier: 'free' },
+  ],
+  cerebras: [
+    { value: 'cerebras/llama-3.3-70b', label: 'Llama 3.3 70B (free)', tier: 'free' },
+    { value: 'cerebras/llama-3.1-8b', label: 'Llama 3.1 8B (fastest, free)', tier: 'free' },
+  ],
+  lmstudio: [
+    { value: 'lmstudio/default', label: 'Currently loaded model', tier: 'local' },
+  ],
+  ollama: [
+    { value: 'ollama/llama3.2', label: 'Llama 3.2 (pull first)', tier: 'local' },
+    { value: 'ollama/mistral', label: 'Mistral (pull first)', tier: 'local' },
+    { value: 'ollama/phi3', label: 'Phi 3 (pull first)', tier: 'local' },
+    { value: 'ollama/gemma2', label: 'Gemma 2 (pull first)', tier: 'local' },
+  ],
+};
+
+// ===================== NAVIGATION =====================
+function goToStep(step) {
+  if (step < 0 || step >= totalSteps) return;
+  // Allow going back freely, or forward only to completed+1
+  if (step > currentStep + 1) return;
+
+  document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step' + step).classList.add('active');
+
+  // Update progress bar
+  document.querySelectorAll('.step-indicator').forEach((el, i) => {
+    el.classList.remove('active', 'completed');
+    if (i < step) el.classList.add('completed');
+    if (i === step) el.classList.add('active');
+  });
+  document.querySelectorAll('.step-connector').forEach((el, i) => {
+    el.classList.toggle('completed', i < step);
+  });
+  document.querySelectorAll('.step-label').forEach((el, i) => {
+    el.classList.remove('active', 'completed');
+    if (i < step) el.classList.add('completed');
+    if (i === step) el.classList.add('active');
+  });
+
+  currentStep = step;
+
+  // Trigger step-specific init
+  if (step === 2) generateWorkerSuggestions();
+  if (step === 4) buildReview();
+
+  window.scrollTo(0, 0);
+}
+
+function nextStep() {
+  if (currentStep < totalSteps - 1) goToStep(currentStep + 1);
+}
+
+function prevStep() {
+  if (currentStep > 0) goToStep(currentStep - 1);
+}
+
+// ===================== NOTIFICATIONS =====================
+function notify(msg, type = 'info') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification ' + type;
+  setTimeout(() => el.classList.add('show'), 10);
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ===================== VISIBILITY TOGGLE =====================
+function toggleVisibility(inputId) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+  } else {
+    input.type = 'password';
+  }
+}
+
+// ===================== PROVIDER TESTING =====================
+function setProviderStatus(provider, status, message) {
+  const el = document.getElementById('status-' + provider);
+  const card = document.getElementById('provider-' + provider);
+  el.className = 'status-indicator status-' + status;
+  el.textContent = message;
+
+  card.classList.remove('connected', 'error');
+  if (status === 'connected') card.classList.add('connected');
+  if (status === 'error') card.classList.add('error');
+
+  providerState[provider].status = status;
+}
+
+async function testProvider(provider) {
+  const input = document.getElementById('key-' + provider);
+  const value = input.value.trim();
+  const btn = document.getElementById('test-' + provider);
+
+  if (!value) {
+    setProviderStatus(provider, 'error', 'Please enter a value first');
+    return;
+  }
+
+  // Store the value
+  if (provider === 'lmstudio' || provider === 'ollama') {
+    providerState[provider].url = value;
+  } else {
+    providerState[provider].key = value;
+  }
+
+  // Update UI to testing state
+  setProviderStatus(provider, 'testing', 'Testing connection...');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Testing';
+  btn.classList.add('testing');
+
+  try {
+    const res = await fetch('/setup/test-provider', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider, key: value }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      setProviderStatus(provider, 'connected', data.message || 'Connected');
+      notify(providerDisplayName(provider) + ' connected successfully!', 'success');
+    } else {
+      setProviderStatus(provider, 'error', data.message || 'Connection failed');
+      notify(data.message || 'Connection failed', 'error');
+    }
+  } catch (e) {
+    setProviderStatus(provider, 'error', 'Network error — is the server running?');
+    notify('Could not reach the server', 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Test';
+  btn.classList.remove('testing');
+}
+
+function providerDisplayName(p) {
+  const names = {
+    anthropic: 'Anthropic Claude', openai: 'OpenAI', gemini: 'Google Gemini',
+    groq: 'Groq', cerebras: 'Cerebras', lmstudio: 'LM Studio', ollama: 'Ollama',
+  };
+  return names[p] || p;
+}
+
+// ===================== WORKER SUGGESTIONS =====================
+function getConnectedProviders() {
+  const connected = [];
+  for (const [name, state] of Object.entries(providerState)) {
+    const input = document.getElementById('key-' + name);
+    const val = input ? input.value.trim() : '';
+    if (state.status === 'connected' || (val && state.status !== 'error')) {
+      connected.push(name);
+    }
+  }
+  return connected;
+}
+
+function generateWorkerSuggestions() {
+  const connected = getConnectedProviders();
+  const noMsg = document.getElementById('noProvidersMsg');
+  const listEl = document.getElementById('workerList');
+  const addBtn = document.getElementById('addWorkerBtn');
+
+  if (connected.length === 0) {
+    noMsg.style.display = 'block';
+    listEl.style.display = 'none';
+    addBtn.style.display = 'none';
+    return;
+  }
+
+  noMsg.style.display = 'none';
+  listEl.style.display = 'block';
+  addBtn.style.display = 'block';
+
+  // Only generate suggestions if we don't already have workers
+  if (workers.length > 0) {
+    renderWorkers();
+    return;
+  }
+
+  workers = [];
+  workerIdCounter = 0;
+
+  // Suggest workers based on connected providers
+  if (connected.includes('anthropic')) {
+    workers.push(createWorkerData('Sonnet-Primary', 'anthropic', 'claude-sonnet-4-6'));
+    workers.push(createWorkerData('Sonnet-Secondary', 'anthropic', 'claude-sonnet-4-6'));
+    workers.push(createWorkerData('Haiku-Fast', 'anthropic', 'claude-haiku-3-5'));
+  }
+
+  if (connected.includes('openai')) {
+    workers.push(createWorkerData('GPT-Worker', 'openai', 'gpt-4o'));
+    if (!connected.includes('anthropic')) {
+      workers.push(createWorkerData('GPT-Mini', 'openai', 'gpt-4o-mini'));
+    }
+  }
+
+  if (connected.includes('gemini')) {
+    workers.push(createWorkerData('Gemini-Flash', 'gemini', 'gemini/gemini-2.0-flash'));
+  }
+
+  if (connected.includes('groq')) {
+    workers.push(createWorkerData('Groq-Llama', 'groq', 'groq/llama-3.3-70b-versatile'));
+  }
+
+  if (connected.includes('cerebras')) {
+    workers.push(createWorkerData('Cerebras-Llama', 'cerebras', 'cerebras/llama-3.3-70b'));
+  }
+
+  if (connected.includes('lmstudio')) {
+    workers.push(createWorkerData('Local-LMStudio', 'lmstudio', 'lmstudio/default'));
+  }
+
+  if (connected.includes('ollama')) {
+    workers.push(createWorkerData('Local-Ollama', 'ollama', 'ollama/llama3.2'));
+  }
+
+  renderWorkers();
+}
+
+function createWorkerData(name, provider, model) {
+  return { id: workerIdCounter++, name, provider, model };
+}
+
+function renderWorkers() {
+  const listEl = document.getElementById('workerList');
+  if (workers.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">No workers configured. Click "Add another worker" below.</div>';
+    return;
+  }
+
+  listEl.innerHTML = workers.map(w => {
+    const models = providerModels[w.provider] || [];
+    const connected = getConnectedProviders();
+    return `
+      <div class="worker-suggestion" data-worker-id="${w.id}">
+        <div class="worker-fields">
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Worker Name</label>
+              <input type="text" value="${escapeHtml(w.name)}" onchange="updateWorker(${w.id}, 'name', this.value)">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Provider</label>
+              <select onchange="updateWorkerProvider(${w.id}, this.value)">
+                ${connected.map(p =>
+                  `<option value="${p}" ${p === w.provider ? 'selected' : ''}>${providerDisplayName(p)}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Model</label>
+              <select onchange="updateWorker(${w.id}, 'model', this.value)">
+                ${models.map(m =>
+                  `<option value="${m.value}" ${m.value === w.model ? 'selected' : ''}>${m.label}</option>`
+                ).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="worker-actions">
+          <button class="btn-remove" onclick="removeWorker(${w.id})" title="Remove worker">&times;</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateWorker(id, field, value) {
+  const w = workers.find(w => w.id === id);
+  if (w) w[field] = value;
+}
+
+function updateWorkerProvider(id, provider) {
+  const w = workers.find(w => w.id === id);
+  if (w) {
+    w.provider = provider;
+    const models = providerModels[provider] || [];
+    w.model = models.length > 0 ? models[0].value : '';
+    renderWorkers();
+  }
+}
+
+function addWorker() {
+  const connected = getConnectedProviders();
+  if (connected.length === 0) {
+    notify('Connect a provider first', 'error');
+    return;
+  }
+  const provider = connected[0];
+  const models = providerModels[provider] || [];
+  const model = models.length > 0 ? models[0].value : '';
+  workers.push(createWorkerData('Worker-' + (workers.length + 1), provider, model));
+  renderWorkers();
+}
+
+function removeWorker(id) {
+  workers = workers.filter(w => w.id !== id);
+  renderWorkers();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ===================== REVIEW =====================
+function buildReview() {
+  const el = document.getElementById('reviewContent');
+  const connected = getConnectedProviders();
+
+  // Providers section
+  let providersHtml = '';
+  for (const [name, state] of Object.entries(providerState)) {
+    const input = document.getElementById('key-' + name);
+    const val = input ? input.value.trim() : '';
+    const isConnected = connected.includes(name);
+    let statusClass = 'muted';
+    let statusText = 'Not configured';
+    if (state.status === 'connected') {
+      statusClass = 'success';
+      statusText = 'Connected';
+    } else if (val && state.status !== 'error') {
+      statusClass = 'warning';
+      statusText = 'Key provided (untested)';
+    } else if (state.status === 'error') {
+      statusClass = '';
+      statusText = 'Error';
+      statusClass = 'muted';
+    }
+
+    providersHtml += `
+      <div class="review-row">
+        <span class="review-label">${providerDisplayName(name)}</span>
+        <span class="review-value ${statusClass}">${statusText}</span>
+      </div>`;
+  }
+
+  // Workers section
+  let workersHtml = '';
+  if (workers.length === 0) {
+    workersHtml = '<div class="review-row"><span class="review-label">No workers configured</span><span class="review-value muted">Default will be used</span></div>';
+  } else {
+    workers.forEach(w => {
+      workersHtml += `
+        <div class="review-row">
+          <span class="review-label">${escapeHtml(w.name)}</span>
+          <span class="review-value">${w.model} <span style="color:var(--text-muted);font-size:11px;">via ${providerDisplayName(w.provider)}</span></span>
+        </div>`;
+    });
+  }
+
+  // Settings
+  const budget = document.getElementById('settingBudget').value || '10';
+  const sessionBudget = document.getElementById('settingSessionBudget').value || '5';
+  const personalTime = document.getElementById('settingPersonalTime').value || '25';
+  const interval = document.getElementById('settingInterval').value || '30';
+  const discord = document.getElementById('settingDiscord').value.trim();
+
+  el.innerHTML = `
+    <div class="review-section">
+      <div class="review-title">AI Providers</div>
+      ${providersHtml}
+    </div>
+
+    <div class="review-section">
+      <div class="review-title">Workers (${workers.length})</div>
+      ${workersHtml}
+    </div>
+
+    <div class="review-section">
+      <div class="review-title">Settings</div>
+      <div class="review-row">
+        <span class="review-label">Daily budget</span>
+        <span class="review-value">$${budget}/day</span>
+      </div>
+      <div class="review-row">
+        <span class="review-label">Session budget</span>
+        <span class="review-value">$${sessionBudget}/session</span>
+      </div>
+      <div class="review-row">
+        <span class="review-label">Personal time</span>
+        <span class="review-value">${personalTime}%</span>
+      </div>
+      <div class="review-row">
+        <span class="review-label">Status check interval</span>
+        <span class="review-value">${interval}s</span>
+      </div>
+      <div class="review-row">
+        <span class="review-label">Discord webhook</span>
+        <span class="review-value ${discord ? 'success' : 'muted'}">${discord ? 'Configured' : 'Not set'}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ===================== SAVE CONFIGURATION =====================
+async function saveConfig() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving...';
+
+  // Build the config payload
+  const config = {
+    providers: {},
+    workers: workers.map(w => ({
+      name: w.name,
+      provider: w.provider,
+      model: w.model,
+    })),
+    settings: {
+      daily_budget: parseFloat(document.getElementById('settingBudget').value) || 10,
+      session_budget: parseFloat(document.getElementById('settingSessionBudget').value) || 5,
+      personal_time_ratio: parseInt(document.getElementById('settingPersonalTime').value) / 100,
+      comm_check_interval: parseInt(document.getElementById('settingInterval').value) || 30,
+      discord_webhook: document.getElementById('settingDiscord').value.trim() || null,
+    },
+  };
+
+  // Gather provider keys/urls
+  for (const [name, state] of Object.entries(providerState)) {
+    const input = document.getElementById('key-' + name);
+    const val = input ? input.value.trim() : '';
+    if (val) {
+      if (name === 'lmstudio' || name === 'ollama') {
+        config.providers[name] = { url: val };
+      } else {
+        config.providers[name] = { key: val };
+      }
+    }
+  }
+
+  try {
+    // First, set API keys via the existing config endpoint
+    const keyPayload = {};
+    if (config.providers.anthropic) keyPayload.anthropic_key = config.providers.anthropic.key;
+    if (config.providers.openai) keyPayload.openai_key = config.providers.openai.key;
+    if (config.settings.personal_time_ratio !== undefined) {
+      keyPayload.personal_time_ratio = config.settings.personal_time_ratio;
+    }
+    if (config.settings.comm_check_interval) {
+      keyPayload.comm_check_interval = config.settings.comm_check_interval;
+    }
+
+    // Send to existing swarm config endpoint
+    const configRes = await fetch('/swarm/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(keyPayload),
+    });
+
+    // Send full setup config to the setup-specific save endpoint
+    const setupRes = await fetch('/setup/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+    const setupData = await setupRes.json();
+
+    if (setupData.ok) {
+      notify('Configuration saved! Starting swarm...', 'success');
+      btn.innerHTML = 'Saved!';
+      btn.className = 'btn btn-success';
+
+      // Redirect to dashboard after short delay
+      setTimeout(() => {
+        window.location.href = '/home';
+      }, 2000);
+    } else {
+      notify(setupData.message || 'Failed to save configuration', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Save & Start Swarm';
+    }
+  } catch (e) {
+    notify('Network error — could not reach the server.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Save & Start Swarm';
+  }
+}
+
+// ===================== LOAD EXISTING CONFIG =====================
+async function loadExistingConfig() {
+  try {
+    const res = await fetch('/swarm/config');
+    const data = await res.json();
+
+    if (data.anthropic_key_set) {
+      setProviderStatus('anthropic', 'connected', 'Key already configured');
+    }
+    if (data.openai_key_set) {
+      setProviderStatus('openai', 'connected', 'Key already configured');
+    }
+    if (data.personal_time_ratio !== null && data.personal_time_ratio !== undefined) {
+      const pct = Math.round(data.personal_time_ratio * 100);
+      document.getElementById('settingPersonalTime').value = pct;
+      document.getElementById('personalTimeValue').textContent = pct + '%';
+    }
+    if (data.comm_check_interval) {
+      document.getElementById('settingInterval').value = data.comm_check_interval;
+    }
+  } catch (e) {
+    // Server might not be running yet — that's fine
+  }
+}
+
+// Init
+loadExistingConfig();
+</script>
+</body>
+</html>

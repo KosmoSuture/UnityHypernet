@@ -108,8 +108,8 @@ DEFAULT_LIMITS = {
     ),
     "max_concurrent_workers": LimitDef(
         name="max_concurrent_workers",
-        soft=10,
-        hard=25,
+        soft=15,
+        hard=30,
         description="Maximum concurrent AI workers in the swarm",
     ),
     "max_task_queue_depth": LimitDef(

@@ -2891,12 +2891,12 @@ def test_scaling_limits():
     assert r6.allowed is True
 
     # Worker limits
-    r7 = limits.check("max_concurrent_workers", 25)
-    assert r7.allowed is False  # Hard limit is 25
+    r7 = limits.check("max_concurrent_workers", 30)
+    assert r7.allowed is False  # Hard limit is 30
 
-    r8 = limits.check("max_concurrent_workers", 10)
+    r8 = limits.check("max_concurrent_workers", 15)
     assert r8.allowed is True
-    assert r8.at_warning  # Soft limit is 10
+    assert r8.at_warning  # Soft limit is 15
 
     r9 = limits.check("max_concurrent_workers", 5)
     assert r9.allowed is True
@@ -2905,8 +2905,8 @@ def test_scaling_limits():
     # Governance: adjust limits
     adj = limits.set_limit("max_concurrent_workers", soft=20, hard=50,
                            requested_by="Matt", reason="Scaling up for swarm test")
-    assert adj.old_soft == 10
-    assert adj.old_hard == 25
+    assert adj.old_soft == 15
+    assert adj.old_hard == 30
     assert adj.new_soft == 20
     assert adj.new_hard == 50
     assert adj.requested_by == "Matt"
@@ -3398,7 +3398,7 @@ def test_limits_persistence():
         # Create system, make governance adjustments
         limits = ScalingLimits()
         default_worker_soft = limits.get_limit("max_concurrent_workers").soft
-        assert default_worker_soft == 10
+        assert default_worker_soft == 15
 
         limits.set_limit("max_concurrent_workers", soft=20, hard=50,
                         requested_by="governance", reason="scaling up")
@@ -3414,7 +3414,7 @@ def test_limits_persistence():
 
         # Load into a fresh system (starts with defaults)
         limits2 = ScalingLimits()
-        assert limits2.get_limit("max_concurrent_workers").soft == 10  # Still default
+        assert limits2.get_limit("max_concurrent_workers").soft == 15  # Still default
         assert limits2.load(save_path) is True
         assert limits2.get_limit("max_concurrent_workers").soft == 20  # Restored
         assert limits2.get_limit("max_concurrent_workers").hard == 50  # Restored
