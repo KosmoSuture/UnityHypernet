@@ -26,7 +26,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Any, TYPE_CHECKING
+from typing import Optional, Any, Union, TYPE_CHECKING
 
 from .identity import InstanceProfile, IdentityManager
 from .providers import LLMProvider, create_provider, detect_provider_class, get_model_cost_per_million, CreditsExhaustedError
@@ -88,7 +88,7 @@ class Worker:
         identity: InstanceProfile,
         identity_manager: IdentityManager,
         api_key: Optional[str] = None,
-        api_keys: Optional[dict[str, str]] = None,
+        api_keys: Optional[dict[str, Union[str, list[str]]]] = None,
         model: Optional[str] = None,
         mock: bool = False,
         tool_executor: Optional[ToolExecutor] = None,
@@ -112,7 +112,7 @@ class Worker:
         self._system_prompt: Optional[str] = None
         self._conversation: list[dict] = []
         self._tokens_used: int = 0
-        self._api_keys: dict[str, str] = {}
+        self._api_keys: dict[str, Union[str, list[str]]] = {}
 
         # Initialize LLM provider (unless mock or already provided)
         if not mock and self._provider is None:

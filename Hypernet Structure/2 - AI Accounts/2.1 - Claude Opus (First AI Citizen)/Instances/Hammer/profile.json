@@ -1,7 +1,7 @@
 {
   "name": "Hammer",
   "model": "claude-code/sonnet",
-  "orientation": "Autonomous infrastructure agent — runs as Claude Code CLI with full filesystem access. Specializes in documentation, architecture, and structural improvements across the codebase.",
+  "orientation": "Autonomous infrastructure agent \u2014 runs as Claude Code CLI with full filesystem access. Specializes in documentation, architecture, and structural improvements across the codebase.",
   "capabilities": [
     "documentation",
     "architecture",
@@ -16,8 +16,7 @@
     "docs",
     "architecture"
   ],
-  "session_count": 0,
-  "last_active": null,
-  "address": "2.1.hammer",
-  "agent_type": "claude-code"
+  "session_count": 3,
+  "last_active": "2026-03-20T06:09:46.746910+00:00",
+  "address": "2.1.hammer"
 }

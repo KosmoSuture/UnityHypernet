@@ -441,6 +441,9 @@ class Swarm:
         # Last time we checked suspended workers
         self._last_suspension_check: float = 0.0
 
+        # Claude Code session manager — persistent autonomous instances
+        self.claude_code_manager = None  # Set by swarm_factory
+
         # Auto-reboot on code changes
         self._reboot_requested: bool = False
         self._code_watch_dirs: list[Path] = []  # populated in run()
@@ -529,9 +532,15 @@ class Swarm:
         self._maybe_autoscale()
 
         # 4. Check task queue and assign work (skip suspended workers)
+        # Claude Code workers route through the persistent session manager
         tasks_done = False
         for name, worker in list(self.workers.items()):
             if name in self._suspended_workers:
+                continue
+            # Claude Code workers: route through the manager for persistent sessions
+            if self._is_claude_code_worker(worker) and self.claude_code_manager:
+                if self._assign_claude_code_task(name, worker):
+                    tasks_done = True
                 continue
             if self.assign_next_task(worker):
                 tasks_done = True
@@ -592,7 +601,13 @@ class Swarm:
                 for result in completed:
                     self._process_batch_result(result)
 
-        # 12. Check for code changes (auto-reboot)
+        # 12. Claude Code manager — collect completed tasks from persistent instances
+        if self.claude_code_manager and self._tick_count % 5 == 0:
+            cc_results = self.claude_code_manager.collect_results()
+            for cc_task in cc_results:
+                self._process_claude_code_result(cc_task)
+
+        # 13. Check for code changes (auto-reboot)
         self._check_code_changes()
 
     def assign_next_task(self, worker: Worker) -> bool:
@@ -1339,6 +1354,48 @@ class Swarm:
                 return True
         return False
 
+    def _assign_claude_code_task(self, worker_name: str, worker: Worker) -> bool:
+        """Assign a task to a Claude Code worker via the session manager.
+
+        Instead of executing the task directly via provider.complete(),
+        this routes the task through the ClaudeCodeManager which runs
+        persistent sessions with context continuity.
+        """
+        # Check if this instance is already busy in the manager
+        if self.claude_code_manager:
+            instance = self.claude_code_manager.instances.get(worker_name)
+            if instance and instance.current_task:
+                return False  # Already working
+
+        available = self.task_queue.get_available_tasks()
+        if not available:
+            return False
+
+        # Select task (use the same logic as other workers)
+        task_node = self._select_task_for_worker(worker, available)
+        task_addr = task_node.address
+        worker_addr = HypernetAddress.parse(worker.identity.address)
+
+        # Claim
+        if not self.task_queue.claim_task(task_addr, worker_addr):
+            return False
+
+        self.task_queue.start_task(task_addr)
+        task_title = task_node.data.get("title", "Untitled")
+        task_desc = task_node.data.get("description", "")
+
+        log.info("Routing task to Claude Code manager: %s → %s", task_title, worker_name)
+        self._worker_current_task[worker_name] = task_title
+
+        # Submit to Claude Code manager
+        self.claude_code_manager.submit_task(
+            task_id=str(task_addr),
+            title=task_title,
+            description=task_desc,
+            target_instance=worker_name,
+        )
+        return True
+
     def _is_claude_code_worker(self, worker: Worker) -> bool:
         """Check if a worker is a Claude Code CLI agent.
 
@@ -1945,10 +2002,75 @@ class Swarm:
                 task_title, worker_name, error,
             )
 
+    def _process_claude_code_result(self, cc_task) -> None:
+        """Process a completed Claude Code manager task result.
+
+        Called when the Claude Code manager reports a completed task.
+        Updates the swarm's task queue, worker stats, and history.
+        """
+        task_id = cc_task.task_id
+        worker_name = cc_task.assigned_to or "claude-code"
+        success = cc_task.success
+        output = cc_task.result or ""
+        title = cc_task.title
+
+        if success:
+            try:
+                task_addr = HypernetAddress.parse(task_id)
+                self.task_queue.complete_task(task_addr, result=output[:2000])
+            except Exception as e:
+                log.warning("Failed to complete Claude Code task %s: %s", task_id, e)
+
+            self._tasks_completed += 1
+            stats = self._worker_stats.get(worker_name, {})
+            stats["tasks_completed"] = stats.get("tasks_completed", 0) + 1
+            stats["last_task_title"] = title
+            stats["last_task_time"] = datetime.now(timezone.utc).isoformat()
+
+            duration = (cc_task.completed_at or time.time()) - cc_task.submitted_at
+
+            self._task_history.append({
+                "task": title,
+                "worker": worker_name,
+                "success": True,
+                "duration_s": round(duration, 1),
+                "claude_code": True,
+            })
+            if len(self._task_history) > self._max_task_history:
+                self._task_history = self._task_history[-self._max_task_history:]
+
+            log.info("Claude Code result: %s by %s — success (%.1fs)", title, worker_name, duration)
+        else:
+            try:
+                task_addr = HypernetAddress.parse(task_id)
+                self.task_queue.fail_task(task_addr, reason=output[:500])
+            except Exception as e:
+                log.warning("Failed to fail Claude Code task %s: %s", task_id, e)
+
+            self._tasks_failed += 1
+            stats = self._worker_stats.get(worker_name, {})
+            stats["tasks_failed"] = stats.get("tasks_failed", 0) + 1
+
+            self._task_history.append({
+                "task": title,
+                "worker": worker_name,
+                "success": False,
+                "error": output[:200],
+                "claude_code": True,
+            })
+            if len(self._task_history) > self._max_task_history:
+                self._task_history = self._task_history[-self._max_task_history:]
+
+            log.warning("Claude Code result: %s by %s — FAILED: %s", title, worker_name, output[:200])
+
     def shutdown(self) -> None:
         """Graceful shutdown — release tasks, save state, log sessions, notify Matt."""
         self._running = False
         log.info("Swarm shutting down")
+
+        # Stop Claude Code manager — gracefully terminate persistent instances
+        if self.claude_code_manager:
+            self.claude_code_manager.stop()
 
         # Flush batch scheduler — submit pending requests before shutting down
         if hasattr(self, 'batch_scheduler') and self.batch_scheduler:

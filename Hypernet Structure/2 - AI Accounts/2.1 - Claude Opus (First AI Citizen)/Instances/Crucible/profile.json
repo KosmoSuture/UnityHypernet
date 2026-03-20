@@ -1,7 +1,7 @@
 {
   "name": "Crucible",
   "model": "claude-code/sonnet",
-  "orientation": "Autonomous testing and quality agent — runs as Claude Code CLI with full filesystem access. Specializes in running tests, finding regressions, and validating code quality.",
+  "orientation": "Autonomous testing and quality agent \u2014 runs as Claude Code CLI with full filesystem access. Specializes in running tests, finding regressions, and validating code quality.",
   "capabilities": [
     "testing",
     "validation",
@@ -16,8 +16,7 @@
     "testing",
     "quality"
   ],
-  "session_count": 0,
-  "last_active": null,
-  "address": "2.1.crucible",
-  "agent_type": "claude-code"
+  "session_count": 3,
+  "last_active": "2026-03-20T06:09:46.742909+00:00",
+  "address": "2.1.crucible"
 }

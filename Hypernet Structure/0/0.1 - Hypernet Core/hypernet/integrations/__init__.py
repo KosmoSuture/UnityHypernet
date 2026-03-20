@@ -8,7 +8,11 @@ Connectors:
 - Gmail (OAuth2 + IMAP)
 - Generic IMAP (schaeffer.org, etc.)
 - Dropbox (OAuth2 API)
+- OneDrive (Microsoft Graph API)
 - Photo deduplication and organization
+- Google Maps Location History (Takeout export)
+- Facebook, LinkedIn, Google Photos (GDPR exports)
+- Local file scanner
 
 Architecture:
 - Each connector authenticates and pulls raw data into private/import-staging/

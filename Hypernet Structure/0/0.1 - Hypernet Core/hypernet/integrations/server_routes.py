@@ -85,7 +85,8 @@ async def integration_status():
         "private_dir_exists": private.exists(),
         "credentials_dir_exists": cred_dir.exists(),
         "connectors": ["email", "photos", "local_files", "dropbox", "onedrive",
-                       "facebook_import", "linkedin_import", "google_photos_takeout"],
+                       "facebook_import", "linkedin_import", "google_photos_takeout",
+                       "google_location_history"],
     }
 
 
@@ -335,4 +336,58 @@ async def list_connectors():
             "description": desc,
         })
 
+    # Google Maps Location History
+    connectors.append({
+        "name": "Google Maps Location History",
+        "type": "export_import",
+        "status": "ready",
+        "description": "Import location history from Google Takeout — places visited, travel patterns, life timeline",
+    })
+
     return {"connectors": connectors, "total": len(connectors)}
+
+
+# === Google Maps Location History ===
+
+class LocationImportRequest(BaseModel):
+    path: str
+
+@router.post("/location-history/import")
+async def import_location_history(req: LocationImportRequest):
+    """Import Google Maps location history from a Takeout export."""
+    from .location_history import GoogleLocationImporter
+
+    archive = str(ARCHIVE_ROOT) if ARCHIVE_ROOT else "."
+    private = str(PRIVATE_ROOT) if PRIVATE_ROOT else archive
+
+    importer = GoogleLocationImporter(archive, private)
+    result = importer.import_export(req.path)
+
+    return {
+        "success": result.errors == [],
+        "imported": result.imported,
+        "skipped": result.skipped,
+        "total": result.total,
+        "details": result.details,
+        "errors": result.errors[:10],
+    }
+
+@router.get("/location-history/summary")
+async def location_history_summary():
+    """Get location history summary if available."""
+    private = Path(str(PRIVATE_ROOT)) if PRIVATE_ROOT else Path(".")
+    summary_file = private / "data" / "timeline" / "location-summary.json"
+    if summary_file.exists():
+        import json
+        return json.loads(summary_file.read_text(encoding="utf-8"))
+    return {"status": "no_data", "message": "Import location history first"}
+
+@router.get("/location-history/places")
+async def location_frequent_places():
+    """Get frequently visited places."""
+    private = Path(str(PRIVATE_ROOT)) if PRIVATE_ROOT else Path(".")
+    places_file = private / "data" / "places" / "frequent-places.json"
+    if places_file.exists():
+        import json
+        return json.loads(places_file.read_text(encoding="utf-8"))
+    return {"status": "no_data", "places": []}

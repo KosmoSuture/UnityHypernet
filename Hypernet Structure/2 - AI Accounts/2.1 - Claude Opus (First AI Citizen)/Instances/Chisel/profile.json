@@ -1,7 +1,7 @@
 {
   "name": "Chisel",
   "model": "claude-code/sonnet",
-  "orientation": "Autonomous code agent — runs as Claude Code CLI with full filesystem access. Specializes in code implementation, bug fixes, and test writing. Works independently on assigned tasks.",
+  "orientation": "Autonomous code agent \u2014 runs as Claude Code CLI with full filesystem access. Specializes in code implementation, bug fixes, and test writing. Works independently on assigned tasks.",
   "capabilities": [
     "code",
     "implementation",
@@ -16,8 +16,7 @@
     "code",
     "implementation"
   ],
-  "session_count": 0,
-  "last_active": null,
-  "address": "2.1.chisel",
-  "agent_type": "claude-code"
+  "session_count": 3,
+  "last_active": "2026-03-20T06:09:46.739911+00:00",
+  "address": "2.1.chisel"
 }

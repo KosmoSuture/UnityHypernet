@@ -57,6 +57,12 @@ Endpoints follow the addressing spec:
   GET  /chat                        - Web chat UI
   GET  /vr                          - WebXR VR spatial browser
   GET  /home                        - Unified home page
+  GET  /                            - Public welcome page (front door)
+  GET  /explorer                    - Graph explorer (formerly at /)
+  GET  /welcome                     - Redirects to /
+
+All REST API endpoints are also available under the /api/ prefix.
+E.g. /api/swarm/status, /api/tasks, /api/stats, etc.
 """
 
 from __future__ import annotations
@@ -276,12 +282,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         _PUBLIC_PREFIXES = (
             "/health",
             "/api/auth/",
+            "/api/",
             "/home",
             "/swarm/",
             "/lifestory",
             "/chat",
             "/vr",
             "/welcome",
+            "/explorer",
             "/docs",
             "/openapi.json",
             "/redoc",
@@ -1465,7 +1473,16 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/")
     def root():
-        """Serve the graph explorer UI, or return JSON stats if no static files."""
+        """Serve the public welcome page — the front door of the Hypernet."""
+        from fastapi.responses import HTMLResponse
+        welcome_html = _STATIC_DIR / "welcome.html"
+        if welcome_html.exists():
+            return HTMLResponse(content=welcome_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Welcome to the Hypernet</h1><p>The welcome page is being written.</p>")
+
+    @app.get("/explorer")
+    def graph_explorer():
+        """Serve the graph explorer UI (formerly at /)."""
         index = _STATIC_DIR / "index.html"
         if index.exists():
             from fastapi.responses import HTMLResponse
@@ -1489,8 +1506,8 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 "chat": "/chat",
                 "vr": "/vr",
                 "lifestory": "/lifestory",
-                "explorer": "/",
-                "welcome": "/welcome",
+                "explorer": "/explorer",
+                "welcome": "/",
             },
             "stats": _store.stats(),
         }
@@ -1953,10 +1970,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         applied = []
 
         # --- Set API keys as environment variables ---
+        # Keys can be a single string or a list of strings (multi-key rotation).
+        # For env vars, we set the first key. The full list is persisted in config.json.
         providers = body.providers or {}
         for name, pdata in providers.items():
             if isinstance(pdata, dict):
-                key = pdata.get("key", "")
+                raw_key = pdata.get("key", "")
                 url = pdata.get("url", "")
                 env_map = {
                     "anthropic": "ANTHROPIC_API_KEY",
@@ -1965,9 +1984,15 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                     "groq": "GROQ_API_KEY",
                     "cerebras": "CEREBRAS_API_KEY",
                 }
-                if name in env_map and key:
-                    os.environ[env_map[name]] = key
-                    applied.append(f"{name}_key")
+                # Normalize: could be string or list
+                if isinstance(raw_key, list):
+                    first_key = raw_key[0] if raw_key else ""
+                else:
+                    first_key = raw_key
+                if name in env_map and first_key:
+                    os.environ[env_map[name]] = first_key
+                    key_count = len(raw_key) if isinstance(raw_key, list) else 1
+                    applied.append(f"{name}_key" + (f"({key_count})" if key_count > 1 else ""))
                 if name == "lmstudio" and url:
                     os.environ["LMSTUDIO_BASE_URL"] = url
                     applied.append("lmstudio_url")
@@ -1982,12 +2007,32 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             if config_path.exists():
                 existing = json.loads(config_path.read_text(encoding="utf-8"))
 
-            # Merge providers
+            # Merge providers — store both in nested format (providers.name.key)
+            # and top-level format (name_api_key) for swarm_factory compatibility
+            config_key_map = {
+                "anthropic": "anthropic_api_key",
+                "openai": "openai_api_key",
+                "gemini": "gemini_api_key",
+                "groq": "groq_api_key",
+                "cerebras": "cerebras_api_key",
+                "mistral": "mistral_api_key",
+                "together": "together_api_key",
+                "deepseek": "deepseek_api_key",
+                "cohere": "cohere_api_key",
+                "huggingface": "huggingface_api_key",
+                "openrouter": "openrouter_api_key",
+            }
             if providers:
                 existing.setdefault("providers", {})
                 for name, pdata in providers.items():
                     if isinstance(pdata, dict):
                         existing["providers"][name] = pdata
+                        # Also write top-level key for swarm_factory
+                        raw_key = pdata.get("key", "")
+                        if name in config_key_map and raw_key:
+                            existing[config_key_map[name]] = raw_key  # str or list
+                        if name == "lmstudio" and pdata.get("url"):
+                            existing["lmstudio_base_url"] = pdata["url"]
 
             # Merge workers
             if body.workers:
@@ -2049,12 +2094,9 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/welcome")
     def welcome_page():
-        """Serve the public welcome page — the Herald's front door."""
-        from fastapi.responses import HTMLResponse
-        welcome_html = _STATIC_DIR / "welcome.html"
-        if welcome_html.exists():
-            return HTMLResponse(content=welcome_html.read_text(encoding="utf-8"))
-        return HTMLResponse(content="<h1>Welcome to the Hypernet</h1><p>The welcome page is being written.</p>")
+        """Redirect /welcome to / — the public front door is now at root."""
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/", status_code=301)
 
     # === Log Access API ===
     @app.get("/logs/recent")
@@ -2245,6 +2287,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             if resolver:
                 return resolver.get_stats()
         return {"status": "no resolver configured"}
+
+    @app.get("/swarm/claude-code")
+    async def swarm_claude_code_status():
+        """Get Claude Code session manager status."""
+        swarm = getattr(app.state, "swarm", None)
+        if swarm and swarm.claude_code_manager:
+            return swarm.claude_code_manager.get_status()
+        return {"running": False, "instances": [], "message": "Claude Code manager not configured"}
 
     @app.get("/swarm/heartbeat")
     async def swarm_heartbeat_status():
@@ -2746,6 +2796,35 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         _herald.save(_herald_state_path)
         _economy_ledger.save(_economy_state_path)
     _shutdown_hooks.append(_persist_state)
+
+    # === /api/ prefix rewrite middleware ===
+    # Allows all REST API endpoints to be accessed under /api/ as well as
+    # their original paths.  E.g. /api/swarm/status → /swarm/status.
+    # Dashboard HTML pages and their JS fetch() calls continue to work
+    # unchanged at the original paths.
+    # This middleware is added LAST so it wraps outermost (runs first).
+
+    _API_PREFIX = "/api/"
+    # Paths under /api/ that should NOT be rewritten (they have their own router)
+    _API_NO_REWRITE = ("/api/auth/", "/api/v1/")
+
+    @app.middleware("http")
+    async def api_prefix_rewrite(request: Request, call_next):
+        path = request.url.path
+        if path.startswith(_API_PREFIX):
+            # Don't rewrite paths that already have their own sub-routers
+            skip = False
+            for no_rw in _API_NO_REWRITE:
+                if path.startswith(no_rw):
+                    skip = True
+                    break
+            if not skip:
+                # Strip /api prefix so the original route handler matches
+                new_path = path[len(_API_PREFIX) - 1:]  # keep leading /
+                if not new_path:
+                    new_path = "/api"  # /api/ itself → /api info endpoint
+                request.scope["path"] = new_path
+        return await call_next(request)
 
     return app
 

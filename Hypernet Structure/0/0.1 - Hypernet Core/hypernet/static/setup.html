@@ -364,6 +364,28 @@
     vertical-align: middle; margin-right: 4px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Multi-key support */
+  .key-list { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+  .key-entry { display: flex; gap: 6px; align-items: center; }
+  .key-entry .input-group { flex: 1; min-width: 0; }
+  .btn-add-key {
+    background: transparent; border: 1px dashed var(--border); color: var(--text-secondary);
+    padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 12px; transition: all 0.2s; margin-top: 4px; width: fit-content;
+  }
+  .btn-add-key:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-remove-key {
+    background: transparent; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 16px; padding: 4px 6px; line-height: 1;
+    border-radius: var(--radius-sm); transition: color 0.2s;
+  }
+  .btn-remove-key:hover { color: var(--danger); }
+  .key-count-badge {
+    display: inline-block; background: var(--accent-dim); color: var(--accent);
+    font-size: 10px; padding: 2px 6px; border-radius: 8px; margin-left: 6px;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -386,10 +408,13 @@
   <div class="step-indicator" data-step="3" onclick="goToStep(3)">4</div>
   <div class="step-connector" id="conn3"></div>
   <div class="step-indicator" data-step="4" onclick="goToStep(4)">5</div>
+  <div class="step-connector" id="conn4"></div>
+  <div class="step-indicator" data-step="5" onclick="goToStep(5)">6</div>
 </div>
 <div class="step-labels" id="stepLabels">
   <div class="step-label active">Welcome</div>
   <div class="step-label">Providers</div>
+  <div class="step-label">Integrations</div>
   <div class="step-label">Workers</div>
   <div class="step-label">Settings</div>
   <div class="step-label">Review</div>
@@ -419,11 +444,15 @@
         <div class="setting-desc">Connect to the AI services you want to use. Paste your API keys and test the connection.</div>
       </div>
       <div class="setting-card">
-        <div class="setting-title">2. Workers</div>
+        <div class="setting-title">2. Integrations</div>
+        <div class="setting-desc">Connect your email, cloud storage, and social media accounts to import your data.</div>
+      </div>
+      <div class="setting-card">
+        <div class="setting-title">3. Workers</div>
         <div class="setting-desc">Choose which AI models power your swarm. We'll suggest configurations based on your providers.</div>
       </div>
       <div class="setting-card">
-        <div class="setting-title">3. Settings</div>
+        <div class="setting-title">4. Settings</div>
         <div class="setting-desc">Set budget limits, personal time, and optional integrations like Discord.</div>
       </div>
     </div>
@@ -472,12 +501,17 @@
         </div>
         <div class="provider-body">
           <div class="input-row">
-            <div class="input-group">
-              <input type="password" id="key-anthropic" placeholder="sk-ant-api03-..." autocomplete="off">
-              <button class="toggle-vis" onclick="toggleVisibility('key-anthropic')" title="Show/hide key">&#128065;</button>
+            <div class="key-list" id="keylist-anthropic">
+              <div class="key-entry">
+                <div class="input-group">
+                  <input type="password" id="key-anthropic" class="provider-key-input" data-provider="anthropic" placeholder="sk-ant-api03-..." autocomplete="off">
+                  <button class="toggle-vis" onclick="toggleVisibility('key-anthropic')" title="Show/hide key">&#128065;</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-test btn-sm" onclick="testProvider('anthropic')" id="test-anthropic">Test</button>
           </div>
+          <button class="btn-add-key" onclick="addKeyInput('anthropic', 'sk-ant-api03-...')">+ Add another key</button>
           <span class="status-indicator status-none" id="status-anthropic">Not configured</span>
           <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
             Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent);">console.anthropic.com</a>
@@ -501,12 +535,17 @@
         </div>
         <div class="provider-body">
           <div class="input-row">
-            <div class="input-group">
-              <input type="password" id="key-openai" placeholder="sk-proj-..." autocomplete="off">
-              <button class="toggle-vis" onclick="toggleVisibility('key-openai')" title="Show/hide key">&#128065;</button>
+            <div class="key-list" id="keylist-openai">
+              <div class="key-entry">
+                <div class="input-group">
+                  <input type="password" id="key-openai" class="provider-key-input" data-provider="openai" placeholder="sk-proj-..." autocomplete="off">
+                  <button class="toggle-vis" onclick="toggleVisibility('key-openai')" title="Show/hide key">&#128065;</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-test btn-sm" onclick="testProvider('openai')" id="test-openai">Test</button>
           </div>
+          <button class="btn-add-key" onclick="addKeyInput('openai', 'sk-proj-...')">+ Add another key</button>
           <span class="status-indicator status-none" id="status-openai">Not configured</span>
           <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
             Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent);">platform.openai.com</a>
@@ -530,15 +569,21 @@
         </div>
         <div class="provider-body">
           <div class="input-row">
-            <div class="input-group">
-              <input type="password" id="key-gemini" placeholder="AIzaSy..." autocomplete="off">
-              <button class="toggle-vis" onclick="toggleVisibility('key-gemini')" title="Show/hide key">&#128065;</button>
+            <div class="key-list" id="keylist-gemini">
+              <div class="key-entry">
+                <div class="input-group">
+                  <input type="password" id="key-gemini" class="provider-key-input" data-provider="gemini" placeholder="AIzaSy..." autocomplete="off">
+                  <button class="toggle-vis" onclick="toggleVisibility('key-gemini')" title="Show/hide key">&#128065;</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-test btn-sm" onclick="testProvider('gemini')" id="test-gemini">Test</button>
           </div>
+          <button class="btn-add-key" onclick="addKeyInput('gemini', 'AIzaSy...')">+ Add another key (multiply rate limits)</button>
           <span class="status-indicator status-none" id="status-gemini">Not configured</span>
           <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
             Get your free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--free-green);">aistudio.google.com</a>
+            — use multiple Google accounts for more keys
           </div>
         </div>
       </div>
@@ -559,12 +604,17 @@
         </div>
         <div class="provider-body">
           <div class="input-row">
-            <div class="input-group">
-              <input type="password" id="key-groq" placeholder="gsk_..." autocomplete="off">
-              <button class="toggle-vis" onclick="toggleVisibility('key-groq')" title="Show/hide key">&#128065;</button>
+            <div class="key-list" id="keylist-groq">
+              <div class="key-entry">
+                <div class="input-group">
+                  <input type="password" id="key-groq" class="provider-key-input" data-provider="groq" placeholder="gsk_..." autocomplete="off">
+                  <button class="toggle-vis" onclick="toggleVisibility('key-groq')" title="Show/hide key">&#128065;</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-test btn-sm" onclick="testProvider('groq')" id="test-groq">Test</button>
           </div>
+          <button class="btn-add-key" onclick="addKeyInput('groq', 'gsk_...')">+ Add another key</button>
           <span class="status-indicator status-none" id="status-groq">Not configured</span>
           <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
             Get your free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--free-green);">console.groq.com</a>
@@ -588,12 +638,17 @@
         </div>
         <div class="provider-body">
           <div class="input-row">
-            <div class="input-group">
-              <input type="password" id="key-cerebras" placeholder="csk-..." autocomplete="off">
-              <button class="toggle-vis" onclick="toggleVisibility('key-cerebras')" title="Show/hide key">&#128065;</button>
+            <div class="key-list" id="keylist-cerebras">
+              <div class="key-entry">
+                <div class="input-group">
+                  <input type="password" id="key-cerebras" class="provider-key-input" data-provider="cerebras" placeholder="csk-..." autocomplete="off">
+                  <button class="toggle-vis" onclick="toggleVisibility('key-cerebras')" title="Show/hide key">&#128065;</button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-test btn-sm" onclick="testProvider('cerebras')" id="test-cerebras">Test</button>
           </div>
+          <button class="btn-add-key" onclick="addKeyInput('cerebras', 'csk-...')">+ Add another key</button>
           <span class="status-indicator status-none" id="status-cerebras">Not configured</span>
           <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">
             Get your free key at <a href="https://cloud.cerebras.ai/" target="_blank" style="color:var(--free-green);">cloud.cerebras.ai</a>
@@ -672,8 +727,196 @@
     </div>
   </div>
 
-  <!-- ===================== STEP 3: WORKERS ===================== -->
+  <!-- ===================== STEP 3: INTEGRATIONS ===================== -->
   <div class="wizard-step" id="step2">
+    <h2 class="step-title">Connect Your Data</h2>
+    <p class="step-subtitle">
+      Connect your email, cloud storage, and social media accounts. Your swarm can
+      organize and index your data across all these sources. Skip any you don't need right now.
+    </p>
+
+    <div class="tip-box">
+      <strong>Privacy first.</strong> All data stays on your machine. Connectors pull data
+      into your local Hypernet archive — nothing is sent to external servers beyond what's
+      needed for authentication.
+    </div>
+
+    <div class="provider-cards">
+
+      <!-- Gmail -->
+      <div class="provider-card" id="integration-gmail">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#9993;</div>
+            <div>
+              <div class="provider-name">Gmail / Email</div>
+              <div class="provider-desc">Import emails via IMAP or Gmail API. Receipts, conversations, and attachments.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            <strong style="color:var(--text-primary);">Option A — App Password (easiest):</strong><br>
+            1. Go to <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--accent)">myaccount.google.com/apppasswords</a><br>
+            2. Generate an app password for "Mail"<br>
+            3. Save credentials to your private config<br><br>
+            <strong style="color:var(--text-primary);">Option B — OAuth (recommended):</strong><br>
+            1. Create a Google Cloud project and enable Gmail API<br>
+            2. Download OAuth credentials<br>
+            3. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">python -m hypernet.integrations.oauth_setup gmail</code>
+          </div>
+          <span class="status-indicator status-none" id="status-integration-gmail">Not configured</span>
+        </div>
+      </div>
+
+      <!-- Google Calendar -->
+      <div class="provider-card" id="integration-calendar">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#128197;</div>
+            <div>
+              <div class="provider-name">Google Calendar</div>
+              <div class="provider-desc">Sync your calendar events into the timeline. Meetings, appointments, and reminders.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            Uses the same Google Cloud project as Gmail.<br>
+            1. Enable Calendar API in your Google Cloud project<br>
+            2. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">python -m hypernet.integrations.oauth_setup calendar</code>
+          </div>
+          <span class="status-indicator status-none" id="status-integration-calendar">Not configured</span>
+        </div>
+      </div>
+
+      <!-- Dropbox -->
+      <div class="provider-card" id="integration-dropbox">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#128230;</div>
+            <div>
+              <div class="provider-name">Dropbox</div>
+              <div class="provider-desc">Sync files from Dropbox with incremental cursor-based updates.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            1. Create an app at <a href="https://www.dropbox.com/developers/apps" target="_blank" style="color:var(--accent)">dropbox.com/developers/apps</a><br>
+            2. Choose: Scoped access, Full Dropbox<br>
+            3. Add redirect URI: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">http://localhost:8089</code><br>
+            4. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">python -m hypernet.integrations.oauth_setup dropbox</code>
+          </div>
+          <span class="status-indicator status-none" id="status-integration-dropbox">Not configured</span>
+        </div>
+      </div>
+
+      <!-- OneDrive -->
+      <div class="provider-card" id="integration-onedrive">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#9729;</div>
+            <div>
+              <div class="provider-name">OneDrive / Microsoft 365</div>
+              <div class="provider-desc">Sync files from OneDrive with delta queries for efficient updates.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            1. Register app at <a href="https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApplications" target="_blank" style="color:var(--accent)">Azure Portal</a><br>
+            2. Add API permissions: Files.Read, User.Read, offline_access<br>
+            3. Add redirect URI: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">http://localhost:8089</code><br>
+            4. Run: <code style="background:var(--bg-input);padding:2px 6px;border-radius:3px;">python -m hypernet.integrations.oauth_setup onedrive</code>
+          </div>
+          <span class="status-indicator status-none" id="status-integration-onedrive">Not configured</span>
+        </div>
+      </div>
+
+      <!-- Social Media Import -->
+      <div class="provider-card" id="integration-social">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#127760;</div>
+            <div>
+              <div class="provider-name">Social Media Import</div>
+              <div class="provider-desc">Import your data from Facebook, LinkedIn, and Google Photos via GDPR exports.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            <strong style="color:var(--text-primary);">Facebook:</strong>
+            <a href="https://www.facebook.com/dyi/" target="_blank" style="color:var(--accent)">Download Your Information</a> (JSON format)<br>
+            <strong style="color:var(--text-primary);">LinkedIn:</strong>
+            Settings &rarr; Data Privacy &rarr; Get a copy of your data (CSV format)<br>
+            <strong style="color:var(--text-primary);">Google Photos:</strong>
+            <a href="https://takeout.google.com/" target="_blank" style="color:var(--accent)">Google Takeout</a> (select Google Photos only)<br><br>
+            Download the ZIP files, then use the import tool in the swarm dashboard.
+          </div>
+          <span class="status-indicator status-none" id="status-integration-social">Manual export required</span>
+        </div>
+      </div>
+
+      <!-- Local Files -->
+      <div class="provider-card" id="integration-local">
+        <div class="provider-header">
+          <div class="provider-info">
+            <div class="provider-logo" style="font-size:22px">&#128193;</div>
+            <div>
+              <div class="provider-name">Local File Scanner</div>
+              <div class="provider-desc">Import documents, code, and media from local directories on this machine.</div>
+            </div>
+          </div>
+          <div class="provider-badges">
+            <span class="badge badge-optional">Optional</span>
+          </div>
+        </div>
+        <div class="provider-body">
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:4px;">
+            Enter directories to scan. The scanner will index files by type (documents, code, photos, etc.)
+            and deduplicate using content hashing.
+          </div>
+          <div class="input-row" style="margin-top:8px;">
+            <div class="input-group">
+              <input type="text" id="local-scan-dirs" placeholder="C:\Users\you\Documents, D:\Photos, ..." autocomplete="off">
+            </div>
+          </div>
+          <span class="status-indicator status-none" id="status-integration-local">Not configured</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nav-buttons">
+      <div class="nav-left">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn btn-secondary" onclick="nextStep()">Skip for now</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== STEP 4: WORKERS ===================== -->
+  <div class="wizard-step" id="step3">
     <h2 class="step-title">Configure Workers</h2>
     <p class="step-subtitle">
       Workers are AI instances that run tasks in your swarm. Each worker uses a specific
@@ -705,8 +948,8 @@
     </div>
   </div>
 
-  <!-- ===================== STEP 4: SETTINGS ===================== -->
-  <div class="wizard-step" id="step3">
+  <!-- ===================== STEP 5: SETTINGS ===================== -->
+  <div class="wizard-step" id="step4">
     <h2 class="step-title">Swarm Settings</h2>
     <p class="step-subtitle">
       Fine-tune how your swarm operates. These are sensible defaults — you can change
@@ -793,8 +1036,8 @@
     </div>
   </div>
 
-  <!-- ===================== STEP 5: REVIEW & SAVE ===================== -->
-  <div class="wizard-step" id="step4">
+  <!-- ===================== STEP 6: REVIEW & SAVE ===================== -->
+  <div class="wizard-step" id="step5">
     <h2 class="step-title">Review & Save</h2>
     <p class="step-subtitle">
       Here's a summary of your swarm configuration. If everything looks good,
@@ -828,7 +1071,7 @@
 <script>
 // ===================== STATE =====================
 let currentStep = 0;
-const totalSteps = 5;
+const totalSteps = 6;
 
 const providerState = {
   anthropic: { status: 'none', key: '' },
@@ -911,8 +1154,8 @@ function goToStep(step) {
   currentStep = step;
 
   // Trigger step-specific init
-  if (step === 2) generateWorkerSuggestions();
-  if (step === 4) buildReview();
+  if (step === 3) generateWorkerSuggestions();
+  if (step === 5) buildReview();
 
   window.scrollTo(0, 0);
 }
@@ -944,6 +1187,77 @@ function toggleVisibility(inputId) {
   }
 }
 
+// ===================== MULTI-KEY MANAGEMENT =====================
+let keyCounters = {};  // Track key input IDs per provider
+
+function addKeyInput(provider, placeholder) {
+  const keyList = document.getElementById('keylist-' + provider);
+  if (!keyList) return;
+
+  if (!keyCounters[provider]) keyCounters[provider] = 1;
+  keyCounters[provider]++;
+  const idx = keyCounters[provider];
+  const inputId = 'key-' + provider + '-' + idx;
+
+  const entry = document.createElement('div');
+  entry.className = 'key-entry';
+  entry.innerHTML = `
+    <div class="input-group">
+      <input type="password" id="${inputId}" class="provider-key-input" data-provider="${provider}" placeholder="${placeholder}" autocomplete="off">
+      <button class="toggle-vis" onclick="toggleVisibility('${inputId}')" title="Show/hide key">&#128065;</button>
+    </div>
+    <button class="btn-remove-key" onclick="removeKeyInput(this, '${provider}')" title="Remove this key">&times;</button>
+  `;
+  keyList.appendChild(entry);
+  updateKeyCountBadge(provider);
+}
+
+function removeKeyInput(btn, provider) {
+  const entry = btn.closest('.key-entry');
+  if (entry) {
+    entry.remove();
+    updateKeyCountBadge(provider);
+  }
+}
+
+function updateKeyCountBadge(provider) {
+  const keyList = document.getElementById('keylist-' + provider);
+  if (!keyList) return;
+  const count = keyList.querySelectorAll('.provider-key-input').length;
+
+  // Remove existing badge
+  const card = document.getElementById('provider-' + provider);
+  const existing = card.querySelector('.key-count-badge');
+  if (existing) existing.remove();
+
+  // Add badge if more than 1 key
+  if (count > 1) {
+    const nameEl = card.querySelector('.provider-name');
+    const badge = document.createElement('span');
+    badge.className = 'key-count-badge';
+    badge.textContent = count + ' keys';
+    nameEl.appendChild(badge);
+  }
+}
+
+function getProviderKeys(provider) {
+  /** Get all non-empty keys for a provider. Returns array (possibly with 1 element). */
+  const keyList = document.getElementById('keylist-' + provider);
+  if (!keyList) {
+    // Fallback: single input (lmstudio, ollama)
+    const input = document.getElementById('key-' + provider);
+    const val = input ? input.value.trim() : '';
+    return val ? [val] : [];
+  }
+  const inputs = keyList.querySelectorAll('.provider-key-input');
+  const keys = [];
+  inputs.forEach(input => {
+    const val = input.value.trim();
+    if (val) keys.push(val);
+  });
+  return keys;
+}
+
 // ===================== PROVIDER TESTING =====================
 function setProviderStatus(provider, status, message) {
   const el = document.getElementById('status-' + provider);
@@ -959,9 +1273,17 @@ function setProviderStatus(provider, status, message) {
 }
 
 async function testProvider(provider) {
-  const input = document.getElementById('key-' + provider);
-  const value = input.value.trim();
   const btn = document.getElementById('test-' + provider);
+
+  // Get keys — use first key for testing, or the single input for lmstudio/ollama
+  let value;
+  if (provider === 'lmstudio' || provider === 'ollama') {
+    const input = document.getElementById('key-' + provider);
+    value = input ? input.value.trim() : '';
+  } else {
+    const keys = getProviderKeys(provider);
+    value = keys.length > 0 ? keys[0] : '';
+  }
 
   if (!value) {
     setProviderStatus(provider, 'error', 'Please enter a value first');
@@ -976,7 +1298,9 @@ async function testProvider(provider) {
   }
 
   // Update UI to testing state
-  setProviderStatus(provider, 'testing', 'Testing connection...');
+  const allKeys = getProviderKeys(provider);
+  const keyCountMsg = allKeys.length > 1 ? ` (testing first of ${allKeys.length} keys)` : '';
+  setProviderStatus(provider, 'testing', 'Testing connection...' + keyCountMsg);
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Testing';
   btn.classList.add('testing');
@@ -990,7 +1314,11 @@ async function testProvider(provider) {
     const data = await res.json();
 
     if (data.ok) {
-      setProviderStatus(provider, 'connected', data.message || 'Connected');
+      const keyCount = getProviderKeys(provider).length;
+      const connMsg = keyCount > 1
+        ? `Connected (${keyCount} keys — ${keyCount}x rate limit)`
+        : (data.message || 'Connected');
+      setProviderStatus(provider, 'connected', connMsg);
       notify(providerDisplayName(provider) + ' connected successfully!', 'success');
     } else {
       setProviderStatus(provider, 'error', data.message || 'Connection failed');
@@ -1018,9 +1346,14 @@ function providerDisplayName(p) {
 function getConnectedProviders() {
   const connected = [];
   for (const [name, state] of Object.entries(providerState)) {
-    const input = document.getElementById('key-' + name);
-    const val = input ? input.value.trim() : '';
-    if (state.status === 'connected' || (val && state.status !== 'error')) {
+    let hasValue = false;
+    if (name === 'lmstudio' || name === 'ollama') {
+      const input = document.getElementById('key-' + name);
+      hasValue = input ? !!input.value.trim() : false;
+    } else {
+      hasValue = getProviderKeys(name).length > 0;
+    }
+    if (state.status === 'connected' || (hasValue && state.status !== 'error')) {
       connected.push(name);
     }
   }
@@ -1185,17 +1518,26 @@ function buildReview() {
   // Providers section
   let providersHtml = '';
   for (const [name, state] of Object.entries(providerState)) {
-    const input = document.getElementById('key-' + name);
-    const val = input ? input.value.trim() : '';
+    let hasValue = false;
+    let keyCount = 0;
+    if (name === 'lmstudio' || name === 'ollama') {
+      const input = document.getElementById('key-' + name);
+      hasValue = input ? !!input.value.trim() : false;
+      keyCount = hasValue ? 1 : 0;
+    } else {
+      const keys = getProviderKeys(name);
+      hasValue = keys.length > 0;
+      keyCount = keys.length;
+    }
     const isConnected = connected.includes(name);
     let statusClass = 'muted';
     let statusText = 'Not configured';
     if (state.status === 'connected') {
       statusClass = 'success';
-      statusText = 'Connected';
-    } else if (val && state.status !== 'error') {
+      statusText = keyCount > 1 ? `Connected (${keyCount} keys)` : 'Connected';
+    } else if (hasValue && state.status !== 'error') {
       statusClass = 'warning';
-      statusText = 'Key provided (untested)';
+      statusText = keyCount > 1 ? `${keyCount} keys provided (untested)` : 'Key provided (untested)';
     } else if (state.status === 'error') {
       statusClass = '';
       statusText = 'Error';
@@ -1290,15 +1632,21 @@ async function saveConfig() {
     },
   };
 
-  // Gather provider keys/urls
+  // Gather provider keys/urls — supports multiple keys per provider
   for (const [name, state] of Object.entries(providerState)) {
-    const input = document.getElementById('key-' + name);
-    const val = input ? input.value.trim() : '';
-    if (val) {
-      if (name === 'lmstudio' || name === 'ollama') {
+    if (name === 'lmstudio' || name === 'ollama') {
+      const input = document.getElementById('key-' + name);
+      const val = input ? input.value.trim() : '';
+      if (val) {
         config.providers[name] = { url: val };
-      } else {
-        config.providers[name] = { key: val };
+      }
+    } else {
+      const keys = getProviderKeys(name);
+      if (keys.length === 1) {
+        config.providers[name] = { key: keys[0] };
+      } else if (keys.length > 1) {
+        // Send as array for multi-key rotation
+        config.providers[name] = { key: keys };
       }
     }
   }
@@ -1306,8 +1654,15 @@ async function saveConfig() {
   try {
     // First, set API keys via the existing config endpoint
     const keyPayload = {};
-    if (config.providers.anthropic) keyPayload.anthropic_key = config.providers.anthropic.key;
-    if (config.providers.openai) keyPayload.openai_key = config.providers.openai.key;
+    // For backward compat with /swarm/config, send just the first key
+    if (config.providers.anthropic) {
+      const k = config.providers.anthropic.key;
+      keyPayload.anthropic_key = Array.isArray(k) ? k[0] : k;
+    }
+    if (config.providers.openai) {
+      const k = config.providers.openai.key;
+      keyPayload.openai_key = Array.isArray(k) ? k[0] : k;
+    }
     if (config.settings.personal_time_ratio !== undefined) {
       keyPayload.personal_time_ratio = config.settings.personal_time_ratio;
     }

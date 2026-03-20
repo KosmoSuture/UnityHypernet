@@ -174,13 +174,39 @@ def _build_swarm_inner(
 
     # Build workers from discovered instances
     workers = {}
-    # Collect all API keys — config file values take precedence over env vars
+    # Collect all API keys — config file values take precedence over env vars.
+    # Values can be a single string OR a list of strings (for multi-key rotation
+    # that multiplies rate limits, e.g., 4 Google accounts = 4 Gemini API keys).
     api_keys = {
         "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
         "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
         "lmstudio_base_url": config.get("lmstudio_base_url", os.environ.get("LMSTUDIO_BASE_URL", "http://localhost:1234/v1")),
     }
-    has_any_key = any(v for k, v in api_keys.items() if k != "lmstudio_base_url")
+    # Collect keys for all OpenAI-compatible providers (gemini, groq, cerebras, etc.)
+    # Import at top of function scope to avoid circular imports
+    from hypernet_swarm.providers import OpenAICompatibleProvider
+    for _prefix, (_name, _url, _config_key, _needs) in OpenAICompatibleProvider.ENDPOINTS.items():
+        if _config_key and _config_key not in api_keys:
+            # Preserve list format from config for multi-key rotation
+            val = config.get(_config_key, os.environ.get(_config_key.upper(), ""))
+            if val:
+                api_keys[_config_key] = val
+    # Also collect Claude Code config keys
+    for cc_key in ("claude_code_working_dir", "claude_code_max_turns",
+                    "claude_code_max_budget_usd", "claude_code_cli_path"):
+        if config.get(cc_key):
+            api_keys[cc_key] = config[cc_key]
+
+    def _has_real_key(v):
+        """Check if a value represents at least one real API key."""
+        if isinstance(v, list):
+            return any(k and k.strip() for k in v)
+        return bool(v and str(v).strip())
+
+    has_any_key = any(_has_real_key(v) for k, v in api_keys.items()
+                      if k not in ("lmstudio_base_url", "claude_code_working_dir",
+                                   "claude_code_max_turns", "claude_code_max_budget_usd",
+                                   "claude_code_cli_path"))
 
     instance_names = config.get("instances", None)
 
@@ -283,5 +309,50 @@ def _build_swarm_inner(
         log.info("Heartbeat system active")
     else:
         swarm.heartbeat = None
+
+    # Claude Code session manager — persistent autonomous instances
+    cc_workers = [name for name, w in workers.items()
+                  if (w.model or "").lower().startswith("claude-code/")]
+    if cc_workers and not mock:
+        from hypernet_swarm.claude_code_manager import ClaudeCodeManager
+
+        # Load boot sequence for Claude Code instances
+        boot_prompt = ""
+        boot_file = Path(archive_root) / "1 - People" / "1.1 Matt Schaeffer" / \
+            "1.1.10 - AI Assistants (Embassy)" / "assistant-1" / "BOOT-SEQUENCE.md"
+        if boot_file.exists():
+            try:
+                content = boot_file.read_text(encoding="utf-8")
+                # Extract the boot prompt between triple backticks
+                parts = content.split("```")
+                if len(parts) >= 3:
+                    boot_prompt = parts[1].strip()
+                else:
+                    boot_prompt = content[:3000]
+            except OSError:
+                pass
+
+        cc_manager = ClaudeCodeManager(
+            working_dir=str(Path(archive_root).parent),
+            max_instances=len(cc_workers),
+            boot_prompt=boot_prompt,
+            max_turns=int(config.get("claude_code_max_turns", 50)),
+            max_budget_usd=float(config.get("claude_code_max_budget_usd", 5.0)),
+            state_dir=str(Path(data_dir) / "claude-code"),
+        )
+        for name in cc_workers:
+            worker = workers[name]
+            model_variant = worker.model.split("/", 1)[-1] if "/" in worker.model else "sonnet"
+            cc_manager.register_instance(name, model=model_variant)
+
+        cc_manager.load_state()
+        cc_manager.start()
+        swarm.claude_code_manager = cc_manager
+        log.info(
+            "Claude Code manager active — %d instances: %s",
+            len(cc_workers), ", ".join(cc_workers),
+        )
+    else:
+        swarm.claude_code_manager = None
 
     return swarm, web_messenger

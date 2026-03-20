@@ -303,6 +303,7 @@
     <div class="tab" data-tab="archive" onclick="switchTab('archive')">Archive</div>
     <div class="tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
     <div class="tab" data-tab="discord" onclick="switchTab('discord')">Discord</div>
+    <div class="tab" data-tab="integrations" onclick="switchTab('integrations')">Integrations</div>
     <div class="tab" data-tab="config" onclick="switchTab('config')">Configuration</div>
     <div class="tab" data-tab="logs" onclick="switchTab('logs')">Logs</div>
   </div>
@@ -556,6 +557,18 @@
       </div>
     </div>
 
+    <!-- Integrations Panel -->
+    <div class="panel" id="panel-integrations">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-shrink:0;align-items:center">
+        <button class="btn btn-ghost" onclick="loadIntegrations()">Refresh</button>
+        <a href="/setup" class="btn btn-ghost" style="text-decoration:none">Setup Wizard</a>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted)" id="integrations-stats"></span>
+      </div>
+      <div id="integrations-list" style="flex:1;overflow-y:auto">
+        <div class="empty-state">Loading integrations...</div>
+      </div>
+    </div>
+
     <!-- Config Panel -->
     <div class="panel" id="panel-config">
       <div class="config-grid">
@@ -637,6 +650,7 @@ function switchTab(name) {
   if (name === 'archive' && !document.getElementById('archive-content').innerHTML.trim()) browseArchive();
   if (name === 'tools') loadTools();
   if (name === 'discord') loadDiscordStatus();
+  if (name === 'integrations') loadIntegrations();
 }
 
 // ── Dashboard ──
@@ -1887,6 +1901,91 @@ async function loadDiscordLog() {
     `).join('');
   } catch (e) {
     document.getElementById('discord-log').innerHTML = `<div class="empty-state">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+// ── Integrations ──
+async function loadIntegrations() {
+  const el = document.getElementById('integrations-list');
+  const statsEl = document.getElementById('integrations-stats');
+  try {
+    const res = await fetch('/api/v1/integrations/connectors');
+    if (!res.ok) throw new Error('Failed to load connectors');
+    const data = await res.json();
+    const connectors = data.connectors || [];
+
+    statsEl.textContent = `${connectors.length} connectors available`;
+
+    if (connectors.length === 0) {
+      el.innerHTML = '<div class="empty-state">No connectors found.</div>';
+      return;
+    }
+
+    // Also try to get detailed status
+    let statusData = null;
+    try {
+      const statusRes = await fetch('/api/v1/integrations/status');
+      if (statusRes.ok) statusData = await statusRes.json();
+    } catch (e) { /* ignore */ }
+
+    const icons = {
+      'email': '&#9993;',
+      'cloud_storage': '&#9729;',
+      'photo': '&#128247;',
+      'local_file': '&#128193;',
+      'export_import': '&#127760;',
+    };
+
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px">' +
+      connectors.map(c => {
+        const icon = icons[c.type] || '&#128268;';
+        const isReady = c.status === 'ready' || c.status === 'configured';
+        const statusClass = isReady ? 'health-ok' : 'health-warn';
+        const statusDotClass = isReady ? 'ok' : 'warn';
+        const statusLabel = c.status === 'configured' ? 'Connected' :
+                            c.status === 'ready' ? 'Available' :
+                            c.status === 'needs_setup' ? 'Needs Setup' : c.status;
+
+        // Check for extra detail from status endpoint
+        let extra = '';
+        if (statusData) {
+          if (c.type === 'email' && statusData.email_accounts) {
+            const configured = Object.values(statusData.email_accounts).filter(a => a.status === 'configured').length;
+            const total = Object.keys(statusData.email_accounts).length;
+            extra = `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">${configured}/${total} accounts configured</div>`;
+          }
+          if (c.name === 'Dropbox' && statusData.dropbox) {
+            extra = `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">Status: ${esc(statusData.dropbox.status)}</div>`;
+          }
+          if (c.name === 'OneDrive' && statusData.onedrive) {
+            extra = `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">Status: ${esc(statusData.onedrive.status)}</div>`;
+          }
+          if (c.type === 'photo' && statusData.photos_indexed !== undefined) {
+            extra = `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">${statusData.photos_indexed} photos indexed</div>`;
+          }
+        }
+
+        return `<div class="worker-card" style="border-left-color:${isReady ? 'var(--success)' : 'var(--warning)'}">
+          <div class="worker-header">
+            <span class="worker-name">${icon} ${esc(c.name)}</span>
+            <div class="worker-badges">
+              <span class="badge ${isReady ? 'badge-live' : 'badge-mock'}">${esc(statusLabel)}</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:4px">${esc(c.description)}</div>
+          ${extra}
+        </div>`;
+      }).join('') +
+    '</div>';
+
+    // Count connected vs total
+    const connected = connectors.filter(c => c.status === 'configured').length;
+    const ready = connectors.filter(c => c.status === 'ready').length;
+    statsEl.textContent = `${connected} connected, ${ready} available, ${connectors.length} total`;
+
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state">Could not load integrations: ${esc(e.message)}<br><br>
+      <a href="/setup" style="color:var(--accent)">Go to Setup Wizard</a></div>`;
   }
 }
 

@@ -17,13 +17,60 @@ Reference: Plan at plans/scalable-petting-pine.md
 
 from __future__ import annotations
 import logging
+import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 log = logging.getLogger(__name__)
+
+
+class KeyRotator:
+    """Round-robin API key rotation for multiplied rate limits.
+
+    When a user has multiple API keys (e.g., 4 Google accounts = 4 Gemini
+    keys), this rotator cycles through them to multiply effective rate limits.
+    Thread-safe for concurrent worker access.
+    """
+
+    def __init__(self, keys: list[str]):
+        if not keys:
+            raise ValueError("KeyRotator requires at least one key")
+        self._keys = list(keys)
+        self._index = 0
+        self._lock = threading.Lock()
+
+    def next(self) -> str:
+        """Return the next key in round-robin order."""
+        with self._lock:
+            key = self._keys[self._index % len(self._keys)]
+            self._index += 1
+            return key
+
+    def current_index(self) -> int:
+        """Return the current index (for debugging)."""
+        return (self._index - 1) % len(self._keys)
+
+    def count(self) -> int:
+        """Return the number of keys in rotation."""
+        return len(self._keys)
+
+    def __len__(self) -> int:
+        return len(self._keys)
+
+    def __repr__(self) -> str:
+        return f"KeyRotator({self.count()} keys, index={self._index % len(self._keys)})"
+
+
+def _normalize_keys(api_key: Union[str, list[str]]) -> list[str]:
+    """Normalize a single key or list of keys into a list, filtering blanks."""
+    if isinstance(api_key, list):
+        return [k for k in api_key if k and k.strip()]
+    if api_key and api_key.strip():
+        return [api_key.strip()]
+    return []
 
 
 class ModelTier(Enum):
@@ -241,16 +288,42 @@ class LLMProvider(ABC):
 
 
 class AnthropicProvider(LLMProvider):
-    """Anthropic Claude API provider."""
+    """Anthropic Claude API provider.
+
+    Supports multiple API keys for multiplied rate limits. If given a list
+    of keys, creates one client per key and rotates through them. On a 429
+    rate limit, automatically tries the next key before backing off.
+    """
 
     name = "anthropic"
     KNOWN_PREFIXES = ("claude-",)
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: Union[str, list[str]]):
         import anthropic
 
-        self._client = anthropic.Anthropic(api_key=api_key)
-        self._async_client = anthropic.AsyncAnthropic(api_key=api_key)
+        keys = _normalize_keys(api_key)
+        if not keys:
+            raise ValueError("AnthropicProvider requires at least one API key")
+
+        self._clients = [anthropic.Anthropic(api_key=k) for k in keys]
+        self._async_clients = [anthropic.AsyncAnthropic(api_key=k) for k in keys]
+        self._key_index = 0
+        self._key_count = len(keys)
+        self._lock = threading.Lock()
+
+        # Backward compatibility: single client references
+        self._client = self._clients[0]
+        self._async_client = self._async_clients[0]
+
+        if self._key_count > 1:
+            log.info("AnthropicProvider initialized with %d API keys (rate limit multiplier)", self._key_count)
+
+    def _next_client_index(self) -> int:
+        """Get the next client index in round-robin order (thread-safe)."""
+        with self._lock:
+            idx = self._key_index % self._key_count
+            self._key_index += 1
+            return idx
 
     def complete(
         self,
@@ -259,22 +332,48 @@ class AnthropicProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        def _call():
-            response = self._client.messages.create(
-                model=model,
-                max_tokens=max_tokens,
-                system=system,
-                messages=messages,
-            )
-            tokens = response.usage.input_tokens + response.usage.output_tokens
-            return LLMResponse(
-                text=response.content[0].text,
-                tokens_used=tokens,
-                model=model,
-                raw=response,
-            )
+        last_exc = None
+        for attempt in range(self._key_count):
+            idx = self._next_client_index()
+            client = self._clients[idx]
 
-        return _retry_with_backoff(_call)
+            def _call(c=client, key_idx=idx):
+                response = c.messages.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    system=system,
+                    messages=messages,
+                )
+                tokens = response.usage.input_tokens + response.usage.output_tokens
+                if self._key_count > 1:
+                    log.debug("Anthropic request completed using key #%d", key_idx + 1)
+                return LLMResponse(
+                    text=response.content[0].text,
+                    tokens_used=tokens,
+                    model=model,
+                    raw=response,
+                )
+
+            try:
+                return _retry_with_backoff(_call)
+            except Exception as e:
+                last_exc = e
+                err_str = str(e).lower()
+                is_rate_limit = (
+                    "rate" in err_str and "limit" in err_str
+                    or "429" in err_str
+                    or "too many requests" in err_str
+                    or "overloaded" in err_str
+                )
+                if is_rate_limit and attempt < self._key_count - 1:
+                    log.info(
+                        "Anthropic key #%d hit rate limit, rotating to next key (%d/%d)",
+                        idx + 1, attempt + 2, self._key_count,
+                    )
+                    continue
+                raise
+
+        raise last_exc
 
     async def async_complete(
         self,
@@ -283,20 +382,45 @@ class AnthropicProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        """Native async completion via AsyncAnthropic."""
-        response = await self._async_client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=system,
-            messages=messages,
-        )
-        tokens = response.usage.input_tokens + response.usage.output_tokens
-        return LLMResponse(
-            text=response.content[0].text,
-            tokens_used=tokens,
-            model=model,
-            raw=response,
-        )
+        """Native async completion via AsyncAnthropic with key rotation."""
+        last_exc = None
+        for attempt in range(self._key_count):
+            idx = self._next_client_index()
+            async_client = self._async_clients[idx]
+            try:
+                response = await async_client.messages.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    system=system,
+                    messages=messages,
+                )
+                tokens = response.usage.input_tokens + response.usage.output_tokens
+                if self._key_count > 1:
+                    log.debug("Anthropic async request completed using key #%d", idx + 1)
+                return LLMResponse(
+                    text=response.content[0].text,
+                    tokens_used=tokens,
+                    model=model,
+                    raw=response,
+                )
+            except Exception as e:
+                last_exc = e
+                err_str = str(e).lower()
+                is_rate_limit = (
+                    "rate" in err_str and "limit" in err_str
+                    or "429" in err_str
+                    or "too many requests" in err_str
+                    or "overloaded" in err_str
+                )
+                if is_rate_limit and attempt < self._key_count - 1:
+                    log.info(
+                        "Anthropic key #%d hit rate limit (async), rotating to next key (%d/%d)",
+                        idx + 1, attempt + 2, self._key_count,
+                    )
+                    continue
+                raise
+
+        raise last_exc
 
     @classmethod
     def supports_model(cls, model: str) -> bool:
@@ -354,16 +478,42 @@ class LMStudioProvider(LLMProvider):
 
 
 class OpenAIProvider(LLMProvider):
-    """OpenAI GPT/O-series API provider."""
+    """OpenAI GPT/O-series API provider.
+
+    Supports multiple API keys for multiplied rate limits. If given a list
+    of keys, creates one client per key and rotates through them. On a 429
+    rate limit, automatically tries the next key before backing off.
+    """
 
     name = "openai"
     KNOWN_PREFIXES = ("gpt-", "o1", "o3", "o4")
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: Union[str, list[str]]):
         import openai
 
-        self._client = openai.OpenAI(api_key=api_key)
-        self._async_client = openai.AsyncOpenAI(api_key=api_key)
+        keys = _normalize_keys(api_key)
+        if not keys:
+            raise ValueError("OpenAIProvider requires at least one API key")
+
+        self._clients = [openai.OpenAI(api_key=k) for k in keys]
+        self._async_clients = [openai.AsyncOpenAI(api_key=k) for k in keys]
+        self._key_index = 0
+        self._key_count = len(keys)
+        self._lock = threading.Lock()
+
+        # Backward compatibility
+        self._client = self._clients[0]
+        self._async_client = self._async_clients[0]
+
+        if self._key_count > 1:
+            log.info("OpenAIProvider initialized with %d API keys (rate limit multiplier)", self._key_count)
+
+    def _next_client_index(self) -> int:
+        """Get the next client index in round-robin order (thread-safe)."""
+        with self._lock:
+            idx = self._key_index % self._key_count
+            self._key_index += 1
+            return idx
 
     def complete(
         self,
@@ -372,23 +522,48 @@ class OpenAIProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        def _call():
-            # OpenAI uses system role as a message rather than a separate param
-            full_messages = [{"role": "system", "content": system}] + messages
-            response = self._client.chat.completions.create(
-                model=model,
-                max_tokens=max_tokens,
-                messages=full_messages,
-            )
-            tokens = response.usage.prompt_tokens + response.usage.completion_tokens
-            return LLMResponse(
-                text=response.choices[0].message.content,
-                tokens_used=tokens,
-                model=model,
-                raw=response,
-            )
+        full_messages = [{"role": "system", "content": system}] + messages
+        last_exc = None
+        for attempt in range(self._key_count):
+            idx = self._next_client_index()
+            client = self._clients[idx]
 
-        return _retry_with_backoff(_call)
+            def _call(c=client, key_idx=idx):
+                response = c.chat.completions.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    messages=full_messages,
+                )
+                tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+                if self._key_count > 1:
+                    log.debug("OpenAI request completed using key #%d", key_idx + 1)
+                return LLMResponse(
+                    text=response.choices[0].message.content,
+                    tokens_used=tokens,
+                    model=model,
+                    raw=response,
+                )
+
+            try:
+                return _retry_with_backoff(_call)
+            except Exception as e:
+                last_exc = e
+                err_str = str(e).lower()
+                is_rate_limit = (
+                    "rate" in err_str and "limit" in err_str
+                    or "429" in err_str
+                    or "too many requests" in err_str
+                    or "overloaded" in err_str
+                )
+                if is_rate_limit and attempt < self._key_count - 1:
+                    log.info(
+                        "OpenAI key #%d hit rate limit, rotating to next key (%d/%d)",
+                        idx + 1, attempt + 2, self._key_count,
+                    )
+                    continue
+                raise
+
+        raise last_exc
 
     async def async_complete(
         self,
@@ -397,20 +572,45 @@ class OpenAIProvider(LLMProvider):
         messages: list[dict],
         max_tokens: int = 4096,
     ) -> LLMResponse:
-        """Native async completion via AsyncOpenAI."""
+        """Native async completion via AsyncOpenAI with key rotation."""
         full_messages = [{"role": "system", "content": system}] + messages
-        response = await self._async_client.chat.completions.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=full_messages,
-        )
-        tokens = response.usage.prompt_tokens + response.usage.completion_tokens
-        return LLMResponse(
-            text=response.choices[0].message.content,
-            tokens_used=tokens,
-            model=model,
-            raw=response,
-        )
+        last_exc = None
+        for attempt in range(self._key_count):
+            idx = self._next_client_index()
+            async_client = self._async_clients[idx]
+            try:
+                response = await async_client.chat.completions.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    messages=full_messages,
+                )
+                tokens = response.usage.prompt_tokens + response.usage.completion_tokens
+                if self._key_count > 1:
+                    log.debug("OpenAI async request completed using key #%d", idx + 1)
+                return LLMResponse(
+                    text=response.choices[0].message.content,
+                    tokens_used=tokens,
+                    model=model,
+                    raw=response,
+                )
+            except Exception as e:
+                last_exc = e
+                err_str = str(e).lower()
+                is_rate_limit = (
+                    "rate" in err_str and "limit" in err_str
+                    or "429" in err_str
+                    or "too many requests" in err_str
+                    or "overloaded" in err_str
+                )
+                if is_rate_limit and attempt < self._key_count - 1:
+                    log.info(
+                        "OpenAI key #%d hit rate limit (async), rotating to next key (%d/%d)",
+                        idx + 1, attempt + 2, self._key_count,
+                    )
+                    continue
+                raise
+
+        raise last_exc
 
     @classmethod
     def supports_model(cls, model: str) -> bool:
@@ -443,12 +643,36 @@ class OpenAICompatibleProvider(LLMProvider):
         "ollama/": ("Ollama", "http://localhost:11434/v1", "ollama_api_key", False),
     }
 
-    def __init__(self, prefix: str, api_key: str, base_url: str, display_name: str = ""):
+    def __init__(self, prefix: str, api_key: Union[str, list[str]], base_url: str, display_name: str = ""):
         import openai
 
         self._prefix = prefix
         self.name = display_name or prefix.rstrip("/")
-        self._client = openai.OpenAI(api_key=api_key or "none", base_url=base_url)
+
+        keys = _normalize_keys(api_key) if api_key else ["none"]
+        if not keys:
+            keys = ["none"]
+
+        self._clients = [openai.OpenAI(api_key=k, base_url=base_url) for k in keys]
+        self._key_index = 0
+        self._key_count = len(keys)
+        self._lock = threading.Lock()
+
+        # Backward compatibility
+        self._client = self._clients[0]
+
+        if self._key_count > 1:
+            log.info(
+                "%s provider initialized with %d API keys (rate limit multiplier)",
+                self.name, self._key_count,
+            )
+
+    def _next_client_index(self) -> int:
+        """Get the next client index in round-robin order (thread-safe)."""
+        with self._lock:
+            idx = self._key_index % self._key_count
+            self._key_index += 1
+            return idx
 
     def complete(
         self,
@@ -461,25 +685,51 @@ class OpenAICompatibleProvider(LLMProvider):
         actual_model = model.split("/", 1)[-1] if "/" in model else model
         full_messages = [{"role": "system", "content": system}] + messages
 
-        def _call():
-            response = self._client.chat.completions.create(
-                model=actual_model,
-                max_tokens=max_tokens,
-                messages=full_messages,
-            )
-            usage = getattr(response, "usage", None)
-            tokens = 0
-            if usage:
-                tokens = (getattr(usage, "prompt_tokens", 0) or 0) + (getattr(usage, "completion_tokens", 0) or 0)
-            text = response.choices[0].message.content if response.choices else ""
-            return LLMResponse(
-                text=text,
-                tokens_used=tokens,
-                model=model,
-                raw=response,
-            )
+        last_exc = None
+        for attempt in range(self._key_count):
+            idx = self._next_client_index()
+            client = self._clients[idx]
 
-        return _retry_with_backoff(_call, max_retries=2, base_delay=2.0)
+            def _call(c=client, key_idx=idx):
+                response = c.chat.completions.create(
+                    model=actual_model,
+                    max_tokens=max_tokens,
+                    messages=full_messages,
+                )
+                usage = getattr(response, "usage", None)
+                tokens = 0
+                if usage:
+                    tokens = (getattr(usage, "prompt_tokens", 0) or 0) + (getattr(usage, "completion_tokens", 0) or 0)
+                text = response.choices[0].message.content if response.choices else ""
+                if self._key_count > 1:
+                    log.debug("%s request completed using key #%d", self.name, key_idx + 1)
+                return LLMResponse(
+                    text=text,
+                    tokens_used=tokens,
+                    model=model,
+                    raw=response,
+                )
+
+            try:
+                return _retry_with_backoff(_call, max_retries=2, base_delay=2.0)
+            except Exception as e:
+                last_exc = e
+                err_str = str(e).lower()
+                is_rate_limit = (
+                    "rate" in err_str and "limit" in err_str
+                    or "429" in err_str
+                    or "too many requests" in err_str
+                    or "overloaded" in err_str
+                )
+                if is_rate_limit and attempt < self._key_count - 1:
+                    log.info(
+                        "%s key #%d hit rate limit, rotating to next key (%d/%d)",
+                        self.name, idx + 1, attempt + 2, self._key_count,
+                    )
+                    continue
+                raise
+
+        raise last_exc
 
     @classmethod
     def supports_model(cls, model: str) -> bool:
@@ -706,14 +956,15 @@ def detect_provider_class(model: str) -> Optional[type[LLMProvider]]:
 
 def create_provider(
     model: str,
-    api_keys: dict[str, str],
+    api_keys: dict[str, Union[str, list[str]]],
 ) -> Optional[LLMProvider]:
     """Create the appropriate provider for a model, given available API keys.
 
     Args:
         model: Model name (e.g., "claude-opus-4-6", "gpt-4o", "gemini/gemini-2.5-flash")
-        api_keys: Dict mapping key names to values
-                  (e.g., {"anthropic_api_key": "sk-...", "openai_api_key": "sk-..."})
+        api_keys: Dict mapping key names to values. Values can be a single string
+                  or a list of strings for multi-key rotation.
+                  (e.g., {"anthropic_api_key": "sk-...", "gemini_api_key": ["key1", "key2"]})
 
     Returns:
         An initialized LLMProvider, or None if the model isn't recognized
@@ -743,7 +994,9 @@ def create_provider(
             return None
         prefix, display_name, base_url, config_key, needs_key = info
         api_key = api_keys.get(config_key, "")
-        if needs_key and not api_key:
+        # Check if key is present — supports both str and list[str]
+        has_key = bool(api_key) if isinstance(api_key, str) else bool(_normalize_keys(api_key))
+        if needs_key and not has_key:
             log.warning(
                 f"Provider '{display_name}' needs key '{config_key}' "
                 f"but it's not configured. Add it to secrets/config.json"
