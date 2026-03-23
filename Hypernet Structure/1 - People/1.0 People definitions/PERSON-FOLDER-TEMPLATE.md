@@ -27,56 +27,71 @@ Each person in the Hypernet ecosystem has a standardized folder structure to sto
 
 ```
 1.X - [Person Name]/
-├── 1.X.0 - Profile & Identity/
-│   ├── README.md (Basic info, contact, role)
-│   ├── BIOGRAPHY.md
-│   ├── SKILLS.md
-│   ├── RESUME.md (if applicable)
-│   └── CONTACT-INFO.md
+├── 1.X.0 - Account Metadata/        ** RESERVED for metadata (per .0 rule) **
+│   └── README.md (How this person node is organized)
 ├── 1.X.1 - Projects/
-│   ├── 1.X.1.0 - Active Projects/
+│   ├── 1.X.1.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.1.1 - Completed Projects/
-│   └── 1.X.1.2 - Archived Projects/
+│   ├── 1.X.1.2 - Archived Projects/
+│   └── 1.X.1.3 - Active Projects/
 ├── 1.X.2 - Documents/
-│   ├── 1.X.2.0 - Personal Documents/
+│   ├── 1.X.2.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.2.1 - Business Documents/
 │   ├── 1.X.2.2 - Legal Documents/
-│   └── 1.X.2.3 - Reference Materials/
+│   ├── 1.X.2.3 - Reference Materials/
+│   └── 1.X.2.4 - Personal Documents/
 ├── 1.X.3 - Communications/
-│   ├── 1.X.3.0 - Email Archives/
+│   ├── 1.X.3.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.3.1 - Meeting Notes/
-│   └── 1.X.3.2 - Correspondence/
+│   ├── 1.X.3.2 - Correspondence/
+│   └── 1.X.3.3 - Email Archives/
 ├── 1.X.4 - Relationships/
-│   ├── 1.X.4.0 - Professional Network/
+│   ├── 1.X.4.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.4.1 - Personal Network/
-│   └── 1.X.4.2 - Organizational Affiliations/
+│   ├── 1.X.4.2 - Organizational Affiliations/
+│   └── 1.X.4.3 - Professional Network/
 ├── 1.X.5 - Tasks & Workflows/
-│   ├── 1.X.5.0 - Active Tasks/
+│   ├── 1.X.5.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.5.1 - Completed Tasks/
-│   └── 1.X.5.2 - Recurring Workflows/
+│   ├── 1.X.5.2 - Recurring Workflows/
+│   └── 1.X.5.3 - Active Tasks/
 ├── 1.X.6 - Personal Data/
-│   ├── 1.X.6.0 - Hypernet Data Store/
+│   ├── 1.X.6.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.6.1 - Privacy Settings/
-│   └── 1.X.6.2 - Data Permissions/
+│   ├── 1.X.6.2 - Data Permissions/
+│   └── 1.X.6.3 - Hypernet Data Store/
 ├── 1.X.7 - Contributions/
-│   ├── 1.X.7.0 - Code Contributions/
+│   ├── 1.X.7.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.7.1 - Documentation/
 │   ├── 1.X.7.2 - Design Work/
-│   └── 1.X.7.3 - Other Contributions/
+│   ├── 1.X.7.3 - Other Contributions/
+│   └── 1.X.7.4 - Code Contributions/
 ├── 1.X.8 - Media/
-│   ├── 1.X.8.0 - Photos/
+│   ├── 1.X.8.0 - Section Metadata/   ** RESERVED **
 │   ├── 1.X.8.1 - Videos/
-│   └── 1.X.8.2 - Audio/
-└── 1.X.9 - Notes & Knowledge/
-    ├── 1.X.9.0 - Personal Notes/
-    ├── 1.X.9.1 - Research/
-    └── 1.X.9.2 - Learning Materials/
+│   ├── 1.X.8.2 - Audio/
+│   └── 1.X.8.3 - Photos/
+├── 1.X.9 - Notes & Knowledge/
+│   ├── 1.X.9.0 - Section Metadata/   ** RESERVED **
+│   ├── 1.X.9.1 - Research/
+│   ├── 1.X.9.2 - Learning Materials/
+│   └── 1.X.9.3 - Personal Notes/
+└── 1.X.10 - Profile & Identity/      (data: bio, contact, skills)
+    ├── README.md (Basic info, contact, role)
+    ├── BIOGRAPHY.md
+    ├── SKILLS.md
+    ├── RESUME.md (if applicable)
+    └── CONTACT-INFO.md
 ```
+
+**IMPORTANT: The .0 Rule**
+
+Every `.0` address is ALWAYS reserved for metadata about the parent node. Data starts at `.1`. This applies recursively at every level of the hierarchy. See 0.0.4 (Node Metadata Framework) for the full specification.
 
 ## Folder Descriptions
 
-### 1.X.0 - Profile & Identity
-Core identity information, biography, skills, contact details. This is the public-facing representation of the person.
+### 1.X.0 - Account Metadata
+**RESERVED** for metadata about the person node. Contains organization instructions, not personal data. Per the .0 metadata rule (0.0.4).
 
 ### 1.X.1 - Projects
 All projects associated with this person, organized by status (active, completed, archived).
@@ -133,7 +148,7 @@ All other individuals in the system
 ## Relationship to Hypernet Platform
 
 When a person has a Hypernet user account:
-- 1.X.6.0 - Hypernet Data Store links to their user_id in the system
+- 1.X.6.3 - Hypernet Data Store links to their user_id in the system
 - Their personal data (media, contacts, tasks, etc.) is accessible via API
 - Privacy settings in 1.X.6.1 control who can access what data
 - Data permissions in 1.X.6.2 define what integrations can access

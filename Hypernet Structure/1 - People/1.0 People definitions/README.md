@@ -63,7 +63,7 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 
 ```
 1.X - [Person Name]/
-├── 1.X.0 - Profile & Identity
+├── 1.X.0 - Account Metadata (RESERVED - per .0 rule)
 ├── 1.X.1 - Projects
 ├── 1.X.2 - Documents
 ├── 1.X.3 - Communications
@@ -72,14 +72,15 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 ├── 1.X.6 - Personal Data (Hypernet)
 ├── 1.X.7 - Contributions
 ├── 1.X.8 - Media
-└── 1.X.9 - Notes & Knowledge
+├── 1.X.9 - Notes & Knowledge
+└── 1.X.10 - Profile & Identity
 ```
 
 ## Relationship to Hypernet Platform
 
 ### User Account Linkage
 - Person nodes with Hypernet accounts link to user_id in database
-- Personal data accessible via API in 1.X.6.0 - Hypernet Data Store
+- Personal data accessible via API in 1.X.6.3 - Hypernet Data Store
 - Privacy controlled via 1.X.6.1 - Privacy Settings
 
 ### Data Storage
@@ -90,7 +91,7 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 
 ## Privacy & Access Control
 
-### Public Information (1.X.0)
+### Public Information (1.X.10 - Profile & Identity)
 - Name, role, public biography
 - Public projects and contributions
 - Contact information (as permitted)

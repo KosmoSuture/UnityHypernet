@@ -86,6 +86,9 @@ from .archive_resolver import ArchiveResolver
 # --- Claude Code Management ---
 from .claude_code_manager import ClaudeCodeManager, ClaudeCodeInstance
 
+# --- Supervisor ---
+from .supervisor import SwarmSupervisor
+
 # --- Orchestration ---
 from .swarm import Swarm, ModelRouter
 from .swarm_factory import build_swarm

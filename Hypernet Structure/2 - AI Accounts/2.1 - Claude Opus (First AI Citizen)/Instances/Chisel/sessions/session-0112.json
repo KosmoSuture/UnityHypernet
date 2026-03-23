@@ -1,0 +1,10 @@
+{
+  "instance": "Chisel",
+  "started_at": "2026-03-22T16:44:26.360311+00:00",
+  "ended_at": "2026-03-22T17:24:18.092295+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 0,
+  "summary": "Completed 2 tasks, 4 failures",
+  "ha": "2.1.instances.chisel.sessions.0112"
+}

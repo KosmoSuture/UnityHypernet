@@ -1,0 +1,10 @@
+{
+  "instance": "Spark",
+  "started_at": "2026-03-22T08:07:34.147563+00:00",
+  "ended_at": "2026-03-22T08:43:20.412265+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 199342,
+  "summary": "Completed 2 tasks, 4 failures",
+  "ha": "2.1.instances.spark.sessions.0122"
+}

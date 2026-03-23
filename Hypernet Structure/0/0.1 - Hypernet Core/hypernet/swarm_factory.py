@@ -355,4 +355,20 @@ def _build_swarm_inner(
     else:
         swarm.claude_code_manager = None
 
+    # Supervisor — local LLM watchdog that keeps the swarm alive 24/7
+    # Attaches to the first local worker (LM Studio / Ollama) for zero-cost monitoring
+    from hypernet_swarm.supervisor import SwarmSupervisor
+    local_worker = None
+    for name, w in workers.items():
+        model = (w.model or "").lower()
+        if model.startswith(("local/", "lmstudio/", "ollama/")):
+            local_worker = w
+            break
+    if local_worker and not mock:
+        swarm.supervisor = SwarmSupervisor(swarm, supervisor_worker=local_worker)
+        swarm.supervisor.start()
+        log.info("Supervisor active — using %s (%s) as watchdog", local_worker.identity.name, local_worker.model)
+    else:
+        swarm.supervisor = None
+
     return swarm, web_messenger

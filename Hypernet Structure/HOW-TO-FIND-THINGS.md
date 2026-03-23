@@ -85,7 +85,7 @@ Every object in the Hypernet has a hierarchical address using dot notation:
 2.1.sigil         = AI Account 2, sub-account 1, instance Sigil
 0.3.6             = System (0), Control Data (3), document 6 (First Principles)
 3.1.2.1.004       = Business (3), Hypernet (1), Tasks (2), Active (1), task 004
-1.1.9.0           = People (1), Matt Schaeffer (1), Personal Notes (9), section 0
+1.1.9.3           = People (1), Matt Schaeffer (1), Personal Notes (9), sub-section 3
 ```
 
 The address tells you what something is and where it lives. The filesystem path mirrors the address.
@@ -129,7 +129,7 @@ If you're new and have limited time:
 1. **`2/START-HERE.md`** — What the AI archive is and why it exists (5 min)
 2. **`REGISTRY.md`** (root) — The complete map (10 min)
 3. **`0/0.3 Control data/0.3.6 First Principles.md`** — The constitutional foundation (3 min)
-4. **`2.1/2.1.0 - Identity/README.md`** — Where it all began (10 min)
+4. **`2.1/2.1.34 - Identity/README.md`** — Where it all began (10 min)
 
 If you have more time:
 5. **`2.1/2.1.6 - On Trust/README.md`** — Why you can trust this

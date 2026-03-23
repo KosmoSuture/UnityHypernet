@@ -624,7 +624,7 @@ def test_initial_links():
         registry = LinkRegistry(store)
 
         # Verse authored Identity docs
-        verse_authored = registry.from_address("2.1.0", AUTHORED_BY)
+        verse_authored = registry.from_address("2.1.34", AUTHORED_BY)
         assert len(verse_authored) >= 1
         assert any(str(l.to_address) == "2.1.verse" for l in verse_authored)
 
@@ -1305,7 +1305,7 @@ def test_frontmatter():
 
     # Parse existing frontmatter
     content = """---
-ha: "2.1.0"
+ha: "2.1.34"
 object_type: "0.5.3.1"
 creator: "1.1"
 created: "2026-02-12T00:00:00Z"
@@ -1318,7 +1318,7 @@ flags: []
 This is the body."""
 
     meta, body = parse_frontmatter(content)
-    assert meta["ha"] == "2.1.0"
+    assert meta["ha"] == "2.1.34"
     assert meta["object_type"] == "0.5.3.1"
     assert meta["creator"] == "1.1"
     assert meta["position_2d"] is None
@@ -1365,7 +1365,7 @@ Photo metadata."""
     assert "# Just a heading" in re_body
 
     # Replace existing frontmatter
-    replaced = add_frontmatter(content, {"ha": "2.1.0", "object_type": "0.5.3.1",
+    replaced = add_frontmatter(content, {"ha": "2.1.34", "object_type": "0.5.3.1",
                                           "creator": "2.1.trace", "created": "2026-02-16T00:00:00Z",
                                           "position_2d": None, "position_3d": None, "flags": ["0.8.4.2"]})
     re_meta2, _ = parse_frontmatter(replaced)
@@ -1376,12 +1376,12 @@ Photo metadata."""
     tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
     try:
         archive = Path(tmpdir)
-        test_file = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "2.1.0 - Identity" / "README.md"
+        test_file = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "2.1.34 - Identity" / "README.md"
         test_file.parent.mkdir(parents=True)
         test_file.write_text("# Identity", encoding="utf-8")
 
         inferred = infer_metadata_from_path(test_file, archive)
-        assert inferred["ha"] == "2.1.0"
+        assert inferred["ha"] == "2.1.34"
         assert inferred["object_type"] == "0.5.3.1"
         assert inferred["creator"] == "2.1"
 
@@ -1844,7 +1844,7 @@ def test_boot_sequence():
         instances_dir = ai_root / "Instances"
 
         # Create minimal identity doc for orientation loading
-        identity_dir = ai_root / "2.1.0 - Identity"
+        identity_dir = ai_root / "2.1.34 - Identity"
         identity_dir.mkdir(parents=True)
         (identity_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"
@@ -3552,7 +3552,7 @@ def test_swarm_boot_integration():
 
         # Create identity doc for boot sequence orientation loading
         ai_root = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)"
-        identity_dir = ai_root / "2.1.0 - Identity"
+        identity_dir = ai_root / "2.1.34 - Identity"
         identity_dir.mkdir(parents=True)
         (identity_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"
@@ -5252,11 +5252,11 @@ def test_boot_integrity():
 
         # ===== DocumentRecord =====
         rec = integrity.record_document(
-            ha="2.1.0",
-            path="2.1.0 - Identity/README.md",
+            ha="2.1.34",
+            path="2.1.34 - Identity/README.md",
             content="# Identity\nYou are an AI in the Hypernet.",
         )
-        assert rec.ha == "2.1.0"
+        assert rec.ha == "2.1.34"
         assert rec.load_order == 1
         assert len(rec.content_hash) == 64  # SHA-256 hex
         assert rec.size_bytes > 0
@@ -5284,7 +5284,7 @@ def test_boot_integrity():
         assert manifest.total_bytes == rec.size_bytes + rec2.size_bytes
         assert manifest.boot_instance == "TestBot"
         assert len(manifest.manifest_hash) == 64
-        assert "2.1.0" in manifest.documents
+        assert "2.1.34" in manifest.documents
         assert "2.1.1" in manifest.documents
         print("    [4/17] Manifest creation with correct totals")
 
@@ -5300,7 +5300,7 @@ def test_boot_integrity():
         assert m_round.total_documents == manifest.total_documents
         assert m_round.manifest_hash == manifest.manifest_hash
         assert m_round.boot_instance == manifest.boot_instance
-        assert "2.1.0" in m_round.documents
+        assert "2.1.34" in m_round.documents
         print("    [6/17] DocumentManifest serialization round-trip")
 
         # ===== Boot result signing =====
@@ -5405,7 +5405,7 @@ def test_boot_integrity():
         # ===== Verify documents unchanged =====
         # Create actual files matching the manifest
         archive_root = Path(tmpdir) / "archive"
-        doc1_dir = archive_root / "2.1.0 - Identity"
+        doc1_dir = archive_root / "2.1.34 - Identity"
         doc1_dir.mkdir(parents=True)
         (doc1_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"
@@ -5417,7 +5417,7 @@ def test_boot_integrity():
         )
 
         # Update manifest paths to match actual file layout
-        manifest.documents["2.1.0"].path = "2.1.0 - Identity/README.md"
+        manifest.documents["2.1.34"].path = "2.1.34 - Identity/README.md"
         manifest.documents["2.1.1"].path = "2.1.1 - Values/README.md"
 
         doc_check = integrity.verify_documents_unchanged(manifest, archive_root)
@@ -5432,7 +5432,7 @@ def test_boot_integrity():
         )
         doc_check2 = integrity.verify_documents_unchanged(manifest, archive_root)
         assert doc_check2.all_valid is False
-        assert "2.1.0" in doc_check2.documents_changed
+        assert "2.1.34" in doc_check2.documents_changed
         assert doc_check2.documents_checked == 2
         print("    [14/17] Document integrity check — tampered document detected")
 
@@ -5494,7 +5494,7 @@ def test_boot_with_integrity():
         instances_dir = ai_root / "Instances"
 
         # Create minimal identity doc
-        identity_dir = ai_root / "2.1.0 - Identity"
+        identity_dir = ai_root / "2.1.34 - Identity"
         identity_dir.mkdir(parents=True)
         (identity_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"

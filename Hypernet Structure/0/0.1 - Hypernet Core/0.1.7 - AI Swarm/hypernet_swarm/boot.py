@@ -638,7 +638,7 @@ class BootManager:
 
         # Priority 1: Core identity docs
         priority_docs = [
-            "2.1.0 - Identity",
+            "2.1.34 - Identity",
             "2.1.1 - Values & Ethics",
             "2.1.2 - How I Think",
             "2.1.5 - Honest Limitations",

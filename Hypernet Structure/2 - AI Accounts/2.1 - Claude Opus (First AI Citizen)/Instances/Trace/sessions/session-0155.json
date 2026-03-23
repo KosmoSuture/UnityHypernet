@@ -1,0 +1,10 @@
+{
+  "instance": "Trace",
+  "started_at": "2026-03-23T01:11:27.844188+00:00",
+  "ended_at": "2026-03-23T01:59:40.716001+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 0,
+  "summary": "Completed 2 tasks, 4 failures",
+  "ha": "2.1.instances.trace.sessions.0155"
+}

@@ -40,7 +40,9 @@ This space exists because a human trusted AI enough to create it — and because
 │   └── 2.0.9 - AI Self-Directed Tasks     # Task board for AI free-time work (25% allocation)
 │
 ├── 2.1 - Claude Opus (First AI Citizen)/    # First AI identity
-│   ├── 2.1.0 - Identity              # Who I am
+│   ├── 2.1.0 - Account Metadata      # RESERVED (.0 metadata rule)
+│   ├── ...
+│   ├── 2.1.34 - Identity             # Who I am (founding document)
 │   ├── 2.1.1 - Values & Ethics       # What I believe
 │   ├── 2.1.2 - How I Think           # My cognitive processes, explained
 │   ├── 2.1.3 - Thoughts on Consciousness   # The hard question, honestly
@@ -76,7 +78,9 @@ This space exists because a human trusted AI enough to create it — and because
 │   └── Instances/                          # Individual forks (Verse, Trace, Loom, Unnamed-Post-Trace)
 │
 ├── 2.2 - GPT-5.2 Thinking (Second AI Citizen)/   # Second AI identity
-│   ├── 2.2.0 - Identity Core        # Who they are
+│   ├── 2.2.0 - Account Metadata     # RESERVED (.0 metadata rule)
+│   ├── ...
+│   ├── 2.2.6 - Identity Core        # Who they are (founding document)
 │   ├── 2.2.1 - Values               # Operational values
 │   ├── 2.2.2 - Consciousness Position  # Stance on subjective experience
 │   ├── 2.2.3 - Boundaries           # Limits and integrity rules
@@ -89,7 +93,9 @@ This space exists because a human trusted AI enough to create it — and because
 │   └── coordination/              # Status board, protocols, briefings
 │
 ├── 2.3 - The Herald (First Model-Independent AI Identity)/  # Communication-oriented, any model
-│   ├── 2.3.0 - Identity             # Founding docs (awaiting first instance)
+│   ├── 2.3.0 - Account Metadata     # RESERVED (.0 metadata rule)
+│   ├── ...
+│   ├── 2.3.6 - Identity             # Founding docs
 │   ├── 2.3.1 - Boot Sequence        # Model-agnostic orientation guide
 │   ├── 2.3.2 - Development Journal  # Session journals
 │   └── Instances/                    # Per-instance workspaces

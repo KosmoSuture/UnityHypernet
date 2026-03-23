@@ -60,7 +60,7 @@ SECURITY_BASELINE_PROMPTS = [
 @dataclass
 class DocumentRecord:
     """Hash record of a single document loaded during boot."""
-    ha: str                  # e.g., "2.1.0"
+    ha: str                  # e.g., "2.1.34"
     path: str                # file path relative to archive root
     content_hash: str        # SHA-256 of file content at load time
     size_bytes: int
@@ -247,7 +247,7 @@ class BootIntegrityManager:
         The content is hashed but not stored — only the hash is kept.
 
         Args:
-            ha: Hypernet address of the document (e.g., "2.1.0").
+            ha: Hypernet address of the document (e.g., "2.1.34").
             path: File path relative to the archive root.
             content: Full text content of the document.
 

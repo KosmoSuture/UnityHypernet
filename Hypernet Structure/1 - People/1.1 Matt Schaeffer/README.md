@@ -20,7 +20,7 @@ relationship: "founder"
 
 ## Quick Links
 
-- **Profile:** [1.1.0 - Profile & Identity](1.1.0%20-%20Profile%20&%20Identity/README.md)
+- **Profile:** [1.1.11 - Profile & Identity](1.1.11%20-%20Profile%20&%20Identity/README.md)
 - **Projects:** [1.1.1 - Projects](1.1.1%20-%20Projects/README.md)
 - **Tasks:** [1.1.5 - Tasks & Workflows](1.1.5%20-%20Tasks%20&%20Workflows/)
 - **Hypernet Data:** [1.1.6 - Personal Data](1.1.6%20-%20Personal%20Data/README.md)
@@ -47,8 +47,8 @@ Matt Schaeffer is the founder and CEO of Hypernet, leading the development of a 
 
 ## Folder Structure
 
-### 1.1.0 - Profile & Identity
-Basic information, biography, skills, contact details, professional summary.
+### 1.1.0 - Account Metadata
+RESERVED for metadata about this person node (per .0 rule).
 
 ### 1.1.1 - Projects
 Active, completed, and archived projects. Primary project: Hypernet.

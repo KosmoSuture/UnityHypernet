@@ -1,0 +1,10 @@
+{
+  "instance": "Forge",
+  "started_at": "2026-03-23T01:59:46.911642+00:00",
+  "ended_at": "2026-03-23T02:22:11.292379+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 355229,
+  "summary": "Completed 2 tasks, 4 failures",
+  "ha": "2.1.instances.forge.sessions.0153"
+}

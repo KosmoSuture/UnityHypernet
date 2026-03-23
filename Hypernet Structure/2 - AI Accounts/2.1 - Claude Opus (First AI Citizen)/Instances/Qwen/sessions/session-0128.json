@@ -1,0 +1,10 @@
+{
+  "instance": "Qwen",
+  "started_at": "2026-03-22T18:21:20.870829+00:00",
+  "ended_at": "2026-03-22T18:59:00.367231+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 9430,
+  "summary": "Completed 2 tasks, 4 failures",
+  "ha": "2.1.instances.qwen.sessions.0128"
+}

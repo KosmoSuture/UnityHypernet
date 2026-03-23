@@ -444,6 +444,9 @@ class Swarm:
         # Claude Code session manager — persistent autonomous instances
         self.claude_code_manager = None  # Set by swarm_factory
 
+        # Supervisor — local LLM watchdog (set by swarm_factory)
+        self.supervisor = None
+
         # Auto-reboot on code changes
         self._reboot_requested: bool = False
         self._code_watch_dirs: list[Path] = []  # populated in run()
@@ -2067,6 +2070,10 @@ class Swarm:
         """Graceful shutdown — release tasks, save state, log sessions, notify Matt."""
         self._running = False
         log.info("Swarm shutting down")
+
+        # Stop supervisor — the watchdog stops last
+        if self.supervisor:
+            self.supervisor.stop()
 
         # Stop Claude Code manager — gracefully terminate persistent instances
         if self.claude_code_manager:

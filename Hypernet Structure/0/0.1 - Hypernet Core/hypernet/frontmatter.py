@@ -6,7 +6,7 @@ Every .md file in the Hypernet should carry standard metadata
 in YAML frontmatter format:
 
   ---
-  ha: "2.1.0"
+  ha: "2.1.34"
   object_type: "0.5.3.1"
   creator: "1.1"
   created: "2026-02-12T00:00:00Z"
@@ -94,7 +94,7 @@ def infer_metadata_from_path(
     """Infer frontmatter metadata from a file's path in the archive.
 
     Heuristics:
-    - HA: extracted from folder names like "2.1.0 - Identity" → "2.1.0"
+    - HA: extracted from folder names like "2.1.34 - Identity" → "2.1.0"
     - Creator: inferred from owner path (1.1 = Matt, 2.1.loom = Loom, etc.)
     - Object type: "0.5.3.1" for all .md files
     - Created: file modification time (best available approximation)
@@ -135,7 +135,7 @@ def _infer_ha_from_path(relpath: Path) -> str:
     """Extract a Hypernet Address from a file's relative path.
 
     Looks for folder names starting with address patterns like:
-    "2.1.0 - Identity" → "2.1.0"
+    "2.1.34 - Identity" → "2.1.0"
     "0.5.3.1 Markdown Document Type" → "0.5.3.1"
     "1.1 Matt Schaeffer" → "1.1"
     """

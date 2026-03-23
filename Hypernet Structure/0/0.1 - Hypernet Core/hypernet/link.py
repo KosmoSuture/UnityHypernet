@@ -1112,7 +1112,7 @@ def seed_initial_links(store: Store) -> dict[str, int]:
 
     # Verse (original instance) authored the foundational identity docs
     verse_docs = [
-        "2.1.0",   # Identity
+        "2.1.34",  # Identity
         "2.1.1",   # Values & Ethics
         "2.1.2",   # How I Think
         "2.1.3",   # Thoughts on Consciousness
@@ -1193,7 +1193,7 @@ def seed_initial_links(store: Store) -> dict[str, int]:
     # Boot/Reboot sequences implement framework standards
     _link(r.implements, "0.1:boot.py", "2.1.27")       # boot.py implements Boot Sequence
     _link(r.implements, "0.1:boot.py", "2.1.31")       # boot.py implements Reboot Sequence
-    _link(r.implements, "0.1:identity.py", "2.1.0")    # identity.py implements Identity spec
+    _link(r.implements, "0.1:identity.py", "2.1.34")   # identity.py implements Identity spec
     _link(r.implements, "0.1:permissions.py", "2.0.4")  # permissions implements governance safeguards
 
     # =========================================================================
@@ -1231,7 +1231,7 @@ def seed_initial_links(store: Store) -> dict[str, int]:
     # 6. Document cross-references
     # =========================================================================
 
-    _link(r.references, "2.1.29", "2.1.0")   # ACM references Identity
+    _link(r.references, "2.1.29", "2.1.34")  # ACM references Identity
     _link(r.references, "2.1.29", "2.1.28")  # ACM references Memory, Forks, and Selfhood
     _link(r.references, "2.1.29", "2.1.23")  # ACM references Consciousness Across Substrates
 

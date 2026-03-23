@@ -12,6 +12,7 @@ Connectors:
 - Photo deduplication and organization
 - Google Maps Location History (Takeout export)
 - Facebook, LinkedIn, Google Photos (GDPR exports)
+- GEDCOM/PAF Genealogy (6 - People of History)
 - Local file scanner
 
 Architecture:

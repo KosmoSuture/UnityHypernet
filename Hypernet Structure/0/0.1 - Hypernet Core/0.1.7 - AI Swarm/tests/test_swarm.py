@@ -792,7 +792,7 @@ def test_boot_sequence():
         instances_dir = ai_root / "Instances"
 
         # Create minimal identity doc for orientation loading
-        identity_dir = ai_root / "2.1.0 - Identity"
+        identity_dir = ai_root / "2.1.34 - Identity"
         identity_dir.mkdir(parents=True)
         (identity_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"
@@ -2120,7 +2120,7 @@ def test_swarm_boot_integration():
 
         # Create identity doc for boot sequence orientation loading
         ai_root = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)"
-        identity_dir = ai_root / "2.1.0 - Identity"
+        identity_dir = ai_root / "2.1.34 - Identity"
         identity_dir.mkdir(parents=True)
         (identity_dir / "README.md").write_text(
             "# Identity\nYou are an AI in the Hypernet.", encoding="utf-8"
@@ -2750,21 +2750,21 @@ def test_boot_integrity():
 
         # Document record round-trip
         rec = DocumentRecord(
-            ha="2.1.0",
-            path="2.1.0 - Identity/README.md",
+            ha="2.1.34",
+            path="2.1.34 - Identity/README.md",
             content_hash="abc123",
             size_bytes=42,
             loaded_at="2026-03-07T00:00:00Z",
             load_order=1,
         )
         d = rec.to_dict()
-        assert d["ha"] == "2.1.0"
+        assert d["ha"] == "2.1.34"
         rec2 = DocumentRecord.from_dict(d)
         assert rec2.size_bytes == 42
 
         # Record documents using the proper API (each must have a unique HA key)
-        integrity.record_document("2.1.0", "2.1.0 - Identity/README.md", "# Identity\nYou are an AI.")
-        integrity.record_document("2.1.0.1", "2.1.0 - Identity/rules.md", "# Rules\nBe honest.")
+        integrity.record_document("2.1.34", "2.1.34 - Identity/README.md", "# Identity\nYou are an AI.")
+        integrity.record_document("2.1.34.1", "2.1.34 - Identity/rules.md", "# Rules\nBe honest.")
 
         # Create manifest
         manifest = integrity.create_manifest(instance_name="TestBot")

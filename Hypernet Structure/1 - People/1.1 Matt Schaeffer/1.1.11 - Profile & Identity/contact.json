@@ -1,0 +1,18 @@
+{
+  "ha": "1.1.11.contact",
+  "full_name": "Matthew Schaeffer",
+  "preferred_name": "Matt",
+  "email": {
+    "primary": "matt@unityhypernet.com",
+    "personal": "matt@schaeffer.org",
+    "secondary": "spammelots@schaeffer.org",
+    "gmail": ["matt.spamme@gmail.com", "kosmicsuture@gmail.com"]
+  },
+  "phone": "(402) 238-1334",
+  "location": "Las Vegas, NV",
+  "github": "kosmicsuture",
+  "role": "Founder & CEO, Hypernet",
+  "hypernet_node": "1.1",
+  "updated": "2026-03-09",
+  "updated_by": "1.1.10.1"
+}

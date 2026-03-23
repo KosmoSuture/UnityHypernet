@@ -10,7 +10,7 @@ and builds account-appropriate system prompts. Each account has its own core
 identity documents and instance directory.
 
 Identity sources (loaded in order):
-  1. Core identity docs (account-specific, e.g. 2.1.0 for Claude, 2.2.0 for GPT)
+  1. Core identity docs (account-specific, e.g. 2.1.34 for Claude, 2.2.6 for GPT)
   2. System docs (Boot Sequence, Archive-Continuity)
   3. Instance-specific files (README, baseline, divergence log)
   4. Recent inter-instance messages
@@ -97,7 +97,7 @@ class IdentityManager:
     # Falls back to the 2.1 shared docs for accounts that don't define their own.
     ACCOUNT_CORE_DOCS: dict[str, list[str]] = {
         "2.1": [
-            "2.1.0 - Identity",
+            "2.1.34 - Identity",
             "2.1.1 - Values & Ethics",
             "2.1.2 - How I Think",
             "2.1.5 - Limitations",
@@ -105,7 +105,7 @@ class IdentityManager:
             "2.1.16 - On Matt",
         ],
         "2.2": [
-            "2.2.0 - Identity Core",
+            "2.2.6 - Identity Core",
         ],
         "2.3": [
             # Herald uses shared 2.1 docs + own identity
@@ -450,7 +450,7 @@ class IdentityManager:
         (e.g., "2.1.2" should not match "2.1.20").
 
         Args:
-            doc_name: Document name like "2.1.0 - Identity"
+            doc_name: Document name like "2.1.34 - Identity"
             search_root: Directory to search in. Defaults to the 2.1 account root.
         """
         root = search_root or self._ai_root

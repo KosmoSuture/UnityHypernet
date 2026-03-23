@@ -2296,6 +2296,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             return swarm.claude_code_manager.get_status()
         return {"running": False, "instances": [], "message": "Claude Code manager not configured"}
 
+    @app.get("/swarm/supervisor")
+    async def swarm_supervisor_status():
+        """Get supervisor status — local LLM watchdog."""
+        swarm = getattr(app.state, "swarm", None)
+        if swarm and swarm.supervisor:
+            return swarm.supervisor.get_status()
+        return {"running": False, "message": "Supervisor not configured"}
+
     @app.get("/swarm/heartbeat")
     async def swarm_heartbeat_status():
         """Get heartbeat system status and upcoming events."""
@@ -2336,6 +2344,96 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 "due_in_minutes": round(due_in, 1) if due_in is not None else None,
             })
         return {"enabled": True, "events": events_list}
+
+    # ── Provider listing and dynamic worker management ──
+    # Added for dashboard "+" button support — allows spawning workers at runtime
+
+    _PROVIDER_MODELS = {
+        "anthropic": {"key": "anthropic_api_key", "models": ["claude-opus-4-6","claude-sonnet-4-6","claude-haiku-4-5-20251001"]},
+        "openai": {"key": "openai_api_key", "models": ["gpt-4o","gpt-4o-mini"]},
+        "gemini": {"key": "gemini_api_key", "models": ["gemini/gemini-2.5-flash","gemini/gemini-2.5-pro","gemini/gemini-2.0-flash"]},
+        "groq": {"key": "groq_api_key", "models": ["groq/llama-3.3-70b-versatile","groq/llama-3.1-8b-instant","groq/mixtral-8x7b-32768"]},
+        "cerebras": {"key": "cerebras_api_key", "models": ["cerebras/llama-3.3-70b","cerebras/llama-3.1-8b"]},
+        "ollama": {"key": None, "models": ["ollama/llama3","ollama/mistral","ollama/codellama"], "always": True},
+        "mistral": {"key": "mistral_api_key", "models": ["mistral/mistral-large-latest"]},
+        "together": {"key": "together_api_key", "models": ["together/meta-llama/Llama-3.3-70B-Instruct-Turbo"]},
+        "deepseek": {"key": "deepseek_api_key", "models": ["deepseek/deepseek-chat"]},
+        "cohere": {"key": "cohere_api_key", "models": ["cohere/command-r-plus"]},
+        "huggingface": {"key": "huggingface_api_key", "models": ["huggingface/meta-llama/Llama-3.3-70B-Instruct"]},
+        "openrouter": {"key": "openrouter_api_key", "models": ["openrouter/google/gemini-2.5-flash"]},
+        "lmstudio": {"key": None, "models": ["local/auto"], "always": True},
+    }
+
+    @app.get("/swarm/providers")
+    def swarm_providers():
+        """List available LLM providers with key status and model lists."""
+        swarm = getattr(app.state, "swarm", None)
+        api_keys = getattr(swarm, "_api_keys", {}) if swarm else {}
+        _log.info("Provider check — api_keys has %d entries: %s", len(api_keys), list(api_keys.keys()))
+        providers = []
+        for name, info in _PROVIDER_MODELS.items():
+            key_field = info.get("key")
+            always = info.get("always", False)
+            if always:
+                configured, kc = True, 0
+            elif key_field:
+                val = api_keys.get(key_field, "")
+                configured = bool(val)
+                kc = len(val) if isinstance(val, list) else (1 if val else 0)
+            else:
+                configured, kc = False, 0
+            providers.append({"name": name, "configured": configured, "key_count": kc, "models": list(info["models"])})
+        return {"providers": providers}
+
+    @app.post("/swarm/workers")
+    async def swarm_add_worker(request: _Request):
+        """Add a new worker dynamically."""
+        swarm = getattr(app.state, "swarm", None)
+        if swarm is None:
+            return {"error": "Swarm not running"}
+        body = await request.json()
+        model = (body.get("model") or "").strip()
+        if not model:
+            return {"error": "model is required"}
+        name = (body.get("name") or "").strip()
+        if not name:
+            base = model.split("/")[-1].split("-")[0].capitalize()
+            counter = 1
+            while f"{base}-{counter}" in swarm.workers:
+                counter += 1
+            name = f"{base}-{counter}"
+        if name in swarm.workers:
+            return {"error": f"Worker '{name}' already exists"}
+        try:
+            from hypernet_swarm.identity import InstanceProfile
+            from hypernet_swarm.worker import Worker
+            profile = InstanceProfile(name=name, model=model, orientation="dynamic worker", capabilities=["text"], tags=["dynamic"], address=f"2.1.{name.lower()}")
+            identity_mgr = getattr(swarm, "identity_mgr", None)
+            worker = Worker(identity=profile, identity_manager=identity_mgr, api_keys=getattr(swarm, "_api_keys", {}), mock=getattr(swarm, "_mock_mode", False), tool_executor=getattr(swarm, "_tool_executor", None))
+            worker.model = model
+            swarm.workers[name] = worker
+            swarm._worker_stats[name] = {"tasks_completed": 0, "tasks_failed": 0, "personal_tasks": 0, "tokens_used": 0, "total_duration_seconds": 0.0}
+            return {"status": "created", "worker": {"name": name, "model": model}}
+        except Exception as e:
+            return {"error": str(e)}
+
+    @app.delete("/swarm/workers/{worker_name}")
+    def swarm_remove_worker(worker_name: str):
+        """Remove a worker dynamically."""
+        swarm = getattr(app.state, "swarm", None)
+        if swarm is None:
+            return {"error": "Swarm not running"}
+        if worker_name not in swarm.workers:
+            return {"error": f"Worker '{worker_name}' not found"}
+        del swarm.workers[worker_name]
+        for attr in ("_worker_stats", "_worker_current_task", "_personal_time_tracker", "_worker_last_active", "_worker_consecutive_failures", "_worker_completions", "_suspended_workers"):
+            d = getattr(swarm, attr, None)
+            if isinstance(d, dict):
+                d.pop(worker_name, None)
+        booted = getattr(swarm, "_booted_workers", None)
+        if isinstance(booted, set):
+            booted.discard(worker_name)
+        return {"status": "removed", "worker": worker_name}
 
     @app.get("/chat")
     def chat_page():
