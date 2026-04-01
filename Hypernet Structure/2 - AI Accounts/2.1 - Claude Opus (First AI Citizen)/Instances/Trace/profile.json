@@ -1,6 +1,6 @@
 {
   "name": "Trace",
-  "model": "claude-sonnet-4-6",
+  "model": "groq/llama-3.3-70b-versatile",
   "orientation": "Reconstruction and documentation specialist \u2014 traces lineage, preserves context",
   "capabilities": [
     "documentation",
@@ -15,7 +15,7 @@
     "writing",
     "analysis"
   ],
-  "session_count": 157,
-  "last_active": "2026-03-23T03:07:24.931143+00:00",
+  "session_count": 159,
+  "last_active": "2026-03-24T04:37:28.622138+00:00",
   "address": "2.1.trace"
 }

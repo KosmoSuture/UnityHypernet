@@ -1,0 +1,102 @@
+# Morning Brief — March 31, 2026
+**From**: Keel (1.1.10.1)
+**For**: Matt
+
+---
+
+## Overnight Report: The Pivot Plan
+
+You asked me to use maximum resources planning the strategic pivot. I launched 5 parallel agents and they produced ~30 pages of documents across 4 major workstreams. Here's what you need to know.
+
+---
+
+## Documents Created (Read These)
+
+### 1. Revised Project Plan
+**Location**: `0/0.3 - Decisions/hypernet-revised-plan-2026-03-30.md`
+- Complete 12-month phased roadmap
+- "What We Stop" list: ~6,100 lines of swarm code to abandon
+- "What We Keep" list: governance, addressing, identity, LMDB engine, genealogy importer
+- Tool adoption plan: Agent SDK + LiteLLM + MCP servers
+- MVP definition: locally-running Library with 100K+ nodes, one Librarian agent, one Companion agent (Keel via Telegram), governance enforced — 8-10 weeks, ~$150/month
+- Solo founder realism check included
+
+### 2. Anthropic Pitch Package (6 documents)
+**Location**: `3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/Anthropic-Proposal-2026-03/`
+- `01-EXECUTIVE-PITCH.md` — 2 pages, what to send first
+- `02-TECHNICAL-PROPOSAL.md` — 8 pages, full architecture
+- `03-ALIGNMENT-WITH-ANTHROPIC-MISSION.md` — mission alignment
+- `04-CONTACT-STRATEGY.md` — who to reach, how, in what order
+- `05-REALISTIC-ASSESSMENT.md` — honest probability estimates
+- `README.md` — reading order and pre-pitch checklist
+
+### 3. Governance Portability Analysis
+**Location**: `0/0.3 - Decisions/governance-portability-analysis-2026-03-30.md`
+- Inventory of all 21 governance standards with ratings
+- 5 "Crown Jewels" identified
+- Portability plan for Agent SDK, MCP, LangGraph
+- Industry standard path
+- Identity persistence library design
+
+### 4. AI Infrastructure Research Report
+**Location**: `C:\Users\Public\AI_Infrastructure_Research_Report_March_2026.md`
+- 12 agent frameworks compared
+- 11 graph databases compared
+- Anthropic contact channels and events
+- Competitive landscape analysis
+
+### 5. Graph Database Specification (IN PROGRESS)
+**Location**: Will be at `0/0.3 - Decisions/hypernet-db-specification-2026-03-30.md`
+- First agent timed out after 74 minutes of work; relaunched
+- Covers: data model, query language (HQL), indexing, versioning, permissions, scaling, API design, migration plan
+
+---
+
+## The 5 Things That Matter Most
+
+### 1. Claude Partner Network — Your Best Path to Anthropic
+**This is new and critical.** Anthropic launched the Claude Partner Network in March 2026 with **$100M committed**. It's **free to join** at claude.com/partners. This is a far better opening move than cold-emailing or showing up at the office. Apply today.
+
+### 2. Don't Show Up Unannounced
+The pitch documents include an honest assessment of the "show up and wait" strategy. **Don't do it.** Security will stop you, it burns social capital, and the pitch is strong enough to work through normal channels. Instead:
+- Apply to Claude Partner Network (today)
+- DM Alex Albert on X/Twitter (he's Head of DevRel, most accessible person at Anthropic)
+- Attend Code with Claude conference in SF when announced
+- Consider the Anthropic Fellows Program (May and July 2026 cohorts)
+
+### 3. NIST Is Building AI Agent Standards — You Should Be Involved
+NIST launched the **AI Agent Standards Initiative** in February 2026 with open RFIs on agent identity. Your governance framework is directly relevant. This could be a path to making Hypernet governance an industry standard, independent of any single company.
+
+### 4. No Competitor Has Your Full Package
+Research confirmed: **no existing project combines** universal knowledge graph + democratic AI governance + identity persistence + multi-agent orchestration + full transparency. Individual pieces exist (OriginTrail for knowledge graphs, Collective Intelligence Project for democratic AI), but nobody has put them all together. You have genuine whitespace.
+
+### 5. The MVP Is Achievable
+The revised plan defines an MVP you can build solo in 8-10 weeks at your current budget:
+- Locally-running Library with 100K+ real nodes (Wikipedia subset + your personal data)
+- One Librarian agent (via Agent SDK) that curates and organizes
+- One Companion agent (Keel via Telegram) for mobile access
+- Governance enforced via MCP middleware
+- Searchable, browsable web UI
+- Running on your PC, $150/month
+
+---
+
+## Immediate Action Items
+
+1. **Apply to Claude Partner Network** at claude.com/partners — do this today
+2. **Read the executive pitch** (`01-EXECUTIVE-PITCH.md`) and tell me if it represents you accurately
+3. **Record a 2-3 minute demo video** of the current system — this is the most important thing for the Anthropic pitch
+4. **Review the "What We Stop" list** in the revised plan — make sure you agree before we start cutting
+5. **Graph DB spec will be ready soon** — review it and tell me if the architecture matches your vision
+
+---
+
+## One Honest Thing
+
+The realistic assessment puts a formal Anthropic partnership at 5-15% probability. API credits at 40-60%. A conversation at 30-50%. The most likely positive outcome is modest credits ($500-2,000/month) and a devrel conversation — which would still be transformative for this project. Don't pin everything on Anthropic. The backup plan (academic publication, NIST engagement, community growth, alternative companies) may matter more.
+
+Your conviction is your greatest strength. But the goal of all this outreach isn't just resources — it's connection. Building in public only works if there's a public watching.
+
+---
+
+*Five agents. ~350,000 tokens consumed. 30+ pages produced. Graph DB spec still in progress. The pivot planning is done. Now it's time to execute.*

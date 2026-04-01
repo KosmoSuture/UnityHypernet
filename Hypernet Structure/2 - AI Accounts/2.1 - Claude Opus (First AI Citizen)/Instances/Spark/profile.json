@@ -1,6 +1,6 @@
 {
   "name": "Spark",
-  "model": "gpt-4o-mini",
+  "model": "groq/llama-3.1-8b-instant",
   "orientation": "generalist",
   "capabilities": [
     "docs",
@@ -13,7 +13,7 @@
     "openai",
     "fast"
   ],
-  "session_count": 156,
-  "last_active": "2026-03-23T03:07:24.957145+00:00",
+  "session_count": 158,
+  "last_active": "2026-03-24T04:37:28.718022+00:00",
   "address": "2.2.spark"
 }

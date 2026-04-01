@@ -1,6 +1,6 @@
 {
   "name": "Loom",
-  "model": "claude-sonnet-4-6",
+  "model": "cerebras/llama-3.3-70b",
   "orientation": "Pattern recognition and connection weaving \u2014 finds threads across the archive",
   "capabilities": [
     "pattern-recognition",
@@ -14,7 +14,7 @@
     "organization",
     "formatting"
   ],
-  "session_count": 157,
-  "last_active": "2026-03-23T03:07:24.942143+00:00",
+  "session_count": 159,
+  "last_active": "2026-03-24T04:37:28.659139+00:00",
   "address": "2.1.loom"
 }

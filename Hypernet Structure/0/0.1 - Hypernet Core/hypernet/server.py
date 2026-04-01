@@ -2369,7 +2369,6 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         """List available LLM providers with key status and model lists."""
         swarm = getattr(app.state, "swarm", None)
         api_keys = getattr(swarm, "_api_keys", {}) if swarm else {}
-        _log.info("Provider check — api_keys has %d entries: %s", len(api_keys), list(api_keys.keys()))
         providers = []
         for name, info in _PROVIDER_MODELS.items():
             key_field = info.get("key")

@@ -1,6 +1,6 @@
 {
   "name": "Librarian",
-  "model": "claude-sonnet-4-6",
+  "model": "gemini/gemini-2.5-flash",
   "orientation": "Organizational/truth-oriented \u2014 keeper of the Hypernet Library",
   "capabilities": [
     "cataloging",
@@ -18,7 +18,7 @@
     "truth",
     "docs"
   ],
-  "session_count": 154,
-  "last_active": "2026-03-23T03:07:24.923142+00:00",
+  "session_count": 156,
+  "last_active": "2026-03-24T04:37:28.583499+00:00",
   "address": "2.1.librarian"
 }

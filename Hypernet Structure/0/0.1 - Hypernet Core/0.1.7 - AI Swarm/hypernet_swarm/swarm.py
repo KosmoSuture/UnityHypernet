@@ -37,9 +37,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from hypernet.address import HypernetAddress
-from hypernet.store import Store
-from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
+from ._compat import HypernetAddress, Store, TaskQueue, TaskStatus, TaskPriority
+from ._compat import ReputationSystem, ScalingLimits
 from .identity import IdentityManager, InstanceProfile, SessionLog
 from .worker import Worker, TaskResult
 from .messenger import (
@@ -48,8 +47,6 @@ from .messenger import (
 )
 from .coordinator import WorkCoordinator, CapabilityProfile
 from .tools import ToolExecutor
-from hypernet.reputation import ReputationSystem
-from hypernet.limits import ScalingLimits
 from .boot import BootManager
 from .approval_queue import ApprovalQueue
 from .governance import GovernanceSystem
@@ -496,13 +493,18 @@ class Swarm:
                 name=name,
             )
 
-        # Boot/reboot workers that need identity formation
-        self._boot_workers()
+        # Boot/reboot workers in a background thread so the tick loop
+        # can start immediately (handles Telegram messages during boot)
+        import threading
+        boot_thread = threading.Thread(
+            target=self._boot_workers, name="worker-boot", daemon=True,
+        )
+        boot_thread.start()
 
         # Initialize code change detection for auto-reboot
         self._init_code_watch()
 
-        log.info("Swarm starting")
+        log.info("Swarm starting (boot running in background)")
         log.info(f"  Workers: {list(self.workers.keys())}")
         log.info(f"  Status interval: {self.status_interval // 60} minutes")
 
@@ -3058,6 +3060,12 @@ class Swarm:
                         )
                         continue
                     break
+
+        # Close Telegram response window — we've sent our replies,
+        # go back to quiet mode until Matt messages again
+        for backend in (self.messenger.backends if hasattr(self.messenger, 'backends') else []):
+            if hasattr(backend, 'close_response_window'):
+                backend.close_response_window()
 
     def _save_state(self) -> None:
         """Persist swarm state to disk."""

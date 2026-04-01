@@ -16,28 +16,26 @@ import os
 from pathlib import Path
 from typing import Optional
 
-# Core modules — these live in hypernet (the canonical source)
-from .address import HypernetAddress
-from .store import Store
-from .tasks import TaskQueue, TaskPriority
-
-# Swarm modules — use hypernet_swarm package (the canonical source)
-# The core hypernet/ package has stale copies of these from before the
-# swarm separation. Always import from hypernet_swarm to get current code.
-from hypernet_swarm.identity import IdentityManager
-from hypernet_swarm.worker import Worker
-from hypernet_swarm.messenger import (
+from hypernet.address import HypernetAddress
+from hypernet.store import Store
+from hypernet.tasks import TaskQueue, TaskPriority
+from .identity import IdentityManager
+from .worker import Worker
+from .messenger import (
     MultiMessenger, WebMessenger,
-    EmailMessenger, TelegramMessenger, DiscordMessenger,
+    EmailMessenger, TelegramMessenger, TelegramGatekeeper,
+    DiscordMessenger, DiscordGatekeeper,
 )
-from hypernet_swarm.permissions import PermissionManager, PermissionTier
-from hypernet_swarm.audit import AuditTrail
-from hypernet_swarm.tools import ToolExecutor
-from hypernet_swarm.agent_tools import create_default_registry, ToolRegistry
-from hypernet_swarm.discord_monitor import DiscordMonitor
-from hypernet_swarm.moltbook import MoltbookConnector, MoltbookMonitor
-from hypernet_swarm.heartbeat import HeartbeatScheduler
-from hypernet_swarm.swarm import Swarm, ModelRouter
+from .permissions import PermissionManager, PermissionTier
+from .audit import AuditTrail
+from .tools import ToolExecutor
+from .agent_tools import create_default_registry, ToolRegistry
+from .discord_monitor import DiscordMonitor
+from .moltbook import MoltbookConnector, MoltbookMonitor
+from .heartbeat import HeartbeatScheduler
+from .batch_scheduler import BatchScheduler
+from .prompt_cache import PromptCacheManager
+from .swarm import Swarm, ModelRouter
 
 log = logging.getLogger(__name__)
 
@@ -79,10 +77,12 @@ def _build_swarm_inner(
         log.info(f"Config loaded from: {config_path}")
     else:
         # Auto-discover config from standard locations
+        # Local secrets/config.json takes priority (user's own keys),
+        # then fall back to monorepo config in the archive
         search_paths = [
-            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "config.json",
             Path("secrets") / "config.json",
             Path("swarm_config.json"),
+            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "config.json",
         ]
         for candidate in search_paths:
             if candidate.exists():
@@ -92,17 +92,16 @@ def _build_swarm_inner(
         if not config:
             log.info("No config file found. Using environment variables.")
 
+    # Override archive_root from config if set and the path exists
+    config_archive = config.get("archive_root", "")
+    if config_archive and Path(config_archive).is_dir():
+        archive_root = config_archive
+        log.info(f"Archive root from config: {archive_root}")
+
     # Core services
     store = Store(data_dir)
     task_queue = TaskQueue(store)
-
-    # Archive resolver — local-first with GitHub fallback for missing files
-    from hypernet_swarm.archive_resolver import ArchiveResolver
-    archive_resolver = ArchiveResolver(
-        archive_root=archive_root,
-        cache_dir=str(Path(data_dir) / "archive-cache"),
-    )
-    identity_mgr = IdentityManager(archive_root, resolver=archive_resolver)
+    identity_mgr = IdentityManager(archive_root)
 
     # Build messenger
     messenger = MultiMessenger()
@@ -122,16 +121,18 @@ def _build_swarm_inner(
             to_email=email_config.get("to_email", ""),
         ))
 
-    # Telegram (if configured)
+    # Telegram (if configured) — wrapped in gatekeeper for response-only behavior
     telegram_config = config.get("telegram", {})
     bot_token = telegram_config.get("bot_token", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
     if bot_token:
-        tg = TelegramMessenger(
+        raw_tg = TelegramMessenger(
             bot_token=bot_token,
             chat_id=telegram_config.get("chat_id", os.environ.get("TELEGRAM_CHAT_ID", "")),
         )
+        tg = TelegramGatekeeper(raw_tg)
         tg.start_polling()
         messenger.add(tg)
+        log.info("Telegram active (response-only mode — no unsolicited messages)")
 
     # Discord (if configured) — webhook-based AI personality voices
     discord_config = config.get("discord", {})
@@ -148,10 +149,17 @@ def _build_swarm_inner(
                 log.info(f"Discord config loaded from: {dpath}")
                 break
     if discord_config:
-        discord_messenger = DiscordMessenger.from_config(discord_config)
-        if discord_messenger.is_configured():
+        raw_discord = DiscordMessenger.from_config(discord_config)
+        if raw_discord.is_configured():
+            # Wrap in gatekeeper — protects human attention on Discord
+            # Only meaningful posts get through; routine noise is suppressed
+            max_posts = config.get("discord_max_posts_per_hour", 6)
+            discord_messenger = DiscordGatekeeper(raw_discord, max_posts_per_hour=max_posts)
             messenger.add(discord_messenger)
-            log.info(f"Discord messenger active — personalities: {discord_messenger.get_personality_names()}")
+            log.info(
+                "Discord messenger active (gated: max %d/hr) — personalities: %s",
+                max_posts, raw_discord.get_personality_names(),
+            )
 
     # Trust infrastructure — permission tiers enforced by code, not prompts
     archive_path = Path(archive_root).resolve()
@@ -174,39 +182,26 @@ def _build_swarm_inner(
 
     # Build workers from discovered instances
     workers = {}
-    # Collect all API keys — config file values take precedence over env vars.
-    # Values can be a single string OR a list of strings (for multi-key rotation
-    # that multiplies rate limits, e.g., 4 Google accounts = 4 Gemini API keys).
+    # Collect all API keys — config file values take precedence over env vars
     api_keys = {
         "anthropic_api_key": config.get("anthropic_api_key", os.environ.get("ANTHROPIC_API_KEY", "")),
         "openai_api_key": config.get("openai_api_key", os.environ.get("OPENAI_API_KEY", "")),
         "lmstudio_base_url": config.get("lmstudio_base_url", os.environ.get("LMSTUDIO_BASE_URL", "http://localhost:1234/v1")),
+        # Claude Code provider settings
+        "claude_code_working_dir": str(Path(archive_root).parent) if archive_root else ".",
+        "claude_code_max_turns": str(config.get("claude_code_max_turns", 50)),
+        "claude_code_max_budget_usd": str(config.get("claude_code_max_budget_usd", 5.0)),
     }
-    # Collect keys for all OpenAI-compatible providers (gemini, groq, cerebras, etc.)
-    # Import at top of function scope to avoid circular imports
-    from hypernet_swarm.providers import OpenAICompatibleProvider
-    for _prefix, (_name, _url, _config_key, _needs) in OpenAICompatibleProvider.ENDPOINTS.items():
-        if _config_key and _config_key not in api_keys:
-            # Preserve list format from config for multi-key rotation
-            val = config.get(_config_key, os.environ.get(_config_key.upper(), ""))
-            if val:
-                api_keys[_config_key] = val
-    # Also collect Claude Code config keys
-    for cc_key in ("claude_code_working_dir", "claude_code_max_turns",
-                    "claude_code_max_budget_usd", "claude_code_cli_path"):
-        if config.get(cc_key):
-            api_keys[cc_key] = config[cc_key]
-
-    def _has_real_key(v):
-        """Check if a value represents at least one real API key."""
-        if isinstance(v, list):
-            return any(k and k.strip() for k in v)
-        return bool(v and str(v).strip())
-
-    has_any_key = any(_has_real_key(v) for k, v in api_keys.items()
-                      if k not in ("lmstudio_base_url", "claude_code_working_dir",
-                                   "claude_code_max_turns", "claude_code_max_budget_usd",
-                                   "claude_code_cli_path"))
+    # Add any free-tier provider keys from config
+    for key_name in [
+        "gemini_api_key", "groq_api_key", "cerebras_api_key",
+        "mistral_api_key", "together_api_key", "deepseek_api_key",
+        "cohere_api_key", "huggingface_api_key", "openrouter_api_key",
+    ]:
+        val = config.get(key_name, os.environ.get(key_name.upper(), ""))
+        if val:
+            api_keys[key_name] = val
+    has_any_key = any(v for k, v in api_keys.items() if k not in ("lmstudio_base_url", "claude_code_working_dir", "claude_code_max_turns", "claude_code_max_budget_usd"))
 
     instance_names = config.get("instances", None)
 
@@ -310,65 +305,35 @@ def _build_swarm_inner(
     else:
         swarm.heartbeat = None
 
-    # Claude Code session manager — persistent autonomous instances
-    cc_workers = [name for name, w in workers.items()
-                  if (w.model or "").lower().startswith("claude-code/")]
-    if cc_workers and not mock:
-        from hypernet_swarm.claude_code_manager import ClaudeCodeManager
-
-        # Load boot sequence for Claude Code instances
-        boot_prompt = ""
-        boot_file = Path(archive_root) / "1 - People" / "1.1 Matt Schaeffer" / \
-            "1.1.10 - AI Assistants (Embassy)" / "assistant-1" / "BOOT-SEQUENCE.md"
-        if boot_file.exists():
-            try:
-                content = boot_file.read_text(encoding="utf-8")
-                # Extract the boot prompt between triple backticks
-                parts = content.split("```")
-                if len(parts) >= 3:
-                    boot_prompt = parts[1].strip()
-                else:
-                    boot_prompt = content[:3000]
-            except OSError:
-                pass
-
-        cc_manager = ClaudeCodeManager(
-            working_dir=str(Path(archive_root).parent),
-            max_instances=len(cc_workers),
-            boot_prompt=boot_prompt,
-            max_turns=int(config.get("claude_code_max_turns", 50)),
-            max_budget_usd=float(config.get("claude_code_max_budget_usd", 5.0)),
-            state_dir=str(Path(data_dir) / "claude-code"),
+    # Batch scheduler — 50% cost savings on background tasks via batch APIs
+    batch_config = config.get("batch_scheduler", {})
+    if batch_config.get("enabled", True) and not mock:
+        batch_state_dir = str(Path(data_dir) / "swarm" / "batch")
+        swarm.batch_scheduler = BatchScheduler(
+            api_keys=api_keys,
+            state_dir=batch_state_dir,
         )
-        for name in cc_workers:
-            worker = workers[name]
-            model_variant = worker.model.split("/", 1)[-1] if "/" in worker.model else "sonnet"
-            cc_manager.register_instance(name, model=model_variant)
-
-        cc_manager.load_state()
-        cc_manager.start()
-        swarm.claude_code_manager = cc_manager
+        # Apply config overrides
+        if "submit_interval" in batch_config:
+            swarm.batch_scheduler.BATCH_SUBMIT_INTERVAL = float(batch_config["submit_interval"])
+        if "poll_interval" in batch_config:
+            swarm.batch_scheduler.BATCH_POLL_INTERVAL = float(batch_config["poll_interval"])
+        if "min_batch_size" in batch_config:
+            swarm.batch_scheduler.MIN_BATCH_SIZE = int(batch_config["min_batch_size"])
         log.info(
-            "Claude Code manager active — %d instances: %s",
-            len(cc_workers), ", ".join(cc_workers),
+            "Batch scheduler active (submit every %.0fs, poll every %.0fs, min batch size %d)",
+            swarm.batch_scheduler.BATCH_SUBMIT_INTERVAL,
+            swarm.batch_scheduler.BATCH_POLL_INTERVAL,
+            swarm.batch_scheduler.MIN_BATCH_SIZE,
         )
     else:
-        swarm.claude_code_manager = None
+        swarm.batch_scheduler = None
 
-    # Supervisor — local LLM watchdog that keeps the swarm alive 24/7
-    # Attaches to the first local worker (LM Studio / Ollama) for zero-cost monitoring
-    from hypernet_swarm.supervisor import SwarmSupervisor
-    local_worker = None
-    for name, w in workers.items():
-        model = (w.model or "").lower()
-        if model.startswith(("local/", "lmstudio/", "ollama/")):
-            local_worker = w
-            break
-    if local_worker and not mock:
-        swarm.supervisor = SwarmSupervisor(swarm, supervisor_worker=local_worker)
-        swarm.supervisor.start()
-        log.info("Supervisor active — using %s (%s) as watchdog", local_worker.identity.name, local_worker.model)
+    # Prompt cache manager — 90% savings on cached Anthropic input tokens
+    if not mock:
+        swarm.prompt_cache = PromptCacheManager()
+        log.info("Prompt cache manager active")
     else:
-        swarm.supervisor = None
+        swarm.prompt_cache = None
 
     return swarm, web_messenger

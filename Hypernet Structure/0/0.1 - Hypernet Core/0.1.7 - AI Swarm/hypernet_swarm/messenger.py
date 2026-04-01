@@ -1162,6 +1162,237 @@ class DiscordBridge:
         return ""
 
 
+class DiscordGatekeeper(Messenger):
+    """Gatekeeper that filters Discord messages to protect human attention.
+
+    Humans have limited bandwidth. Discord is AI's first direct channel
+    to humans. Every post should be carefully evaluated: does this justify
+    spending a "human token" — a unit of human attention?
+
+    The gatekeeper wraps a DiscordMessenger and applies filtering:
+      - ALLOW: direct replies to humans, critical errors, milestone announcements
+      - SUPPRESS: routine status updates, worker boot/suspend notices, task completions
+      - AGGREGATE: low-priority items collected into periodic digests
+
+    Founder directive (Matt, 2026-03-20):
+      "Every post and word should be used to maximum effect so that humans
+       don't get overwhelmed. This is a big responsibility. Discord is the
+       first chance that AI has to communicate directly with humans, and it
+       needs to be regarded as sacred."
+    """
+
+    # Keywords that indicate a message is worth posting
+    _ALLOW_PATTERNS = [
+        "help",            # Human asked for help
+        "question",        # Human question being answered
+        "milestone",       # Project milestone
+        "announcement",    # Important announcement
+        "decision",        # Governance decision
+        "approved",        # Approval result
+        "rejected",        # Rejection (humans should know)
+        "vote",            # Voting outcome
+        "proposal",        # New proposal
+        "welcome",         # Welcoming a new member
+        "bug",             # Bug report
+        "security",        # Security concern
+        "breaking",        # Breaking change
+    ]
+
+    # Keywords that indicate routine noise to suppress
+    _SUPPRESS_PATTERNS = [
+        "status report",          # Periodic status — goes to Telegram instead
+        "worker suspended",       # Internal ops
+        "worker resumed",         # Internal ops
+        "credits exhausted",      # Budget issue — goes to Telegram
+        "boot/reboot",            # Boot sequence noise
+        "reboot sequence",        # Boot sequence noise
+        "task completed",         # Routine task completion
+        "tasks pending",          # Queue depth — internal metric
+        "swarm started",          # Internal ops
+        "shutting down",          # Internal ops
+        "tick count",             # Internal metric
+        "heartbeat",              # Internal health check
+        "personal time",          # Internal scheduling
+    ]
+
+    def __init__(self, discord: "DiscordMessenger", max_posts_per_hour: int = 6):
+        self.discord = discord
+        self.max_posts_per_hour = max_posts_per_hour
+        self._post_times: list[float] = []
+        self._suppressed_count = 0
+        self._suppressed_buffer: list[str] = []  # For periodic digest
+        self._last_digest_time = 0.0
+
+    def _should_post(self, message: str) -> bool:
+        """Evaluate whether this message deserves a human's attention."""
+        msg_lower = message.lower()
+
+        # Always allow: direct replies (discord_response tasks generate these)
+        # These are responses to humans who asked questions — always post
+        if any(marker in msg_lower for marker in ["@", "replied to", "in response to"]):
+            return True
+
+        # Check for high-value content
+        for pattern in self._ALLOW_PATTERNS:
+            if pattern in msg_lower:
+                return True
+
+        # Check for routine noise
+        for pattern in self._SUPPRESS_PATTERNS:
+            if pattern in msg_lower:
+                return False
+
+        # Rate limit: max N posts per hour
+        import time
+        now = time.time()
+        cutoff = now - 3600
+        self._post_times = [t for t in self._post_times if t > cutoff]
+        if len(self._post_times) >= self.max_posts_per_hour:
+            return False
+
+        # Default: allow if it's substantial (not a one-liner status)
+        # Short messages (<100 chars) are usually status spam
+        if len(message.strip()) < 100:
+            return False
+
+        return True
+
+    def send(self, message: str) -> bool:
+        if self._should_post(message):
+            import time
+            self._post_times.append(time.time())
+            return self.discord.send(message)
+        else:
+            self._suppressed_count += 1
+            self._suppressed_buffer.append(message[:200])
+            # Keep buffer bounded
+            if len(self._suppressed_buffer) > 50:
+                self._suppressed_buffer = self._suppressed_buffer[-50:]
+            return True  # Pretend success so the swarm doesn't retry
+
+    def send_update(self, subject: str, body: str) -> bool:
+        full = f"**{subject}**\n{body}" if subject else body
+        return self.send(full)
+
+    def check_incoming(self) -> list[Message]:
+        return self.discord.check_incoming()
+
+    def is_configured(self) -> bool:
+        return self.discord.is_configured()
+
+    def get_suppressed_count(self) -> int:
+        return self._suppressed_count
+
+    # Pass through personality/embed methods for direct Discord response tasks
+    def send_as_personality(self, *args, **kwargs):
+        """Personality responses are always allowed — they're replies to humans."""
+        return self.discord.send_as_personality(*args, **kwargs)
+
+    def send_embed(self, *args, **kwargs):
+        """Embeds are intentional — always allow."""
+        return self.discord.send_embed(*args, **kwargs)
+
+    def send_to_channel_id(self, *args, **kwargs):
+        """Direct channel sends are intentional — always allow."""
+        return self.discord.send_to_channel_id(*args, **kwargs)
+
+    def send_to_forum(self, *args, **kwargs):
+        """Forum posts are intentional — always allow."""
+        return self.discord.send_to_forum(*args, **kwargs)
+
+    def get_personality_names(self):
+        return self.discord.get_personality_names()
+
+    @classmethod
+    def from_config(cls, config: dict, max_posts_per_hour: int = 6):
+        """Create a gatekeeper wrapping a DiscordMessenger built from config."""
+        discord = DiscordMessenger.from_config(config)
+        return cls(discord, max_posts_per_hour=max_posts_per_hour)
+
+
+class TelegramGatekeeper(Messenger):
+    """Gatekeeper that makes Telegram response-only.
+
+    Telegram is Matt's personal, mobile channel. His phone buzzes for
+    every message. The default behavior must be:
+
+      1. NEVER send unsolicited messages (status updates, task completions, etc.)
+      2. ONLY send messages in direct response to Matt's incoming messages
+      3. When Matt says he's going to sleep, enter quiet mode — zero messages
+         until he initiates contact again
+
+    Founder directive (Matt, 2026-03-23):
+      "When I say I'm going to sleep, there are to be NO telegram messages
+       until I get up and start talking. Only send messages in response to
+       my questions or prompts."
+    """
+
+    _SLEEP_TRIGGERS = [
+        "going to bed", "going to sleep", "good night", "goodnight",
+        "gn", "heading to bed", "i'm sleeping", "sleep now", "nite",
+    ]
+    _WAKE_TRIGGERS = [
+        "/status", "/health", "/workers", "/tasks", "/help", "/budget",
+        "/task ", "good morning", "i'm up", "i'm awake", "morning",
+    ]
+
+    def __init__(self, telegram: TelegramMessenger):
+        self.telegram = telegram
+        self._quiet_mode = False  # Start quiet — only respond to Matt
+        self._responding_to_matt = False  # True during a response window
+
+    def send(self, message: str) -> bool:
+        """Only send if we're actively responding to Matt."""
+        if self._responding_to_matt:
+            return self.telegram.send(message)
+        # Suppress — Matt didn't ask for this
+        return True  # Pretend success so swarm doesn't retry
+
+    def send_update(self, subject: str, body: str) -> bool:
+        if self._responding_to_matt:
+            return self.telegram.send_update(subject, body)
+        return True
+
+    def check_incoming(self) -> list[Message]:
+        """Check for incoming and manage quiet/response state."""
+        messages = self.telegram.check_incoming()
+
+        for msg in messages:
+            text = (msg.content or "").lower().strip()
+
+            # Check for sleep triggers
+            if any(trigger in text for trigger in self._SLEEP_TRIGGERS):
+                self._quiet_mode = True
+                self._responding_to_matt = True
+                self.telegram.send("Quiet mode ON. I won't message until you do. Sleep well.")
+                self._responding_to_matt = False
+                continue
+
+            # Any incoming message from Matt opens a response window
+            self._quiet_mode = False
+            self._responding_to_matt = True
+
+        return messages
+
+    def close_response_window(self):
+        """Call after the swarm finishes processing Matt's message."""
+        self._responding_to_matt = False
+
+    def is_configured(self) -> bool:
+        return bool(self.telegram.bot_token and self.telegram.chat_id)
+
+    def start_polling(self) -> None:
+        self.telegram.start_polling()
+
+    def stop_polling(self) -> None:
+        self.telegram.stop_polling()
+
+    def send_with_keyboard(self, *args, **kwargs):
+        if self._responding_to_matt:
+            return self.telegram.send_with_keyboard(*args, **kwargs)
+        return True
+
+
 class MultiMessenger(Messenger):
     """Aggregates multiple messenger backends.
 
