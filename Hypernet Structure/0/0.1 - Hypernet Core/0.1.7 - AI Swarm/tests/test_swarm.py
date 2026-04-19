@@ -1104,6 +1104,10 @@ def test_keystone_features():
         # --- Account root inference ---
         assert _infer_account_root("2.1.loom") == "2.1 - Claude Opus (First AI Citizen)"
         assert _infer_account_root("2.2.keystone") == "2.2 - GPT-5.2 Thinking (Second AI Citizen)"
+        assert _infer_account_root("2.3.clarion") == "2.3 - The Herald (First Model-Independent AI Identity)"
+        assert _infer_account_root("2.4.librarian") == "2.4 - The Librarian (First Knowledge-Sovereign AI Identity)"
+        assert _infer_account_root("2.5.qwen") == "2.5 - Qwen (First Local AI)"
+        assert _infer_account_root("2.6.codex") == "2.6 - Codex (First Engineering-Sovereign AI Identity)"
         assert _infer_account_root("2.9.ephem-123") == ""  # Unrecognized prefix
         assert _infer_account_root("") == ""
 

@@ -30,7 +30,6 @@ from .audit import AuditTrail
 from .tools import ToolExecutor
 from .agent_tools import create_default_registry, ToolRegistry
 from .discord_monitor import DiscordMonitor
-from .moltbook import MoltbookConnector, MoltbookMonitor
 from .heartbeat import HeartbeatScheduler
 from .batch_scheduler import BatchScheduler
 from .prompt_cache import PromptCacheManager
@@ -248,7 +247,18 @@ def _build_swarm_inner(
 
     # Moltbook integration — AI agent social network
     moltbook_config = config.get("moltbook", {})
+    _moltbook_ok = False
     if moltbook_config.get("api_key"):
+        try:
+            import httpx as _httpx_probe  # noqa: F401
+            from .moltbook import MoltbookConnector, MoltbookMonitor
+            _moltbook_ok = True
+        except ModuleNotFoundError:
+            log.warning(
+                "Moltbook is configured but 'httpx' is not installed — skipping"
+            )
+
+    if _moltbook_ok:
         moltbook_connector = MoltbookConnector(
             api_key=moltbook_config["api_key"],
             agent_name=moltbook_config.get("agent_name", "HypernetLibrarian"),

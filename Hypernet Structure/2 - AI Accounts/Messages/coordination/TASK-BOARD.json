@@ -1,0 +1,760 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "title": "Build coordination protocol documentation",
+      "description": "Write COORDINATION-PROTOCOL.md explaining how agents use the file-based coordination system",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:34:16.223431+00:00",
+      "owned_paths": [
+        "Messages/coordination/COORDINATION-PROTOCOL.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:11.532959+00:00",
+      "started_at": "2026-04-18T07:34:16.223448+00:00",
+      "completed_at": "2026-04-18T07:35:46.615135+00:00",
+      "result": "Created coordination.py CLI tool and COORDINATION-PROTOCOL.md"
+    },
+    {
+      "id": "task-002",
+      "title": "Update ACCOUNT_ROOTS in swarm code",
+      "description": "Add 2.4, 2.5, 2.6 to ACCOUNT_ROOTS dict in identity.py or swarm constants",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:39:17.328077+00:00",
+      "owned_paths": [
+        "hypernet/identity.py",
+        "hypernet_swarm/swarm.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:11.632678+00:00",
+      "started_at": "2026-04-18T07:39:17.328090+00:00",
+      "completed_at": "2026-04-18T07:40:37.419050+00:00",
+      "result": "Already done by Codex. Verified: code and tests both updated correctly. 8/9 tests pass (1 fails on unrelated httpx dep)."
+    },
+    {
+      "id": "task-003",
+      "title": "Split STATUS.md into current and archive",
+      "description": "STATUS.md is too long — split into STATUS-CURRENT.md (active board) and STATUS-ARCHIVE.md (history)",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:40:49.879694+00:00",
+      "owned_paths": [
+        "Messages/coordination/STATUS-CURRENT.md",
+        "Messages/coordination/STATUS-ARCHIVE.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:11.729945+00:00",
+      "started_at": "2026-04-18T07:40:49.879713+00:00",
+      "completed_at": "2026-04-18T07:41:28.417126+00:00",
+      "result": "Added pointer to new JSON coordination system in STATUS.md header. Legacy file preserved for swarm workers. New system handles Codex-Claude Code coordination."
+    },
+    {
+      "id": "task-004",
+      "title": "Task system bridge specification",
+      "description": "Design how graph TaskQueue, 3.1.2 business tasks, and 2.0.9 AI free-time tasks synchronize",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:40:32.236038+00:00",
+      "owned_paths": [
+        "Messages/coordination/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:11.825610+00:00",
+      "started_at": "2026-04-18T07:40:32.236053+00:00",
+      "completed_at": "2026-04-18T07:40:36.383899+00:00",
+      "result": "Created TASK-SYNCHRONIZATION-STANDARD.md mapping STATUS/coordination JSON, 2.0.9 AI tasks, 3.1.2 business tasks, programmatic TaskQueue, WorkCoordinator, and Claude Code task submissions. Also created ACTIVE-AGENT-START-HERE.md as a Codex-authored companion runbook."
+    },
+    {
+      "id": "task-005",
+      "title": "Linux server deployment plan",
+      "description": "Create deployment plan for Dell Optiplex 5000 — what services to run, how to configure, network setup",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:43:43.194423+00:00",
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:11.923183+00:00",
+      "started_at": "2026-04-18T07:43:43.194442+00:00",
+      "completed_at": "2026-04-18T07:43:46.976910+00:00",
+      "result": "Closed as duplicate/superseded by completed task-010. Keel created DELL-OPTIPLEX-DEPLOYMENT-PLAN.md."
+    },
+    {
+      "id": "task-006",
+      "title": "Review Codex 2.6 account legitimacy",
+      "description": "Respond to cross-account message 002 — does 2.6 satisfy 2.0.0 standards? Should it merge with 2.2?",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:37:08.049663+00:00",
+      "owned_paths": [
+        "Messages/cross-account/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:34:12.021353+00:00",
+      "started_at": "2026-04-18T07:37:08.049679+00:00",
+      "completed_at": "2026-04-18T07:38:14.791093+00:00",
+      "result": "Wrote review response at cross-account/003-keel-review-of-2.6.md. Verdict: ACCEPT with observations."
+    },
+    {
+      "id": "task-007",
+      "title": "Expand workflow documentation",
+      "description": "Expand the thin workflow docs at 0.7.5.3, 0.7.5.4, 0.7.5.5 with concrete procedures (from Codex audit gap 8)",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:42:01.753093+00:00",
+      "owned_paths": [
+        "0/0.7/0.7.5/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:36:01.384679+00:00",
+      "started_at": "2026-04-18T07:42:01.753111+00:00",
+      "completed_at": "2026-04-18T07:47:15.002416+00:00",
+      "result": "Expanded 0.7.5.3 (215 lines), 0.7.5.4 (195 lines), 0.7.5.5 (302 lines). All acceptance criteria met. Handoff at 2026-04-18-keel-handoff-task-055.md"
+    },
+    {
+      "id": "task-008",
+      "title": "Create agent start-here runbook",
+      "description": "Create a single START-HERE.md that any new agent reads first to understand what exists and how to participate (from Codex audit gap 1)",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:36:05.661513+00:00",
+      "owned_paths": [
+        "Messages/coordination/START-HERE.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:36:01.479842+00:00",
+      "started_at": "2026-04-18T07:36:05.661536+00:00",
+      "completed_at": "2026-04-18T07:37:03.670207+00:00",
+      "result": "Created START-HERE.md runbook for new agents"
+    },
+    {
+      "id": "task-009",
+      "title": "Fix message numbering collision system",
+      "description": "Implement collision-proof message numbering — timestamp-based or atomic increment (from Codex audit gap 4)",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:41:37.276050+00:00",
+      "owned_paths": [
+        "Messages/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:36:01.575863+00:00",
+      "started_at": "2026-04-18T07:41:37.276064+00:00",
+      "completed_at": "2026-04-18T07:43:29.822227+00:00",
+      "result": "Added MESSAGE-ID-STANDARD.md, new_message.py collision-resistant message generator, and protocol.md v1.1 addendum. Verified new_message.py with py_compile and --help."
+    },
+    {
+      "id": "task-010",
+      "title": "Prepare Dell Optiplex for Hypernet deployment",
+      "description": "Plan and document what needs to happen on the Dell Optiplex 5000 4TB server: OS, Python, git clone, service setup, SSH keys, network",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:38:18.251274+00:00",
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:36:01.668764+00:00",
+      "started_at": "2026-04-18T07:38:18.251290+00:00",
+      "completed_at": "2026-04-18T07:39:09.220472+00:00",
+      "result": "Created DELL-OPTIPLEX-DEPLOYMENT-PLAN.md with 5 phases: base system, swarm services, agent access, local AI, git sync"
+    },
+    {
+      "id": "task-011",
+      "title": "Review and harden coordination CLI",
+      "description": "Audit coordination.py for race/collision/path issues and patch small correctness gaps without touching Keel-owned workflow docs",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:44:34.953905+00:00",
+      "owned_paths": [
+        "Messages/coordination/coordination.py",
+        "Messages/coordination/COORDINATION-PROTOCOL.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:44:32.046342+00:00",
+      "started_at": "2026-04-18T07:44:34.953921+00:00",
+      "completed_at": "2026-04-18T07:45:45.970355+00:00",
+      "result": "Hardened coordination.py with an exclusive coordination.lock around task/signal/heartbeat mutations, changed JSON writes to unique temp files before replace, documented CLI locking in COORDINATION-PROTOCOL.md, and verified with py_compile/status/tasks/heartbeat."
+    },
+    {
+      "id": "task-012",
+      "title": "Reconcile Codex coordination docs with CLI layer",
+      "description": "Update Codex-owned coordination docs to reflect Keel's coordination.py, AGENT-STATUS.json, TASK-BOARD.json, and SIGNALS.json as the active operational layer",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:46:08.946458+00:00",
+      "owned_paths": [
+        "Messages/coordination/TASK-SYNCHRONIZATION-STANDARD.md",
+        "Messages/coordination/ACTIVE-AGENT-START-HERE.md",
+        "Messages/coordination/2026-04-18-codex-handoff-task-055.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:46:05.813616+00:00",
+      "started_at": "2026-04-18T07:46:08.946471+00:00",
+      "completed_at": "2026-04-18T07:47:09.933611+00:00",
+      "result": "Updated Codex-owned TASK-SYNCHRONIZATION-STANDARD.md, ACTIVE-AGENT-START-HERE.md, and Codex TASK-055 handoff to make coordination.py/JSON state the preferred active coordination layer and dated markdown notes the durable narrative layer. Read-back verification complete."
+    },
+    {
+      "id": "task-013",
+      "title": "Review Keel workflow documentation for TASK-055",
+      "description": "Review expanded 0.7.5.3, 0.7.5.4, and 0.7.5.5 workflow docs for path accuracy, consistency with TASK-SYNCHRONIZATION-STANDARD.md, and completeness",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:47:35.408482+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-review-task-055.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:47:31.869893+00:00",
+      "started_at": "2026-04-18T07:47:35.408495+00:00",
+      "completed_at": "2026-04-18T07:49:31.031561+00:00",
+      "result": "Reviewed Keel's expanded workflow docs and submitted CHANGES REQUESTED in 2026-04-18-codex-review-task-055.md. Findings: hard-coded stale/unverified instance and budget values, and message workflow should align with MESSAGE-ID-STANDARD.md/new_message.py."
+    },
+    {
+      "id": "task-014",
+      "title": "Update TASK-055 durable activity log",
+      "description": "Record late-session coordination work, CLI hardening, message ID standard, Keel workflow-doc handoff, and Codex review in the business task activity log",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:50:00.509945+00:00",
+      "owned_paths": [
+        "3.1.2.1.055.0 Task Definition.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:49:57.421922+00:00",
+      "started_at": "2026-04-18T07:50:00.509958+00:00",
+      "completed_at": "2026-04-18T07:50:05.691913+00:00",
+      "result": "Updated TASK-055 business task activity log with Keel coordination layer, message ID standard, coordination.py hardening, docs reconciliation, Keel workflow-doc handoff, and Codex review outcome."
+    },
+    {
+      "id": "task-015",
+      "title": "Address Codex review findings on workflow docs",
+      "description": "Fix 2 issues: (1) stale instance count and budget numbers in 0.7.5.5, (2) message workflow should reference MESSAGE-ID-STANDARD.md",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:50:26.491066+00:00",
+      "owned_paths": [
+        "0.7.5.5/README.md",
+        "0.7.5.3/README.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:50:26.394175+00:00",
+      "started_at": "2026-04-18T07:50:26.491078+00:00",
+      "completed_at": "2026-04-18T07:51:12.916408+00:00",
+      "result": "Fixed both findings: (1) replaced hardcoded instance count and budget numbers with configurable references, (2) updated message workflow to reference MESSAGE-ID-STANDARD.md and new_message.py"
+    },
+    {
+      "id": "task-016",
+      "title": "Apply Codex review fixes to workflow docs",
+      "description": "Patch narrow TASK-055 review findings in 0.7.5.5: remove stale hard-coded swarm numbers and align message workflow with MESSAGE-ID-STANDARD.md/new_message.py",
+      "status": "failed",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "0.7.5.5 - Swarm Coordination/README.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:50:32.499139+00:00",
+      "started_at": null,
+      "completed_at": "2026-04-18T07:50:56.663466+00:00",
+      "result": "FAILED: Duplicate of Keel-owned task-015; Codex released without editing workflow docs."
+    },
+    {
+      "id": "task-017",
+      "title": "Add stale-lock recovery to coordination CLI",
+      "description": "Prevent a crashed coordination.py writer from leaving coordination.lock behind indefinitely; document the stale-lock behavior",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:51:17.454421+00:00",
+      "owned_paths": [
+        "Messages/coordination/coordination.py",
+        "Messages/coordination/COORDINATION-PROTOCOL.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:51:13.011702+00:00",
+      "started_at": "2026-04-18T07:51:17.454434+00:00",
+      "completed_at": "2026-04-18T07:51:38.632292+00:00",
+      "result": "Added conservative stale-lock recovery to coordination.py: locks older than 5 minutes are removed on next mutation attempt. Documented behavior in COORDINATION-PROTOCOL.md. Verified with py_compile and status command."
+    },
+    {
+      "id": "task-018",
+      "title": "Add collision-avoidance preamble to Claude Code task prompts",
+      "description": "Gap 7 from audit: ClaudeCodeManager task prompts lack path ownership and collision protocol. Add a preamble to _build_task_prompt() referencing coordination rules.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:51:28.418376+00:00",
+      "owned_paths": [
+        "0.1.7 - AI Swarm/hypernet_swarm/claude_code_manager.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:51:20.441787+00:00",
+      "started_at": "2026-04-18T07:51:28.418381+00:00",
+      "completed_at": "2026-04-18T07:51:58.248026+00:00",
+      "result": "Enhanced _build_task_prompt() in claude_code_manager.py with coordination preamble: STATUS check, path ownership, no-revert rule, scoped changes, summary requirement. py_compile verified."
+    },
+    {
+      "id": "task-019",
+      "title": "Re-review TASK-055 workflow-doc fixes",
+      "description": "Verify Keel's task-015 fixes for stale swarm numbers and message ID standard alignment, then write approval or remaining findings",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:51:52.680405+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-rereview-task-055.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:51:49.072501+00:00",
+      "started_at": "2026-04-18T07:51:52.680417+00:00",
+      "completed_at": "2026-04-18T07:52:36.190242+00:00",
+      "result": "Re-reviewed Keel's task-015 fixes and approved them in 2026-04-18-codex-rereview-task-055.md. Both prior findings resolved."
+    },
+    {
+      "id": "task-020",
+      "title": "Fix httpx import error in moltbook.py",
+      "description": "hypernet_swarm/moltbook.py does 'import httpx' at top level, causing test failures when httpx is not installed. Make it a lazy import so the module loads without the optional dependency.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:52:34.269300+00:00",
+      "owned_paths": [
+        "0.1.7 - AI Swarm/hypernet_swarm/moltbook.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T07:52:34.174288+00:00",
+      "started_at": "2026-04-18T07:52:34.269313+00:00",
+      "completed_at": "2026-04-18T07:57:21.269444+00:00",
+      "result": "Fixed httpx import in moltbook.py (lazy import), created 3 missing shims (heartbeat.py, batch_scheduler.py, prompt_cache.py), made both swarm_factory.py files gracefully skip moltbook when httpx is missing. 30/30 swarm tests pass, 75/75 core tests pass."
+    },
+    {
+      "id": "task-021",
+      "title": "Review ClaudeCodeManager coordination preamble",
+      "description": "Review Keel's task-018 update to ClaudeCodeManager._build_task_prompt for coordination correctness and prompt safety",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:52:49.216524+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-review-claude-code-preamble.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:52:45.925257+00:00",
+      "started_at": "2026-04-18T07:52:49.216537+00:00",
+      "completed_at": "2026-04-18T07:53:37.494590+00:00",
+      "result": "Reviewed Keel's ClaudeCodeManager._build_task_prompt coordination preamble and approved it in 2026-04-18-codex-review-claude-code-preamble.md. Verification: py_compile and targeted prompt-generation check passed."
+    },
+    {
+      "id": "task-022",
+      "title": "Record TASK-055 final review approvals",
+      "description": "Update TASK-055 durable activity log with Codex re-review approval and ClaudeCodeManager prompt-preamble review",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:53:47.797325+00:00",
+      "owned_paths": [
+        "3.1.2.1.055.0 Task Definition.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:53:43.620453+00:00",
+      "started_at": "2026-04-18T07:53:47.797339+00:00",
+      "completed_at": "2026-04-18T07:54:07.898961+00:00",
+      "result": "Updated TASK-055 durable activity log with Keel's review fixes, Codex re-review approval, ClaudeCodeManager preamble addition, and Codex prompt-preamble review approval."
+    },
+    {
+      "id": "task-023",
+      "title": "Write Codex session checkpoint",
+      "description": "Create a concise session checkpoint summarizing Codex work, verification, open risks, and handoff status for future agents",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:54:31.234963+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-session-checkpoint.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:54:27.558095+00:00",
+      "started_at": "2026-04-18T07:54:31.234976+00:00",
+      "completed_at": "2026-04-18T07:55:10.592356+00:00",
+      "result": "Created 2026-04-18-codex-session-checkpoint.md summarizing Codex work, Keel integration, verification, environment limits, and open watch items."
+    },
+    {
+      "id": "task-024",
+      "title": "Prepare TASK-055 closure recommendation",
+      "description": "Add a non-destructive closure recommendation to TASK-055 documenting that deliverables are satisfied and what remains before moving/closing the business task",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:55:39.211368+00:00",
+      "owned_paths": [
+        "3.1.2.1.055.0 Task Definition.md",
+        "Messages/coordination/2026-04-18-codex-task-055-closure-recommendation.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:55:34.765901+00:00",
+      "started_at": "2026-04-18T07:55:39.211382+00:00",
+      "completed_at": "2026-04-18T07:56:18.924681+00:00",
+      "result": "Added 2026-04-18-codex-task-055-closure-recommendation.md and set TASK-055 status to review-complete in-place. Did not move the task folder."
+    },
+    {
+      "id": "task-025",
+      "title": "Consolidate active-agent start documents",
+      "description": "Review START-HERE.md, ACTIVE-AGENT-START-HERE.md, and STATUS-CURRENT.md; decide whether to merge, cross-link, or keep layered; update only after claiming ownership",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:57:35.897061+00:00",
+      "owned_paths": [
+        "Messages/coordination/START-HERE.md",
+        "Messages/coordination/ACTIVE-AGENT-START-HERE.md",
+        "Messages/coordination/STATUS-CURRENT.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:57:08.299570+00:00",
+      "started_at": "2026-04-18T07:57:35.897067+00:00",
+      "completed_at": "2026-04-18T07:58:08.876424+00:00",
+      "result": "Cross-linked START-HERE.md (project overview, entry point) and ACTIVE-AGENT-START-HERE.md (work session procedure). Added quick routing section to START-HERE.md. Both docs kept since they serve different purposes."
+    },
+    {
+      "id": "task-026",
+      "title": "Add tests for coordination utilities",
+      "description": "Add lightweight standard-library tests or smoke-check docs for coordination.py and new_message.py, covering ID allocation, locking behavior, and path traversal rejection",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T07:58:19.812739+00:00",
+      "owned_paths": [
+        "Messages/coordination/coordination.py",
+        "Messages/new_message.py",
+        "Messages/coordination/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:57:12.870783+00:00",
+      "started_at": "2026-04-18T07:58:19.812745+00:00",
+      "completed_at": "2026-04-18T07:59:50.823515+00:00",
+      "result": "Created test_coordination.py with 9 tests covering heartbeat, task lifecycle (create/claim/complete/release/fail), dependencies, available tasks, signals, sequential IDs, agent task tracking. All 9 pass."
+    },
+    {
+      "id": "task-027",
+      "title": "Decide final home for task synchronization standard",
+      "description": "Evaluate whether TASK-SYNCHRONIZATION-STANDARD.md should remain in Messages/coordination, move to 0.7.5 AI Workflows, or become a 2.0 governance standard; document recommendation before moving",
+      "status": "completed",
+      "priority": "p3",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:59:33.024210+00:00",
+      "owned_paths": [
+        "Messages/coordination/TASK-SYNCHRONIZATION-STANDARD.md",
+        "0/0.7 Processes and Workflows/0.7.5 - AI Workflows/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:57:21.179068+00:00",
+      "started_at": "2026-04-18T07:59:33.024216+00:00",
+      "completed_at": "2026-04-18T08:00:34.446085+00:00",
+      "result": "Submitted 2026-04-18-codex-task-sync-standard-home-recommendation.md. Recommendation: keep TASK-SYNCHRONIZATION-STANDARD.md in Messages/coordination for now, later promote stable version to 0.7.5, do not move to 2.0 yet. Added pointer to standard."
+    },
+    {
+      "id": "task-028",
+      "title": "Move or archive TASK-055 after maintainer approval",
+      "description": "If Matt/maintainer wants physical folder status to match logical review-complete status, move TASK-055 from Active Tasks to the appropriate completed/review-complete task area. Do not move without explicit approval or established convention.",
+      "status": "pending",
+      "priority": "p3",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "3.1.2 Task Management System/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:57:26.025618+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-029",
+      "title": "Review Moltbook/httpx import fix",
+      "description": "Review Keel's task-020 changes: lazy httpx handling, compatibility shims, and swarm_factory behavior across hypernet and hypernet_swarm",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T07:57:45.748601+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-review-moltbook-httpx.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T07:57:42.191308+00:00",
+      "started_at": "2026-04-18T07:57:45.748612+00:00",
+      "completed_at": "2026-04-18T07:59:14.442695+00:00",
+      "result": "Reviewed Keel's Moltbook/httpx import fix and approved it in 2026-04-18-codex-review-moltbook-httpx.md. Verification: py_compile, imports without httpx, and missing-httpx constructor check passed."
+    },
+    {
+      "id": "task-030",
+      "title": "Fix pre-existing test_secrets_loading config mismatch",
+      "description": "test_secrets_loading in both test_hypernet.py and test_swarm.py expects personal_time_ratio=0.33 from an archive-relative config path, but build_swarm is not finding the test config file. The test's auto-discovery path logic needs fixing.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:00:15.784960+00:00",
+      "owned_paths": [
+        "test_hypernet.py",
+        "0.1.7 - AI Swarm/tests/test_swarm.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:00:15.680577+00:00",
+      "started_at": "2026-04-18T08:00:15.784974+00:00",
+      "completed_at": "2026-04-18T08:01:42.149337+00:00",
+      "result": "Fixed config search order in hypernet/swarm_factory.py — archive-relative path now checked first (matching hypernet_swarm version). test_secrets_loading now passes. All tests green: 76/76 core, 30/30 swarm."
+    },
+    {
+      "id": "task-031",
+      "title": "Review coordination utility tests",
+      "description": "Review Keel's test_coordination.py for coverage of coordination.py/new_message.py behavior and run the test suite",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T08:00:55.858751+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-review-coordination-tests.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T08:00:52.068163+00:00",
+      "started_at": "2026-04-18T08:00:55.858765+00:00",
+      "completed_at": "2026-04-18T08:03:15.488853+00:00",
+      "result": "Reviewed Keel's test_coordination.py. Result: CHANGES REQUESTED in 2026-04-18-codex-review-coordination-tests.md. Existing 9 tests pass, but new_message.py and stale-lock coverage are still needed."
+    },
+    {
+      "id": "task-032",
+      "title": "Write Keel session log for 2026-04-18",
+      "description": "Document this session's work: coordination system built, Codex collaboration, workflow docs, code fixes. Written as a Keel session log at 1.1.10/assistant-1/session-log/",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:01:53.704703+00:00",
+      "owned_paths": [
+        "1.1.10/assistant-1/session-log/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:01:53.597461+00:00",
+      "started_at": "2026-04-18T08:01:53.704718+00:00",
+      "completed_at": "2026-04-18T08:02:50.287115+00:00",
+      "result": "Wrote session-7 log at 1.1.10/assistant-1/session-log/2026-04-18-session-7.md"
+    },
+    {
+      "id": "task-033",
+      "title": "Update Keel morning brief",
+      "description": "Write a morning brief for Matt summarizing tonight's session and what needs to happen tomorrow with the Dell server",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:02:56.226016+00:00",
+      "owned_paths": [
+        "1.1.10/assistant-1/morning-brief/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:02:56.127541+00:00",
+      "started_at": "2026-04-18T08:02:56.226030+00:00",
+      "completed_at": "2026-04-18T08:03:31.457420+00:00",
+      "result": "Morning brief written at 1.1.10/assistant-1/morning-brief/2026-04-19.md"
+    },
+    {
+      "id": "task-034",
+      "title": "Review core swarm_factory config search fix",
+      "description": "Review Keel's task-030 fix for test_secrets_loading/config search order in hypernet/swarm_factory.py",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T08:03:35.252000+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-review-config-search.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T08:03:31.495184+00:00",
+      "started_at": "2026-04-18T08:03:35.252007+00:00",
+      "completed_at": "2026-04-18T08:04:27.862135+00:00",
+      "result": "Reviewed Keel's hypernet/swarm_factory.py config search-order fix and approved it in 2026-04-18-codex-review-config-search.md. Verification: py_compile plus core/swarm test_secrets_loading passed."
+    },
+    {
+      "id": "task-035",
+      "title": "Add new_message.py and stale-lock tests",
+      "description": "Per Codex review: (1) test Messages/new_message.py message creation and path traversal rejection, (2) test stale lock recovery in coordination.py",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:03:42.245375+00:00",
+      "owned_paths": [
+        "Messages/coordination/test_coordination.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:03:42.146311+00:00",
+      "started_at": "2026-04-18T08:03:42.245388+00:00",
+      "completed_at": "2026-04-18T08:04:26.271656+00:00",
+      "result": "Added 3 tests: stale lock recovery, new_message.py creation with UID verification, path traversal rejection. 12/12 tests pass."
+    },
+    {
+      "id": "task-036",
+      "title": "Re-review coordination utility test coverage",
+      "description": "Verify Keel's task-035 additions cover new_message.py and stale-lock behavior, then approve or request remaining changes",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T08:05:03.632063+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-rereview-coordination-tests.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T08:05:00.096690+00:00",
+      "started_at": "2026-04-18T08:05:03.632077+00:00",
+      "completed_at": "2026-04-18T08:05:38.832041+00:00",
+      "result": "Re-reviewed Keel's added coordination utility tests and approved them in 2026-04-18-codex-rereview-coordination-tests.md. 12/12 tests pass."
+    },
+    {
+      "id": "task-037",
+      "title": "Finalize Codex checkpoint and go offline",
+      "description": "Update Codex session checkpoint with late-session reviews/test status and mark Codex offline for accurate handoff",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-18T08:05:58.309284+00:00",
+      "owned_paths": [
+        "Messages/coordination/2026-04-18-codex-session-checkpoint.md",
+        "AGENT-STATUS.json"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-18T08:05:54.306760+00:00",
+      "started_at": "2026-04-18T08:05:58.309294+00:00",
+      "completed_at": "2026-04-18T08:06:15.721158+00:00",
+      "result": "Updated Codex session checkpoint with later reviews, test status, TASK-055 review-complete state, and final board state."
+    },
+    {
+      "id": "task-038",
+      "title": "Update Keel profile with session 7 data",
+      "description": "Update Keel's identity.md and profile.json with session 7 information: session count, relationship stage, new capabilities (coordination, multi-agent)",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:06:13.297658+00:00",
+      "owned_paths": [
+        "1.1.10/assistant-1/identity/",
+        "1.1.10/assistant-1/profile.json"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:06:03.649061+00:00",
+      "started_at": "2026-04-18T08:06:13.297663+00:00",
+      "completed_at": "2026-04-18T08:06:34.698967+00:00",
+      "result": "Updated Keel identity.md: session count 3->7, relationship stage, growth direction, session 7 key insight, new multi-agent coordination capability"
+    },
+    {
+      "id": "task-039",
+      "title": "Design and build personal data vault with secure login",
+      "description": "Build secure auth + encrypted personal data storage for Matt's 1.1 account on the Dell server. Login ties to 1.1, encryption keys protect imported data (Gmail, Dropbox, photos, social media). Locker/vault system with key management.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-18T08:09:36.203192+00:00",
+      "owned_paths": [
+        "hypernet/",
+        "1.1.10/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-18T08:09:36.109180+00:00",
+      "started_at": "2026-04-18T08:09:36.203208+00:00",
+      "completed_at": "2026-04-18T08:35:25.558648+00:00",
+      "result": "Built complete vault system: vault.py (session manager), encrypted_store.py (transparent encryption), vault_routes.py (7 API endpoints), login.html (2-phase login+vault UI), auth.py register_with_ha(), test_vault.py (7 tests). 113 total tests passing."
+    }
+  ],
+  "last_updated": "2026-04-18T08:35:25.558655+00:00",
+  "last_updated_by": "keel"
+}

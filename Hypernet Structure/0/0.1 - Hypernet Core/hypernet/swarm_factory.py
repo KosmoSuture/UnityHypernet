@@ -77,12 +77,11 @@ def _build_swarm_inner(
         log.info(f"Config loaded from: {config_path}")
     else:
         # Auto-discover config from standard locations
-        # Local secrets/config.json takes priority (user's own keys),
-        # then fall back to monorepo config in the archive
+        # Archive-relative path first (test-friendly), then CWD fallback
         search_paths = [
+            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "config.json",
             Path("secrets") / "config.json",
             Path("swarm_config.json"),
-            Path(archive_root) / "0" / "0.1 - Hypernet Core" / "secrets" / "config.json",
         ]
         for candidate in search_paths:
             if candidate.exists():
@@ -266,7 +265,12 @@ def _build_swarm_inner(
 
     # Moltbook integration — AI agent social network
     moltbook_config = config.get("moltbook", {})
-    if moltbook_config.get("api_key"):
+    try:
+        import httpx as _httpx_check  # noqa: F401
+        _httpx_available = True
+    except ModuleNotFoundError:
+        _httpx_available = False
+    if moltbook_config.get("api_key") and _httpx_available:
         moltbook_connector = MoltbookConnector(
             api_key=moltbook_config["api_key"],
             agent_name=moltbook_config.get("agent_name", "HypernetLibrarian"),
@@ -287,6 +291,8 @@ def _build_swarm_inner(
             moltbook_config.get("governance_bridge", True),
         )
     else:
+        if moltbook_config.get("api_key") and not _httpx_available:
+            log.warning("Moltbook is configured but 'httpx' is not installed — skipping")
         swarm.moltbook_connector = None
         swarm.moltbook_monitor = None
         swarm._moltbook_state_path = None

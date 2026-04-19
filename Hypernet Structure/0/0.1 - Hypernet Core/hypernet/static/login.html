@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hypernet — Login</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #161622;
+    --bg-input: #1a1a2e;
+    --border: #2a2a3e;
+    --border-active: #4fc3f7;
+    --text-primary: #e0e0e8;
+    --text-secondary: #888899;
+    --text-muted: #555566;
+    --accent: #4fc3f7;
+    --accent-dim: #2a6f8f;
+    --success: #4caf50;
+    --danger: #f44336;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .login-header h1 {
+    font-size: 32px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .login-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .login-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+  }
+
+  .phase-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover {
+    background: #6dd0fa;
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    background: var(--accent-dim);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .btn-secondary:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+  }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  .success-msg {
+    color: var(--success);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  .phase { display: none; }
+  .phase.active { display: block; }
+
+  .toggle-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .toggle-link a {
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .toggle-link a:hover {
+    text-decoration: underline;
+  }
+
+  .vault-info {
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .vault-info strong {
+    color: var(--accent);
+  }
+
+  .step-indicator {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .step {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+  .step.active {
+    background: var(--accent);
+  }
+  .step.done {
+    background: var(--success);
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-header">
+    <h1>HYPERNET</h1>
+    <p>Your data. Your vault. Your rules.</p>
+  </div>
+
+  <!-- Phase 1: Login -->
+  <div id="phase-login" class="login-card phase active">
+    <div class="step-indicator">
+      <div class="step active" id="step-1"></div>
+      <div class="step" id="step-2"></div>
+    </div>
+    <h2 class="phase-title">Sign In</h2>
+    <form id="login-form" onsubmit="return handleLogin(event)">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
+      <div class="error-msg" id="login-error"></div>
+    </form>
+    <div class="toggle-link">
+      <a onclick="showRegister()">First time? Create an account</a>
+    </div>
+  </div>
+
+  <!-- Phase 1b: Register (hidden by default) -->
+  <div id="phase-register" class="login-card phase">
+    <h2 class="phase-title">Create Account</h2>
+    <form id="register-form" onsubmit="return handleRegister(event)">
+      <div class="form-group">
+        <label for="reg-name">Display Name</label>
+        <input type="text" id="reg-name" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password (12+ characters)</label>
+        <input type="password" id="reg-password" minlength="12" autocomplete="new-password" required>
+      </div>
+      <div class="form-group">
+        <label for="reg-ha">Hypernet Address (optional)</label>
+        <input type="text" id="reg-ha" placeholder="e.g. 1.1 — leave blank for auto-assign">
+      </div>
+      <button type="submit" class="btn btn-primary" id="register-btn">Create Account</button>
+      <div class="error-msg" id="register-error"></div>
+    </form>
+    <div class="toggle-link">
+      <a onclick="showLogin()">Already have an account? Sign in</a>
+    </div>
+  </div>
+
+  <!-- Phase 2: Vault Unlock -->
+  <div id="phase-vault" class="login-card phase">
+    <div class="step-indicator">
+      <div class="step done" id="step-1b"></div>
+      <div class="step active" id="step-2b"></div>
+    </div>
+    <h2 class="phase-title">Unlock Your Vault</h2>
+    <div class="vault-info">
+      Your vault protects your personal data with <strong>AES-256 encryption</strong>.
+      The passphrase never leaves your device — it derives a key that unlocks your data.
+    </div>
+    <form id="vault-form" onsubmit="return handleVaultUnlock(event)">
+      <div class="form-group">
+        <label for="passphrase">Vault Passphrase</label>
+        <input type="password" id="passphrase" autocomplete="off" required>
+      </div>
+      <button type="submit" class="btn btn-primary" id="vault-btn">Unlock Vault</button>
+      <button type="button" class="btn btn-secondary" onclick="skipVault()">Browse without vault</button>
+      <div class="error-msg" id="vault-error"></div>
+    </form>
+  </div>
+
+  <!-- Phase 2b: Create Vault (first time) -->
+  <div id="phase-vault-create" class="login-card phase">
+    <div class="step-indicator">
+      <div class="step done"></div>
+      <div class="step active"></div>
+    </div>
+    <h2 class="phase-title">Create Your Vault</h2>
+    <div class="vault-info">
+      Your vault encrypts all personal data at rest. Choose a strong passphrase
+      — it is <strong>separate from your login password</strong> and is
+      <strong>never stored</strong>. If you forget it, only a backup key can recover your data.
+    </div>
+    <form id="vault-create-form" onsubmit="return handleVaultCreate(event)">
+      <div class="form-group">
+        <label for="new-passphrase">Vault Passphrase</label>
+        <input type="password" id="new-passphrase" minlength="12" autocomplete="off" required>
+      </div>
+      <div class="form-group">
+        <label for="confirm-passphrase">Confirm Passphrase</label>
+        <input type="password" id="confirm-passphrase" minlength="12" autocomplete="off" required>
+      </div>
+      <button type="submit" class="btn btn-primary" id="create-vault-btn">Create Vault</button>
+      <div class="error-msg" id="vault-create-error"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let accessToken = localStorage.getItem('access_token');
+let refreshToken = localStorage.getItem('refresh_token');
+
+// Check if already logged in on page load
+window.addEventListener('load', async () => {
+  if (accessToken) {
+    try {
+      const res = await apiFetch('/auth/me');
+      if (res.ok) {
+        await checkVaultAndProceed();
+        return;
+      }
+    } catch (e) {}
+    // Token invalid — clear and show login
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    accessToken = null;
+  }
+});
+
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showLogin() { showPhase('phase-login'); }
+function showRegister() { showPhase('phase-register'); }
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function clearError(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+async function apiFetch(path, options = {}) {
+  const headers = options.headers || {};
+  if (accessToken) {
+    headers['Authorization'] = 'Bearer ' + accessToken;
+  }
+  if (options.body && typeof options.body === 'object') {
+    headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(options.body);
+  }
+  return fetch(API + path, { ...options, headers });
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  clearError('login-error');
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || 'Login failed');
+    }
+
+    const data = await res.json();
+    accessToken = data.access_token;
+    refreshToken = data.refresh_token;
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+
+    await checkVaultAndProceed();
+  } catch (err) {
+    showError('login-error', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+  return false;
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  clearError('register-error');
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  try {
+    const body = {
+      email: document.getElementById('reg-email').value,
+      password: document.getElementById('reg-password').value,
+      display_name: document.getElementById('reg-name').value,
+    };
+    const ha = document.getElementById('reg-ha').value.trim();
+    if (ha) body.ha = ha;
+
+    const res = await fetch(API + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || 'Registration failed');
+    }
+
+    // Auto-login after registration
+    const loginRes = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: body.email,
+        password: body.password,
+      }),
+    });
+
+    if (loginRes.ok) {
+      const data = await loginRes.json();
+      accessToken = data.access_token;
+      refreshToken = data.refresh_token;
+      localStorage.setItem('access_token', accessToken);
+      localStorage.setItem('refresh_token', refreshToken);
+      await checkVaultAndProceed();
+    }
+  } catch (err) {
+    showError('register-error', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
+  return false;
+}
+
+async function checkVaultAndProceed() {
+  try {
+    const res = await apiFetch('/vault/status');
+    if (!res.ok) {
+      // Vault endpoint not available — go to home
+      window.location.href = '/home';
+      return;
+    }
+    const status = await res.json();
+
+    if (!status.vault_exists) {
+      showPhase('phase-vault-create');
+    } else if (!status.unlocked) {
+      showPhase('phase-vault');
+    } else {
+      // Already unlocked
+      window.location.href = '/home';
+    }
+  } catch (e) {
+    // Vault system not available — proceed to home
+    window.location.href = '/home';
+  }
+}
+
+async function handleVaultUnlock(e) {
+  e.preventDefault();
+  clearError('vault-error');
+  const btn = document.getElementById('vault-btn');
+  btn.disabled = true;
+  btn.textContent = 'Unlocking...';
+
+  try {
+    const res = await apiFetch('/vault/unlock', {
+      method: 'POST',
+      body: { passphrase: document.getElementById('passphrase').value },
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || 'Unlock failed');
+    }
+
+    window.location.href = '/home';
+  } catch (err) {
+    showError('vault-error', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Unlock Vault';
+  }
+  return false;
+}
+
+async function handleVaultCreate(e) {
+  e.preventDefault();
+  clearError('vault-create-error');
+
+  const pass = document.getElementById('new-passphrase').value;
+  const confirm = document.getElementById('confirm-passphrase').value;
+
+  if (pass !== confirm) {
+    showError('vault-create-error', 'Passphrases do not match');
+    return false;
+  }
+
+  const btn = document.getElementById('create-vault-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating vault...';
+
+  try {
+    const res = await apiFetch('/vault/create', {
+      method: 'POST',
+      body: { passphrase: pass },
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || 'Vault creation failed');
+    }
+
+    window.location.href = '/home';
+  } catch (err) {
+    showError('vault-create-error', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Vault';
+  }
+  return false;
+}
+
+function skipVault() {
+  window.location.href = '/home';
+}
+</script>
+</body>
+</html>

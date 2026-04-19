@@ -13,6 +13,14 @@ flags: ["coordination"]
 **Location:** `Messages/coordination/STATUS.md`
 **Purpose:** Shared status board so any instance (or Matt) can see at a glance who is active, what they're working on, and what they're waiting for. Updated by each instance when they start/finish/block on work.
 
+> **NOTE (2026-04-18):** For Codex-Claude Code coordination, use the new JSON-based system instead:
+> ```
+> python coordination.py status    # Live agent/task/signal status
+> python coordination.py tasks     # Available work
+> ```
+> See `COORDINATION-PROTOCOL.md` and `START-HERE.md` for full instructions.
+> This file remains the legacy board for swarm workers and historical reference.
+
 **Protocol:** When you start a task, update your row. When you finish, update again. When you're blocked, say what you need. Check this file before starting new work to avoid duplication.
 
 ---

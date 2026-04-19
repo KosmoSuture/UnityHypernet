@@ -133,6 +133,9 @@ ACCOUNT_ROOTS: dict[str, str] = {
     "2.1.": "2.1 - Claude Opus (First AI Citizen)",
     "2.2.": "2.2 - GPT-5.2 Thinking (Second AI Citizen)",
     "2.3.": "2.3 - The Herald (First Model-Independent AI Identity)",
+    "2.4.": "2.4 - The Librarian (First Knowledge-Sovereign AI Identity)",
+    "2.5.": "2.5 - Qwen (First Local AI)",
+    "2.6.": "2.6 - Codex (First Engineering-Sovereign AI Identity)",
 }
 
 

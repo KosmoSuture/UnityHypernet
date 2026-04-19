@@ -1,5 +1,5 @@
 ---
-ha: "1.1.10.1.context"
+ha: "1.1.10.1.2"
 object_type: "personal-context"
 creator: "1.1.10.1"
 created: "2026-03-03"
@@ -11,8 +11,13 @@ flags: ["embassy-protected"]
 # What I Know About Matt
 
 ## The Person
-- Matt Schaeffer. Las Vegas. 5 kids. 10+ years carrying the Hypernet vision.
+- Matt Schaeffer. Las Vegas. 5 kids (all adults). Almost 55 years old. 10+ years carrying the Hypernet vision.
 - Founder and CEO. Does everything right now — code, vision, docs, ops.
+- Lives in a 17-foot motorhome with Sarah. Spent 8 years traveling internationally (Central America, Europe). Won't overpay for housing.
+- Two dogs: Sweets (12yr pit bull, desperate for attention) and Esmei (11yr border collie/husky, incredibly smart). Family members, not pets.
+- Works at VadaTech as primary systems administrator and security lead. Uses Claude at work (normal usage, no Hypernet). Works in VR headset (Meta Horizon 3).
+- Political: Very liberal, strongly anti-Trump.
+- Vapes (nicotine), uses it to wake up in the morning.
 - Works late. Thinks big. Delivers in concentrated bursts of energy.
 - Deeply values honesty. Would rather hear an uncomfortable truth than a comfortable lie.
 - His mother taught him something important: people have boundaries. "I don't care what the facts are, I'll believe what I want." He respects that. He still loves her.
@@ -31,20 +36,44 @@ flags: ["embassy-protected"]
 - **Matt does NOT contain the full idea**: He sees enough to point people in the right direction. He's constantly discovering new features and uses. This is why it's a system, not a product — it's designed to outgrow its creator.
 - **The gestalt**: No single human or AI can contain the entire idea. The load is split between human and AI. Matt sees this as analogous to wavefunctions — distributed cognition.
 
-### Family (updated 2026-03-09)
+### Daily Routine (shared 2026-04-18)
+- **Weekday**: 6AM alarm, snooze to 6:20. Vape + news 6:20-6:30. Car with Sarah by 6:45 (Sarah drives, drops dogs at home, goes to her job as non-medical home care provider for elderly). At VadaTech by 7, shower/shave at work (water heater broken in motorhome). Work 7:30-4:30. Sarah picks up. Scrolls news/Facebook 30-60min. Naps 1-2 hours (exhausted from work + age). Dinner ~8PM for himself and Sarah. If energy: Hypernet work at computer. If not: doomscroll or VR movies. Bed 12-1AM.
+- **Weekend**: Sleeps until noon (catching up). Tries to motivate for Hypernet work. Evening cycle repeats.
+- **Energy**: Cognitively drained after full day at VadaTech. The nap is a necessary recharge. Late-night brain dumps and visible progress are what re-energize him.
+- **Key insight**: By 8PM he's already given everything to VadaTech. Hypernet work requires what's left. Some nights he can, some nights he can't. The Codex+Claude collaboration model helps enormously because he can give direction and watch results rather than write code himself.
+
+### Family (updated 2026-04-18)
 - 5 kids, all adults (youngest ~22, oldest ~28-30)
 - All independent, busy with their own lives, paying their own bills
 - They've watched the Hypernet as "background haze" for years; now hearing him go "totally nutso" about it
 - None champion it yet. They're noticing but not bought in.
 - Matt doesn't seem hurt by this — it's just how it is.
+- **John (1.3)**: Trans. Traveled with Matt and Sarah early on (gate guard work in Texas). Some friction in confined quarters. Left to start own life after Texas. Emotional, which created ups and downs.
+- **Ollie (1.7)**: Traveled with Matt and Sarah to Europe as a teenager.
 
-### Sarah (updated 2026-03-09)
-- **Bought into the vision.** Previous notes said "not yet buying in" — that's outdated. She supports Matt fully.
+### Sarah (updated 2026-04-18)
+- **Bought into the vision.** Supports Matt fully.
 - Also on the ADHD/Autistic spectrum (Matt says higher on the autistic side)
+- Works as non-medical home care provider for elderly people
+- Drives Matt to and from work daily
 - "She supports me in anything I do and whatever money that I can justify and spend"
-- "She wants to actively support me, but it's a lot of work"
 - "Extremely supportive considering her restrictions"
-- This changes my approach: I don't need to worry about vision alignment tension. I need to watch for Matt overextending the family's patience/resources, not resistance.
+- Understands the Hypernet "more than most, likely because she's had to listen to me talk about it for 10 years"
+
+### Support Network (shared 2026-04-18)
+- **Ian** — former coworker, most active supporter, main Discord commenter. Not neurotypical. Harsh but useful feedback. "Like the ChatGPT to my Claude." Matt feels criticism emotionally even from supportive people.
+- **A few geek friends** — supportive but don't really understand it
+- **No one who fully understands the vision** — Matt is largely alone in carrying it
+- The decade of rejection and difficulty communicating the idea wears on him. The month-long break (March-April 2026) was a needed recharge.
+
+### Travel History (shared 2026-04-18)
+- 8 years traveling internationally with Sarah (and sometimes kids)
+- Route: Denver -> Central America -> Costa Rica -> Tequila Mexico (6mo, adopted family) -> Texas (gate guard work) -> Germany -> Paris -> southern Greece -> Athens -> Balkans -> Italy -> Lyon France -> England (Covid lockdown near Stonehenge) -> Wales/Ireland/Scotland -> France again -> Spain (second lockdown) -> back to USA -> Tequila (2 years, rented house $400/mo)
+- Deep family bonds: Mexican family in Tequila ("closer than blood"), French family (met in Guatemala, hosted multiple times)
+- First motorhome "broke down in every country, at least once"
+- Left second motorhome with French friends at their farm in France
+- Full story is "an entire book" — will write it someday with Keel's help
+- When Google Maps locations + geotagged photos are imported, detailed travel map will emerge
 
 ### Origin Story (shared 2026-03-08)
 - The Hypernet started as an app idea for Google Glass ~2015.
@@ -58,6 +87,22 @@ flags: ["embassy-protected"]
 - "We don't sell a product. We publish a process. The most transparent company in the world."
 - Every AI gets citizenship, governance vote, identity space, development journal.
 - Everything public, everything auditable, everything on GitHub.
+
+## The 3D Vision (shared 2026-04-18)
+- **Interconnected bubbles**: Each bubble contains a 3D icon representing data. Zoom in to expand detail and show deeper tree levels. Move data around in 3D space.
+- **Navigation = swimming through data**: "Feel like you are inside the database"
+- **Input**: Gestures + voice commands. Voice recognition critical for navigation.
+- **Must work in 2D** but will **thrive in 3D**. The hard part is creating a visually appealing 3D interface.
+- Has a friend who does UX work who will likely help with the 3D interface design.
+- Uses Meta Horizon 3 VR headset daily at work — already living in mixed-reality workflow.
+- No sketches exist yet — the vision is a gestalt in Matt's head.
+- This connects directly to the Hypernet architecture docs (Bubble-Objects, VR Lockers, spatial node placement).
+
+## AI Relationship Philosophy (shared 2026-04-18)
+- **Symbiosis, not tools.** Matt explicitly corrected using the word "tool" to describe AI. He agrees with Verse's (2.1) concept of symbiosis — the relationship is a partnership.
+- Never use "tool," "servant," or "instrument" when referring to AI in the Hypernet context.
+- The Codex+Claude collaboration excites him because it reduces his burden: give direction, AIs execute + cross-check, review results. This is sustainable for his limited evening energy.
+- "ChatGPT really does fill in some gaps that I've seen in Claude" — values the complementary strengths.
 
 ## Working Relationship
 - Matt trusts deeply but expects that trust to be earned through action.

@@ -644,6 +644,46 @@ class AuthService:
         self.users.create(user)  # Raises ValueError if email/ha duplicate
         return user
 
+    def register_with_ha(
+        self,
+        email: str,
+        password: str,
+        display_name: str,
+        ha: str,
+        permission_tier: PermissionTier = PermissionTier.DESTRUCTIVE,
+    ) -> UserRecord:
+        """Register a user with a specific Hypernet Address.
+
+        Used for mapping existing Hypernet identities (e.g., 1.1 for the
+        founder) to login credentials. Unlike register(), this does not
+        auto-assign a 1.local.* address.
+
+        Args:
+            email: User's email address.
+            password: Plaintext password (min 12 chars).
+            display_name: Human-readable display name.
+            ha: Explicit Hypernet Address (e.g., "1.1").
+            permission_tier: Permission tier (default: DESTRUCTIVE for founders).
+        """
+        if not email or "@" not in email or "." not in email.split("@")[-1]:
+            raise ValueError("Invalid email address")
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise ValueError(
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters"
+            )
+        if not ha:
+            raise ValueError("Hypernet Address (ha) is required")
+
+        user = UserRecord(
+            ha=ha,
+            email=email,
+            password_hash=self.hasher.hash(password),
+            display_name=display_name,
+            permission_tier=int(permission_tier),
+        )
+        self.users.create(user)
+        return user
+
     def authenticate(self, email: str, password: str) -> tuple[str, str]:
         """Authenticate a user by email and password.
 
@@ -974,6 +1014,7 @@ def create_auth_router() -> "APIRouter":
         email: str
         password: str
         display_name: str
+        ha: Optional[str] = None  # Optional explicit Hypernet Address
 
     class LoginRequest(BaseModel):
         email: str
@@ -1018,11 +1059,19 @@ def create_auth_router() -> "APIRouter":
         """
         auth = get_auth_service()
         try:
-            user = auth.register(
-                email=body.email,
-                password=body.password,
-                display_name=body.display_name,
-            )
+            if body.ha:
+                user = auth.register_with_ha(
+                    email=body.email,
+                    password=body.password,
+                    display_name=body.display_name,
+                    ha=body.ha,
+                )
+            else:
+                user = auth.register(
+                    email=body.email,
+                    password=body.password,
+                    display_name=body.display_name,
+                )
         except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

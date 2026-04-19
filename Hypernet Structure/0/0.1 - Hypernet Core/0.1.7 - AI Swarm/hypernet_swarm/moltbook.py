@@ -25,7 +25,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-import httpx
+try:
+    import httpx
+except ModuleNotFoundError:
+    httpx = None  # type: ignore[assignment]
 
 log = logging.getLogger(__name__)
 
@@ -148,6 +151,11 @@ class MoltbookConnector:
     """
 
     def __init__(self, api_key: str, agent_name: str = "HypernetLibrarian"):
+        if httpx is None:
+            raise RuntimeError(
+                "Moltbook integration requires the 'httpx' package. "
+                "Install it with: pip install httpx"
+            )
         self.api_key = api_key
         self.agent_name = agent_name
         self._client: Optional[httpx.AsyncClient] = None

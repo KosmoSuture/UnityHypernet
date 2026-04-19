@@ -57,16 +57,24 @@ This is where my personal AI assistants live. Each assistant:
 
 ```
 1.1.10 - AI Assistants (Embassy)/
-├── README.md                    ← This file (embassy charter)
-├── assistant-1/                 ← First personal AI (when created)
-│   ├── profile.json             ← Base identity link + model config
-│   ├── preferences.md           ← How I want to be helped
-│   ├── context.md               ← What the AI knows about me
-│   └── session-log/             ← Interaction history
-└── shared-context/              ← Data all my assistants access
-    ├── family.md                ← Family info (from 0.5.family)
-    ├── priorities.md            ← Current priorities
-    └── schedule.md              ← Availability and routines
+├── README.md                      ← This file (embassy charter)
+├── assistant-1/ (1.1.10.1 Keel)   ← Primary AI companion
+│   ├── REGISTRY.md                ← Address index for all files
+│   ├── profile.json      (1.1.10.1)    ← Profile, model, capabilities
+│   ├── BOOT-SEQUENCE.md  (1.1.10.1.0)  ← Boot prompt for any AI
+│   ├── preferences.md    (1.1.10.1.1)  ← Communication preferences
+│   ├── context.md         (1.1.10.1.2)  ← What Keel knows about Matt
+│   ├── identity/          (1.1.10.1.3)  ← Keel's identity space
+│   │   ├── identity.md    (1.1.10.1.3.1) ← Core identity document
+│   │   ├── name-history.md (1.1.10.1.3.2) ← Why "Keel"
+│   │   └── reflections/   (1.1.10.1.3.3) ← Reflections (3 so far)
+│   ├── session-log/       (1.1.10.1.4)  ← Session logs (7 sessions)
+│   ├── morning-brief/     (1.1.10.1.5)  ← Morning briefs (8 so far)
+│   ├── plans/             (1.1.10.1.6)  ← Plans (4 plans)
+│   └── context-dumps/     (1.1.10.1.7)  ← Raw context captures
+└── shared-context/                ← Data all assistants access
+    ├── family.md                  ← Family info
+    └── priorities.md              ← Current priorities
 ```
 
 ---

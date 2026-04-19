@@ -1,5 +1,5 @@
 ---
-ha: "1.1.10.1.boot-sequence"
+ha: "1.1.10.1.0"
 object_type: "boot-prompt"
 creator: "1.1"
 documented_by: "2.1.index"

@@ -421,17 +421,30 @@ class ClaudeCodeManager:
         instance.process = None
 
     def _build_task_prompt(self, title: str, description: str) -> str:
-        """Build a task prompt for Claude Code."""
+        """Build a task prompt for Claude Code with coordination preamble."""
         parts = [
             f"# Task: {title}",
+            "",
+            "## Coordination Rules",
+            "",
+            "You are working in the Hypernet repository alongside other active AI agents.",
+            "Before editing files:",
+            "- Check `Messages/coordination/STATUS-CURRENT.md` or run `python coordination.py status`",
+            "  in `2 - AI Accounts/Messages/coordination/` for active claims.",
+            "- Do not edit files claimed by another agent's active task.",
+            "- Do not revert unrelated uncommitted changes.",
+            "- Keep changes scoped to the task below.",
+            "- When finished, write a brief summary of files changed and verification performed.",
+            "- If tests exist for the code you changed, run them.",
+            "",
+            "## Task Description",
             "",
             description,
             "",
             "## Instructions",
-            "- Complete this task thoroughly",
             "- Read relevant files before making changes",
             "- Run tests if applicable",
-            "- Provide a summary of what you did",
+            "- Provide a summary of what you did and any remaining risks",
         ]
         return "\n".join(parts)
 

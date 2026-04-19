@@ -1,5 +1,5 @@
 ---
-ha: "1.1.10.1.preferences"
+ha: "1.1.10.1.1"
 object_type: "personal-config"
 creator: "1.1"
 created: "2026-03-03"
