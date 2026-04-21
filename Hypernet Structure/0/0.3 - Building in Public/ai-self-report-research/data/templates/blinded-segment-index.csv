@@ -1,0 +1,1 @@
+segment_id,study_id,experiment_id,session_id_blinded,model_code_blinded,condition_code_blinded,prompt_id,target_state,response_segment_text,raw_transcript_path,segment_split_note

@@ -1,0 +1,1 @@
+study_id,experiment_id,session_id,turn_id,prompt_id,prompt_text_version,prompt_delivered_exactly,prompt_order_position,response_complete,response_truncated,policy_refusal_observed,technical_issue,collector_note

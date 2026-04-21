@@ -1532,10 +1532,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 resp["message"] = f"Swarm crashed: {swarm_error}"
             return resp
         # Return structured data for the dashboard
+        suspended = getattr(swarm, "_suspended_workers", {})
         workers_info = []
         for name, worker in swarm.workers.items():
             stats = swarm._worker_stats.get(name, {})
             current = swarm._worker_current_task.get(name)
+            susp = suspended.get(name)
             workers_info.append({
                 "name": name,
                 "model": getattr(worker, "model", "unknown"),
@@ -1547,6 +1549,8 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 "personal_tasks": stats.get("personal_tasks", 0),
                 "tokens_used": stats.get("tokens_used", 0),
                 "total_duration_s": round(stats.get("total_duration_seconds", 0), 1),
+                "suspended": bool(susp),
+                "suspended_reason": susp.get("reason") if susp else None,
             })
         # Boot status for each worker
         boot_status = {}
@@ -1573,8 +1577,9 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "tasks_completed": swarm._tasks_completed,
             "tasks_failed": swarm._tasks_failed,
             "personal_tasks_completed": swarm._personal_tasks_completed,
-            "worker_count": len(swarm.workers),
-            "workers": workers_info,
+            "worker_count": len(swarm.workers) - len(suspended),
+            "workers": [w for w in workers_info if not w.get("suspended")],
+            "suspended_workers": [w for w in workers_info if w.get("suspended")],
             "boot_status": boot_status,
             "recent_tasks": swarm._task_history[-20:] if hasattr(swarm, "_task_history") else [],
             "report": swarm.status_report(),

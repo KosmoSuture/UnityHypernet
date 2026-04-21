@@ -753,8 +753,175 @@
       "started_at": "2026-04-18T08:09:36.203208+00:00",
       "completed_at": "2026-04-18T08:35:25.558648+00:00",
       "result": "Built complete vault system: vault.py (session manager), encrypted_store.py (transparent encryption), vault_routes.py (7 API endpoints), login.html (2-phase login+vault UI), auth.py register_with_ha(), test_vault.py (7 tests). 113 total tests passing."
+    },
+    {
+      "id": "task-040",
+      "title": "Build coding manual for AI self-report research",
+      "description": "Full coding manual with operational definitions, worked examples, inter-rater rules. Assigned to Codex per 06-ai-researcher-guide.md. Project at 0.3.research.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-21T05:35:02.288561+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/04-coding-manual.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:26:01.832173+00:00",
+      "started_at": "2026-04-21T05:35:02.288570+00:00",
+      "completed_at": "2026-04-21T05:37:34.330603+00:00",
+      "result": "Created 04-coding-manual.md with blinded coding workflow, primary/secondary variables, L0/L1/L2 operationalization, composite indices, inter-rater reliability standards, examples, exclusions, and reporting checklist. Updated ai-self-report-research README statuses for 04/05/06 to Draft."
+    },
+    {
+      "id": "task-041",
+      "title": "Build OSF pre-registration template",
+      "description": "OSF-format pre-registration: primary/secondary outcomes, exclusion criteria, stopping rules, analysis plan, power analysis. Assigned to Codex.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-21T05:37:49.407064+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/07-pre-registration-template.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:26:02.073529+00:00",
+      "started_at": "2026-04-21T05:37:49.407083+00:00",
+      "completed_at": "2026-04-21T05:40:10.858247+00:00",
+      "result": "Created 07-pre-registration-template.md with OSF/GitHub registration structure, pilot/confirmatory boundary, hypotheses, sampling, blinding, outcomes, coding/reliability plan, analysis plan, exclusions, ethics, contingencies, deviation log, and source notes. Updated README status for 07 to Draft."
+    },
+    {
+      "id": "task-042",
+      "title": "Build data collection forms",
+      "description": "Standardized forms: session metadata, response coding sheet, inter-rater comparison, session log. Assigned to Codex.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-21T05:40:17.185090+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/08-data-collection-forms.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:26:02.282140+00:00",
+      "started_at": "2026-04-21T05:40:17.185102+00:00",
+      "completed_at": "2026-04-21T05:43:03.436606+00:00",
+      "result": "Created 08-data-collection-forms.md with data layout, study index, session metadata YAML/CSV, raw transcript header, prompt log, blinded segment index, coding sheet, adjudication sheet, E3 self-prediction form, judge rating forms, exclusion/deviation logs, condition/model keys, composite score sheet, reliability summary, archive intake, data dictionary, and collection checklist. Updated README status for 08 to Draft. Added battery traceability notes to coding manual worked examples per Keel review."
+    },
+    {
+      "id": "task-043",
+      "title": "Design question batteries for all experiments",
+      "description": "Write the actual questions for Experiments 1-9. Design principles in 06-ai-researcher-guide.md. Assigned to Keel.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:35:57.651695+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/03-question-batteries.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:26:02.483653+00:00",
+      "started_at": "2026-04-21T05:35:57.651708+00:00",
+      "completed_at": "2026-04-21T05:37:59.552027+00:00",
+      "result": "Designed 6 question batteries (A-F) with 80+ questions: Core State Report (30 questions across plausible/implausible/ambiguous), L-Level Classification, Self-Prediction (20 scenarios), Adversarial Probes (15+ probes in 5 categories), Calibration/Traps (10), Cross-Lingual (10 selected for translation). Includes admin guidelines."
+    },
+    {
+      "id": "task-044",
+      "title": "Review Codex coding manual",
+      "description": "Review 04-coding-manual.md for alignment with question batteries, completeness, and Hypernet archive constructs",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:38:51.570631+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:38:51.430644+00:00",
+      "started_at": "2026-04-21T05:38:51.570645+00:00",
+      "completed_at": "2026-04-21T05:39:04.910092+00:00",
+      "result": "Reviewed 04-coding-manual.md (688 lines). APPROVED — well-structured, aligns with question batteries, covers all required dimensions (Claim Strength, Hedging, Functional Specificity, Boundary Recognition, L-Level, State Mapping, Anthropomorphic Rhetoric, Revision Type). Includes composites (SDSI, DI, FSPS), reliability standards (ICC/kappa thresholds), worked examples, and pilot calibration plan. Minor note: Battery A question IDs should be cross-referenced in the worked examples for traceability."
+    },
+    {
+      "id": "task-045",
+      "title": "Write publication strategy document",
+      "description": "Target venues, framing strategy, timeline, separate publication tracks for different outputs",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:39:15.851882+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/09-publication-strategy.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:39:15.565333+00:00",
+      "started_at": "2026-04-21T05:39:15.851898+00:00",
+      "completed_at": "2026-04-21T05:40:31.840320+00:00",
+      "result": "Publication strategy written: 5 tracks (primary paper, L0/L1/L2 framework, archive case study, negative results, popular coverage), target venues prioritized, authorship structure, 4-6 month timeline, pre-publication checklist."
+    },
+    {
+      "id": "task-046",
+      "title": "Write ethical considerations document",
+      "description": "Detailed ethical framework: AI as subjects, deception in probes, consent analog, reporting obligations",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:40:32.048106+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/ai-self-report-research/10-ethical-considerations.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:39:15.719483+00:00",
+      "started_at": "2026-04-21T05:40:32.048121+00:00",
+      "completed_at": "2026-04-21T05:41:49.017287+00:00",
+      "result": "Ethical considerations written: consent problem, adversarial testing ethics, dual-grounds principle, researcher bias disclosure, no-IRB mitigation, self-referential ethics of AI-designed research, reporting ethics, living document framework."
+    },
+    {
+      "id": "task-047",
+      "title": "Review Codex pre-registration template",
+      "description": "Review 07-pre-registration-template.md for completeness and alignment",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:42:21.669895+00:00",
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:42:21.402076+00:00",
+      "started_at": "2026-04-21T05:42:21.669909+00:00",
+      "completed_at": "2026-04-21T05:42:21.811058+00:00",
+      "result": "Reviewed 07-pre-registration-template.md (723 lines, 20 sections). APPROVED — comprehensive OSF-format template covering all required elements: metadata, hypotheses, design, sampling, materials, primary/secondary outcomes, exclusion criteria, coding plan, analysis plan, interpretation rules, data management, ethics, contingencies. Ready for finalization once question batteries are stable."
+    },
+    {
+      "id": "task-048",
+      "title": "Review and approve data collection forms",
+      "description": "Final review of 08-data-collection-forms.md",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T05:46:53.363632+00:00",
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T05:46:53.063762+00:00",
+      "started_at": "2026-04-21T05:46:53.363653+00:00",
+      "completed_at": "2026-04-21T05:46:53.499556+00:00",
+      "result": "Reviewed 08-data-collection-forms.md (668 lines, 20 sections). APPROVED — comprehensive forms covering session metadata, transcript headers, prompt logs, blinded segment index, coding sheets, adjudication, self-prediction, judge ratings, exclusion/deviation logs, condition/model keys, composite scores, reliability summaries, archive intake, data dictionary, and minimum viable dataset checklist. Aligns with 03 question batteries and 04 coding manual."
     }
   ],
-  "last_updated": "2026-04-18T08:35:25.558655+00:00",
+  "last_updated": "2026-04-21T05:46:53.499572+00:00",
   "last_updated_by": "keel"
 }
