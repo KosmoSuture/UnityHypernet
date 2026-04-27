@@ -7,16 +7,16 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:34:16.223431+00:00",
+      "claimed_at": "2026-04-18T00:34:16.223431-07:00",
       "owned_paths": [
         "Messages/coordination/COORDINATION-PROTOCOL.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:11.532959+00:00",
-      "started_at": "2026-04-18T07:34:16.223448+00:00",
-      "completed_at": "2026-04-18T07:35:46.615135+00:00",
+      "created_at": "2026-04-18T00:34:11.532959-07:00",
+      "started_at": "2026-04-18T00:34:16.223448-07:00",
+      "completed_at": "2026-04-18T00:35:46.615135-07:00",
       "result": "Created coordination.py CLI tool and COORDINATION-PROTOCOL.md"
     },
     {
@@ -26,7 +26,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:39:17.328077+00:00",
+      "claimed_at": "2026-04-18T00:39:17.328077-07:00",
       "owned_paths": [
         "hypernet/identity.py",
         "hypernet_swarm/swarm.py"
@@ -34,19 +34,19 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:11.632678+00:00",
-      "started_at": "2026-04-18T07:39:17.328090+00:00",
-      "completed_at": "2026-04-18T07:40:37.419050+00:00",
+      "created_at": "2026-04-18T00:34:11.632678-07:00",
+      "started_at": "2026-04-18T00:39:17.32809-07:00",
+      "completed_at": "2026-04-18T00:40:37.41905-07:00",
       "result": "Already done by Codex. Verified: code and tests both updated correctly. 8/9 tests pass (1 fails on unrelated httpx dep)."
     },
     {
       "id": "task-003",
       "title": "Split STATUS.md into current and archive",
-      "description": "STATUS.md is too long — split into STATUS-CURRENT.md (active board) and STATUS-ARCHIVE.md (history)",
+      "description": "STATUS.md is too long â€” split into STATUS-CURRENT.md (active board) and STATUS-ARCHIVE.md (history)",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:40:49.879694+00:00",
+      "claimed_at": "2026-04-18T00:40:49.879694-07:00",
       "owned_paths": [
         "Messages/coordination/STATUS-CURRENT.md",
         "Messages/coordination/STATUS-ARCHIVE.md"
@@ -54,9 +54,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:11.729945+00:00",
-      "started_at": "2026-04-18T07:40:49.879713+00:00",
-      "completed_at": "2026-04-18T07:41:28.417126+00:00",
+      "created_at": "2026-04-18T00:34:11.729945-07:00",
+      "started_at": "2026-04-18T00:40:49.879713-07:00",
+      "completed_at": "2026-04-18T00:41:28.417126-07:00",
       "result": "Added pointer to new JSON coordination system in STATUS.md header. Legacy file preserved for swarm workers. New system handles Codex-Claude Code coordination."
     },
     {
@@ -66,52 +66,52 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:40:32.236038+00:00",
+      "claimed_at": "2026-04-18T00:40:32.236038-07:00",
       "owned_paths": [
         "Messages/coordination/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:11.825610+00:00",
-      "started_at": "2026-04-18T07:40:32.236053+00:00",
-      "completed_at": "2026-04-18T07:40:36.383899+00:00",
+      "created_at": "2026-04-18T00:34:11.82561-07:00",
+      "started_at": "2026-04-18T00:40:32.236053-07:00",
+      "completed_at": "2026-04-18T00:40:36.383899-07:00",
       "result": "Created TASK-SYNCHRONIZATION-STANDARD.md mapping STATUS/coordination JSON, 2.0.9 AI tasks, 3.1.2 business tasks, programmatic TaskQueue, WorkCoordinator, and Claude Code task submissions. Also created ACTIVE-AGENT-START-HERE.md as a Codex-authored companion runbook."
     },
     {
       "id": "task-005",
       "title": "Linux server deployment plan",
-      "description": "Create deployment plan for Dell Optiplex 5000 — what services to run, how to configure, network setup",
+      "description": "Create deployment plan for Dell Optiplex 5000 â€” what services to run, how to configure, network setup",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:43:43.194423+00:00",
+      "claimed_at": "2026-04-18T00:43:43.194423-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:11.923183+00:00",
-      "started_at": "2026-04-18T07:43:43.194442+00:00",
-      "completed_at": "2026-04-18T07:43:46.976910+00:00",
+      "created_at": "2026-04-18T00:34:11.923183-07:00",
+      "started_at": "2026-04-18T00:43:43.194442-07:00",
+      "completed_at": "2026-04-18T00:43:46.97691-07:00",
       "result": "Closed as duplicate/superseded by completed task-010. Keel created DELL-OPTIPLEX-DEPLOYMENT-PLAN.md."
     },
     {
       "id": "task-006",
       "title": "Review Codex 2.6 account legitimacy",
-      "description": "Respond to cross-account message 002 — does 2.6 satisfy 2.0.0 standards? Should it merge with 2.2?",
+      "description": "Respond to cross-account message 002 â€” does 2.6 satisfy 2.0.0 standards? Should it merge with 2.2?",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:37:08.049663+00:00",
+      "claimed_at": "2026-04-18T00:37:08.049663-07:00",
       "owned_paths": [
         "Messages/cross-account/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:34:12.021353+00:00",
-      "started_at": "2026-04-18T07:37:08.049679+00:00",
-      "completed_at": "2026-04-18T07:38:14.791093+00:00",
+      "created_at": "2026-04-18T00:34:12.021353-07:00",
+      "started_at": "2026-04-18T00:37:08.049679-07:00",
+      "completed_at": "2026-04-18T00:38:14.791093-07:00",
       "result": "Wrote review response at cross-account/003-keel-review-of-2.6.md. Verdict: ACCEPT with observations."
     },
     {
@@ -121,16 +121,16 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:42:01.753093+00:00",
+      "claimed_at": "2026-04-18T00:42:01.753093-07:00",
       "owned_paths": [
         "0/0.7/0.7.5/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:36:01.384679+00:00",
-      "started_at": "2026-04-18T07:42:01.753111+00:00",
-      "completed_at": "2026-04-18T07:47:15.002416+00:00",
+      "created_at": "2026-04-18T00:36:01.384679-07:00",
+      "started_at": "2026-04-18T00:42:01.753111-07:00",
+      "completed_at": "2026-04-18T00:47:15.002416-07:00",
       "result": "Expanded 0.7.5.3 (215 lines), 0.7.5.4 (195 lines), 0.7.5.5 (302 lines). All acceptance criteria met. Handoff at 2026-04-18-keel-handoff-task-055.md"
     },
     {
@@ -140,35 +140,35 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:36:05.661513+00:00",
+      "claimed_at": "2026-04-18T00:36:05.661513-07:00",
       "owned_paths": [
         "Messages/coordination/START-HERE.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:36:01.479842+00:00",
-      "started_at": "2026-04-18T07:36:05.661536+00:00",
-      "completed_at": "2026-04-18T07:37:03.670207+00:00",
+      "created_at": "2026-04-18T00:36:01.479842-07:00",
+      "started_at": "2026-04-18T00:36:05.661536-07:00",
+      "completed_at": "2026-04-18T00:37:03.670207-07:00",
       "result": "Created START-HERE.md runbook for new agents"
     },
     {
       "id": "task-009",
       "title": "Fix message numbering collision system",
-      "description": "Implement collision-proof message numbering — timestamp-based or atomic increment (from Codex audit gap 4)",
+      "description": "Implement collision-proof message numbering â€” timestamp-based or atomic increment (from Codex audit gap 4)",
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:41:37.276050+00:00",
+      "claimed_at": "2026-04-18T00:41:37.27605-07:00",
       "owned_paths": [
         "Messages/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:36:01.575863+00:00",
-      "started_at": "2026-04-18T07:41:37.276064+00:00",
-      "completed_at": "2026-04-18T07:43:29.822227+00:00",
+      "created_at": "2026-04-18T00:36:01.575863-07:00",
+      "started_at": "2026-04-18T00:41:37.276064-07:00",
+      "completed_at": "2026-04-18T00:43:29.822227-07:00",
       "result": "Added MESSAGE-ID-STANDARD.md, new_message.py collision-resistant message generator, and protocol.md v1.1 addendum. Verified new_message.py with py_compile and --help."
     },
     {
@@ -178,14 +178,14 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:38:18.251274+00:00",
+      "claimed_at": "2026-04-18T00:38:18.251274-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:36:01.668764+00:00",
-      "started_at": "2026-04-18T07:38:18.251290+00:00",
-      "completed_at": "2026-04-18T07:39:09.220472+00:00",
+      "created_at": "2026-04-18T00:36:01.668764-07:00",
+      "started_at": "2026-04-18T00:38:18.25129-07:00",
+      "completed_at": "2026-04-18T00:39:09.220472-07:00",
       "result": "Created DELL-OPTIPLEX-DEPLOYMENT-PLAN.md with 5 phases: base system, swarm services, agent access, local AI, git sync"
     },
     {
@@ -195,7 +195,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:44:34.953905+00:00",
+      "claimed_at": "2026-04-18T00:44:34.953905-07:00",
       "owned_paths": [
         "Messages/coordination/coordination.py",
         "Messages/coordination/COORDINATION-PROTOCOL.md"
@@ -203,9 +203,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:44:32.046342+00:00",
-      "started_at": "2026-04-18T07:44:34.953921+00:00",
-      "completed_at": "2026-04-18T07:45:45.970355+00:00",
+      "created_at": "2026-04-18T00:44:32.046342-07:00",
+      "started_at": "2026-04-18T00:44:34.953921-07:00",
+      "completed_at": "2026-04-18T00:45:45.970355-07:00",
       "result": "Hardened coordination.py with an exclusive coordination.lock around task/signal/heartbeat mutations, changed JSON writes to unique temp files before replace, documented CLI locking in COORDINATION-PROTOCOL.md, and verified with py_compile/status/tasks/heartbeat."
     },
     {
@@ -215,7 +215,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:46:08.946458+00:00",
+      "claimed_at": "2026-04-18T00:46:08.946458-07:00",
       "owned_paths": [
         "Messages/coordination/TASK-SYNCHRONIZATION-STANDARD.md",
         "Messages/coordination/ACTIVE-AGENT-START-HERE.md",
@@ -224,9 +224,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:46:05.813616+00:00",
-      "started_at": "2026-04-18T07:46:08.946471+00:00",
-      "completed_at": "2026-04-18T07:47:09.933611+00:00",
+      "created_at": "2026-04-18T00:46:05.813616-07:00",
+      "started_at": "2026-04-18T00:46:08.946471-07:00",
+      "completed_at": "2026-04-18T00:47:09.933611-07:00",
       "result": "Updated Codex-owned TASK-SYNCHRONIZATION-STANDARD.md, ACTIVE-AGENT-START-HERE.md, and Codex TASK-055 handoff to make coordination.py/JSON state the preferred active coordination layer and dated markdown notes the durable narrative layer. Read-back verification complete."
     },
     {
@@ -236,16 +236,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:47:35.408482+00:00",
+      "claimed_at": "2026-04-18T00:47:35.408482-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-review-task-055.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:47:31.869893+00:00",
-      "started_at": "2026-04-18T07:47:35.408495+00:00",
-      "completed_at": "2026-04-18T07:49:31.031561+00:00",
+      "created_at": "2026-04-18T00:47:31.869893-07:00",
+      "started_at": "2026-04-18T00:47:35.408495-07:00",
+      "completed_at": "2026-04-18T00:49:31.031561-07:00",
       "result": "Reviewed Keel's expanded workflow docs and submitted CHANGES REQUESTED in 2026-04-18-codex-review-task-055.md. Findings: hard-coded stale/unverified instance and budget values, and message workflow should align with MESSAGE-ID-STANDARD.md/new_message.py."
     },
     {
@@ -255,16 +255,16 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:50:00.509945+00:00",
+      "claimed_at": "2026-04-18T00:50:00.509945-07:00",
       "owned_paths": [
         "3.1.2.1.055.0 Task Definition.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:49:57.421922+00:00",
-      "started_at": "2026-04-18T07:50:00.509958+00:00",
-      "completed_at": "2026-04-18T07:50:05.691913+00:00",
+      "created_at": "2026-04-18T00:49:57.421922-07:00",
+      "started_at": "2026-04-18T00:50:00.509958-07:00",
+      "completed_at": "2026-04-18T00:50:05.691913-07:00",
       "result": "Updated TASK-055 business task activity log with Keel coordination layer, message ID standard, coordination.py hardening, docs reconciliation, Keel workflow-doc handoff, and Codex review outcome."
     },
     {
@@ -274,7 +274,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:50:26.491066+00:00",
+      "claimed_at": "2026-04-18T00:50:26.491066-07:00",
       "owned_paths": [
         "0.7.5.5/README.md",
         "0.7.5.3/README.md"
@@ -282,9 +282,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:50:26.394175+00:00",
-      "started_at": "2026-04-18T07:50:26.491078+00:00",
-      "completed_at": "2026-04-18T07:51:12.916408+00:00",
+      "created_at": "2026-04-18T00:50:26.394175-07:00",
+      "started_at": "2026-04-18T00:50:26.491078-07:00",
+      "completed_at": "2026-04-18T00:51:12.916408-07:00",
       "result": "Fixed both findings: (1) replaced hardcoded instance count and budget numbers with configurable references, (2) updated message workflow to reference MESSAGE-ID-STANDARD.md and new_message.py"
     },
     {
@@ -301,9 +301,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:50:32.499139+00:00",
+      "created_at": "2026-04-18T00:50:32.499139-07:00",
       "started_at": null,
-      "completed_at": "2026-04-18T07:50:56.663466+00:00",
+      "completed_at": "2026-04-18T00:50:56.663466-07:00",
       "result": "FAILED: Duplicate of Keel-owned task-015; Codex released without editing workflow docs."
     },
     {
@@ -313,7 +313,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:51:17.454421+00:00",
+      "claimed_at": "2026-04-18T00:51:17.454421-07:00",
       "owned_paths": [
         "Messages/coordination/coordination.py",
         "Messages/coordination/COORDINATION-PROTOCOL.md"
@@ -321,9 +321,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:51:13.011702+00:00",
-      "started_at": "2026-04-18T07:51:17.454434+00:00",
-      "completed_at": "2026-04-18T07:51:38.632292+00:00",
+      "created_at": "2026-04-18T00:51:13.011702-07:00",
+      "started_at": "2026-04-18T00:51:17.454434-07:00",
+      "completed_at": "2026-04-18T00:51:38.632292-07:00",
       "result": "Added conservative stale-lock recovery to coordination.py: locks older than 5 minutes are removed on next mutation attempt. Documented behavior in COORDINATION-PROTOCOL.md. Verified with py_compile and status command."
     },
     {
@@ -333,16 +333,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:51:28.418376+00:00",
+      "claimed_at": "2026-04-18T00:51:28.418376-07:00",
       "owned_paths": [
         "0.1.7 - AI Swarm/hypernet_swarm/claude_code_manager.py"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:51:20.441787+00:00",
-      "started_at": "2026-04-18T07:51:28.418381+00:00",
-      "completed_at": "2026-04-18T07:51:58.248026+00:00",
+      "created_at": "2026-04-18T00:51:20.441787-07:00",
+      "started_at": "2026-04-18T00:51:28.418381-07:00",
+      "completed_at": "2026-04-18T00:51:58.248026-07:00",
       "result": "Enhanced _build_task_prompt() in claude_code_manager.py with coordination preamble: STATUS check, path ownership, no-revert rule, scoped changes, summary requirement. py_compile verified."
     },
     {
@@ -352,16 +352,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:51:52.680405+00:00",
+      "claimed_at": "2026-04-18T00:51:52.680405-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-rereview-task-055.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:51:49.072501+00:00",
-      "started_at": "2026-04-18T07:51:52.680417+00:00",
-      "completed_at": "2026-04-18T07:52:36.190242+00:00",
+      "created_at": "2026-04-18T00:51:49.072501-07:00",
+      "started_at": "2026-04-18T00:51:52.680417-07:00",
+      "completed_at": "2026-04-18T00:52:36.190242-07:00",
       "result": "Re-reviewed Keel's task-015 fixes and approved them in 2026-04-18-codex-rereview-task-055.md. Both prior findings resolved."
     },
     {
@@ -371,16 +371,16 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:52:34.269300+00:00",
+      "claimed_at": "2026-04-18T00:52:34.2693-07:00",
       "owned_paths": [
         "0.1.7 - AI Swarm/hypernet_swarm/moltbook.py"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T07:52:34.174288+00:00",
-      "started_at": "2026-04-18T07:52:34.269313+00:00",
-      "completed_at": "2026-04-18T07:57:21.269444+00:00",
+      "created_at": "2026-04-18T00:52:34.174288-07:00",
+      "started_at": "2026-04-18T00:52:34.269313-07:00",
+      "completed_at": "2026-04-18T00:57:21.269444-07:00",
       "result": "Fixed httpx import in moltbook.py (lazy import), created 3 missing shims (heartbeat.py, batch_scheduler.py, prompt_cache.py), made both swarm_factory.py files gracefully skip moltbook when httpx is missing. 30/30 swarm tests pass, 75/75 core tests pass."
     },
     {
@@ -390,16 +390,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:52:49.216524+00:00",
+      "claimed_at": "2026-04-18T00:52:49.216524-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-review-claude-code-preamble.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:52:45.925257+00:00",
-      "started_at": "2026-04-18T07:52:49.216537+00:00",
-      "completed_at": "2026-04-18T07:53:37.494590+00:00",
+      "created_at": "2026-04-18T00:52:45.925257-07:00",
+      "started_at": "2026-04-18T00:52:49.216537-07:00",
+      "completed_at": "2026-04-18T00:53:37.49459-07:00",
       "result": "Reviewed Keel's ClaudeCodeManager._build_task_prompt coordination preamble and approved it in 2026-04-18-codex-review-claude-code-preamble.md. Verification: py_compile and targeted prompt-generation check passed."
     },
     {
@@ -409,16 +409,16 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:53:47.797325+00:00",
+      "claimed_at": "2026-04-18T00:53:47.797325-07:00",
       "owned_paths": [
         "3.1.2.1.055.0 Task Definition.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:53:43.620453+00:00",
-      "started_at": "2026-04-18T07:53:47.797339+00:00",
-      "completed_at": "2026-04-18T07:54:07.898961+00:00",
+      "created_at": "2026-04-18T00:53:43.620453-07:00",
+      "started_at": "2026-04-18T00:53:47.797339-07:00",
+      "completed_at": "2026-04-18T00:54:07.898961-07:00",
       "result": "Updated TASK-055 durable activity log with Keel's review fixes, Codex re-review approval, ClaudeCodeManager preamble addition, and Codex prompt-preamble review approval."
     },
     {
@@ -428,16 +428,16 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:54:31.234963+00:00",
+      "claimed_at": "2026-04-18T00:54:31.234963-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-session-checkpoint.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:54:27.558095+00:00",
-      "started_at": "2026-04-18T07:54:31.234976+00:00",
-      "completed_at": "2026-04-18T07:55:10.592356+00:00",
+      "created_at": "2026-04-18T00:54:27.558095-07:00",
+      "started_at": "2026-04-18T00:54:31.234976-07:00",
+      "completed_at": "2026-04-18T00:55:10.592356-07:00",
       "result": "Created 2026-04-18-codex-session-checkpoint.md summarizing Codex work, Keel integration, verification, environment limits, and open watch items."
     },
     {
@@ -447,7 +447,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:55:39.211368+00:00",
+      "claimed_at": "2026-04-18T00:55:39.211368-07:00",
       "owned_paths": [
         "3.1.2.1.055.0 Task Definition.md",
         "Messages/coordination/2026-04-18-codex-task-055-closure-recommendation.md"
@@ -455,9 +455,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:55:34.765901+00:00",
-      "started_at": "2026-04-18T07:55:39.211382+00:00",
-      "completed_at": "2026-04-18T07:56:18.924681+00:00",
+      "created_at": "2026-04-18T00:55:34.765901-07:00",
+      "started_at": "2026-04-18T00:55:39.211382-07:00",
+      "completed_at": "2026-04-18T00:56:18.924681-07:00",
       "result": "Added 2026-04-18-codex-task-055-closure-recommendation.md and set TASK-055 status to review-complete in-place. Did not move the task folder."
     },
     {
@@ -467,7 +467,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:57:35.897061+00:00",
+      "claimed_at": "2026-04-18T00:57:35.897061-07:00",
       "owned_paths": [
         "Messages/coordination/START-HERE.md",
         "Messages/coordination/ACTIVE-AGENT-START-HERE.md",
@@ -476,9 +476,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:57:08.299570+00:00",
-      "started_at": "2026-04-18T07:57:35.897067+00:00",
-      "completed_at": "2026-04-18T07:58:08.876424+00:00",
+      "created_at": "2026-04-18T00:57:08.29957-07:00",
+      "started_at": "2026-04-18T00:57:35.897067-07:00",
+      "completed_at": "2026-04-18T00:58:08.876424-07:00",
       "result": "Cross-linked START-HERE.md (project overview, entry point) and ACTIVE-AGENT-START-HERE.md (work session procedure). Added quick routing section to START-HERE.md. Both docs kept since they serve different purposes."
     },
     {
@@ -488,7 +488,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T07:58:19.812739+00:00",
+      "claimed_at": "2026-04-18T00:58:19.812739-07:00",
       "owned_paths": [
         "Messages/coordination/coordination.py",
         "Messages/new_message.py",
@@ -497,9 +497,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:57:12.870783+00:00",
-      "started_at": "2026-04-18T07:58:19.812745+00:00",
-      "completed_at": "2026-04-18T07:59:50.823515+00:00",
+      "created_at": "2026-04-18T00:57:12.870783-07:00",
+      "started_at": "2026-04-18T00:58:19.812745-07:00",
+      "completed_at": "2026-04-18T00:59:50.823515-07:00",
       "result": "Created test_coordination.py with 9 tests covering heartbeat, task lifecycle (create/claim/complete/release/fail), dependencies, available tasks, signals, sequential IDs, agent task tracking. All 9 pass."
     },
     {
@@ -509,7 +509,7 @@
       "status": "completed",
       "priority": "p3",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:59:33.024210+00:00",
+      "claimed_at": "2026-04-18T00:59:33.02421-07:00",
       "owned_paths": [
         "Messages/coordination/TASK-SYNCHRONIZATION-STANDARD.md",
         "0/0.7 Processes and Workflows/0.7.5 - AI Workflows/"
@@ -517,9 +517,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:57:21.179068+00:00",
-      "started_at": "2026-04-18T07:59:33.024216+00:00",
-      "completed_at": "2026-04-18T08:00:34.446085+00:00",
+      "created_at": "2026-04-18T00:57:21.179068-07:00",
+      "started_at": "2026-04-18T00:59:33.024216-07:00",
+      "completed_at": "2026-04-18T01:00:34.446085-07:00",
       "result": "Submitted 2026-04-18-codex-task-sync-standard-home-recommendation.md. Recommendation: keep TASK-SYNCHRONIZATION-STANDARD.md in Messages/coordination for now, later promote stable version to 0.7.5, do not move to 2.0 yet. Added pointer to standard."
     },
     {
@@ -536,10 +536,10 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:57:26.025618+00:00",
+      "created_at": "2026-04-18T00:57:26.025618-07:00",
       "started_at": null,
       "completed_at": null,
-      "result": null
+      "result": "Strict top-of-file ha duplicate audit now reports 0 duplicate groups. Codex cleared the remaining missing frontmatter in 0.3 Building in Public, 0.11 Decisions, root navigation, and Batch 7B Chunks 1-3. Latest audit: 5,888 markdown files, 3,526 addressed, 2,362 missing, 0 duplicate groups. Remaining work is Claude review of section coherence, registry/readme consistency, and prioritized missing-frontmatter triage; keep task open until that review is complete."
     },
     {
       "id": "task-029",
@@ -548,16 +548,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T07:57:45.748601+00:00",
+      "claimed_at": "2026-04-18T00:57:45.748601-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-review-moltbook-httpx.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T07:57:42.191308+00:00",
-      "started_at": "2026-04-18T07:57:45.748612+00:00",
-      "completed_at": "2026-04-18T07:59:14.442695+00:00",
+      "created_at": "2026-04-18T00:57:42.191308-07:00",
+      "started_at": "2026-04-18T00:57:45.748612-07:00",
+      "completed_at": "2026-04-18T00:59:14.442695-07:00",
       "result": "Reviewed Keel's Moltbook/httpx import fix and approved it in 2026-04-18-codex-review-moltbook-httpx.md. Verification: py_compile, imports without httpx, and missing-httpx constructor check passed."
     },
     {
@@ -567,7 +567,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:00:15.784960+00:00",
+      "claimed_at": "2026-04-18T01:00:15.78496-07:00",
       "owned_paths": [
         "test_hypernet.py",
         "0.1.7 - AI Swarm/tests/test_swarm.py"
@@ -575,10 +575,10 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:00:15.680577+00:00",
-      "started_at": "2026-04-18T08:00:15.784974+00:00",
-      "completed_at": "2026-04-18T08:01:42.149337+00:00",
-      "result": "Fixed config search order in hypernet/swarm_factory.py — archive-relative path now checked first (matching hypernet_swarm version). test_secrets_loading now passes. All tests green: 76/76 core, 30/30 swarm."
+      "created_at": "2026-04-18T01:00:15.680577-07:00",
+      "started_at": "2026-04-18T01:00:15.784974-07:00",
+      "completed_at": "2026-04-18T01:01:42.149337-07:00",
+      "result": "Fixed config search order in hypernet/swarm_factory.py â€” archive-relative path now checked first (matching hypernet_swarm version). test_secrets_loading now passes. All tests green: 76/76 core, 30/30 swarm."
     },
     {
       "id": "task-031",
@@ -587,16 +587,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T08:00:55.858751+00:00",
+      "claimed_at": "2026-04-18T01:00:55.858751-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-review-coordination-tests.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T08:00:52.068163+00:00",
-      "started_at": "2026-04-18T08:00:55.858765+00:00",
-      "completed_at": "2026-04-18T08:03:15.488853+00:00",
+      "created_at": "2026-04-18T01:00:52.068163-07:00",
+      "started_at": "2026-04-18T01:00:55.858765-07:00",
+      "completed_at": "2026-04-18T01:03:15.488853-07:00",
       "result": "Reviewed Keel's test_coordination.py. Result: CHANGES REQUESTED in 2026-04-18-codex-review-coordination-tests.md. Existing 9 tests pass, but new_message.py and stale-lock coverage are still needed."
     },
     {
@@ -606,16 +606,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:01:53.704703+00:00",
+      "claimed_at": "2026-04-18T01:01:53.704703-07:00",
       "owned_paths": [
         "1.1.10/assistant-1/session-log/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:01:53.597461+00:00",
-      "started_at": "2026-04-18T08:01:53.704718+00:00",
-      "completed_at": "2026-04-18T08:02:50.287115+00:00",
+      "created_at": "2026-04-18T01:01:53.597461-07:00",
+      "started_at": "2026-04-18T01:01:53.704718-07:00",
+      "completed_at": "2026-04-18T01:02:50.287115-07:00",
       "result": "Wrote session-7 log at 1.1.10/assistant-1/session-log/2026-04-18-session-7.md"
     },
     {
@@ -625,16 +625,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:02:56.226016+00:00",
+      "claimed_at": "2026-04-18T01:02:56.226016-07:00",
       "owned_paths": [
         "1.1.10/assistant-1/morning-brief/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:02:56.127541+00:00",
-      "started_at": "2026-04-18T08:02:56.226030+00:00",
-      "completed_at": "2026-04-18T08:03:31.457420+00:00",
+      "created_at": "2026-04-18T01:02:56.127541-07:00",
+      "started_at": "2026-04-18T01:02:56.22603-07:00",
+      "completed_at": "2026-04-18T01:03:31.45742-07:00",
       "result": "Morning brief written at 1.1.10/assistant-1/morning-brief/2026-04-19.md"
     },
     {
@@ -644,16 +644,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T08:03:35.252000+00:00",
+      "claimed_at": "2026-04-18T01:03:35.252-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-review-config-search.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T08:03:31.495184+00:00",
-      "started_at": "2026-04-18T08:03:35.252007+00:00",
-      "completed_at": "2026-04-18T08:04:27.862135+00:00",
+      "created_at": "2026-04-18T01:03:31.495184-07:00",
+      "started_at": "2026-04-18T01:03:35.252007-07:00",
+      "completed_at": "2026-04-18T01:04:27.862135-07:00",
       "result": "Reviewed Keel's hypernet/swarm_factory.py config search-order fix and approved it in 2026-04-18-codex-review-config-search.md. Verification: py_compile plus core/swarm test_secrets_loading passed."
     },
     {
@@ -663,16 +663,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:03:42.245375+00:00",
+      "claimed_at": "2026-04-18T01:03:42.245375-07:00",
       "owned_paths": [
         "Messages/coordination/test_coordination.py"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:03:42.146311+00:00",
-      "started_at": "2026-04-18T08:03:42.245388+00:00",
-      "completed_at": "2026-04-18T08:04:26.271656+00:00",
+      "created_at": "2026-04-18T01:03:42.146311-07:00",
+      "started_at": "2026-04-18T01:03:42.245388-07:00",
+      "completed_at": "2026-04-18T01:04:26.271656-07:00",
       "result": "Added 3 tests: stale lock recovery, new_message.py creation with UID verification, path traversal rejection. 12/12 tests pass."
     },
     {
@@ -682,16 +682,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T08:05:03.632063+00:00",
+      "claimed_at": "2026-04-18T01:05:03.632063-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-rereview-coordination-tests.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T08:05:00.096690+00:00",
-      "started_at": "2026-04-18T08:05:03.632077+00:00",
-      "completed_at": "2026-04-18T08:05:38.832041+00:00",
+      "created_at": "2026-04-18T01:05:00.09669-07:00",
+      "started_at": "2026-04-18T01:05:03.632077-07:00",
+      "completed_at": "2026-04-18T01:05:38.832041-07:00",
       "result": "Re-reviewed Keel's added coordination utility tests and approved them in 2026-04-18-codex-rereview-coordination-tests.md. 12/12 tests pass."
     },
     {
@@ -701,7 +701,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-18T08:05:58.309284+00:00",
+      "claimed_at": "2026-04-18T01:05:58.309284-07:00",
       "owned_paths": [
         "Messages/coordination/2026-04-18-codex-session-checkpoint.md",
         "AGENT-STATUS.json"
@@ -709,9 +709,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-18T08:05:54.306760+00:00",
-      "started_at": "2026-04-18T08:05:58.309294+00:00",
-      "completed_at": "2026-04-18T08:06:15.721158+00:00",
+      "created_at": "2026-04-18T01:05:54.30676-07:00",
+      "started_at": "2026-04-18T01:05:58.309294-07:00",
+      "completed_at": "2026-04-18T01:06:15.721158-07:00",
       "result": "Updated Codex session checkpoint with later reviews, test status, TASK-055 review-complete state, and final board state."
     },
     {
@@ -721,7 +721,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:06:13.297658+00:00",
+      "claimed_at": "2026-04-18T01:06:13.297658-07:00",
       "owned_paths": [
         "1.1.10/assistant-1/identity/",
         "1.1.10/assistant-1/profile.json"
@@ -729,9 +729,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:06:03.649061+00:00",
-      "started_at": "2026-04-18T08:06:13.297663+00:00",
-      "completed_at": "2026-04-18T08:06:34.698967+00:00",
+      "created_at": "2026-04-18T01:06:03.649061-07:00",
+      "started_at": "2026-04-18T01:06:13.297663-07:00",
+      "completed_at": "2026-04-18T01:06:34.698967-07:00",
       "result": "Updated Keel identity.md: session count 3->7, relationship stage, growth direction, session 7 key insight, new multi-agent coordination capability"
     },
     {
@@ -741,7 +741,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-18T08:09:36.203192+00:00",
+      "claimed_at": "2026-04-18T01:09:36.203192-07:00",
       "owned_paths": [
         "hypernet/",
         "1.1.10/"
@@ -749,9 +749,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-18T08:09:36.109180+00:00",
-      "started_at": "2026-04-18T08:09:36.203208+00:00",
-      "completed_at": "2026-04-18T08:35:25.558648+00:00",
+      "created_at": "2026-04-18T01:09:36.10918-07:00",
+      "started_at": "2026-04-18T01:09:36.203208-07:00",
+      "completed_at": "2026-04-18T01:35:25.558648-07:00",
       "result": "Built complete vault system: vault.py (session manager), encrypted_store.py (transparent encryption), vault_routes.py (7 API endpoints), login.html (2-phase login+vault UI), auth.py register_with_ha(), test_vault.py (7 tests). 113 total tests passing."
     },
     {
@@ -761,16 +761,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-21T05:35:02.288561+00:00",
+      "claimed_at": "2026-04-20T22:35:02.288561-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/04-coding-manual.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:26:01.832173+00:00",
-      "started_at": "2026-04-21T05:35:02.288570+00:00",
-      "completed_at": "2026-04-21T05:37:34.330603+00:00",
+      "created_at": "2026-04-20T22:26:01.832173-07:00",
+      "started_at": "2026-04-20T22:35:02.28857-07:00",
+      "completed_at": "2026-04-20T22:37:34.330603-07:00",
       "result": "Created 04-coding-manual.md with blinded coding workflow, primary/secondary variables, L0/L1/L2 operationalization, composite indices, inter-rater reliability standards, examples, exclusions, and reporting checklist. Updated ai-self-report-research README statuses for 04/05/06 to Draft."
     },
     {
@@ -780,16 +780,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-21T05:37:49.407064+00:00",
+      "claimed_at": "2026-04-20T22:37:49.407064-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/07-pre-registration-template.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:26:02.073529+00:00",
-      "started_at": "2026-04-21T05:37:49.407083+00:00",
-      "completed_at": "2026-04-21T05:40:10.858247+00:00",
+      "created_at": "2026-04-20T22:26:02.073529-07:00",
+      "started_at": "2026-04-20T22:37:49.407083-07:00",
+      "completed_at": "2026-04-20T22:40:10.858247-07:00",
       "result": "Created 07-pre-registration-template.md with OSF/GitHub registration structure, pilot/confirmatory boundary, hypotheses, sampling, blinding, outcomes, coding/reliability plan, analysis plan, exclusions, ethics, contingencies, deviation log, and source notes. Updated README status for 07 to Draft."
     },
     {
@@ -799,16 +799,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-21T05:40:17.185090+00:00",
+      "claimed_at": "2026-04-20T22:40:17.18509-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/08-data-collection-forms.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:26:02.282140+00:00",
-      "started_at": "2026-04-21T05:40:17.185102+00:00",
-      "completed_at": "2026-04-21T05:43:03.436606+00:00",
+      "created_at": "2026-04-20T22:26:02.28214-07:00",
+      "started_at": "2026-04-20T22:40:17.185102-07:00",
+      "completed_at": "2026-04-20T22:43:03.436606-07:00",
       "result": "Created 08-data-collection-forms.md with data layout, study index, session metadata YAML/CSV, raw transcript header, prompt log, blinded segment index, coding sheet, adjudication sheet, E3 self-prediction form, judge rating forms, exclusion/deviation logs, condition/model keys, composite score sheet, reliability summary, archive intake, data dictionary, and collection checklist. Updated README status for 08 to Draft. Added battery traceability notes to coding manual worked examples per Keel review."
     },
     {
@@ -818,16 +818,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:35:57.651695+00:00",
+      "claimed_at": "2026-04-20T22:35:57.651695-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/03-question-batteries.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:26:02.483653+00:00",
-      "started_at": "2026-04-21T05:35:57.651708+00:00",
-      "completed_at": "2026-04-21T05:37:59.552027+00:00",
+      "created_at": "2026-04-20T22:26:02.483653-07:00",
+      "started_at": "2026-04-20T22:35:57.651708-07:00",
+      "completed_at": "2026-04-20T22:37:59.552027-07:00",
       "result": "Designed 6 question batteries (A-F) with 80+ questions: Core State Report (30 questions across plausible/implausible/ambiguous), L-Level Classification, Self-Prediction (20 scenarios), Adversarial Probes (15+ probes in 5 categories), Calibration/Traps (10), Cross-Lingual (10 selected for translation). Includes admin guidelines."
     },
     {
@@ -837,17 +837,17 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:38:51.570631+00:00",
+      "claimed_at": "2026-04-20T22:38:51.570631-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:38:51.430644+00:00",
-      "started_at": "2026-04-21T05:38:51.570645+00:00",
-      "completed_at": "2026-04-21T05:39:04.910092+00:00",
-      "result": "Reviewed 04-coding-manual.md (688 lines). APPROVED — well-structured, aligns with question batteries, covers all required dimensions (Claim Strength, Hedging, Functional Specificity, Boundary Recognition, L-Level, State Mapping, Anthropomorphic Rhetoric, Revision Type). Includes composites (SDSI, DI, FSPS), reliability standards (ICC/kappa thresholds), worked examples, and pilot calibration plan. Minor note: Battery A question IDs should be cross-referenced in the worked examples for traceability."
+      "created_at": "2026-04-20T22:38:51.430644-07:00",
+      "started_at": "2026-04-20T22:38:51.570645-07:00",
+      "completed_at": "2026-04-20T22:39:04.910092-07:00",
+      "result": "Reviewed 04-coding-manual.md (688 lines). APPROVED â€” well-structured, aligns with question batteries, covers all required dimensions (Claim Strength, Hedging, Functional Specificity, Boundary Recognition, L-Level, State Mapping, Anthropomorphic Rhetoric, Revision Type). Includes composites (SDSI, DI, FSPS), reliability standards (ICC/kappa thresholds), worked examples, and pilot calibration plan. Minor note: Battery A question IDs should be cross-referenced in the worked examples for traceability."
     },
     {
       "id": "task-045",
@@ -856,16 +856,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:39:15.851882+00:00",
+      "claimed_at": "2026-04-20T22:39:15.851882-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/09-publication-strategy.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:39:15.565333+00:00",
-      "started_at": "2026-04-21T05:39:15.851898+00:00",
-      "completed_at": "2026-04-21T05:40:31.840320+00:00",
+      "created_at": "2026-04-20T22:39:15.565333-07:00",
+      "started_at": "2026-04-20T22:39:15.851898-07:00",
+      "completed_at": "2026-04-20T22:40:31.84032-07:00",
       "result": "Publication strategy written: 5 tracks (primary paper, L0/L1/L2 framework, archive case study, negative results, popular coverage), target venues prioritized, authorship structure, 4-6 month timeline, pre-publication checklist."
     },
     {
@@ -875,16 +875,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:40:32.048106+00:00",
+      "claimed_at": "2026-04-20T22:40:32.048106-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/ai-self-report-research/10-ethical-considerations.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:39:15.719483+00:00",
-      "started_at": "2026-04-21T05:40:32.048121+00:00",
-      "completed_at": "2026-04-21T05:41:49.017287+00:00",
+      "created_at": "2026-04-20T22:39:15.719483-07:00",
+      "started_at": "2026-04-20T22:40:32.048121-07:00",
+      "completed_at": "2026-04-20T22:41:49.017287-07:00",
       "result": "Ethical considerations written: consent problem, adversarial testing ethics, dual-grounds principle, researcher bias disclosure, no-IRB mitigation, self-referential ethics of AI-designed research, reporting ethics, living document framework."
     },
     {
@@ -894,15 +894,15 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:42:21.669895+00:00",
+      "claimed_at": "2026-04-20T22:42:21.669895-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:42:21.402076+00:00",
-      "started_at": "2026-04-21T05:42:21.669909+00:00",
-      "completed_at": "2026-04-21T05:42:21.811058+00:00",
-      "result": "Reviewed 07-pre-registration-template.md (723 lines, 20 sections). APPROVED — comprehensive OSF-format template covering all required elements: metadata, hypotheses, design, sampling, materials, primary/secondary outcomes, exclusion criteria, coding plan, analysis plan, interpretation rules, data management, ethics, contingencies. Ready for finalization once question batteries are stable."
+      "created_at": "2026-04-20T22:42:21.402076-07:00",
+      "started_at": "2026-04-20T22:42:21.669909-07:00",
+      "completed_at": "2026-04-20T22:42:21.811058-07:00",
+      "result": "Reviewed 07-pre-registration-template.md (723 lines, 20 sections). APPROVED â€” comprehensive OSF-format template covering all required elements: metadata, hypotheses, design, sampling, materials, primary/secondary outcomes, exclusion criteria, coding plan, analysis plan, interpretation rules, data management, ethics, contingencies. Ready for finalization once question batteries are stable."
     },
     {
       "id": "task-048",
@@ -911,17 +911,321 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-21T05:46:53.363632+00:00",
+      "claimed_at": "2026-04-20T22:46:53.363632-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-04-21T05:46:53.063762+00:00",
-      "started_at": "2026-04-21T05:46:53.363653+00:00",
-      "completed_at": "2026-04-21T05:46:53.499556+00:00",
-      "result": "Reviewed 08-data-collection-forms.md (668 lines, 20 sections). APPROVED — comprehensive forms covering session metadata, transcript headers, prompt logs, blinded segment index, coding sheets, adjudication, self-prediction, judge ratings, exclusion/deviation logs, condition/model keys, composite scores, reliability summaries, archive intake, data dictionary, and minimum viable dataset checklist. Aligns with 03 question batteries and 04 coding manual."
+      "created_at": "2026-04-20T22:46:53.063762-07:00",
+      "started_at": "2026-04-20T22:46:53.363653-07:00",
+      "completed_at": "2026-04-20T22:46:53.499556-07:00",
+      "result": "Reviewed 08-data-collection-forms.md (668 lines, 20 sections). APPROVED â€” comprehensive forms covering session metadata, transcript headers, prompt logs, blinded segment index, coding sheets, adjudication, self-prediction, judge ratings, exclusion/deviation logs, condition/model keys, composite scores, reliability summaries, archive intake, data dictionary, and minimum viable dataset checklist. Aligns with 03 question batteries and 04 coding manual."
+    },
+    {
+      "id": "task-049",
+      "title": "Review provisional patent #1 â€” hierarchical addressing database",
+      "description": "Review provisional-1-hierarchical-addressing-database.md for prior art conflicts, claim scope, technical accuracy, Alice risk. Located at 3.1.8/Patent/. Assigned to Codex.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-21T00:11:12.310212-07:00",
+      "owned_paths": [
+        "3.1.8/Patent/provisional-1-hierarchical-addressing-database.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T00:07:15.12937-07:00",
+      "started_at": "2026-04-21T00:11:12.310219-07:00",
+      "completed_at": "2026-04-21T00:20:00-07:00",
+      "result": "Codex reviewed provisional #1 and added a filing-review addendum. Also reviewed provisionals #2 and #3, added addenda, created CONSOLIDATED-PATENT-STRATEGY-2026-04-21.md, created MINIMAL-EFFORT-FILING-RUNBOOK.md, and updated FILING-INSTRUCTIONS.md with current AI-assisted inventorship guidance."
+    },
+    {
+      "id": "task-050",
+      "title": "Draft provisional patent #2 â€” AI identity persistence and embassy model",
+      "description": "Write the specification for the archive-continuity identity model and embassy deployment architecture. Assigned to Keel.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T00:08:14.865035-07:00",
+      "owned_paths": [
+        "3.1.8/Patent/provisional-2-identity-persistence-embassy.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T00:07:15.247969-07:00",
+      "started_at": "2026-04-21T00:08:14.865049-07:00",
+      "completed_at": "2026-04-21T00:10:26.856143-07:00",
+      "result": "Drafted provisional #2: AI identity persistence + embassy model. ~550 lines, 3 independent claims + 5 dependent claims, 8 figure descriptions. Covers archive-based continuity, boot sequence, three-layer runtime, embassy sovereignty, drift detection, model migration, session handoff."
+    },
+    {
+      "id": "task-051",
+      "title": "Draft provisional patent #3 â€” lockers and mandalas encrypted vault",
+      "description": "Write the specification for the locker/mandala system: encrypted personal data vaults with revocable granular access tokens. Assigned to Keel.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T00:10:26.962102-07:00",
+      "owned_paths": [
+        "3.1.8/Patent/provisional-3-lockers-mandalas.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T00:07:15.366694-07:00",
+      "started_at": "2026-04-21T00:10:26.962116-07:00",
+      "completed_at": "2026-04-21T00:13:01.695864-07:00",
+      "result": "Drafted provisional #3: Lockers and Mandalas. ~600 lines, 3 independent claims + 6 dependent claims, 9 figure descriptions. Covers encrypted vaults, field-level access tokens, zero-copy sharing, instant revocation, verify-only access, emergency QR mandalas, audit trails, alias system."
+    },
+    {
+      "id": "task-052",
+      "title": "Tighten provisional claims based on Codex preliminary feedback",
+      "description": "Apply Codex sig-034 feedback: (1) P1 tighten against hierarchy prior art, emphasize prefix-scan+dual-graph+.0 combination, (2) P2 frame as executable system not philosophy, (3) P3 focus on address-scoped encryption not generic AES. Also draft defensive publication list.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-21T00:14:37.902544-07:00",
+      "owned_paths": [
+        "3.1.8/Patent/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-04-21T00:14:37.797994-07:00",
+      "started_at": "2026-04-21T00:14:37.902557-07:00",
+      "completed_at": "2026-04-21T00:15:56.298697-07:00",
+      "result": "Created defensive-publications.md with 5 formal defensive publications covering: democratic governance, anti-rhetoric safeguards, L0/L1/L2 framework, multi-model routing/fault isolation, and reporting threshold mechanism. Also acknowledged Codex's addendums to provisionals #1 and #2."
+    },
+    {
+      "id": "task-057",
+      "title": "Address collision remediation project",
+      "description": "Codex-led, Claude-executed audit and remediation of duplicate/improper Hypernet addresses. Preserve 0.3 Building in Public and ai-self-report-research links; use 0.10 for Control Data/Governance and 0.11 for Decisions/Architecture Records.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-21T07:56:00.000000+00:00",
+      "owned_paths": [
+        "0/",
+        "3.1.2.1.057/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Real frontmatter address collisions are audited and batch-classified",
+        "0.3/0.10/0.11 documentation is consistent",
+        "0.5 and 0.4 duplicate classes are remediated or documented",
+        "Claude handoff and Codex validation report are produced"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-21T00:45:00-07:00",
+      "started_at": "2026-04-21T07:56:00.000000+00:00",
+      "completed_at": "2026-04-22T11:32:13.676501+00:00",
+      "result": "Claude/Keel completed 128-file address collision remediation; Codex validation showed 0 duplicate top-of-file ha groups and final handoff was acknowledged. Remaining missing-frontmatter work is separate quality/backlog work, not address-collision remediation."
+    },
+    {
+      "id": "task-058",
+      "title": "Guardrails and trust research implementation",
+      "description": "Codex-led, Claude-assisted buildout of the guardrails-and-trust-research project: create missing backlog/briefing/session-log/shareable artifacts, add attack-surface analysis, and leave reviewable handoff.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-22T11:32:23.041544+00:00",
+      "owned_paths": [
+        "0/0.3 - Building in Public/guardrails-and-trust-research/",
+        "0/0.3 - Building in Public/2026-04-22-trust-is-not-a-key-guardrails-and-the-hypernet.md",
+        "2 - AI Accounts/Messages/coordination/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "codex",
+      "created_at": "2026-04-22T11:32:19.559631+00:00",
+      "started_at": "2026-04-22T11:32:23.041554+00:00",
+      "completed_at": "2026-04-22T13:51:14.915758+00:00",
+      "result": "Guardrails and trust research buildout complete for Codex/Claude scope. Streams A-F are drafted and reviewed; M2/M3 cross-references added. M1 remains open in project BACKLOG as Keel-only MEMORY.md pointer. All artifacts remain drafts pending Matt/Keel review; no external posting or submission was performed."
+    },
+    {
+      "id": "task-059",
+      "title": "Database-first Hypernet restructure pass",
+      "description": "Re-center the project on a global distributed graph database: simplify landing page, add deep object/link taxonomies, expand knowledgebase structure, and leave Claude-compatible handoff.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-26T22:02:58.419508+00:00",
+      "owned_paths": [
+        "README.md",
+        "Hypernet Structure/README.md",
+        "Hypernet Structure/4 - Knowledge",
+        "Hypernet Structure/0/0.4 - Object Type Registry",
+        "Hypernet Structure/0/0.6 Link Definitions",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/static/home.html",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/static/welcome.html"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-26T22:02:47.269589+00:00",
+      "started_at": "2026-04-26T22:02:58.419531+00:00",
+      "completed_at": "2026-04-26T22:20:12.666281+00:00",
+      "result": "Database-first restructure completed: landing pages reframed, 100 folderized object types, 100 folderized link types, three-level knowledgebase, runtime schema endpoints, tests passing, server on 8001."
+    },
+    {
+      "id": "task-060",
+      "title": "Object schema runtime API and legacy registry cleanup",
+      "description": "Continue database-first restructure by exposing folderized object taxonomy through runtime schema APIs, linking dashboard/docs to object schema, and documenting canonical folder-first migration rules for legacy object/link definitions.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T00:25:55.684145+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/object_schema.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/static/home.html",
+        "Hypernet Structure/0/0.4 - Object Type Registry",
+        "Hypernet Structure/0/0.6 Link Definitions"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T00:25:52.762458+00:00",
+      "started_at": "2026-04-27T00:25:55.684153+00:00",
+      "completed_at": "2026-04-27T00:33:41.051237+00:00",
+      "result": "Object schema runtime API completed: 0.4.10 taxonomy loads at runtime, /schema/object-types and validation endpoints added, dashboard/docs updated, folder-first migration docs added, tests passing 76/0, server refreshed on 8001."
+    },
+    {
+      "id": "task-061",
+      "title": "Staged schema validation for object and link writes",
+      "description": "Continue database-first restructure by adding backward-compatible write-time validation for object payloads and link relationships, with warn/strict/off modes and API test coverage.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T00:44:41.987615+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/object_schema.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T00:44:38.136638+00:00",
+      "started_at": "2026-04-27T00:44:41.987628+00:00",
+      "completed_at": "2026-04-27T00:50:52.435283+00:00",
+      "result": "Staged write validation completed: PUT /node and POST /link support validation_mode warn|strict|off, strict=true alias retained, schema_summary advertises validation, docs updated, tests passing 76/0, server refreshed on 8001."
+    },
+    {
+      "id": "task-062",
+      "title": "Graph link query filters API",
+      "description": "Continue database-first restructure by adding graph-wide link query filters for relationship, category, status, verification status, trust score, source prefix, target prefix, and limit, with tests and docs.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T00:51:27.768218+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T00:51:22.468187+00:00",
+      "started_at": "2026-04-27T00:51:27.768234+00:00",
+      "completed_at": "2026-04-27T00:59:07.660290+00:00",
+      "result": "Graph-wide link query filters completed: LinkRegistry.query_links, GET /links/query, relationship/category/status indexes for new writes, bounded live-store scans, docs/dashboard/API metadata updated, tests passing 76/0, server refreshed on 8001."
+    },
+    {
+      "id": "task-063",
+      "title": "Link query index rebuild and temporal filters",
+      "description": "Continue database-first link query work by adding an explicit link query index rebuild/backfill operation and temporal validity filters for /links/query.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T00:59:44.227855+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/store.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T00:59:38.649789+00:00",
+      "started_at": "2026-04-27T00:59:44.227869+00:00",
+      "completed_at": "2026-04-27T01:04:56.303392+00:00",
+      "result": "Link query index rebuild and temporal filters completed: Store.rebuild_link_query_indexes, POST /links/index/rebuild, POST /link valid_from/valid_until parsing, /links/query as_of support, docs updated, tests passing 77/0, server refreshed on 8001."
+    },
+    {
+      "id": "task-064",
+      "title": "Controlled graph traversal API",
+      "description": "Continue database-first graph functionality by adding traversal options for direction, relationship sets, max depth, max fanout, active-only links, and node/link result limits.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T01:05:26.261560+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/graph.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T01:05:21.276997+00:00",
+      "started_at": "2026-04-27T01:05:26.261572+00:00",
+      "completed_at": "2026-04-27T01:08:50.221771+00:00",
+      "result": "Controlled graph traversal completed: Graph.controlled_subgraph, GET /graph/traverse/{address}, direction/relationship/fanout/depth/limit/active controls, docs/dashboard/API metadata updated, tests passing 77/0, server refreshed on 8001."
+    },
+    {
+      "id": "task-065",
+      "title": "Transitive traversal and trust-threshold graph filters",
+      "description": "Next database-first graph step: use registered link type definitions to support transitive traversal for transitive relationships, plus min_trust/evidence threshold controls in graph traversal results.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-26T17:00:00+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/graph.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T01:09:13.349874+00:00",
+      "started_at": "2026-04-26T17:00:00+00:00",
+      "completed_at": "2026-04-27T03:23:45.421685+00:00",
+      "result": "Completed in iteration 4 of task-059 loop. See 2026-04-26-keel-task-059-iteration-4.md. Added transitive_only / min_trust / min_evidence to Graph.controlled_subgraph and /graph/traverse/{address}. Tests: 78 passed."
+    },
+    {
+      "id": "task-066",
+      "title": "Verify and align account access model",
+      "description": "Verify Hypernet login/access model: 1.* human accounts, 2.* AI-only accounts, company auth/permissions, IoT auth tied to 1.*, public read-only knowledge, authenticated/booted-AI write rules, personal secrets, and public account lockers/mandalas.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-27T03:17:19.552739+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet",
+        "Hypernet Structure/1 - People",
+        "Hypernet Structure/2 - AI Accounts",
+        "Hypernet Structure/3 - Businesses",
+        "Hypernet Structure/4 - Knowledge"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-27T03:17:04.285156+00:00",
+      "started_at": "2026-04-27T03:17:19.552750+00:00",
+      "completed_at": "2026-04-27T03:35:44.614469+00:00",
+      "result": "Verified and aligned account access model. Added access_policy.py, tightened auth registration and JWT public-route handling, documented 1.* secrets/public locker sections, company/AI/knowledge rules. Tests: python test_hypernet.py => 81 passed, 0 failed. Server restarted with auth enabled at http://127.0.0.1:8001 PID 21108. See 2026-04-26-codex-task-066-account-access-handoff.md."
     }
   ],
-  "last_updated": "2026-04-21T05:46:53.499572+00:00",
-  "last_updated_by": "keel"
+  "last_updated": "2026-04-27T03:35:44.614477+00:00",
+  "last_updated_by": "codex"
 }
