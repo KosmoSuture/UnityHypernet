@@ -40,6 +40,13 @@ from .limits import ScalingLimits, LimitDef, LimitResult
 from .reputation import ReputationSystem, ReputationProfile, ReputationEntry
 from .favorites import FavoritesManager
 from .frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
+from .object_schema import (
+    ObjectTypeDef,
+    list_object_type_defs,
+    object_type_summary,
+    get_object_type_def,
+    validate_object_payload,
+)
 
 # Swarm orchestration has been separated into the hypernet_swarm package (0.1.7).
 # Import from hypernet_swarm for: Swarm, Worker, IdentityManager, providers,

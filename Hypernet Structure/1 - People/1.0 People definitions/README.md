@@ -73,7 +73,9 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 ├── 1.X.7 - Contributions
 ├── 1.X.8 - Media
 ├── 1.X.9 - Notes & Knowledge
-└── 1.X.10 - Profile & Identity
+├── 1.X.10 - Profile & Identity
+├── 1.X.11 - Secrets & Credentials
+└── 1.X.12 - Public Profile & Lockers
 ```
 
 ## Relationship to Hypernet Platform
@@ -100,6 +102,7 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 - Personal documents (1.X.2)
 - Communications (1.X.3)
 - Personal data (1.X.6)
+- Secrets and credentials (1.X.11)
 - Requires authentication and authorization
 
 ### Access Levels
@@ -107,6 +110,14 @@ Each person node follows the template defined in PERSON-FOLDER-TEMPLATE.md:
 2. **Team** - Hypernet team members only
 3. **Private** - Person + authorized individuals only
 4. **System** - System access only (encrypted)
+
+### Secrets and Public Account Surface
+
+Every personal account needs a private credential area and a public surface:
+
+- `1.X.11 - Secrets & Credentials` stores only metadata and encrypted locker references for passwords, API keys, recovery codes, device credentials, and signing keys.
+- `1.X.12 - Public Profile & Lockers` is the browsable public side of the account, including public profile data, public keys, public claims, and locker/mandala indexes.
+- Existing accounts may shift these extension addresses if a slot was already in use. Matt's `1.1` account uses `1.1.12` and `1.1.13`.
 
 ## Implementation Status
 

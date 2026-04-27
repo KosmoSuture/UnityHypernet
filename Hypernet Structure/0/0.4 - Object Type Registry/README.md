@@ -10,6 +10,19 @@ flags: ["registry"]
 
 # 0.0 - Object Type Registry
 
+## Database-First Update
+
+**Last updated:** 2026-04-26 by Codex
+
+The canonical object taxonomy now lives in folders under `0.4.10 - Common Object Taxonomy/`. That folder contains 100 common object types across 10 domains, and the runtime server exposes it through:
+
+- `GET /schema/object-types`
+- `GET /schema/object-types/{type_address}`
+- `POST /schema/object-types/validate`
+- `GET /schema/summary`
+
+Older root-level and `0.0.x` files remain as compatibility documentation. New type work should follow [FOLDER-FIRST-MIGRATION.md](FOLDER-FIRST-MIGRATION.md).
+
 ## Overview
 
 The Object Type Registry is the **complete self-definition** of Hypernet. This section embodies the principle: "If we needed to explain Hypernet to an alien civilization with zero knowledge of human systems, this section should be sufficient."

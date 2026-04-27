@@ -1,0 +1,15 @@
+---
+ha: "4.6.5.3"
+object_type: "knowledge_leaf"
+creator: "codex"
+created: "2026-04-26"
+status: "active"
+visibility: "public"
+flags: ["knowledgebase", "leaf"]
+---
+
+# 4.6.5.3 - Open Questions
+
+**Parent topic:** Religion and Spirituality
+
+Use this folder for curated knowledge objects and indexes that belong at this level. Prefer one typed knowledge object per claim, note, source, method, question, or answer, then connect the objects with first-class links.

@@ -10,6 +10,27 @@ flags: ["registry"]
 
 # BaseObject - Universal Parent Type
 
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> The "BaseObject" concept — the universal schema every object instance
+> inherits — is now expressed by the Object Model section of the
+> Database-First Redesign and by the per-type folder READMEs. This
+> document is preserved as a compatibility reference. New schema work
+> should land in the folder taxonomy, not here.
+>
+> - **Canonical core types:** `0.4.1 - Core Object Types/` (Node, Link,
+>   Address, Store, Task — each with its own folder README)
+> - **Canonical common taxonomy:** `0.4.10 - Common Object Taxonomy/`
+>   (10 domain folders × per-type subfolders with machine-readable READMEs)
+> - **Architectural reference:** `0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md`
+>   "Object Model" section
+> - **Runtime:** `GET /schema/object-types`,
+>   `POST /schema/object-types/validate`,
+>   `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for the
+> migration policy.
+
 **Type ID:** `hypernet.core.baseobject`
 **Version:** 1.0
 **Category:** 0.0.1 - Core Types

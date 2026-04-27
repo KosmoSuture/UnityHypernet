@@ -1,5 +1,5 @@
 ---
-ha: "0.4.0.1.1"
+ha: "0.4.legacy.0.1.1.user"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-09"
@@ -9,6 +9,21 @@ flags: ["registry"]
 ---
 
 # User - Human or AI Account
+
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> Human and AI account types are now defined under the Identity and
+> Agent Objects domain in the canonical taxonomy. This document is
+> preserved as a compatibility reference.
+>
+> - **Canonical:** `0.4.10 - Common Object Taxonomy/0.4.10.1 - Identity and Agent Objects/`
+>   (Person, AI Instance, AI Account, Organization, etc. — each with its
+>   own folder README)
+> - **Runtime:** `GET /schema/object-types`,
+>   `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for the
+> migration policy.
 
 **Type ID:** `hypernet.core.user`
 **Version:** 1.0

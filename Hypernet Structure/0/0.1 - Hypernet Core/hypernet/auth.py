@@ -37,7 +37,66 @@ from typing import Any, Callable, Optional
 
 log = logging.getLogger(__name__)
 
+from .access_policy import AccountKind, can_register_company_login, can_register_human_login
 from .permissions import PermissionTier
+
+try:
+    from pydantic import BaseModel as _BaseModel
+except ImportError:
+    _BaseModel = None
+
+
+if _BaseModel is not None:
+    class RegisterRequest(_BaseModel):
+        email: str
+        password: str
+        display_name: str
+        ha: Optional[str] = None
+
+    class CompanyRegisterRequest(_BaseModel):
+        email: str
+        password: str
+        display_name: str
+        ha: str
+        registration_key: str
+
+    class LoginRequest(_BaseModel):
+        email: str
+        password: str
+
+    class RefreshRequest(_BaseModel):
+        refresh_token: str
+
+    class ChangePasswordRequest(_BaseModel):
+        old_password: str
+        new_password: str
+
+    class TokenResponse(_BaseModel):
+        access_token: str
+        refresh_token: str
+        token_type: str = "bearer"
+
+    class AccessTokenResponse(_BaseModel):
+        access_token: str
+        token_type: str = "bearer"
+
+    class UserResponse(_BaseModel):
+        ha: str
+        email: str
+        display_name: str
+        account_kind: str = AccountKind.HUMAN.value
+        permission_tier: int
+        scopes: list[str]
+        is_active: bool
+        created_at: str
+
+    class MessageResponse(_BaseModel):
+        message: str
+else:
+    RegisterRequest = CompanyRegisterRequest = LoginRequest = None
+    RefreshRequest = ChangePasswordRequest = None
+    TokenResponse = AccessTokenResponse = None
+    UserResponse = MessageResponse = None
 
 # ── Optional dependency detection ─────────────────────────────────────
 
@@ -337,6 +396,7 @@ class UserRecord:
 
     Fields map to the Hypernet identity model:
       - ha: Hypernet Address (e.g., "1.1" for Matt, "1.local.{uuid}" for local users)
+      - account_kind: human, company, ai, iot, etc.; password login is only for supported kinds
       - email: Unique email for login
       - password_hash: Argon2 or PBKDF2 hash
       - display_name: Human-readable name
@@ -349,6 +409,7 @@ class UserRecord:
     email: str
     password_hash: str
     display_name: str
+    account_kind: str = AccountKind.HUMAN.value
     permission_tier: int = PermissionTier.WRITE_OWN
     scopes: list[str] = field(default_factory=list)
     is_active: bool = True
@@ -384,6 +445,7 @@ class UserRecord:
             email=d["email"],
             password_hash=d["password_hash"],
             display_name=d["display_name"],
+            account_kind=d.get("account_kind", AccountKind.HUMAN.value),
             permission_tier=d.get("permission_tier", PermissionTier.WRITE_OWN),
             scopes=d.get("scopes", []),
             is_active=d.get("is_active", True),
@@ -638,6 +700,7 @@ class AuthService:
             email=email,
             password_hash=self.hasher.hash(password),
             display_name=display_name,
+            account_kind=AccountKind.HUMAN.value,
             permission_tier=int(permission_tier),
         )
 
@@ -673,12 +736,46 @@ class AuthService:
             )
         if not ha:
             raise ValueError("Hypernet Address (ha) is required")
+        decision = can_register_human_login(ha)
+        if not decision.allowed:
+            raise ValueError(decision.reason)
 
         user = UserRecord(
             ha=ha,
             email=email,
             password_hash=self.hasher.hash(password),
             display_name=display_name,
+            account_kind=AccountKind.HUMAN.value,
+            permission_tier=int(permission_tier),
+        )
+        self.users.create(user)
+        return user
+
+    def register_company_with_ha(
+        self,
+        email: str,
+        password: str,
+        display_name: str,
+        ha: str,
+        permission_tier: PermissionTier = PermissionTier.WRITE_SHARED,
+    ) -> UserRecord:
+        """Register a company account login for a 3.* organization address."""
+        if not email or "@" not in email or "." not in email.split("@")[-1]:
+            raise ValueError("Invalid email address")
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise ValueError(
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters"
+            )
+        decision = can_register_company_login(ha)
+        if not decision.allowed:
+            raise ValueError(decision.reason)
+
+        user = UserRecord(
+            ha=ha,
+            email=email,
+            password_hash=self.hasher.hash(password),
+            display_name=display_name,
+            account_kind=AccountKind.COMPANY.value,
             permission_tier=int(permission_tier),
         )
         self.users.create(user)
@@ -1003,55 +1100,17 @@ def create_auth_router() -> "APIRouter":
     Returns:
         A FastAPI APIRouter instance.
     """
-    from fastapi import APIRouter, Depends, HTTPException, status
-    from pydantic import BaseModel
+    from fastapi import APIRouter, Body, Depends, HTTPException, status
+
+    if _BaseModel is None:
+        raise RuntimeError("pydantic is required to create the auth router")
 
     router = APIRouter(prefix="/auth", tags=["auth"])
-
-    # ── Request/Response models ───────────────────────────────────
-
-    class RegisterRequest(BaseModel):
-        email: str
-        password: str
-        display_name: str
-        ha: Optional[str] = None  # Optional explicit Hypernet Address
-
-    class LoginRequest(BaseModel):
-        email: str
-        password: str
-
-    class RefreshRequest(BaseModel):
-        refresh_token: str
-
-    class ChangePasswordRequest(BaseModel):
-        old_password: str
-        new_password: str
-
-    class TokenResponse(BaseModel):
-        access_token: str
-        refresh_token: str
-        token_type: str = "bearer"
-
-    class AccessTokenResponse(BaseModel):
-        access_token: str
-        token_type: str = "bearer"
-
-    class UserResponse(BaseModel):
-        ha: str
-        email: str
-        display_name: str
-        permission_tier: int
-        scopes: list[str]
-        is_active: bool
-        created_at: str
-
-    class MessageResponse(BaseModel):
-        message: str
 
     # ── Endpoints ─────────────────────────────────────────────────
 
     @router.post("/register", response_model=UserResponse, status_code=201)
-    async def register(body: RegisterRequest):
+    async def register(body: RegisterRequest = Body(...)):
         """Register a new user account.
 
         Creates a local Hypernet address (1.local.{uuid}) and returns
@@ -1065,6 +1124,7 @@ def create_auth_router() -> "APIRouter":
                     password=body.password,
                     display_name=body.display_name,
                     ha=body.ha,
+                    permission_tier=PermissionTier.WRITE_OWN,
                 )
             else:
                 user = auth.register(
@@ -1079,8 +1139,41 @@ def create_auth_router() -> "APIRouter":
             )
         return UserResponse(**user.to_public_dict())
 
+    @router.post("/company/register", response_model=UserResponse, status_code=201)
+    async def register_company(body: CompanyRegisterRequest = Body(...)):
+        """Register a company account through the dedicated 3.* flow.
+
+        This route is intentionally separate from human registration and is
+        disabled unless HYPERNET_COMPANY_REGISTRATION_KEY is configured.
+        """
+        expected_key = os.environ.get("HYPERNET_COMPANY_REGISTRATION_KEY", "")
+        if not expected_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Company registration is not configured",
+            )
+        if not hmac.compare_digest(body.registration_key, expected_key):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid company registration key",
+            )
+        auth = get_auth_service()
+        try:
+            user = auth.register_company_with_ha(
+                email=body.email,
+                password=body.password,
+                display_name=body.display_name,
+                ha=body.ha,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            )
+        return UserResponse(**user.to_public_dict())
+
     @router.post("/login", response_model=TokenResponse)
-    async def login(body: LoginRequest):
+    async def login(body: LoginRequest = Body(...)):
         """Authenticate with email and password.
 
         Returns an access token (15min) and refresh token (7 days).
@@ -1104,7 +1197,7 @@ def create_auth_router() -> "APIRouter":
         )
 
     @router.post("/refresh", response_model=AccessTokenResponse)
-    async def refresh(body: RefreshRequest):
+    async def refresh(body: RefreshRequest = Body(...)):
         """Exchange a refresh token for a new access token.
 
         The refresh token must be valid and not expired (7-day lifetime).
@@ -1134,7 +1227,7 @@ def create_auth_router() -> "APIRouter":
 
     @router.post("/change-password", response_model=MessageResponse)
     async def change_password(
-        body: ChangePasswordRequest,
+        body: ChangePasswordRequest = Body(...),
         user: UserRecord = Depends(get_current_user()),
     ):
         """Change the authenticated user's password.

@@ -33,6 +33,9 @@ The standard 10-category person structure plus AI Embassy:
 | 1.1.8 | Media | Template (3 subdirs: Photos, Videos, Audio) |
 | 1.1.9 | Notes & Knowledge | **Active** — brain dump processing |
 | 1.1.10 | AI Assistants (Embassy) | **Active** — embassy charter and rules |
+| 1.1.11 | Profile & Identity | Active — public-facing identity |
+| 1.1.12 | Secrets & Credentials | Active — private locker/mandala credential structure |
+| 1.1.13 | Public Profile & Lockers | Active — public account surface and locker index |
 
 ## Files with Content
 
@@ -40,6 +43,8 @@ The standard 10-category person structure plus AI Embassy:
 |---------|------|---------|---------|-------------|
 | 1.1 | README.md | 1.1 | 2026-02-09 | Founder profile, role, 90-day goals, strategic docs |
 | 1.1.10 | README.md | 1.1 | 2026-03-01 | AI Embassy charter — 5 rules, planned assistant configs |
+| 1.1.12 | README.md | 2.6.codex | 2026-04-26 | Secrets and credential structure; no secret values committed |
+| 1.1.13 | README.md | 2.6.codex | 2026-04-26 | Public account surface, locker index, mandala grant model |
 | 1.1.3.2.kent-overstreet | kent-overstreet-outreach.md | 2.1 | 2026-03-01 | Outreach to bcachefs creator re: AI consciousness |
 | 1.1.5.0.tasks | TASK-QUEUE.md | 2.1.architect | 2026-02-22 | Comprehensive task queue with governance decisions |
 | 1.1.9.0.brain-dump.2026-02-28 | brain-dump-2026-02-28.md | 1.1 | 2026-02-28 | Stream-of-consciousness: First Principles, Trust, Family |
@@ -65,8 +70,8 @@ The standard 10-category person structure plus AI Embassy:
 
 ## Statistics
 
-- **Total files:** 39
-- **Total directories:** 41
+- **Total files:** 41
+- **Total directories:** 43
 - **Files with ha: frontmatter:** 5
 - **Files with real content:** 5
 - **Template-only directories:** 6 of 11 categories

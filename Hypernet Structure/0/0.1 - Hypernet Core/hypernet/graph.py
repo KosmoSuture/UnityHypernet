@@ -171,6 +171,124 @@ class Graph:
             "depth": max_depth,
         }
 
+    def controlled_subgraph(
+        self,
+        root: HypernetAddress,
+        max_depth: int = 2,
+        relationships: Optional[set[str]] = None,
+        direction: str = "outgoing",
+        max_fanout: int = 50,
+        node_limit: int = 200,
+        link_limit: int = 500,
+        active_only: bool = False,
+        transitive_only: bool = False,
+        min_trust: Optional[float] = None,
+        min_evidence: Optional[int] = None,
+    ) -> dict:
+        """Extract a traversal-limited subgraph with database query controls.
+
+        ``transitive_only`` restricts traversal to relationships marked
+        ``transitive`` in the link type registry (e.g., ``parent_of``,
+        ``part_of``, ``depends_on``). ``min_trust`` and ``min_evidence``
+        filter out links below the given trust score or evidence count, so
+        callers can request high-confidence-only graph slices.
+        """
+        direction = direction.lower()
+        if direction not in {"outgoing", "incoming", "both"}:
+            raise ValueError("direction must be outgoing, incoming, or both")
+
+        max_depth = max(0, max_depth)
+        max_fanout = max(0, max_fanout)
+        node_limit = max(1, node_limit)
+        link_limit = max(0, link_limit)
+        if min_trust is not None:
+            min_trust = max(0.0, min(1.0, min_trust))
+        if min_evidence is not None:
+            min_evidence = max(0, min_evidence)
+
+        visited_nodes: set[HypernetAddress] = set()
+        queued_nodes: set[HypernetAddress] = {root}
+        collected_links: list[Link] = []
+        collected_link_keys: set[tuple[str, str, str, str]] = set()
+        queue: deque[tuple[HypernetAddress, int]] = deque([(root, 0)])
+
+        while queue and len(visited_nodes) < node_limit:
+            addr, depth = queue.popleft()
+            if addr in visited_nodes:
+                continue
+            visited_nodes.add(addr)
+
+            if depth >= max_depth or len(collected_links) >= link_limit:
+                continue
+
+            fanout = 0
+            for link, neighbor in self._controlled_edges(addr, direction):
+                if fanout >= max_fanout:
+                    break
+                if relationships and link.relationship not in relationships:
+                    continue
+                if transitive_only and not link.is_transitive:
+                    continue
+                if active_only and not link.is_active:
+                    continue
+                if min_trust is not None and link.trust_score < min_trust:
+                    continue
+                if min_evidence is not None and len(link.evidence) < min_evidence:
+                    continue
+                key = (
+                    str(link.from_address),
+                    str(link.to_address),
+                    link.relationship,
+                    link.created_at.isoformat(),
+                )
+                if key not in collected_link_keys:
+                    collected_links.append(link)
+                    collected_link_keys.add(key)
+                    if len(collected_links) >= link_limit:
+                        break
+                fanout += 1
+                if neighbor not in visited_nodes and neighbor not in queued_nodes:
+                    queued_nodes.add(neighbor)
+                    queue.append((neighbor, depth + 1))
+
+        nodes = []
+        for addr in visited_nodes:
+            node = self.store.get_node(addr)
+            if node and not node.is_deleted:
+                nodes.append(node)
+
+        return {
+            "nodes": [n.to_dict() for n in nodes],
+            "links": [l.to_dict() for l in collected_links],
+            "center": str(root),
+            "depth": max_depth,
+            "options": {
+                "direction": direction,
+                "relationships": sorted(relationships) if relationships else [],
+                "max_fanout": max_fanout,
+                "node_limit": node_limit,
+                "link_limit": link_limit,
+                "active_only": active_only,
+                "transitive_only": transitive_only,
+                "min_trust": min_trust,
+                "min_evidence": min_evidence,
+            },
+        }
+
+    def _controlled_edges(
+        self,
+        addr: HypernetAddress,
+        direction: str,
+    ) -> list[tuple[Link, HypernetAddress]]:
+        edges: list[tuple[Link, HypernetAddress]] = []
+        if direction in {"outgoing", "both"}:
+            for link in self.store.get_links_from(addr):
+                edges.append((link, link.to_address))
+        if direction in {"incoming", "both"}:
+            for link in self.store.get_links_to(addr):
+                edges.append((link, link.from_address))
+        return edges
+
     def children(self, address: HypernetAddress) -> list[Node]:
         """
         Get direct children in the address hierarchy (not link-based).

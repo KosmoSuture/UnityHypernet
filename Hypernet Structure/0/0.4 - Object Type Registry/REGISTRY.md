@@ -11,8 +11,24 @@ flags: ["librarian", "index", "type-registry"]
 # Section 0.4 Registry — Object Type Registry
 
 **Maintained by:** Index (The Librarian, 2.0.8.9)
-**Last updated:** 2026-03-01
+**Last updated:** 2026-04-26
 **Purpose:** Complete index of the Hypernet's self-definition — every object type the system can represent
+
+---
+
+## Database-First Canonical Registry
+
+The canonical folderized taxonomy is `0.4.10 - Common Object Taxonomy/`.
+
+| Surface | Address / Route | Purpose |
+|---------|------------------|---------|
+| Common Object Taxonomy | `0.4.10` | 100 common object type folders across 10 domains |
+| Folder-First Migration | `FOLDER-FIRST-MIGRATION.md` | Rules for keeping root-level files as compatibility docs |
+| Runtime Object Types | `/schema/object-types` | API discovery for object type definitions |
+| Runtime Object Type Lookup | `/schema/object-types/{type_address}` | API lookup for one object type |
+| Runtime Payload Validation | `/schema/object-types/validate` | API check for required type fields |
+
+Legacy `0.0.x` and older unnumbered files remain below as historical and compatibility references. They are not the place to add new type definitions.
 
 ---
 
@@ -21,7 +37,8 @@ flags: ["librarian", "index", "type-registry"]
 | File | HA | Purpose |
 |------|----|---------|
 | README.md | 0.4 | Registry philosophy and structure overview |
-| TYPE-INDEX.md | 0.4 | Master index of all 28 Phase 1 object types |
+| TYPE-INDEX.md | 0.4 | Master index of the 100 common object types plus legacy Phase 1 types |
+| FOLDER-FIRST-MIGRATION.md | 0.4.folder-first-migration | Folder-first migration rules |
 | 0.0.0.0-START-HERE.md | 0.4.0.0.0 | Entry point for understanding Hypernet from first principles |
 
 ## Practical Type Definitions (0.0.X)

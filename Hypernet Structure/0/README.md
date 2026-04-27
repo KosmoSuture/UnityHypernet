@@ -1,3 +1,13 @@
+---
+ha: "0"
+object_type: "readme"
+creator: "1.1"
+created: "2026-02-26"
+status: "active"
+visibility: "public"
+flags: ["metadata", "infrastructure", "navigation"]
+---
+
 # Section 0: System Metadata and Hypernet Infrastructure
 
 **Version:** 1.2
@@ -65,15 +75,37 @@ It's crucial to understand the distinction between Section 0 and the actual impl
 
 **Why it matters:** Hypernet operates on a distributed network of specialized nodes. This section defines the three node types that work together to provide storage, computation, and security.
 
-### 0.3 - Control Data
-**Purpose:** Governance and system parameters
+### 0.3 - Building in Public
+**Purpose:** Public documentation of the Hypernet development process
 **Contains:**
-- Governance structures and voting procedures
+- Build logs, session narratives, and development diaries
+- Brain dump documentation
+- AI self-report research project (0.3.research)
+- Public-facing development materials
+
+**Why it matters:** Transparency is a core Hypernet value. This section documents the raw process of building the system — successes, failures, decisions, and discoveries — so anyone can follow along.
+
+> **Note:** Governance and control data formerly at 0.3 have been moved to 0.10. Architectural decision records formerly at 0.3 have been moved to 0.11.
+
+### 0.10 - Control Data and Governance
+**Purpose:** Democratic governance structures and system configuration
+**Contains:**
+- Governance structures and voting procedures (0.10.0 through 0.10.8)
+- Reputation system, dispute resolution, financial governance
 - System configuration parameters
-- Feature flags and rollout controls
 - Access control policies
 
-**Why it matters:** This ensures Hypernet remains democratically governed and prevents any single entity from capturing the system. All governance decisions are documented here.
+**Why it matters:** This ensures Hypernet remains democratically governed and prevents any single entity from capturing the system.
+
+### 0.11 - Decisions and Architecture Records
+**Purpose:** Architectural decisions and design records
+**Contains:**
+- Database specification decisions
+- Security framework decisions
+- Compliance and governance portability analyses
+- Revised plans and architecture records
+
+**Why it matters:** Every significant architectural decision is documented with rationale, alternatives considered, and outcomes.
 
 ### 0.4 - Object Type Registry
 **Purpose:** Canonical object type definitions
@@ -281,11 +313,11 @@ Anyone can propose changes to Section 0 metadata, but changes require:
 
 ## Section 0 Statistics
 
-**Current state (February 2026):**
+**Current state (April 2026):**
 - **Subsections:** 8 active
 - **Total documents:** 40+ specification files
-- **Object types defined:** 9 master types
-- **Link types defined:** 30+ relationship types
+- **Object types defined:** 100 common object types in `0.4.10`, plus legacy/master schemas
+- **Link types defined:** 100 common link types in `0.6.11`, plus runtime registered relationship types
 - **Workflows defined:** 8 core workflows
 - **Node types:** 3 (Storage, Processing, Cerberus)
 - **Working code:** 14,600+ lines Python across 32 modules (Hypernet Core library)

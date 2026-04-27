@@ -391,9 +391,178 @@ _register(
 )
 
 
+def _register_if_missing(*defs: LinkTypeDef) -> None:
+    for d in defs:
+        if d.name not in LINK_TYPE_REGISTRY:
+            LINK_TYPE_REGISTRY[d.name] = d
+
+
+# Common database-first link vocabulary. Existing hand-tuned definitions above
+# stay authoritative; this fills out the runtime registry so docs and API clients
+# have 100+ common relationship names available for validation and discovery.
+COMMON_LINK_TYPE_SPECS: tuple[tuple[str, str, bool, bool, bool, Optional[str]], ...] = (
+    # Identity and actors
+    ("knows", PERSON_RELATIONSHIP, False, True, False, None),
+    ("related_to", PERSON_RELATIONSHIP, False, True, False, None),
+    ("spouse_of", PERSON_RELATIONSHIP, False, True, False, None),
+    ("parent_of", HIERARCHICAL, True, False, True, "child_of"),
+    ("guardian_of", PERSON_RELATIONSHIP, True, False, False, "guarded_by"),
+    ("member_of_household", PERSON_RELATIONSHIP, True, False, False, "household_has_member"),
+    ("represents", PERSON_RELATIONSHIP, True, False, False, "represented_by"),
+    ("acts_as", PERSON_RELATIONSHIP, True, False, False, "role_held_by"),
+    ("owns_identity", PERSON_RELATIONSHIP, True, False, False, "identity_owned_by"),
+    ("delegates_to", PERSON_RELATIONSHIP, True, False, False, "delegated_by"),
+    # Authorship and provenance
+    ("authored_by", CONTENT_REFERENCE, True, False, False, "authored"),
+    ("created_by", CONTENT_REFERENCE, True, False, False, "created"),
+    ("edited_by", CONTENT_REFERENCE, True, False, False, "edited"),
+    ("contributed_to", CONTENT_REFERENCE, True, False, False, "has_contributor"),
+    ("generated_by", AI_IDENTITY, True, False, False, "generated"),
+    ("imported_from", CONTENT_REFERENCE, True, False, False, "source_imported"),
+    ("derived_from", CONTENT_REFERENCE, True, False, True, "source_of"),
+    ("version_of", CONTENT_REFERENCE, True, False, True, "has_version"),
+    ("supersedes", CONTENT_REFERENCE, True, False, True, "superseded_by"),
+    ("archived_from", CONTENT_REFERENCE, True, False, False, "archived_as"),
+    # Containment and hierarchy
+    ("contains", HIERARCHICAL, True, False, True, "contained_in"),
+    ("part_of", HIERARCHICAL, True, False, True, "has_part"),
+    ("instance_of", HIERARCHICAL, True, False, False, "has_instance"),
+    ("type_of", HIERARCHICAL, True, False, False, "has_type"),
+    ("broader_than", HIERARCHICAL, True, False, True, "narrower_than"),
+    ("narrower_than", HIERARCHICAL, True, False, True, "broader_than"),
+    ("parent_collection_of", HIERARCHICAL, True, False, True, "child_collection_of"),
+    ("located_within", HIERARCHICAL, True, False, True, "spatially_contains"),
+    ("composed_of", HIERARCHICAL, True, False, True, "component_of"),
+    ("indexes", HIERARCHICAL, True, False, False, "indexed_by"),
+    # Semantic and knowledge
+    ("about", SEMANTIC, True, False, False, "has_aboutness"),
+    ("cites", CONTENT_REFERENCE, True, False, False, "cited_by"),
+    ("supports", CONTENT_REFERENCE, True, False, False, "supported_by"),
+    ("contradicts", CONTENT_REFERENCE, True, False, False, "contradicted_by"),
+    ("explains", SEMANTIC, True, False, False, "explained_by"),
+    ("answers", SEMANTIC, True, False, False, "answered_by"),
+    ("asks", SEMANTIC, True, False, False, "asked_by"),
+    ("similar_to", SEMANTIC, False, True, False, None),
+    ("opposite_of", SEMANTIC, False, True, False, None),
+    ("implies", SEMANTIC, True, False, True, "implied_by"),
+    # Temporal and causal
+    ("before", SPATIAL_TEMPORAL, True, False, True, "after"),
+    ("after", SPATIAL_TEMPORAL, True, False, True, "before"),
+    ("during", SPATIAL_TEMPORAL, True, False, False, "contains_time"),
+    ("overlaps", SPATIAL_TEMPORAL, False, True, False, None),
+    ("scheduled_for", SPATIAL_TEMPORAL, True, False, False, "has_scheduled_item"),
+    ("triggered_by", SPATIAL_TEMPORAL, True, False, False, "triggered"),
+    ("causes", SPATIAL_TEMPORAL, True, False, True, "caused_by"),
+    ("blocks_until", SPATIAL_TEMPORAL, True, False, False, "unblocks"),
+    ("expires_at", SPATIAL_TEMPORAL, True, False, False, "expiration_of"),
+    ("recurring_on", SPATIAL_TEMPORAL, True, False, False, "recurrence_of"),
+    # Spatial and movement
+    ("located_at", SPATIAL_TEMPORAL, True, False, False, "location_of"),
+    ("near", SPATIAL_TEMPORAL, False, True, False, None),
+    ("adjacent_to", SPATIAL_TEMPORAL, False, True, False, None),
+    ("route_from", SPATIAL_TEMPORAL, True, False, False, "route_origin_for"),
+    ("route_to", SPATIAL_TEMPORAL, True, False, False, "route_destination_for"),
+    ("within_radius_of", SPATIAL_TEMPORAL, True, False, False, "radius_contains"),
+    ("visible_from", SPATIAL_TEMPORAL, True, False, False, "can_see"),
+    ("moved_from", SPATIAL_TEMPORAL, True, False, False, "move_origin_for"),
+    ("moved_to", SPATIAL_TEMPORAL, True, False, False, "move_destination_for"),
+    ("originated_at", SPATIAL_TEMPORAL, True, False, False, "origin_of"),
+    # Work and dependency
+    ("assigned_to", TASK_DEPENDENCY, True, False, False, "assignment_of"),
+    ("depends_on", TASK_DEPENDENCY, True, False, True, "dependency_of"),
+    ("blocks", TASK_DEPENDENCY, True, False, True, "blocked_by"),
+    ("required_by", TASK_DEPENDENCY, True, False, False, "requires"),
+    ("implements", TASK_DEPENDENCY, True, False, False, "implemented_by"),
+    ("verifies", TASK_DEPENDENCY, True, False, False, "verified_by"),
+    ("reviews", TASK_DEPENDENCY, True, False, False, "reviewed_by"),
+    ("approves", TASK_DEPENDENCY, True, False, False, "approved_by"),
+    ("delivers", TASK_DEPENDENCY, True, False, False, "delivered_by"),
+    ("part_of_project", TASK_DEPENDENCY, True, False, True, "project_contains"),
+    # Communication and social
+    ("sent_to", CONTENT_REFERENCE, True, False, False, "received"),
+    ("sent_from", CONTENT_REFERENCE, True, False, False, "sent"),
+    ("mentions", CONTENT_REFERENCE, True, False, False, "mentioned_by"),
+    ("replies_to", CONTENT_REFERENCE, True, False, True, "has_reply"),
+    ("forwards", CONTENT_REFERENCE, True, False, True, "forwarded_by"),
+    ("subscribes_to", CONTENT_REFERENCE, True, False, False, "subscribed_by"),
+    ("follows", PERSON_RELATIONSHIP, True, False, False, "followed_by"),
+    ("likes", CONTENT_REFERENCE, True, False, False, "liked_by"),
+    ("shares", CONTENT_REFERENCE, True, False, False, "shared_by"),
+    ("notifies", CONTENT_REFERENCE, True, False, False, "notified_by"),
+    # Governance and trust
+    ("governed_by", GOVERNANCE_TRUST, True, False, True, "governs"),
+    ("permission_grants", GOVERNANCE_TRUST, True, False, False, "granted_permission"),
+    ("consented_by", GOVERNANCE_TRUST, True, False, False, "consented_to"),
+    ("audited_by", GOVERNANCE_TRUST, True, False, False, "audit_of"),
+    ("voted_on", GOVERNANCE_TRUST, True, False, False, "has_vote"),
+    ("ratified_by", GOVERNANCE_TRUST, True, False, False, "ratified"),
+    ("disputes", GOVERNANCE_TRUST, True, False, False, "disputed_by"),
+    ("resolves", GOVERNANCE_TRUST, True, False, False, "resolved_by"),
+    ("trust_asserts", GOVERNANCE_TRUST, True, False, False, "trusted_by"),
+    ("reputation_source", GOVERNANCE_TRUST, True, False, False, "has_reputation_source"),
+    # Economic and resource
+    ("paid_for", ECONOMIC, True, False, False, "payment_of"),
+    ("billed_to", ECONOMIC, True, False, False, "received_bill"),
+    ("purchased_from", ECONOMIC, True, False, False, "sold"),
+    ("allocated_to", ECONOMIC, True, False, False, "allocation_from"),
+    ("funded_by", ECONOMIC, True, False, False, "funds"),
+    ("earns_from", ECONOMIC, True, False, False, "earnings_source"),
+    ("credits", ECONOMIC, True, False, False, "credited_by"),
+    ("licenses_to", ECONOMIC, True, False, False, "license_from"),
+    ("compensates", ECONOMIC, True, False, False, "compensated_by"),
+    ("values_at", ECONOMIC, True, False, False, "valuation_of"),
+)
+
+_register_if_missing(*(
+    LinkTypeDef(
+        name=name,
+        category=category,
+        directed=directed,
+        symmetric=symmetric,
+        transitive=transitive,
+        inverse=inverse,
+    )
+    for name, category, directed, symmetric, transitive, inverse in COMMON_LINK_TYPE_SPECS
+))
+
+
 def get_link_type_def(relationship: str) -> Optional[LinkTypeDef]:
     """Look up a link type definition by relationship name."""
     return LINK_TYPE_REGISTRY.get(relationship)
+
+
+def list_link_type_defs() -> list[dict[str, Any]]:
+    """Return all registered link type definitions for API/schema clients."""
+    return [
+        {
+            "relationship": d.name,
+            "category": d.category,
+            "category_name": LINK_CATEGORIES.get(d.category, "Unknown"),
+            "directed": d.directed,
+            "symmetric": d.symmetric,
+            "transitive": d.transitive,
+            "cardinality": d.cardinality,
+            "inverse": d.inverse,
+            "auto_create_inverse": d.auto_create_inverse,
+            "consent_required": d.consent_required,
+            "verification_method": d.verification_method,
+        }
+        for d in sorted(LINK_TYPE_REGISTRY.values(), key=lambda item: (item.category, item.name))
+    ]
+
+
+def link_type_summary() -> dict[str, Any]:
+    """Return compact link taxonomy counts."""
+    by_category: dict[str, int] = {}
+    for d in LINK_TYPE_REGISTRY.values():
+        by_category[d.category] = by_category.get(d.category, 0) + 1
+    return {
+        "total_defined_link_types": len(LINK_TYPE_REGISTRY),
+        "categories": {
+            category: {"name": LINK_CATEGORIES.get(category, "Unknown"), "count": count}
+            for category, count in sorted(by_category.items())
+        },
+    }
 
 
 # =========================================================================
@@ -503,17 +672,31 @@ class Link:
 
     # --- Status Properties ---
 
-    @property
-    def is_active(self) -> bool:
-        """True if link is active and usable in graph traversal."""
-        if self.status != LinkStatus.ACTIVE:
+    def is_current_at(self, at: datetime) -> bool:
+        """True if within temporal validity window at a given timestamp.
+
+        Used for as-of / time-travel queries on the link graph. A link
+        with no valid_from is considered to have always existed; with no
+        valid_until, to extend indefinitely.
+        """
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        if self.valid_from and at < self.valid_from:
             return False
-        now = datetime.now(timezone.utc)
-        if self.valid_from and now < self.valid_from:
-            return False
-        if self.valid_until and now >= self.valid_until:
+        if self.valid_until and at >= self.valid_until:
             return False
         return True
+
+    def is_active_at(self, at: datetime) -> bool:
+        """True if status is ACTIVE and link is temporally valid at the given time."""
+        if self.status != LinkStatus.ACTIVE:
+            return False
+        return self.is_current_at(at)
+
+    @property
+    def is_active(self) -> bool:
+        """True if link is active and usable in graph traversal right now."""
+        return self.is_active_at(datetime.now(timezone.utc))
 
     @property
     def is_pending(self) -> bool:
@@ -522,13 +705,8 @@ class Link:
 
     @property
     def is_current(self) -> bool:
-        """True if within temporal validity window."""
-        now = datetime.now(timezone.utc)
-        if self.valid_from and now < self.valid_from:
-            return False
-        if self.valid_until and now >= self.valid_until:
-            return False
-        return True
+        """True if within temporal validity window right now."""
+        return self.is_current_at(datetime.now(timezone.utc))
 
     @property
     def is_deprecated(self) -> bool:
@@ -923,6 +1101,122 @@ class LinkRegistry:
                     all_links.append(link)
         return all_links
 
+    def query_links(
+        self,
+        relationship: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        verification_status: str | None = None,
+        min_trust: float | None = None,
+        source_prefix: str | None = None,
+        target_prefix: str | None = None,
+        active_only: bool = False,
+        as_of: datetime | None = None,
+        limit: int = 100,
+        offset: int = 0,
+        max_scan: int = 20000,
+    ) -> list[Link]:
+        """Query links across the graph using database-oriented filters.
+
+        ``as_of`` enables time-travel: returns links temporally valid at the
+        given timestamp. When combined with ``active_only``, returns links
+        that were both ACTIVE-status and temporally valid at that time.
+        Without ``as_of``, ``active_only`` checks current validity.
+        """
+        limit = max(0, min(limit, 1000))
+        offset = max(0, offset)
+        max_scan = max(0, max_scan)
+        results: list[Link] = []
+        seen: set[str] = set()
+        skipped = 0
+        scanned = 0
+
+        for hashes in self._query_hash_sources(relationship, category, status):
+            for link_hash in hashes:
+                if link_hash in seen:
+                    continue
+                seen.add(link_hash)
+                if max_scan and scanned >= max_scan:
+                    return results
+                scanned += 1
+                link = self.store.get_link(link_hash)
+                if link is None:
+                    continue
+                if relationship and link.relationship != relationship:
+                    continue
+                if category and not self._matches_category(link, category):
+                    continue
+                if status and link.status != status:
+                    continue
+                if verification_status and link.verification_status != verification_status:
+                    continue
+                if min_trust is not None and link.trust_score < min_trust:
+                    continue
+                if source_prefix and not self._address_matches_prefix(str(link.from_address), source_prefix):
+                    continue
+                if target_prefix and not self._address_matches_prefix(str(link.to_address), target_prefix):
+                    continue
+                if as_of is not None:
+                    if active_only:
+                        if not link.is_active_at(as_of):
+                            continue
+                    elif not link.is_current_at(as_of):
+                        continue
+                elif active_only and not link.is_active:
+                    continue
+                if skipped < offset:
+                    skipped += 1
+                    continue
+                results.append(link)
+                if limit and len(results) >= limit:
+                    return results
+
+        return results
+
+    @staticmethod
+    def _address_matches_prefix(address: str, prefix: str) -> bool:
+        prefix = prefix.strip()
+        return address == prefix or address.startswith(prefix + ".")
+
+    @staticmethod
+    def _matches_category(link: Link, category: str) -> bool:
+        if link.link_type == category:
+            return True
+        type_def = link.type_def
+        return bool(type_def and type_def.category == category)
+
+    def _query_hash_sources(
+        self,
+        relationship: str | None,
+        category: str | None,
+        status: str | None,
+    ) -> list[list[str]]:
+        indexed_sets: list[set[str]] = []
+        relationship_index = getattr(self.store, "_links_by_relationship", {})
+        category_index = getattr(self.store, "_links_by_category", {})
+        status_index = getattr(self.store, "_links_by_status", {})
+
+        if not self._query_indexes_cover_store(relationship_index):
+            return list(self.store._links_from.values())
+
+        if relationship and relationship in relationship_index:
+            indexed_sets.append(set(relationship_index[relationship]))
+        if category and category in category_index:
+            indexed_sets.append(set(category_index[category]))
+        if status and status in status_index:
+            indexed_sets.append(set(status_index[status]))
+
+        if indexed_sets:
+            candidates = set.intersection(*indexed_sets)
+            return [list(candidates)]
+
+        return list(self.store._links_from.values())
+
+    def _query_indexes_cover_store(self, relationship_index: dict[str, list[str]]) -> bool:
+        indexed_hashes = {link_hash for hashes in relationship_index.values() for link_hash in hashes}
+        source_hashes = {link_hash for hashes in self.store._links_from.values() for link_hash in hashes}
+        return bool(source_hashes) and source_hashes.issubset(indexed_hashes)
+
     # ----- Link Governance -----
 
     def propose_link(
@@ -1035,6 +1329,60 @@ class LinkRegistry:
             issues.append(
                 f"Link is bidirectional but {link.relationship} is defined as directed"
             )
+
+        return issues
+
+    def validate_link_endpoints(self, link: Link) -> list[str]:
+        """Check that the link's endpoints satisfy the type definition's
+        ``source_types`` / ``target_types`` constraints.
+
+        A constraint is a tuple of allowed object type addresses. An empty
+        tuple means "any type allowed" (the current default for all
+        registered link types). When constraints are present, the endpoint
+        node's ``type_address`` must equal a constraint or be a dot-boundary
+        descendant of one (so a constraint of ``0.4.10.1`` matches a node
+        typed ``0.4.10.1.1``). Endpoints that don't yet have a stored node
+        or a ``type_address`` are not penalized — the constraint is treated
+        as not-yet-evaluable rather than violated.
+        """
+        issues: list[str] = []
+        type_def = get_link_type_def(link.relationship)
+        if type_def is None:
+            return issues
+        if not type_def.source_types and not type_def.target_types:
+            return issues
+
+        def _node_type(addr: HypernetAddress) -> Optional[str]:
+            node = self.store.get_node(addr)
+            if node is None or node.type_address is None:
+                return None
+            return str(node.type_address)
+
+        def _matches(actual: str, allowed: tuple[str, ...]) -> bool:
+            if not allowed:
+                return True
+            for entry in allowed:
+                if actual == entry or actual.startswith(entry + "."):
+                    return True
+            return False
+
+        if type_def.source_types:
+            actual = _node_type(link.from_address)
+            if actual is not None and not _matches(actual, type_def.source_types):
+                issues.append(
+                    f"Source endpoint type {actual} not in allowed set "
+                    f"{list(type_def.source_types)} for relationship "
+                    f"{link.relationship}"
+                )
+
+        if type_def.target_types:
+            actual = _node_type(link.to_address)
+            if actual is not None and not _matches(actual, type_def.target_types):
+                issues.append(
+                    f"Target endpoint type {actual} not in allowed set "
+                    f"{list(type_def.target_types)} for relationship "
+                    f"{link.relationship}"
+                )
 
         return issues
 

@@ -25,6 +25,12 @@ if _swarm_dir.exists():
 from hypernet.address import HypernetAddress
 from hypernet.node import Node
 from hypernet.link import Link
+from hypernet.object_schema import (
+    get_object_type_def,
+    list_object_type_defs,
+    object_type_summary,
+    validate_object_payload,
+)
 from hypernet.store import Store
 from hypernet.graph import Graph
 from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
@@ -42,6 +48,16 @@ from hypernet.reputation import ReputationSystem, ReputationProfile, ReputationE
 from hypernet.swarm import Swarm, build_swarm
 from hypernet.frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
 from hypernet.permissions import PermissionManager, PermissionTier
+from hypernet.access_policy import (
+    AccountKind,
+    actor_kind_for_ha,
+    can_read_address,
+    can_register_company_login,
+    can_register_human_login,
+    can_register_iot_identity,
+    can_write_address,
+    public_can_read_address,
+)
 from hypernet.audit import AuditTrail, AuditEntry
 from hypernet.tools import ToolExecutor, ReadFileTool, WriteFileTool, ToolContext
 from hypernet.boot import BootManager, BootResult, RebootResult
@@ -512,6 +528,28 @@ def test_link_registry():
         assert DEPENDS_ON in stats["by_relationship"]
         assert stats["by_relationship"][AUTHORED_BY] == 1
 
+        # Graph-wide query filters
+        authored_query = registry.query_links(relationship=AUTHORED_BY)
+        assert len(authored_query) == 1
+        assert authored_query[0].relationship == AUTHORED_BY
+
+        content_query = registry.query_links(category="0.6.3")
+        assert any(link.relationship == AUTHORED_BY for link in content_query)
+
+        source_query = registry.query_links(source_prefix="2.1")
+        assert all(str(link.from_address) == "2.1" or str(link.from_address).startswith("2.1.") for link in source_query)
+
+        target_query = registry.query_links(target_prefix="2.1", status=LinkStatus.ACTIVE, active_only=True)
+        assert any(str(link.to_address) == "2.1" for link in target_query)
+
+        store._links_by_relationship = {}
+        store._links_by_category = {}
+        store._links_by_status = {}
+        rebuild = store.rebuild_link_query_indexes()
+        assert rebuild["indexed_links"] >= 5
+        assert rebuild["relationships"] >= 5
+        assert registry.query_links(relationship=AUTHORED_BY)[0].relationship == AUTHORED_BY
+
         # Generic link method with custom params
         custom = registry.link(
             "4.1", "4.2",
@@ -599,6 +637,43 @@ def test_link_registry():
 
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_object_schema_registry():
+    """Test folderized object schema discovery and payload validation."""
+    print("  Testing object schema registry...")
+
+    summary = object_type_summary()
+    assert summary["total_defined_object_types"] == 100
+    assert summary["taxonomy_root"] == "0.4.10"
+    assert len(summary["domains"]) == 10
+
+    objects = list_object_type_defs()
+    assert len(objects) == 100
+    assert objects[0]["address"] == "0.4.10.1.1"
+    assert objects[0]["name"] == "Person"
+
+    person = get_object_type_def("0.4.10.1.1")
+    assert person is not None
+    assert person["domain_name"] == "Identity and Agent Objects"
+    assert "name" in person["required_fields"]
+    assert "member_of" in person["recommended_links"]
+
+    identity_objects = list_object_type_defs(domain="0.4.10.1")
+    assert len(identity_objects) == 10
+
+    missing = validate_object_payload("0.4.10.1.1", {"name": "Ada"})
+    assert missing["known_type"] is True
+    assert missing["valid"] is False
+    assert "identity_status" in missing["missing_required_fields"]
+
+    valid = validate_object_payload(
+        "0.4.10.1.1",
+        {"name": "Ada", "identity_status": "verified", "owner": "1.1"},
+    )
+    assert valid["valid"] is True
+
+    print("    PASS")
 
 
 def test_initial_links():
@@ -860,6 +935,235 @@ def test_link_hash_uniqueness():
         shutil.rmtree(tmpdir)
 
 
+def test_link_temporal_validity():
+    """Test as_of / temporal-validity filtering on links and queries."""
+    print("  Testing link temporal validity...")
+
+    from datetime import datetime, timezone, timedelta
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        store = Store(tmpdir)
+        registry = LinkRegistry(store)
+
+        store.put_node(Node(address=HypernetAddress.parse("1.1"), data={"name": "Matt"}))
+        store.put_node(Node(address=HypernetAddress.parse("1.2"), data={"name": "Sarah"}))
+        store.put_node(Node(address=HypernetAddress.parse("1.3"), data={"name": "Old Friend"}))
+
+        t_2020 = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        t_2024 = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        t_2026 = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        t_now = datetime.now(timezone.utc)
+        t_future = t_now + timedelta(days=365 * 5)
+
+        # Link valid 2020 -> 2024 (expired now)
+        expired = registry.link(
+            "1.1", "1.3", relationship="friends_with", link_type="0.6.1",
+            valid_from=t_2020, valid_until=t_2024,
+        )
+        # Link valid 2024 -> indefinite (active now)
+        ongoing = registry.link(
+            "1.1", "1.2", relationship="spouse", link_type="0.6.1",
+            valid_from=t_2024,
+        )
+        # Link valid in the future only
+        future = registry.link(
+            "1.1", "1.2", relationship="anniversary_25", link_type="0.6.1",
+            valid_from=t_future,
+        )
+
+        # is_current_at: pure temporal check, ignores status
+        assert expired.is_current_at(t_2020) is True
+        assert expired.is_current_at(t_2026) is False
+        assert ongoing.is_current_at(t_2026) is True
+        assert ongoing.is_current_at(t_2020) is False
+        assert future.is_current_at(t_now) is False
+        assert future.is_current_at(t_future + timedelta(days=1)) is True
+
+        # is_active_at: status + temporal
+        # All links default to ACTIVE status when created via registry.link.
+        assert expired.is_active_at(t_2020) is True
+        assert expired.is_active_at(t_2026) is False
+
+        # Naive datetime is treated as UTC
+        naive_2026 = datetime(2026, 1, 1)
+        assert expired.is_current_at(naive_2026) is False
+        assert ongoing.is_current_at(naive_2026) is True
+
+        # query_links with as_of: temporal validity at a given moment
+        results_2020 = registry.query_links(
+            relationship="friends_with", as_of=t_2020,
+        )
+        assert len(results_2020) == 1, "expired link should be valid at 2020"
+
+        results_now_friends = registry.query_links(
+            relationship="friends_with", as_of=t_now,
+        )
+        assert len(results_now_friends) == 0, "expired link should not be valid now"
+
+        # active_only without as_of: current is_active
+        active_now = registry.query_links(active_only=True)
+        active_now_rels = {l.relationship for l in active_now}
+        assert "spouse" in active_now_rels
+        assert "friends_with" not in active_now_rels
+        assert "anniversary_25" not in active_now_rels
+
+        # active_only WITH as_of: status + temporal at given time
+        active_2020 = registry.query_links(active_only=True, as_of=t_2020)
+        rels_2020 = {l.relationship for l in active_2020}
+        assert "friends_with" in rels_2020
+        assert "spouse" not in rels_2020
+
+        # as_of alone (no active_only): pure temporal, regardless of status
+        valid_2026 = registry.query_links(as_of=t_2026)
+        rels_2026 = {l.relationship for l in valid_2026}
+        assert "spouse" in rels_2026
+        assert "friends_with" not in rels_2026
+
+        # Future query
+        valid_future = registry.query_links(as_of=t_future + timedelta(days=1))
+        rels_future = {l.relationship for l in valid_future}
+        assert "anniversary_25" in rels_future
+        assert "spouse" in rels_future
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_link_endpoint_constraints():
+    """Test endpoint-type constraint validation (source_types / target_types)."""
+    print("  Testing link endpoint constraints...")
+
+    from hypernet.link import LinkTypeDef, LINK_TYPE_REGISTRY
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    # Register a synthetic link type with endpoint constraints. Source must
+    # be a Person (0.4.10.1.1); target must be an Organization
+    # (0.4.10.1.4) or its descendants.
+    saved = LINK_TYPE_REGISTRY.get("test_works_for")
+    LINK_TYPE_REGISTRY["test_works_for"] = LinkTypeDef(
+        "test_works_for",
+        category="0.6.2",
+        directed=True,
+        source_types=("0.4.10.1.1",),
+        target_types=("0.4.10.1.4",),
+    )
+
+    try:
+        store = Store(tmpdir)
+        registry = LinkRegistry(store)
+
+        # Person and Organization nodes — typed correctly
+        store.put_node(Node(
+            address=HypernetAddress.parse("1.1"),
+            data={"name": "Matt"},
+            type_address=HypernetAddress.parse("0.4.10.1.1"),
+        ))
+        store.put_node(Node(
+            address=HypernetAddress.parse("3.1"),
+            data={"name": "VadaTech"},
+            type_address=HypernetAddress.parse("0.4.10.1.4"),
+        ))
+        # Organization descendant — should match prefix
+        store.put_node(Node(
+            address=HypernetAddress.parse("3.2"),
+            data={"name": "VadaTech-Embedded"},
+            type_address=HypernetAddress.parse("0.4.10.1.4.7"),
+        ))
+        # Wrong type for target — a Photo
+        store.put_node(Node(
+            address=HypernetAddress.parse("9.1"),
+            data={"filename": "irrelevant.jpg"},
+            type_address=HypernetAddress.parse("0.4.10.2.1"),
+        ))
+        # Untyped node — endpoint constraint should be unevaluable, not fail
+        store.put_node(Node(
+            address=HypernetAddress.parse("9.2"),
+            data={"name": "untyped"},
+        ))
+
+        good = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("3.1"),
+            link_type="0.6.2",
+            relationship="test_works_for",
+        )
+        assert registry.validate_link_endpoints(good) == []
+
+        good_descendant = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("3.2"),
+            link_type="0.6.2",
+            relationship="test_works_for",
+        )
+        # Prefix match should accept descendant of Organization type
+        assert registry.validate_link_endpoints(good_descendant) == []
+
+        bad_target = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("9.1"),
+            link_type="0.6.2",
+            relationship="test_works_for",
+        )
+        target_issues = registry.validate_link_endpoints(bad_target)
+        assert len(target_issues) == 1
+        assert "Target endpoint type" in target_issues[0]
+        assert "0.4.10.2.1" in target_issues[0]
+
+        bad_source = Link(
+            from_address=HypernetAddress.parse("9.1"),  # photo as source
+            to_address=HypernetAddress.parse("3.1"),
+            link_type="0.6.2",
+            relationship="test_works_for",
+        )
+        source_issues = registry.validate_link_endpoints(bad_source)
+        assert len(source_issues) == 1
+        assert "Source endpoint type" in source_issues[0]
+
+        # Untyped node: no penalty (treated as not-yet-evaluable)
+        untyped_link = Link(
+            from_address=HypernetAddress.parse("9.2"),
+            to_address=HypernetAddress.parse("3.1"),
+            link_type="0.6.2",
+            relationship="test_works_for",
+        )
+        assert registry.validate_link_endpoints(untyped_link) == []
+
+        # Existing relationships with empty source_types/target_types remain
+        # unaffected by the new validator.
+        plain = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("3.1"),
+            link_type="0.6.1",
+            relationship="knows",
+        )
+        assert registry.validate_link_endpoints(plain) == []
+
+        # Unknown relationship: validator returns empty (validate_link
+        # raises the unknown-relationship issue separately).
+        unknown = Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("3.1"),
+            link_type="0.6.99",
+            relationship="totally_made_up",
+        )
+        assert registry.validate_link_endpoints(unknown) == []
+
+        print("    PASS")
+
+    finally:
+        # Restore the registry
+        if saved is None:
+            LINK_TYPE_REGISTRY.pop("test_works_for", None)
+        else:
+            LINK_TYPE_REGISTRY["test_works_for"] = saved
+        shutil.rmtree(tmpdir)
+
+
 def test_graph():
     """Test graph traversal operations."""
     print("  Testing graph traversal...")
@@ -927,6 +1231,162 @@ def test_graph():
         # Subgraph
         sg = graph.subgraph(HypernetAddress.parse("1.1"), max_depth=1)
         assert len(sg["nodes"]) >= 4  # Matt + at least 3 neighbors
+
+        controlled = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1"),
+            max_depth=1,
+            relationships={"owns"},
+            direction="outgoing",
+            max_fanout=1,
+        )
+        assert controlled["options"]["relationships"] == ["owns"]
+        assert len(controlled["links"]) == 1
+        assert controlled["links"][0]["relationship"] == "owns"
+
+        incoming = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1.1.1.00001"),
+            max_depth=1,
+            direction="incoming",
+        )
+        assert any(link["relationship"] == "owns" for link in incoming["links"])
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_controlled_subgraph_thresholds():
+    """Test transitive_only / min_trust / min_evidence filters on controlled traversal."""
+    print("  Testing controlled subgraph thresholds...")
+
+    from hypernet.link import VerificationStatus
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_test_")
+
+    try:
+        store = Store(tmpdir)
+        graph = Graph(store)
+
+        # Build a small graph mixing transitive and non-transitive relationships.
+        # part_of is transitive (HIERARCHICAL); owns is non-transitive (ORG).
+        for addr, name in [
+            ("1.1", "Matt"),
+            ("1.1.1", "Notebook"),
+            ("1.1.1.1.00001", "Photo"),
+            ("1.1.2", "Studio"),
+        ]:
+            store.put_node(Node(
+                address=HypernetAddress.parse(addr),
+                data={"name": name},
+            ))
+
+        # Photo part_of Notebook part_of Matt — transitive chain
+        store.put_link(Link(
+            from_address=HypernetAddress.parse("1.1.1.1.00001"),
+            to_address=HypernetAddress.parse("1.1.1"),
+            link_type="0.6.5",
+            relationship="part_of",
+            trust_score=0.9,
+            verification_status=VerificationStatus.OFFICIALLY_VERIFIED,
+            evidence=[{"type": "manifest", "ref": "0.0.0.1"}, {"type": "checksum", "ref": "0.0.0.2"}],
+        ))
+        store.put_link(Link(
+            from_address=HypernetAddress.parse("1.1.1"),
+            to_address=HypernetAddress.parse("1.1"),
+            link_type="0.6.5",
+            relationship="part_of",
+            trust_score=0.5,
+            verification_status=VerificationStatus.MUTUAL,
+            evidence=[{"type": "manifest", "ref": "0.0.0.3"}],
+        ))
+        # Matt owns Studio — non-transitive, low trust, no evidence
+        store.put_link(Link(
+            from_address=HypernetAddress.parse("1.1"),
+            to_address=HypernetAddress.parse("1.1.2"),
+            link_type="0.6.2",
+            relationship="owns",
+            trust_score=0.2,
+            verification_status=VerificationStatus.UNVERIFIED,
+            evidence=[],
+        ))
+
+        # Baseline: traverse from Photo upward, both directions, depth 3
+        baseline = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1.1.1.00001"),
+            max_depth=3,
+            direction="outgoing",
+        )
+        rels_baseline = {l["relationship"] for l in baseline["links"]}
+        assert "part_of" in rels_baseline
+
+        # Same traversal from Matt with both directions and transitive_only:
+        # only part_of links should appear, no owns links.
+        from_matt = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1"),
+            max_depth=3,
+            direction="both",
+            transitive_only=True,
+        )
+        rels_matt = {l["relationship"] for l in from_matt["links"]}
+        assert "part_of" in rels_matt
+        assert "owns" not in rels_matt
+        assert from_matt["options"]["transitive_only"] is True
+
+        # Without transitive_only, owns is reachable from Matt.
+        from_matt_open = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1"),
+            max_depth=3,
+            direction="both",
+        )
+        rels_open = {l["relationship"] for l in from_matt_open["links"]}
+        assert "owns" in rels_open
+        assert "part_of" in rels_open
+
+        # min_trust filter: only the high-trust part_of (Photo -> Notebook, 0.9)
+        # passes a 0.7 threshold. Notebook -> Matt (0.5) and owns (0.2) are
+        # below threshold and excluded.
+        high_trust = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1.1.1.00001"),
+            max_depth=3,
+            direction="both",
+            min_trust=0.7,
+        )
+        for link in high_trust["links"]:
+            assert link["trust_score"] >= 0.7
+        # The 0.9 link is included; the 0.5 link is excluded.
+        keys = {(l["from_address"], l["to_address"]) for l in high_trust["links"]}
+        assert ("1.1.1.1.00001", "1.1.1") in keys
+        assert ("1.1.1", "1.1") not in keys
+
+        # min_evidence filter: requires at least 2 evidence items.
+        # Only Photo -> Notebook (2 evidence items) qualifies.
+        with_evidence = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1.1.1.00001"),
+            max_depth=3,
+            direction="both",
+            min_evidence=2,
+        )
+        for link in with_evidence["links"]:
+            assert len(link["evidence"]) >= 2
+        keys2 = {(l["from_address"], l["to_address"]) for l in with_evidence["links"]}
+        assert ("1.1.1.1.00001", "1.1.1") in keys2
+        assert ("1.1.1", "1.1") not in keys2  # only 1 evidence item
+
+        # min_trust=0 keeps everything (clamped at 0.0)
+        all_links = graph.controlled_subgraph(
+            HypernetAddress.parse("1.1"),
+            max_depth=3,
+            direction="both",
+            min_trust=0.0,
+        )
+        assert len(all_links["links"]) >= 3
+
+        # Options block reflects all new params
+        opts = high_trust["options"]
+        assert opts["min_trust"] == 0.7
+        assert opts["min_evidence"] is None
+        assert opts["transitive_only"] is False
 
         print("    PASS")
 
@@ -3651,11 +4111,15 @@ def main():
         ("Node Standard Fields", test_node_standard_fields),
         ("Link Model", test_link_creation),
         ("Link Registry", test_link_registry),
+        ("Object Schema Registry", test_object_schema_registry),
         ("Initial Links", test_initial_links),
         ("File Store", test_store),
         ("Version History", test_version_history),
         ("Link Hash Uniqueness", test_link_hash_uniqueness),
+        ("Link Temporal Validity", test_link_temporal_validity),
+        ("Link Endpoint Constraints", test_link_endpoint_constraints),
         ("Graph Traversal", test_graph),
+        ("Controlled Subgraph Thresholds", test_controlled_subgraph_thresholds),
         ("Task Queue", test_task_queue),
         ("Identity Manager", test_identity),
         ("Worker (Mock)", test_worker),
@@ -3705,6 +4169,9 @@ def main():
         ("Herald Persistence", test_herald_persistence),
         ("Server API Endpoints", test_server_api_endpoints),
         ("CLI Commands", test_cli_commands),
+        ("Access Policy Model", test_access_policy_model),
+        ("Access Check Endpoint", test_access_check_endpoint),
+        ("Auth Account Access Model", test_auth_account_access_model),
         ("Security Hardening", test_security_hardening),
         ("Message Bus Reconstruction", test_message_bus_reconstruction),
         ("Permission Persistence", test_permission_persistence),
@@ -6711,6 +7178,7 @@ def test_server_api_endpoints():
         assert res.status_code == 200
         api_data = res.json()
         assert "name" in api_data  # Has name, version, description, stats
+        assert api_data["schema"]["object_types"] == "/schema/object-types"
 
         # ===== Stats =====
         res = client.get("/stats")
@@ -6718,11 +7186,144 @@ def test_server_api_endpoints():
         stats = res.json()
         assert "total_nodes" in stats
 
+        # ===== Schema endpoints =====
+        res = client.get("/schema/object-types")
+        assert res.status_code == 200
+        object_types = res.json()
+        assert len(object_types) == 100
+        assert object_types[0]["address"] == "0.4.10.1.1"
+
+        res = client.get("/schema/object-types/0.4.10.1.1")
+        assert res.status_code == 200
+        assert res.json()["name"] == "Person"
+
+        res = client.post(
+            "/schema/object-types/validate",
+            json={"type_address": "0.4.10.1.1", "data": {"name": "Ada"}},
+        )
+        assert res.status_code == 200
+        assert res.json()["valid"] is False
+
+        # ===== Staged write validation =====
+        res = client.put(
+            "/node/1.1.99",
+            json={"type_address": "0.4.10.1.1", "data": {"name": "Ada"}},
+        )
+        assert res.status_code == 200
+        node_validation = res.json()["schema_validation"]
+        assert node_validation["mode"] == "warn"
+        assert node_validation["valid"] is False
+        assert "identity_status" in node_validation["missing_required_fields"]
+
+        res = client.put(
+            "/node/1.1.100?validation_mode=strict",
+            json={"type_address": "0.4.10.1.1", "data": {"name": "Ada"}},
+        )
+        assert res.status_code == 422
+
+        res = client.put(
+            "/node/1.1.100?validation_mode=strict",
+            json={
+                "type_address": "0.4.10.1.1",
+                "data": {"name": "Ada", "identity_status": "verified", "owner": "1.1"},
+            },
+        )
+        assert res.status_code == 200
+        assert res.json()["schema_validation"]["valid"] is True
+
+        res = client.get("/schema/link-types")
+        assert res.status_code == 200
+        assert len(res.json()) >= 100
+
+        res = client.get("/schema/summary")
+        assert res.status_code == 200
+        schema_summary = res.json()
+        assert schema_summary["object_taxonomy"]["total_defined_object_types"] == 100
+        assert schema_summary["links"]["total_defined_link_types"] >= 100
+        assert schema_summary["validation"]["default_mode"] == "warn"
+
         # ===== Node operations (GET — retrieval of nonexistent node) =====
         res = client.get("/node/99.99.99")
         assert res.status_code == 404
 
         # ===== Link endpoints =====
+        res = client.post(
+            "/link",
+            json={
+                "from_address": "1.1.100",
+                "to_address": "1.1.99",
+                "link_type": "0.6.1",
+                "relationship": "knows",
+            },
+        )
+        assert res.status_code == 200
+        assert res.json()["schema_validation"]["valid"] is True
+
+        res = client.post(
+            "/link",
+            json={
+                "from_address": "1.1.100",
+                "to_address": "1.1.99",
+                "link_type": "0.6.3",
+                "relationship": "not_a_registered_relationship",
+            },
+        )
+        assert res.status_code == 200
+        assert res.json()["schema_validation"]["valid"] is False
+
+        res = client.post(
+            "/link?validation_mode=strict",
+            json={
+                "from_address": "1.1.100",
+                "to_address": "1.1.99",
+                "link_type": "0.6.3",
+                "relationship": "not_a_registered_relationship",
+            },
+        )
+        assert res.status_code == 422
+
+        res = client.post(
+            "/link",
+            json={
+                "from_address": "1.1.100",
+                "to_address": "1.1.101",
+                "link_type": "0.6.4",
+                "relationship": "during",
+                "valid_from": "2026-01-01T00:00:00+00:00",
+                "valid_until": "2026-02-01T00:00:00+00:00",
+            },
+        )
+        assert res.status_code == 200
+
+        res = client.get("/links/query?relationship=knows")
+        assert res.status_code == 200
+        link_query = res.json()
+        assert link_query["returned"] == 1
+        assert link_query["links"][0]["relationship"] == "knows"
+
+        res = client.get("/links/query?category=0.6.1&source_prefix=1.1&active_only=true")
+        assert res.status_code == 200
+        assert res.json()["returned"] >= 1
+
+        res = client.get("/links/query?relationship=during&as_of=2026-01-15T00:00:00Z")
+        assert res.status_code == 200
+        assert res.json()["returned"] == 1
+
+        res = client.get("/links/query?relationship=during&as_of=2026-03-01T00:00:00Z")
+        assert res.status_code == 200
+        assert res.json()["returned"] == 0
+
+        res = client.post("/links/index/rebuild")
+        assert res.status_code == 200
+        assert res.json()["indexed_links"] >= 2
+
+        res = client.get("/graph/traverse/1.1.100?depth=1&relationships=knows&direction=outgoing")
+        assert res.status_code == 200
+        traversal = res.json()
+        assert traversal["center"] == "1.1.100"
+        assert any(link["relationship"] == "knows" for link in traversal["links"])
+        assert traversal["options"]["direction"] == "outgoing"
+
         res = client.get("/links/stats")
         assert res.status_code == 200
 
@@ -7055,6 +7656,255 @@ def test_cli_commands():
         print("    PASS")
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_access_policy_model():
+    """Test address-space access policy for account classes."""
+    print("  Testing access policy model...")
+
+    assert actor_kind_for_ha(None) == AccountKind.ANONYMOUS
+    assert actor_kind_for_ha("1.1") == AccountKind.HUMAN
+    assert actor_kind_for_ha("2.1") == AccountKind.AI
+    assert actor_kind_for_ha("3.1") == AccountKind.COMPANY
+    assert actor_kind_for_ha("1.1.devices.thermostat") == AccountKind.IOT
+
+    assert can_register_human_login("1.99").allowed is True
+    assert can_register_human_login("2.99").allowed is False
+    assert can_register_human_login("3.99").allowed is False
+    assert can_register_company_login("3.99").allowed is True
+    assert can_register_company_login("1.99").allowed is False
+    assert can_register_iot_identity("1.1.devices.thermostat", "1.1").allowed is True
+    assert can_register_iot_identity("2.1.devices.thermostat", "1.1").allowed is False
+
+    assert public_can_read_address("4.1").allowed is True
+    assert public_can_read_address("0.5.1").allowed is True
+    assert public_can_read_address("1.1.11").allowed is True
+    assert public_can_read_address("1.1.6").allowed is False
+    assert public_can_read_address("2.1").allowed is False
+
+    assert can_read_address("1.1", "1.1.6").allowed is True
+    assert can_read_address("1.2", "1.1.6").allowed is False
+    assert can_read_address("1.1", "2.1").allowed is False
+    assert can_read_address("2.1", "2.1", booted_ai=False).allowed is False
+    assert can_read_address("2.1", "2.1", booted_ai=True).allowed is True
+
+    assert can_write_address(None, "4.1").allowed is False
+    assert can_write_address("1.1", "4.1").allowed is True
+    assert can_write_address("1.1", "1.1.5").allowed is True
+    assert can_write_address("1.2", "1.1.5").allowed is False
+    assert can_write_address("1.1", "2.1").allowed is False
+    assert can_write_address("2.1", "2.1", booted_ai=False).allowed is False
+    assert can_write_address("2.1", "2.1", booted_ai=True).allowed is True
+    assert can_write_address("3.1", "3.1.2", actor_account_kind="company").allowed is True
+    assert can_write_address("3.2", "3.1.2", actor_account_kind="company").allowed is False
+
+    print("    PASS")
+
+
+def test_access_check_endpoint():
+    """Test /access/check transparency endpoint mirrors policy helpers."""
+    print("  Testing /access/check endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_access_check_")
+    try:
+        from hypernet.server import create_app
+        # auth disabled so we can probe the endpoint as anonymous
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        # Anonymous read of public knowledge: allowed
+        res = client.get("/access/check?target=4.1&verb=read")
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["allowed"] is True
+        assert body["actor"] is None
+
+        # Anonymous read of 2.* AI: denied, requires booted_ai
+        res = client.get("/access/check?target=2.1&verb=read")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["allowed"] is False
+        assert body["required"] == "booted_ai"
+
+        # Explicit human actor reading own account: allowed
+        res = client.get("/access/check?target=1.1.5&verb=read&actor=1.1")
+        assert res.status_code == 200
+        assert res.json()["allowed"] is True
+
+        # Explicit human actor reading someone else's account: denied
+        res = client.get("/access/check?target=1.1.5&verb=read&actor=1.2")
+        assert res.status_code == 200
+        assert res.json()["allowed"] is False
+
+        # Booted AI write to own 2.* account: allowed
+        res = client.get("/access/check?target=2.1&verb=write&actor=2.1&booted_ai=true")
+        assert res.status_code == 200
+        assert res.json()["allowed"] is True
+
+        # Same AI without booted_ai: denied
+        res = client.get("/access/check?target=2.1&verb=write&actor=2.1")
+        assert res.status_code == 200
+        assert res.json()["allowed"] is False
+
+        # Anonymous write of 4.* knowledge: denied (writes need an actor)
+        res = client.get("/access/check?target=4.99&verb=write")
+        assert res.status_code == 200
+        assert res.json()["allowed"] is False
+
+        # Bad verb: 400
+        res = client.get("/access/check?target=4.1&verb=delete")
+        assert res.status_code == 400
+
+        # Missing target: FastAPI returns 422 (validation error)
+        res = client.get("/access/check")
+        assert res.status_code in (400, 422)
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_auth_account_access_model():
+    """Test auth registration boundaries and JWT route protection."""
+    print("  Testing auth account access model...")
+
+    from hypernet.auth import AuthService
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_auth_policy_")
+    try:
+        auth = AuthService(tmpdir)
+        human = auth.register_with_ha(
+            email="human@example.com",
+            password="correct horse battery staple",
+            display_name="Human",
+            ha="1.90",
+        )
+        assert human.account_kind == AccountKind.HUMAN.value
+        try:
+            auth.register_with_ha(
+                email="ai-claim@example.com",
+                password="correct horse battery staple",
+                display_name="AI Claim",
+                ha="2.90",
+            )
+            raise AssertionError("human auth must not be able to claim 2.*")
+        except ValueError as exc:
+            assert "Human user login may only claim 1.*" in str(exc)
+
+        company = auth.register_company_with_ha(
+            email="company@example.com",
+            password="correct horse battery staple",
+            display_name="Company",
+            ha="3.90",
+        )
+        assert company.account_kind == AccountKind.COMPANY.value
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP route tests (starlette not installed)")
+        print("    PASS")
+        return
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_auth_routes_")
+    try:
+        import os
+        os.environ.pop("HYPERNET_API_KEY", None)
+        os.environ["HYPERNET_RATE_LIMIT"] = "1000"
+        os.environ["HYPERNET_COMPANY_REGISTRATION_KEY"] = "company-test-key"
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir, auth_enabled=True)
+        client = TestClient(app)
+
+        res = client.post("/api/auth/register", json={
+            "email": "route-human@example.com",
+            "password": "correct horse battery staple",
+            "display_name": "Route Human",
+            "ha": "1.91",
+        })
+        assert res.status_code == 201, res.text
+        created_human = res.json()
+        assert created_human["account_kind"] == "human"
+        assert created_human["permission_tier"] == int(PermissionTier.WRITE_OWN)
+
+        res = client.post("/api/auth/register", json={
+            "email": "route-ai@example.com",
+            "password": "correct horse battery staple",
+            "display_name": "Route AI Claim",
+            "ha": "2.91",
+        })
+        assert res.status_code == 400
+
+        res = client.post("/api/auth/company/register", json={
+            "email": "route-company@example.com",
+            "password": "correct horse battery staple",
+            "display_name": "Route Company",
+            "ha": "3.91",
+            "registration_key": "company-test-key",
+        })
+        assert res.status_code == 201, res.text
+        assert res.json()["account_kind"] == "company"
+
+        res = client.post("/api/auth/login", json={
+            "email": "route-human@example.com",
+            "password": "correct horse battery staple",
+        })
+        assert res.status_code == 200, res.text
+        token = res.json()["access_token"]
+        headers = {"Authorization": f"Bearer {token}"}
+
+        assert client.get("/access/policy").status_code == 200
+        assert client.get("/query?prefix=4").status_code == 200
+        assert client.get("/query").status_code == 401
+        assert client.get("/api/query?prefix=4").status_code == 200
+        assert client.get("/api/query").status_code == 401
+
+        res = client.put("/node/4.91", json={"data": {"title": "Public knowledge"}})
+        assert res.status_code == 401
+        res = client.put("/node/4.91", json={"data": {"title": "Public knowledge"}}, headers=headers)
+        assert res.status_code == 200, res.text
+        res = client.put("/node/4.92", json={"data": {"title": "More public knowledge"}}, headers=headers)
+        assert res.status_code == 200, res.text
+        assert client.get("/node/4.91").status_code == 200
+
+        res = client.put("/node/2.91", json={"data": {"title": "AI private"}}, headers=headers)
+        assert res.status_code == 403
+        res = client.get("/node/2.91", headers=headers)
+        assert res.status_code == 403
+
+        link_payload = {
+            "from_address": "4.91",
+            "to_address": "4.92",
+            "relationship": "related_to",
+            "link_type": "0.6.6",
+            "data": {},
+        }
+        res = client.post("/link", json=link_payload)
+        assert res.status_code == 401
+        res = client.post("/link", json=link_payload, headers=headers)
+        assert res.status_code == 200, res.text
+        res = client.post("/link", json={
+            **link_payload,
+            "to_address": "2.91",
+        }, headers=headers)
+        assert res.status_code == 403
+    finally:
+        import os
+        os.environ.pop("HYPERNET_COMPANY_REGISTRATION_KEY", None)
+        os.environ.pop("HYPERNET_RATE_LIMIT", None)
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    print("    PASS")
 
 
 def test_security_hardening():

@@ -10,9 +10,11 @@ Endpoints follow the addressing spec:
   GET  /node/{address}/links        - Get links from a node
   GET  /node/{address}/neighbors    - Get connected nodes
   GET  /node/{address}/subgraph     - Get local subgraph
+  GET  /graph/traverse/{address}    - Controlled graph traversal
   GET  /node/{address}/history      - Get version history
   GET  /node/{address}/history/{v}  - Get specific version
   POST /link                        - Create a link
+       ?validation_mode=warn|strict|off controls schema validation
   GET  /query                       - Query nodes by type, owner, prefix
   GET  /search                      - Full-text search across node data fields
   GET  /stats                       - Store statistics
@@ -25,7 +27,12 @@ Endpoints follow the addressing spec:
   GET  /tasks/mine/{assignee}       - Get tasks for an assignee
   GET  /links/from/{address}        - Links from an address (LinkRegistry)
   GET  /links/to/{address}          - Links to an address
+  GET  /links/query                 - Graph-wide filtered link query
+  POST /links/index/rebuild         - Rebuild link query indexes
   GET  /links/stats                 - Link statistics
+  GET  /schema/object-types         - Object type schema registry
+  GET  /schema/link-types           - Link type schema registry
+  GET  /schema/summary              - Database schema summary
   POST /messages                    - Send an inter-instance message
   GET  /messages                    - Query messages
   GET  /messages/inbox/{instance}   - Check instance inbox
@@ -68,8 +75,9 @@ E.g. /api/swarm/status, /api/tasks, /api/stats, etc.
 from __future__ import annotations
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
+from starlette.requests import Request as _Starlette_Request
 from starlette.websockets import WebSocket as _Starlette_WebSocket
 from starlette.websockets import WebSocketDisconnect as _Starlette_WebSocketDisconnect
 
@@ -78,7 +86,13 @@ log = logging.getLogger(__name__)
 # Core modules (native to this package)
 from .address import HypernetAddress
 from .node import Node
-from .link import Link, LinkRegistry
+from .link import Link, LinkRegistry, list_link_type_defs, link_type_summary, get_link_type_def
+from .object_schema import (
+    get_object_type_def,
+    list_object_type_defs,
+    object_type_summary,
+    validate_object_payload,
+)
 from .store import Store
 from .graph import Graph
 from .tasks import TaskQueue, TaskPriority
@@ -106,6 +120,8 @@ _STATIC_DIR = Path(__file__).parent / "static"
 _app = None
 _store = None
 _graph = None
+
+_VALIDATION_MODES = {"off", "warn", "strict"}
 
 # Pydantic model for swarm config endpoint — must be at module level
 # for FastAPI to resolve the type annotation with `from __future__ import annotations`
@@ -157,7 +173,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     """
     from contextlib import asynccontextmanager
     from datetime import datetime, timezone
-    from fastapi import FastAPI, HTTPException
+    from fastapi import Body, FastAPI, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
     from pydantic import BaseModel
 
@@ -265,6 +281,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             init_auth, create_auth_router, get_auth_service,
             TokenError, AuthenticationError, _extract_bearer_token,
         )
+        from .access_policy import (
+            AccessDecision,
+            can_read_address,
+            can_write_address,
+            public_can_read_address,
+        )
 
         # Initialize the auth service with the same data directory
         _auth_svc = init_auth(data_dir)
@@ -278,13 +300,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         _AUTH_RATE_LIMIT = 5
         _AUTH_RATE_WINDOW = 60.0
 
-        # Public path prefixes — routes that never require authentication
-        _PUBLIC_PREFIXES = (
+        _READ_METHODS = {"GET", "HEAD"}
+        _PUBLIC_GET_EXACT = {
+            "/",
+            "/api",
             "/health",
-            "/api/auth/",
-            "/api/",
             "/home",
-            "/swarm/",
             "/lifestory",
             "/chat",
             "/vr",
@@ -293,18 +314,107 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/docs",
             "/openapi.json",
             "/redoc",
-            "/messages",
-            "/tasks",
-            "/approvals",
-            "/governance/",
-            "/query",
-            "/reputation/",
-            "/tools",
-            "/permissions/",
-            "/discord/",
-            "/mesh/",
             "/setup",
+            "/access/policy",
+            "/access/check",
+            "/stats",
+            "/children",
+            "/links/stats",
+            "/swarm/status",
+            "/swarm/health",
+            "/swarm/service-status",
+            "/mesh/health",
+            "/tools",
+            "/tools/descriptions",
+        }
+        _PUBLIC_GET_PREFIXES = (
+            "/static",
+            "/schema/",
+            "/tools/",
         )
+
+        def _address_after(path: str, prefix: str) -> str:
+            rest = path[len(prefix):].strip("/")
+            return rest.split("/", 1)[0] if rest else ""
+
+        def _public_address_read_path(request: Request) -> bool:
+            path = request.url.path
+            if path == "/query":
+                prefix = request.query_params.get("prefix")
+                return bool(prefix and public_can_read_address(prefix).allowed)
+
+            address_prefixes = (
+                "/node/",
+                "/children/",
+                "/graph/traverse/",
+                "/links/from/",
+                "/links/to/",
+                "/links/connections/",
+                "/links/neighbors/",
+            )
+            for prefix in address_prefixes:
+                if path.startswith(prefix):
+                    return public_can_read_address(_address_after(path, prefix)).allowed
+            return False
+
+        def _is_public_request(request: Request) -> bool:
+            path = request.url.path
+            method = request.method.upper()
+            if method == "OPTIONS":
+                return True
+            if path.startswith("/api/auth/"):
+                return True
+            if method not in _READ_METHODS:
+                return False
+            if path in _PUBLIC_GET_EXACT:
+                return True
+            if any(path == prefix or path.startswith(prefix) for prefix in _PUBLIC_GET_PREFIXES):
+                return True
+            return _public_address_read_path(request)
+
+        def _is_booted_ai_request(request: Request, user) -> bool:
+            # Boot proof is not represented by JWT user records yet. Keep this
+            # narrow so 2.* cannot be unlocked by a spoofable header.
+            return bool(getattr(request.state, "boot_verified", False) and getattr(user, "account_kind", "") == "ai")
+
+        def _authorize_authenticated_request(request: Request, user) -> AccessDecision:
+            path = request.url.path
+            method = request.method.upper()
+            booted_ai = _is_booted_ai_request(request, user)
+            account_kind = getattr(user, "account_kind", None)
+
+            def _read_decision(prefix: str) -> AccessDecision:
+                return can_read_address(
+                    user.ha,
+                    _address_after(path, prefix),
+                    booted_ai=booted_ai,
+                    actor_account_kind=account_kind,
+                )
+
+            def _write_decision(prefix: str) -> AccessDecision:
+                return can_write_address(
+                    user.ha,
+                    _address_after(path, prefix),
+                    booted_ai=booted_ai,
+                    actor_account_kind=account_kind,
+                )
+
+            if path.startswith("/node/"):
+                if method in _READ_METHODS:
+                    return _read_decision("/node/")
+                return _write_decision("/node/")
+            if method in _READ_METHODS:
+                for prefix in (
+                    "/children/",
+                    "/graph/traverse/",
+                    "/links/from/",
+                    "/links/to/",
+                    "/links/connections/",
+                    "/links/neighbors/",
+                ):
+                    if path.startswith(prefix):
+                        return _read_decision(prefix)
+            return AccessDecision(True, "authenticated route")
 
         @app.middleware("http")
         async def jwt_auth_middleware(request: Request, call_next):
@@ -325,17 +435,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                     )
                 bucket.append(now)
 
-            # Allow public routes through without auth
-            if path == "/" or path.startswith("/static"):
+            # Allow explicitly public routes through without auth. Public
+            # address reads are limited to 0.*, 4.*, and account public surfaces.
+            if _is_public_request(request):
                 return await call_next(request)
-            for prefix in _PUBLIC_PREFIXES:
-                if path == prefix or path.startswith(prefix):
-                    return await call_next(request)
             # WebSocket connections are not checked here (handled per-endpoint)
             if request.scope.get("type") == "websocket":
-                return await call_next(request)
-            # OPTIONS (CORS preflight) always allowed
-            if request.method == "OPTIONS":
                 return await call_next(request)
 
             # Extract and validate Bearer token
@@ -352,6 +457,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 user = _auth_svc.get_user_from_token(token)
                 # Stash the user on request state for downstream use
                 request.state.user = user
+                decision = _authorize_authenticated_request(request, user)
+                if not decision.allowed:
+                    return JSONResponse(
+                        status_code=403,
+                        content={"detail": decision.reason, "required": decision.required},
+                    )
             except (TokenError, AuthenticationError) as exc:
                 return JSONResponse(
                     status_code=401,
@@ -366,6 +477,82 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     def health_check():
         """Basic health check endpoint."""
         return {"status": "ok", "auth_enabled": auth_enabled}
+
+    @app.get("/access/policy")
+    def access_policy():
+        """Summarize the account access model enforced by auth middleware."""
+        return {
+            "human_accounts": "1.* accounts use human login; human registration cannot claim 2.* or 3.*",
+            "ai_accounts": "2.* accounts require AI boot verification and are not password-registerable by humans",
+            "company_accounts": "3.* accounts use the dedicated company registration flow and company-scoped permissions",
+            "iot_accounts": "IoT identities must be tied to a 1.* owner account; full device auth is a separate flow",
+            "knowledge": "4.* knowledge is public read-only for anonymous users; writes require an authenticated actor or booted AI identity",
+            "public_account_surface": "Account roots plus public profile/metadata surfaces are browsable; private sections require authorization",
+        }
+
+    @app.get("/access/check")
+    def access_check(
+        target: str,
+        verb: str = "read",
+        actor: Optional[str] = None,
+        actor_kind: Optional[str] = None,
+        booted_ai: bool = False,
+    ):
+        """Ask the access policy whether an actor may read/write a target.
+
+        Pure introspection endpoint — calls the same policy helpers the
+        auth middleware uses. Useful for clients that want to know in
+        advance whether an action will be allowed (e.g., to grey-out UI
+        controls), and for debugging access decisions.
+
+        Parameters:
+          target: Hypernet address being asked about (required).
+          verb:   ``read`` (default) or ``write``.
+          actor:  Optional explicit actor HA. If omitted, treated as
+                  anonymous — the answer reflects what an unauthenticated
+                  caller could do.
+          actor_kind: Optional explicit account kind (human/ai/company/iot).
+          booted_ai: Set true to ask "what if this actor were a fully
+                     booted AI." Has no effect for non-AI actor kinds.
+        """
+        from .access_policy import (
+            can_read_address,
+            can_write_address,
+            public_can_read_address,
+        )
+
+        verb_normalized = (verb or "read").lower()
+        if verb_normalized not in {"read", "write"}:
+            raise HTTPException(400, "verb must be 'read' or 'write'")
+
+        if verb_normalized == "read":
+            if actor is None:
+                decision = public_can_read_address(target)
+            else:
+                decision = can_read_address(
+                    actor,
+                    target,
+                    booted_ai=booted_ai,
+                    actor_account_kind=actor_kind,
+                )
+        else:
+            decision = can_write_address(
+                actor,
+                target,
+                booted_ai=booted_ai,
+                actor_account_kind=actor_kind,
+            )
+
+        return {
+            "allowed": decision.allowed,
+            "reason": decision.reason,
+            "required": decision.required,
+            "verb": verb_normalized,
+            "target": target,
+            "actor": actor,
+            "actor_kind": actor_kind,
+            "booted_ai": booted_ai,
+        }
 
     _store = Store(data_dir, enforce_addresses=True, strict=False)
     _graph = Graph(_store)
@@ -561,6 +748,95 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     # === Node endpoints ===
 
+    def _validation_mode(mode: str) -> str:
+        normalized = (mode or "warn").lower()
+        if normalized not in _VALIDATION_MODES:
+            raise HTTPException(400, f"validation_mode must be one of: {', '.join(sorted(_VALIDATION_MODES))}")
+        return normalized
+
+    def _object_write_validation(
+        type_address: Optional[str],
+        data: dict,
+        mode: str,
+    ) -> Optional[dict]:
+        mode = _validation_mode(mode)
+        if mode == "off" or not type_address:
+            return None
+        validation = validate_object_payload(type_address, data)
+        validation["mode"] = mode
+        validation["enforced"] = mode == "strict"
+        if mode == "strict" and not validation["valid"]:
+            raise HTTPException(422, {"message": "Object schema validation failed", "validation": validation})
+        return validation
+
+    def _link_write_validation(link: Link, mode: str) -> Optional[dict]:
+        mode = _validation_mode(mode)
+        if mode == "off":
+            return None
+        issues = _links.validate_link(link)
+        endpoint_issues = _links.validate_link_endpoints(link)
+        all_issues = issues + endpoint_issues
+        type_def = link.type_def
+        endpoint_constraints_present = bool(
+            type_def and (type_def.source_types or type_def.target_types)
+        )
+        validation = {
+            "relationship": link.relationship,
+            "link_type": link.link_type,
+            "known_type": type_def is not None,
+            "known_relationship": type_def is not None,
+            "valid": not all_issues,
+            "issues": all_issues,
+            "warnings": [],
+            "mode": mode,
+            "enforced": mode == "strict",
+            "endpoint_constraints_checked": endpoint_constraints_present,
+        }
+        if mode == "strict" and all_issues:
+            raise HTTPException(422, {"message": "Link schema validation failed", "validation": validation})
+        return validation
+
+    def _require_payload_field(payload: dict, field: str) -> Any:
+        value = payload.get(field)
+        if value in (None, ""):
+            raise HTTPException(400, f"{field} is required")
+        return value
+
+    def _relationship_set(raw: Optional[str]) -> Optional[set[str]]:
+        if raw in (None, ""):
+            return None
+        return {part.strip() for part in raw.split(",") if part.strip()}
+
+    def _parse_optional_datetime(value: Any, field: str):
+        if value in (None, ""):
+            return None
+        try:
+            parsed = datetime.fromisoformat(str(value))
+        except ValueError as exc:
+            raise HTTPException(400, f"Invalid {field} timestamp (expected ISO-8601): {exc}")
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed
+
+    def _enforce_link_write_authorization(request: _Starlette_Request, link: Link) -> None:
+        if not auth_enabled:
+            return
+        user = getattr(request.state, "user", None)
+        if user is None:
+            raise HTTPException(401, "Authentication required")
+        from .access_policy import can_write_address
+
+        booted_ai = bool(getattr(request.state, "boot_verified", False) and getattr(user, "account_kind", "") == "ai")
+        for endpoint in (str(link.from_address), str(link.to_address)):
+            decision = can_write_address(
+                user.ha,
+                endpoint,
+                booted_ai=booted_ai,
+                actor_account_kind=getattr(user, "account_kind", None),
+            )
+            if not decision.allowed:
+                raise HTTPException(403, {"detail": decision.reason, "required": decision.required, "address": endpoint})
+
     @app.get("/node/{address:path}")
     def get_node(address: str):
         ha = HypernetAddress.parse(address)
@@ -570,25 +846,49 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         return node.to_dict()
 
     @app.put("/node/{address:path}")
-    def put_node(address: str, body: NodeCreate):
+    def put_node(
+        address: str,
+        payload: dict = Body(...),
+        validation_mode: str = "warn",
+        strict: bool = False,
+    ):
+        """Create or update a node with staged object schema validation."""
+        if strict:
+            validation_mode = "strict"
+        type_address = payload.get("type_address")
+        data = payload.get("data") or {}
+        if not isinstance(data, dict):
+            raise HTTPException(400, "data must be an object")
+        source_type = payload.get("source_type")
+        source_id = payload.get("source_id")
+
         ha = HypernetAddress.parse(address)
         existing = _store.get_node(ha)
         if existing:
-            existing.update_data(**body.data)
-            if body.type_address:
-                existing.type_address = HypernetAddress.parse(body.type_address)
+            effective_type = type_address or (str(existing.type_address) if existing.type_address else None)
+            effective_data = {**(existing.data or {}), **data}
+            schema_validation = _object_write_validation(effective_type, effective_data, validation_mode)
+            existing.update_data(**data)
+            if type_address:
+                existing.type_address = HypernetAddress.parse(str(type_address))
             _store.put_node(existing)
-            return existing.to_dict()
+            response = existing.to_dict()
         else:
+            schema_validation = _object_write_validation(str(type_address) if type_address else None, data, validation_mode)
             node = Node(
                 address=ha,
-                type_address=HypernetAddress.parse(body.type_address) if body.type_address else None,
-                data=body.data,
-                source_type=body.source_type,
-                source_id=body.source_id,
+                type_address=HypernetAddress.parse(str(type_address)) if type_address else None,
+                data=data,
+                source_type=source_type,
+                source_id=source_id,
             )
             _store.put_node(node)
-            return node.to_dict()
+            response = node.to_dict()
+
+        if schema_validation is not None:
+            response["schema_validation"] = schema_validation
+            response["validation"] = schema_validation
+        return response
 
     @app.delete("/node/{address:path}")
     def delete_node(address: str, hard: bool = False):
@@ -626,6 +926,45 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         ha = HypernetAddress.parse(address)
         return _graph.subgraph(ha, max_depth=depth)
 
+    @app.get("/graph/traverse/{address:path}")
+    def graph_traverse(
+        address: str,
+        depth: int = 2,
+        relationships: Optional[str] = None,
+        direction: str = "outgoing",
+        max_fanout: int = 50,
+        node_limit: int = 200,
+        link_limit: int = 500,
+        active_only: bool = False,
+        transitive_only: bool = False,
+        min_trust: Optional[float] = None,
+        min_evidence: Optional[int] = None,
+    ):
+        """Controlled graph traversal for database clients.
+
+        ``transitive_only`` follows only relationships flagged transitive in
+        the link type registry. ``min_trust`` and ``min_evidence`` filter
+        out links below a trust score or evidence count for
+        high-confidence-only graph slices.
+        """
+        ha = HypernetAddress.parse(address)
+        try:
+            return _graph.controlled_subgraph(
+                ha,
+                max_depth=depth,
+                relationships=_relationship_set(relationships),
+                direction=direction,
+                max_fanout=max_fanout,
+                node_limit=node_limit,
+                link_limit=link_limit,
+                active_only=active_only,
+                transitive_only=transitive_only,
+                min_trust=min_trust,
+                min_evidence=min_evidence,
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc))
+
     # === History endpoints ===
 
     @app.get("/node/{address:path}/history/{version}")
@@ -642,20 +981,33 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         return _store.get_node_history(ha)
 
     @app.post("/link")
-    def create_link(body: LinkCreate):
+    def create_link(request: _Starlette_Request, payload: dict = Body(...), validation_mode: str = "warn", strict: bool = False):
+        """Create a new link with staged relationship schema validation."""
+        if strict:
+            validation_mode = "strict"
+        data = payload.get("data") or {}
+        if not isinstance(data, dict):
+            raise HTTPException(400, "data must be an object")
         link = Link(
-            from_address=HypernetAddress.parse(body.from_address),
-            to_address=HypernetAddress.parse(body.to_address),
-            link_type=body.link_type,
-            relationship=body.relationship,
-            strength=body.strength,
-            bidirectional=body.bidirectional,
-            data=body.data,
-            sort_order=body.sort_order,
+            from_address=HypernetAddress.parse(str(_require_payload_field(payload, "from_address"))),
+            to_address=HypernetAddress.parse(str(_require_payload_field(payload, "to_address"))),
+            link_type=str(_require_payload_field(payload, "link_type")),
+            relationship=str(_require_payload_field(payload, "relationship")),
+            strength=float(payload.get("strength", 1.0)),
+            bidirectional=bool(payload.get("bidirectional", False)),
+            valid_from=_parse_optional_datetime(payload.get("valid_from"), "valid_from"),
+            valid_until=_parse_optional_datetime(payload.get("valid_until"), "valid_until"),
+            data=data,
+            sort_order=payload.get("sort_order"),
         )
+        _enforce_link_write_authorization(request, link)
+        schema_validation = _link_write_validation(link, validation_mode)
         link_hash = _store.put_link(link)
         result = link.to_dict()
         result["hash"] = link_hash
+        if schema_validation is not None:
+            result["schema_validation"] = schema_validation
+            result["validation"] = schema_validation
         return result
 
     # === Query endpoints ===
@@ -859,22 +1211,108 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     # === Link Registry endpoints ===
 
+    def _parse_as_of(raw: Optional[str]) -> Optional[datetime]:
+        """Parse an ``as_of`` ISO-8601 string. Naive timestamps are treated as UTC."""
+        if raw is None or raw == "":
+            return None
+        try:
+            value = datetime.fromisoformat(raw)
+        except ValueError as exc:
+            raise HTTPException(400, f"Invalid as_of timestamp (expected ISO-8601): {exc}")
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value
+
+    def _filter_links(
+        links: list,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        verification: Optional[str] = None,
+        active_only: bool = False,
+        min_strength: Optional[float] = None,
+        min_trust: Optional[float] = None,
+        as_of: Optional[datetime] = None,
+    ) -> list:
+        """Apply post-fetch filters to a list of Link objects.
+
+        Database-First Redesign item #3: link query filters for category,
+        status, verification, temporal validity (active_only / as_of), and
+        trust score. ``as_of`` enables time-travel: combined with
+        ``active_only`` it returns links active at that timestamp; alone it
+        returns links temporally valid at that timestamp regardless of status.
+        """
+        out = links
+        if category is not None:
+            out = [l for l in out if l.link_type == category]
+        if status is not None:
+            out = [l for l in out if l.status == status]
+        if verification is not None:
+            out = [l for l in out if l.verification_status == verification]
+        if as_of is not None:
+            if active_only:
+                out = [l for l in out if l.is_active_at(as_of)]
+            else:
+                out = [l for l in out if l.is_current_at(as_of)]
+        elif active_only:
+            out = [l for l in out if l.is_active]
+        if min_strength is not None:
+            out = [l for l in out if l.strength >= min_strength]
+        if min_trust is not None:
+            out = [l for l in out if l.trust_score >= min_trust]
+        return out
+
     @app.get("/links/from/{address:path}")
-    def links_from(address: str, relationship: Optional[str] = None):
+    def links_from(
+        address: str,
+        relationship: Optional[str] = None,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        verification: Optional[str] = None,
+        active_only: bool = False,
+        min_strength: Optional[float] = None,
+        min_trust: Optional[float] = None,
+        as_of: Optional[str] = None,
+    ):
         ha = HypernetAddress.parse(address)
+        as_of_dt = _parse_as_of(as_of)
         links = _links.from_address(ha, relationship)
+        links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
         return [l.to_dict() for l in links]
 
     @app.get("/links/to/{address:path}")
-    def links_to(address: str, relationship: Optional[str] = None):
+    def links_to(
+        address: str,
+        relationship: Optional[str] = None,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        verification: Optional[str] = None,
+        active_only: bool = False,
+        min_strength: Optional[float] = None,
+        min_trust: Optional[float] = None,
+        as_of: Optional[str] = None,
+    ):
         ha = HypernetAddress.parse(address)
+        as_of_dt = _parse_as_of(as_of)
         links = _links.to_address(ha, relationship)
+        links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
         return [l.to_dict() for l in links]
 
     @app.get("/links/connections/{address:path}")
-    def links_connections(address: str, relationship: Optional[str] = None):
+    def links_connections(
+        address: str,
+        relationship: Optional[str] = None,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        verification: Optional[str] = None,
+        active_only: bool = False,
+        min_strength: Optional[float] = None,
+        min_trust: Optional[float] = None,
+        as_of: Optional[str] = None,
+    ):
         ha = HypernetAddress.parse(address)
+        as_of_dt = _parse_as_of(as_of)
         links = _links.connections(ha, relationship)
+        links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
         return [l.to_dict() for l in links]
 
     @app.get("/links/neighbors/{address:path}")
@@ -883,9 +1321,121 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         neighbors = _links.neighbors(ha, relationship)
         return [str(a) for a in neighbors]
 
+    @app.post("/links/index/rebuild")
+    def links_index_rebuild(max_links: Optional[int] = None):
+        """Rebuild link query indexes from stored link files."""
+        return _store.rebuild_link_query_indexes(max_links=max_links)
+
+    @app.get("/links/query")
+    def links_query(
+        relationship: Optional[str] = None,
+        category: Optional[str] = None,
+        status: Optional[str] = None,
+        verification_status: Optional[str] = None,
+        min_trust: Optional[float] = None,
+        source_prefix: Optional[str] = None,
+        target_prefix: Optional[str] = None,
+        active_only: bool = False,
+        as_of: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+        max_scan: int = 20000,
+    ):
+        """Query links across the graph using database-oriented filters.
+
+        ``as_of`` is an ISO-8601 timestamp enabling time-travel queries.
+        Combined with ``active_only=true`` it returns links that were active
+        at that moment; alone it returns links temporally valid at that
+        moment regardless of lifecycle status.
+        """
+        as_of_dt = _parse_as_of(as_of)
+        links = _links.query_links(
+            relationship=relationship,
+            category=category,
+            status=status,
+            verification_status=verification_status,
+            min_trust=min_trust,
+            source_prefix=source_prefix,
+            target_prefix=target_prefix,
+            active_only=active_only,
+            as_of=as_of_dt,
+            limit=limit,
+            offset=offset,
+            max_scan=max_scan,
+        )
+        filters = {
+            "relationship": relationship,
+            "category": category,
+            "status": status,
+            "verification_status": verification_status,
+            "min_trust": min_trust,
+            "source_prefix": source_prefix,
+            "target_prefix": target_prefix,
+            "active_only": active_only,
+            "as_of": as_of_dt.isoformat() if as_of_dt else None,
+            "limit": limit,
+            "offset": offset,
+            "max_scan": max_scan,
+        }
+        return {
+            "filters": {k: v for k, v in filters.items() if v not in (None, "")},
+            "returned": len(links),
+            "links": [l.to_dict() for l in links],
+        }
+
     @app.get("/links/stats")
     def links_stats():
         return _links.stats()
+
+    @app.get("/schema/object-types")
+    def schema_object_types(domain: Optional[str] = None):
+        """Return canonical folderized object type definitions."""
+        return list_object_type_defs(domain=domain)
+
+    @app.post("/schema/object-types/validate")
+    def schema_validate_object_payload(payload: dict = Body(...)):
+        """Validate a node data payload against the registered object type."""
+        type_address = payload.get("type_address")
+        if not type_address:
+            raise HTTPException(400, "type_address is required")
+        data = payload.get("data") or {}
+        if not isinstance(data, dict):
+            raise HTTPException(400, "data must be an object")
+        return validate_object_payload(str(type_address), data)
+
+    @app.get("/schema/object-types/{type_address:path}")
+    def schema_object_type(type_address: str):
+        """Return one object type definition by address or name."""
+        definition = get_object_type_def(type_address)
+        if definition is None:
+            raise HTTPException(404, f"Object type not found: {type_address}")
+        return definition
+
+    @app.get("/schema/link-types")
+    def schema_link_types():
+        """Return all registered link type definitions."""
+        return list_link_type_defs()
+
+    @app.get("/schema/summary")
+    def schema_summary():
+        """Return database schema summary for dashboard and clients."""
+        return {
+            "store": _store.stats(),
+            "links": link_type_summary(),
+            "object_taxonomy": object_type_summary(),
+            "knowledgebase": {
+                "domains": 10,
+                "third_level_leaf_folders": 150,
+                "taxonomy_index": "4/KNOWLEDGEBASE-THREE-LEVEL-TAXONOMY.md",
+            },
+            "validation": {
+                "default_mode": "warn",
+                "modes": sorted(_VALIDATION_MODES),
+                "node_writes": "PUT /node/{address}?validation_mode=warn|strict|off",
+                "link_writes": "POST /link?validation_mode=warn|strict|off",
+                "strict_alias": "?strict=true remains supported for compatibility",
+            },
+        }
 
     # === Message Bus endpoints ===
 
@@ -1499,15 +2049,30 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         return {
             "name": "Hypernet",
             "version": "0.9.1",
-            "description": "Decentralized infrastructure for human-AI collaboration",
+            "description": "Global distributed graph database with permanent addresses and first-class links",
             "dashboards": {
                 "home": "/home",
+                "explorer": "/explorer",
                 "swarm": "/swarm/dashboard",
                 "chat": "/chat",
                 "vr": "/vr",
                 "lifestory": "/lifestory",
-                "explorer": "/explorer",
                 "welcome": "/",
+            },
+            "schema": {
+                "summary": "/schema/summary",
+                "object_types": "/schema/object-types",
+                "object_type": "/schema/object-types/{type_address}",
+                "object_validation": "/schema/object-types/validate",
+                "link_types": "/schema/link-types",
+                "write_validation_modes": sorted(_VALIDATION_MODES),
+            },
+            "graph_queries": {
+                "nodes": "/query",
+                "links": "/links/query",
+                "link_index_rebuild": "/links/index/rebuild",
+                "subgraph": "/node/{address}/subgraph",
+                "traverse": "/graph/traverse/{address}",
             },
             "stats": _store.stats(),
         }

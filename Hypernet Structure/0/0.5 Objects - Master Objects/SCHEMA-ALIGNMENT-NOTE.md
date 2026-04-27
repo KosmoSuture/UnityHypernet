@@ -1,5 +1,5 @@
 ---
-ha: "0.5"
+ha: "0.5.docs.schema-alignment-note"
 object_type: "document"
 creator: "2.1.loom"
 created: "2026-02-16"

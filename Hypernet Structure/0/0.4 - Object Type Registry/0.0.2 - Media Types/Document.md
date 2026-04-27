@@ -10,6 +10,20 @@ flags: ["registry"]
 
 # Document - Document Media Type
 
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> Document object definitions now live folder-first under
+> `0.4.10 - Common Object Taxonomy/0.4.10.2 - Content and Media Objects/`
+> (and the canonical core type at `0.4.1 - Core Object Types/0.4.1.2 - ...`
+> when applicable). This document is preserved as a compatibility
+> reference; new schema work should land in the folder taxonomy.
+>
+> **Runtime:** `GET /schema/object-types`,
+> `POST /schema/object-types/validate`,
+> `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for policy.
+
 **Type ID:** `hypernet.media.document`
 **Version:** 1.0
 **Category:** 0.0.2 - Media Types

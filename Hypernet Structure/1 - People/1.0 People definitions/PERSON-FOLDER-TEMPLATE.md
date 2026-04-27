@@ -1,5 +1,5 @@
 ---
-ha: "1.0"
+ha: "1.0.doc.person-folder-template"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -76,12 +76,14 @@ Each person in the Hypernet ecosystem has a standardized folder structure to sto
 │   ├── 1.X.9.1 - Research/
 │   ├── 1.X.9.2 - Learning Materials/
 │   └── 1.X.9.3 - Personal Notes/
-└── 1.X.10 - Profile & Identity/      (data: bio, contact, skills)
+├── 1.X.10 - Profile & Identity/      (data: bio, contact, skills)
     ├── README.md (Basic info, contact, role)
     ├── BIOGRAPHY.md
     ├── SKILLS.md
     ├── RESUME.md (if applicable)
     └── CONTACT-INFO.md
+├── 1.X.11 - Secrets & Credentials/   (private: lockers only, no committed secret values)
+└── 1.X.12 - Public Profile & Lockers/ (public side: profile, public keys, locker/mandala index)
 ```
 
 **IMPORTANT: The .0 Rule**
@@ -119,6 +121,17 @@ Photos, videos, audio files related to this person.
 
 ### 1.X.9 - Notes & Knowledge
 Personal notes, research, learning materials, knowledge base.
+
+### 1.X.10 - Profile & Identity
+Public and private identity material, biography, contact policy, skills, resumes, and profile claims.
+
+### 1.X.11 - Secrets & Credentials
+Passwords, API tokens, recovery codes, cryptographic keys, service accounts, and IoT credentials. Actual secret values must live in encrypted lockers or gitignored private staging, never in committed plaintext.
+
+### 1.X.12 - Public Profile & Lockers
+The account's public side: public profile, public keys, public claims, contact routes, public locker index, and mandala grant metadata. Public locker entries may reveal safe metadata, not private contents.
+
+Existing accounts may have extension addresses shifted when a slot was already assigned before this standard was updated. Matt's reference account uses `1.1.12` for secrets and `1.1.13` for the public locker surface because `1.1.11` already existed as Profile & Identity.
 
 ## Usage Guidelines
 

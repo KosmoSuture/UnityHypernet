@@ -10,6 +10,20 @@ flags: ["registry"]
 
 # Contact - Person Contact Info
 
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> Contact object definitions now live folder-first under
+> `0.4.10 - Common Object Taxonomy/0.4.10.1 - Identity and Agent Objects/`
+> (a Contact is a Person reference with attached communication
+> endpoints). This document is preserved as a compatibility reference;
+> new schema work should land in the folder taxonomy.
+>
+> **Runtime:** `GET /schema/object-types`,
+> `POST /schema/object-types/validate`,
+> `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for policy.
+
 **Type ID:** `hypernet.life.contact`
 **Version:** 1.0
 **Category:** 0.0.8 - Life Types

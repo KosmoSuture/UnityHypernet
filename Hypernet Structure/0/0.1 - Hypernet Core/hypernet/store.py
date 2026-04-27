@@ -17,6 +17,9 @@ Storage layout:
       by_owner.json             (owner_address -> [node addresses])
       links_from.json           (from_address -> [link hashes])
       links_to.json             (to_address -> [link hashes])
+      links_by_relationship.json (relationship -> [link hashes])
+      links_by_category.json     (0.6 category -> [link hashes])
+      links_by_status.json       (status -> [link hashes])
     history/
       1/1/v0001.json            (version 1 snapshot of node 1.1)
       1/1/v0002.json            (version 2 snapshot of node 1.1)
@@ -259,6 +262,9 @@ class Store:
         self._owner_index: dict[str, list[str]] = {}   # owner_address -> [node addresses]
         self._links_from: dict[str, list[str]] = {}    # from_address -> [link hashes]
         self._links_to: dict[str, list[str]] = {}      # to_address -> [link hashes]
+        self._links_by_relationship: dict[str, list[str]] = {}
+        self._links_by_category: dict[str, list[str]] = {}
+        self._links_by_status: dict[str, list[str]] = {}
 
         self._ensure_dirs()
         self._load_indexes()
@@ -556,6 +562,27 @@ class Store:
             if link_hash not in self._links_to[to_str]:
                 self._links_to[to_str].append(link_hash)
 
+            for index in (
+                self._links_by_relationship,
+                self._links_by_category,
+                self._links_by_status,
+            ):
+                for key in list(index.keys()):
+                    if link_hash in index[key]:
+                        index[key].remove(link_hash)
+                    if not index[key]:
+                        del index[key]
+
+            for index, key in (
+                (self._links_by_relationship, link.relationship),
+                (self._links_by_category, link.link_type),
+                (self._links_by_status, link.status),
+            ):
+                if key not in index:
+                    index[key] = []
+                if link_hash not in index[key]:
+                    index[key].append(link_hash)
+
             self._save_indexes()
 
         return link_hash
@@ -567,6 +594,55 @@ class Store:
             return None
         data = json.loads(path.read_text(encoding="utf-8"))
         return Link.from_dict(data)
+
+    def rebuild_link_query_indexes(self, max_links: Optional[int] = None) -> dict:
+        """Rebuild relationship/category/status indexes from stored link files."""
+        relationship_index: dict[str, list[str]] = {}
+        category_index: dict[str, list[str]] = {}
+        status_index: dict[str, list[str]] = {}
+        all_hashes: list[str] = []
+        seen: set[str] = set()
+
+        for hashes in self._links_from.values():
+            for link_hash in hashes:
+                if link_hash in seen:
+                    continue
+                seen.add(link_hash)
+                all_hashes.append(link_hash)
+                if max_links is not None and len(all_hashes) >= max_links:
+                    break
+            if max_links is not None and len(all_hashes) >= max_links:
+                break
+
+        missing = 0
+        indexed = 0
+        for link_hash in all_hashes:
+            link = self.get_link(link_hash)
+            if link is None:
+                missing += 1
+                continue
+            for index, key in (
+                (relationship_index, link.relationship),
+                (category_index, link.link_type),
+                (status_index, link.status),
+            ):
+                index.setdefault(key, []).append(link_hash)
+            indexed += 1
+
+        with self.locks.index_lock():
+            self._links_by_relationship = relationship_index
+            self._links_by_category = category_index
+            self._links_by_status = status_index
+            self._save_indexes()
+
+        return {
+            "indexed_links": indexed,
+            "missing_links": missing,
+            "limited": max_links is not None and indexed + missing >= max_links,
+            "relationships": len(relationship_index),
+            "categories": len(category_index),
+            "statuses": len(status_index),
+        }
 
     def get_links_from(
         self,
@@ -678,6 +754,9 @@ class Store:
             "owner_index": self._owner_index,
             "links_from": self._links_from,
             "links_to": self._links_to,
+            "links_by_relationship": self._links_by_relationship,
+            "links_by_category": self._links_by_category,
+            "links_by_status": self._links_by_status,
         }
         for name, data in indexes.items():
             path = self._index_dir / f"{name}.json"
@@ -713,6 +792,9 @@ class Store:
             ("owner_index", "_owner_index"),
             ("links_from", "_links_from"),
             ("links_to", "_links_to"),
+            ("links_by_relationship", "_links_by_relationship"),
+            ("links_by_category", "_links_by_category"),
+            ("links_by_status", "_links_by_status"),
         ]:
             path = self._index_dir / f"{name}.json"
             if path.exists():

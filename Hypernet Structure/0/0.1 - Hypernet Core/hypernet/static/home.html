@@ -3,283 +3,587 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hypernet</title>
+<title>Hypernet Database</title>
 <style>
   :root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
-    --bg-card: #161622;
-    --bg-input: #1a1a2e;
-    --border: #2a2a3e;
-    --border-active: #4fc3f7;
-    --text-primary: #e0e0e8;
-    --text-secondary: #888899;
-    --text-muted: #555566;
-    --accent: #4fc3f7;
-    --accent-dim: #2a6f8f;
-    --success: #4caf50;
-    --success-dim: #1b3a1d;
-    --danger: #f44336;
-    --danger-dim: #3a1515;
-    --warning: #ff9800;
-    --warning-dim: #3a2a0a;
-    --purple: #7c4dff;
-    --teal: #26a69a;
-    --gold: #ffd54f;
-    --radius: 10px;
-    --radius-sm: 6px;
+    --bg: #0b0c0d;
+    --panel: #141514;
+    --panel-2: #1b1d1b;
+    --line: #30342f;
+    --text: #f0f2ee;
+    --muted: #a4aaa0;
+    --faint: #70776e;
+    --green: #7fc97a;
+    --cyan: #6db7c8;
+    --amber: #d6b35d;
+    --red: #d77969;
+    --radius: 8px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
 
-  .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
-  .header h1 { font-size: 22px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
-  .header-status { display: flex; gap: 12px; align-items: center; font-size: 12px; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .status-dot.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
-  .status-dot.off { background: var(--danger); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
 
-  .content { flex: 1; max-width: 1000px; margin: 0 auto; padding: 40px 32px; width: 100%; }
+  a { color: inherit; text-decoration: none; }
 
-  .greeting { margin-bottom: 40px; }
-  .greeting h2 { font-size: 28px; font-weight: 300; color: var(--text-primary); margin-bottom: 8px; }
-  .greeting p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
 
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  header {
+    border-bottom: 1px solid var(--line);
+    background: #101110;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
 
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
-  .card:hover { border-color: var(--accent-dim); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-  .card-icon { font-size: 28px; margin-bottom: 12px; }
-  .card h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
-  .card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-  .card .card-status { font-size: 11px; margin-top: 12px; padding: 4px 10px; border-radius: 12px; display: inline-block; }
-  .card .card-status.active { background: var(--success-dim); color: var(--success); }
-  .card .card-status.inactive { background: var(--bg-input); color: var(--text-muted); }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+  }
 
-  .card.primary { border-color: var(--accent-dim); border-width: 2px; }
-  .card.primary:hover { border-color: var(--accent); }
+  .brand h1 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: 0;
+    font-weight: 700;
+  }
 
-  .quick-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 40px; }
-  .qstat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-  .qstat .val { font-size: 24px; font-weight: 700; color: var(--accent); }
-  .qstat .lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .brand span {
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
 
-  .section-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; font-weight: 600; }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
 
-  .recent-activity { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .activity-item:last-child { border-bottom: none; }
-  .activity-text { color: var(--text-secondary); }
-  .activity-time { color: var(--text-muted); font-size: 11px; }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 6px;
+    background: var(--red);
+  }
 
-  .footer { padding: 16px 32px; text-align: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); }
-  .footer a { color: var(--accent); text-decoration: none; }
+  .dot.on { background: var(--green); }
+
+  main {
+    width: min(1320px, 100%);
+    margin: 0 auto;
+    padding: 22px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
+    gap: 18px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .panel-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .panel-head h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .panel-body { padding: 16px; }
+
+  .hero {
+    padding: 20px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .hero-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .hero-title h2 {
+    margin: 0 0 8px;
+    font-size: clamp(26px, 4vw, 42px);
+    line-height: 1.05;
+    letter-spacing: 0;
+  }
+
+  .hero-title p {
+    margin: 0;
+    max-width: 720px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-size: 15px;
+  }
+
+  .address-chip {
+    font-family: "Cascadia Code", Consolas, monospace;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--green);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    border-radius: var(--radius);
+    padding: 13px;
+    min-height: 78px;
+  }
+
+  .stat .value {
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+
+  .stat .label {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .button.primary {
+    background: var(--green);
+    border-color: var(--green);
+    color: #071007;
+  }
+
+  .button:hover { border-color: var(--cyan); }
+
+  .query-row {
+    display: grid;
+    grid-template-columns: 1fr 150px 110px auto;
+    gap: 10px;
+  }
+
+  input, select {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: #0f100f;
+    color: var(--text);
+    padding: 0 11px;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .table th,
+  .table td {
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    padding: 9px 6px;
+    vertical-align: top;
+  }
+
+  .table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .mono {
+    font-family: "Cascadia Code", Consolas, monospace;
+    color: var(--green);
+  }
+
+  .muted { color: var(--muted); }
+
+  .route-list,
+  .taxonomy-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .route,
+  .taxonomy-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    border-radius: 7px;
+    padding: 10px 11px;
+    font-size: 13px;
+  }
+
+  .route strong,
+  .taxonomy-row strong { font-size: 13px; }
+
+  .route span,
+  .taxonomy-row span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .secondary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .secondary .button {
+    min-height: 34px;
+    font-size: 12px;
+  }
+
+  @media (max-width: 980px) {
+    main { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .query-row { grid-template-columns: 1fr; }
+    .hero-title { display: block; }
+    .address-chip { display: inline-flex; margin-top: 12px; }
+  }
+
+  @media (max-width: 620px) {
+    header { align-items: flex-start; flex-direction: column; }
+    .brand { display: block; }
+    .brand span { display: block; margin-top: 4px; white-space: normal; }
+    main { padding: 12px; }
+    .secondary { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
+<div class="shell">
+  <header>
+    <div class="brand">
+      <h1>Hypernet</h1>
+      <span>distributed graph database</span>
+    </div>
+    <div class="status">
+      <span>API <i class="dot on" id="apiDot"></i></span>
+      <span>Swarm <i class="dot" id="swarmDot"></i></span>
+    </div>
+  </header>
 
-<div class="header">
-  <h1>HYPERNET</h1>
-  <div class="header-status">
-    <span>Server <span class="status-dot on" id="serverDot"></span></span>
-    <span>Swarm <span class="status-dot off" id="swarmDot"></span></span>
-  </div>
-</div>
+  <main>
+    <section class="panel hero">
+      <div class="hero-title">
+        <div>
+          <h2>Addressed objects. Typed links. Queryable graph.</h2>
+          <p>Hypernet's primary product is the graph database: permanent hierarchical addresses, typed objects, first-class links, and auditable storage that can move from local files to distributed backends without changing the object/link contract.</p>
+        </div>
+        <div class="address-chip">0.4 objects + 0.6 links</div>
+      </div>
 
-<div class="content">
-  <div class="greeting">
-    <h2 id="greetingText">Welcome back.</h2>
-    <p id="greetingSubtext">Your Hypernet is running. Choose where to go.</p>
-  </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="value" id="statNodes">-</div><div class="label">Stored nodes</div></div>
+        <div class="stat"><div class="value" id="statLinks">-</div><div class="label">Stored links</div></div>
+        <div class="stat"><div class="value" id="statTypes">100</div><div class="label">Common object types</div></div>
+        <div class="stat"><div class="value" id="statLinkTypes">-</div><div class="label">Registered link types</div></div>
+        <div class="stat"><div class="value" id="statKnowledge">150</div><div class="label">Knowledge leaves</div></div>
+      </div>
 
-  <div class="section-title">Control Centers</div>
-  <div class="cards">
-    <a class="card primary" href="/swarm/dashboard">
-      <div class="card-icon">&#9881;</div>
-      <h3>Swarm Dashboard</h3>
-      <p>Monitor AI workers, manage tasks, chat with the swarm, review approvals. Your primary control center.</p>
-      <span class="card-status" id="swarmStatus">checking...</span>
-    </a>
+      <div class="actions">
+        <a class="button primary" href="/explorer">Open Graph Explorer</a>
+        <a class="button" href="/docs" target="_blank">API Docs</a>
+        <a class="button" href="/schema/object-types">Object Schema</a>
+        <a class="button" href="/schema/link-types">Link Schema</a>
+        <a class="button" href="/query">Node Query</a>
+      </div>
+    </section>
 
-    <a class="card" href="/chat">
-      <div class="card-icon">&#128172;</div>
-      <h3>Talk to the Swarm</h3>
-      <p>Direct conversation with your AI workers. Ask questions, give directions, get reports.</p>
-      <span class="card-status active">always available</span>
-    </a>
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Taxonomy Roots</h2>
+      </div>
+      <div class="panel-body taxonomy-list">
+        <div class="taxonomy-row"><div><strong>Objects</strong><br><span>100 common types in folders</span></div><span class="mono">0.4.10</span></div>
+        <div class="taxonomy-row"><div><strong>Links</strong><br><span>100 common relationships in folders</span></div><span class="mono">0.6.11</span></div>
+        <div class="taxonomy-row"><div><strong>Knowledge</strong><br><span>10 domains, 150 leaf folders</span></div><span class="mono">4</span></div>
+        <div class="taxonomy-row"><div><strong>Validation</strong><br><span>Warn by default, strict on demand</span></div><span class="mono">writes</span></div>
+      </div>
+    </aside>
 
-    <a class="card" href="/lifestory">
-      <div class="card-icon">&#128214;</div>
-      <h3>Life Story</h3>
-      <p>Your personal timeline, chapters, milestones, and narrative. The story your data tells about your life.</p>
-      <span class="card-status" id="storyStatus">checking...</span>
-    </a>
-  </div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Graph Query</h2>
+      </div>
+      <div class="panel-body">
+        <div class="query-row">
+          <input id="addressInput" placeholder="Address or prefix, e.g. 1.1, 0.4.10, 4.3" value="">
+          <select id="queryMode">
+            <option value="prefix">Prefix</option>
+            <option value="node">Node</option>
+            <option value="subgraph">Subgraph</option>
+          </select>
+          <select id="depthInput">
+            <option value="1">Depth 1</option>
+            <option value="2" selected>Depth 2</option>
+            <option value="3">Depth 3</option>
+            <option value="4">Depth 4</option>
+          </select>
+          <button class="button primary" type="button" onclick="runQuery()">Run</button>
+        </div>
+        <div style="margin-top:14px; max-height:360px; overflow:auto;">
+          <table class="table" id="resultTable">
+            <thead><tr><th>Address</th><th>Type</th><th>Summary</th></tr></thead>
+            <tbody><tr><td colspan="3" class="muted">No query yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-  <div class="section-title">Tools</div>
-  <div class="cards">
-    <a class="card" href="/vr">
-      <div class="card-icon">&#129526;</div>
-      <h3>VR Interface</h3>
-      <p>Walk through the Hypernet in 3D. Spatial node browser for Quest headsets — works in any WebXR browser.</p>
-      <span class="card-status active">WebXR ready</span>
-    </a>
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Database Surfaces</h2>
+      </div>
+      <div class="panel-body route-list">
+        <a class="route" href="/explorer"><strong>Graph Explorer</strong><span>/explorer</span></a>
+        <a class="route" href="/graph/traverse/1.1?depth=2"><strong>Graph Traversal</strong><span>/graph/traverse/{address}</span></a>
+        <a class="route" href="/stats"><strong>Store Stats</strong><span>/stats</span></a>
+        <a class="route" href="/links/query"><strong>Link Query</strong><span>/links/query</span></a>
+        <a class="route" href="/links/stats"><strong>Link Stats</strong><span>/links/stats</span></a>
+        <a class="route" href="/schema/summary"><strong>Schema Summary</strong><span>/schema/summary</span></a>
+        <a class="route" href="/schema/object-types"><strong>Object Types</strong><span>/schema/object-types</span></a>
+        <a class="route" href="/schema/link-types"><strong>Link Types</strong><span>/schema/link-types</span></a>
+      </div>
+    </aside>
 
-    <a class="card" href="/explorer">
-      <div class="card-icon">&#127760;</div>
-      <h3>Graph Explorer</h3>
-      <p>Visual exploration of the Hypernet address space. Browse nodes, links, and the full archive structure.</p>
-    </a>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Registered Object Types</h2>
+        <span class="muted" id="objectTypeCount">loading</span>
+      </div>
+      <div class="panel-body" style="max-height:420px; overflow:auto;">
+        <table class="table" id="objectTypeTable">
+          <thead><tr><th>Address</th><th>Type</th><th>Required Fields</th></tr></thead>
+          <tbody><tr><td colspan="3" class="muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
 
-    <a class="card" href="/setup">
-      <div class="card-icon">&#9881;</div>
-      <h3>Setup Wizard</h3>
-      <p>Connect AI providers, configure workers, and set up your swarm. Start here if you're new.</p>
-      <span class="card-status active">New users</span>
-    </a>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Registered Link Types</h2>
+        <span class="muted" id="linkTypeCount">loading</span>
+      </div>
+      <div class="panel-body" style="max-height:420px; overflow:auto;">
+        <table class="table" id="linkTypeTable">
+          <thead><tr><th>Relationship</th><th>Category</th><th>Properties</th></tr></thead>
+          <tbody><tr><td colspan="3" class="muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
 
-    <a class="card" href="/">
-      <div class="card-icon">&#128220;</div>
-      <h3>Public Welcome</h3>
-      <p>The Herald's front door. What the world sees when they visit the Hypernet. Your public face.</p>
-    </a>
-
-    <a class="card" href="/docs" target="_blank">
-      <div class="card-icon">&#128736;</div>
-      <h3>API Documentation</h3>
-      <p>Full REST API reference. Every endpoint, every parameter. Auto-generated from the server code.</p>
-    </a>
-  </div>
-
-  <div class="section-title">Quick Stats</div>
-  <div class="quick-stats" id="quickStats">
-    <div class="qstat"><div class="val" id="statNodes">-</div><div class="lbl">Nodes</div></div>
-    <div class="qstat"><div class="val" id="statLinks">-</div><div class="lbl">Links</div></div>
-    <div class="qstat"><div class="val" id="statWorkers">-</div><div class="lbl">Workers</div></div>
-    <div class="qstat"><div class="val" id="statTasks">-</div><div class="lbl">Tasks</div></div>
-    <div class="qstat"><div class="val" id="statAccounts">-</div><div class="lbl">Accounts</div></div>
-    <div class="qstat"><div class="val" id="statRoutes">130+</div><div class="lbl">API Routes</div></div>
-    <div class="qstat"><div class="val" id="statService">-</div><div class="lbl">Service</div></div>
-  </div>
-
-  <div class="section-title">Recent Tasks</div>
-  <div class="recent-activity" id="recentActivity">
-    <div class="activity-item"><span class="activity-text">Loading...</span></div>
-  </div>
-</div>
-
-<div class="footer">
-  Hypernet v0.9 &mdash; <a href="https://github.com/kosmicsuture/hypernet">Source</a> &mdash; One command. One tab. Everything connected.
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Secondary Systems</h2>
+      </div>
+      <div class="panel-body secondary">
+        <a class="button" href="/swarm/dashboard">Swarm</a>
+        <a class="button" href="/chat">Chat</a>
+        <a class="button" href="/vr">VR</a>
+        <a class="button" href="/lifestory">Life Story</a>
+        <a class="button" href="/setup">Setup</a>
+        <a class="button" href="/">Public</a>
+      </div>
+    </aside>
+  </main>
 </div>
 
 <script>
-// Greeting based on time of day
-function setGreeting() {
-  const hour = new Date().getHours();
-  const el = document.getElementById('greetingText');
-  if (hour < 5) el.textContent = "Burning the midnight oil.";
-  else if (hour < 12) el.textContent = "Good morning.";
-  else if (hour < 17) el.textContent = "Good afternoon.";
-  else if (hour < 21) el.textContent = "Good evening.";
-  else el.textContent = "Late night session.";
+const resultBody = document.querySelector('#resultTable tbody');
+
+function displayValue(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
 }
-setGreeting();
 
-// Check swarm status
-async function checkSwarm() {
+function nodeSummary(node) {
+  const data = node.data || {};
+  return data.title || data.name || data.label || data.description || data.filename || '';
+}
+
+async function loadStats() {
   try {
-    const res = await fetch('/swarm/status');
-    const data = await res.json();
-    const running = data.status === 'running';
-    const workers = data.worker_count || (data.workers ? data.workers.length : 0);
-    document.getElementById('swarmDot').className = 'status-dot ' + (running ? 'on' : 'off');
-    document.getElementById('statWorkers').textContent = workers;
-    document.getElementById('swarmStatus').textContent = running ? `${workers} workers active` : `${workers} workers (stopped)`;
-    document.getElementById('swarmStatus').className = 'card-status ' + (running ? 'active' : 'inactive');
+    const [statsRes, schemaRes, swarmRes] = await Promise.allSettled([
+      fetch('/stats').then(r => r.json()),
+      fetch('/schema/summary').then(r => r.json()),
+      fetch('/swarm/status').then(r => r.json())
+    ]);
 
-    // Tasks
-    const completed = data.tasks_completed || 0;
-    const failed = data.tasks_failed || 0;
-    document.getElementById('statTasks').textContent = completed + failed;
-
-    // Recent tasks (from swarm status data)
-    const recent = data.recent_tasks || [];
-    if (recent.length > 0) {
-      const el = document.getElementById('recentActivity');
-      el.innerHTML = recent.slice().reverse().slice(0, 8).map(t => {
-        const icon = t.success ? '&#10003;' : '&#10007;';
-        const cls = t.success ? 'color:var(--success)' : 'color:var(--danger)';
-        return `<div class="activity-item">
-          <span class="activity-text"><span style="${cls}">${icon}</span> ${t.task || 'Task'}</span>
-          <span class="activity-time">${t.worker || ''} &middot; ${t.duration_s || '?'}s</span>
-        </div>`;
-      }).join('');
+    if (statsRes.status === 'fulfilled') {
+      document.getElementById('statNodes').textContent = statsRes.value.total_nodes || 0;
+      document.getElementById('statLinks').textContent = statsRes.value.total_links || 0;
     }
-  } catch(e) {
-    document.getElementById('swarmStatus').textContent = 'not running';
-    document.getElementById('swarmStatus').className = 'card-status inactive';
+
+    if (schemaRes.status === 'fulfilled') {
+      const schema = schemaRes.value;
+      document.getElementById('statLinkTypes').textContent = schema.links.total_defined_link_types || '-';
+      document.getElementById('statTypes').textContent = schema.object_taxonomy.total_defined_object_types || 100;
+      document.getElementById('statKnowledge').textContent = schema.knowledgebase.third_level_leaf_folders || 150;
+    }
+
+    if (swarmRes.status === 'fulfilled') {
+      const running = swarmRes.value.status === 'running';
+      document.getElementById('swarmDot').className = 'dot ' + (running ? 'on' : '');
+    }
+  } catch (err) {
+    document.getElementById('apiDot').className = 'dot';
   }
 }
 
-// Check store stats
-async function checkStore() {
+async function loadObjectTypes() {
+  const body = document.querySelector('#objectTypeTable tbody');
   try {
-    const res = await fetch('/stats');
-    const data = await res.json();
-    document.getElementById('statNodes').textContent = data.total_nodes || 0;
-    document.getElementById('statLinks').textContent = data.total_links || 0;
-  } catch(e) {}
+    const rows = await fetch('/schema/object-types').then(r => r.json());
+    document.getElementById('objectTypeCount').textContent = `${rows.length} defined`;
+    body.innerHTML = rows.slice(0, 160).map(row => `<tr>
+      <td class="mono">${escapeHtml(row.address)}</td>
+      <td>${escapeHtml(row.name)}<br><span class="muted">${escapeHtml(row.domain_name)}</span></td>
+      <td class="muted">${escapeHtml((row.required_fields || []).join(', ') || '-')}</td>
+    </tr>`).join('');
+  } catch (err) {
+    body.innerHTML = '<tr><td colspan="3" class="muted">Could not load object types.</td></tr>';
+    document.getElementById('objectTypeCount').textContent = 'unavailable';
+  }
 }
 
-// Check local accounts
-async function checkAccounts() {
+async function loadLinkTypes() {
+  const body = document.querySelector('#linkTypeTable tbody');
   try {
-    const res = await fetch('/accounts/local');
-    const data = await res.json();
-    document.getElementById('statAccounts').textContent = data.length || 0;
-    if (data.length > 0) {
-      document.getElementById('storyStatus').textContent = `${data.length} account(s)`;
-      document.getElementById('storyStatus').className = 'card-status active';
+    const rows = await fetch('/schema/link-types').then(r => r.json());
+    document.getElementById('linkTypeCount').textContent = `${rows.length} defined`;
+    body.innerHTML = rows.slice(0, 160).map(row => {
+      const props = [
+        row.directed ? 'directed' : 'undirected',
+        row.symmetric ? 'symmetric' : '',
+        row.transitive ? 'transitive' : '',
+        row.inverse ? `inverse: ${row.inverse}` : ''
+      ].filter(Boolean).join(', ');
+      return `<tr>
+        <td class="mono">${escapeHtml(row.relationship)}</td>
+        <td>${escapeHtml(row.category_name || row.category)}</td>
+        <td class="muted">${escapeHtml(props)}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    body.innerHTML = '<tr><td colspan="3" class="muted">Could not load link types.</td></tr>';
+    document.getElementById('linkTypeCount').textContent = 'unavailable';
+  }
+}
+
+async function runQuery() {
+  const address = document.getElementById('addressInput').value.trim();
+  const mode = document.getElementById('queryMode').value;
+  const depth = document.getElementById('depthInput').value;
+  if (!address) {
+    resultBody.innerHTML = '<tr><td colspan="3" class="muted">Enter an address or prefix.</td></tr>';
+    return;
+  }
+
+  resultBody.innerHTML = '<tr><td colspan="3" class="muted">Loading...</td></tr>';
+  try {
+    let data;
+    if (mode === 'node') {
+      data = [await fetch(`/node/${encodeURIComponent(address)}`).then(r => r.json())];
+    } else if (mode === 'subgraph') {
+      const graph = await fetch(`/node/${encodeURIComponent(address)}/subgraph?depth=${depth}`).then(r => r.json());
+      data = graph.nodes || [];
     } else {
-      document.getElementById('storyStatus').textContent = 'no accounts yet';
-      document.getElementById('storyStatus').className = 'card-status inactive';
+      data = await fetch(`/query?prefix=${encodeURIComponent(address)}`).then(r => r.json());
     }
-  } catch(e) {
-    document.getElementById('storyStatus').textContent = 'available';
-    document.getElementById('storyStatus').className = 'card-status inactive';
+
+    if (!Array.isArray(data) || data.length === 0) {
+      resultBody.innerHTML = '<tr><td colspan="3" class="muted">No results.</td></tr>';
+      return;
+    }
+
+    resultBody.innerHTML = data.slice(0, 80).map(node => `<tr>
+      <td class="mono">${escapeHtml(node.address)}</td>
+      <td class="mono">${escapeHtml(node.type_address || '-')}</td>
+      <td>${escapeHtml(nodeSummary(node) || displayValue(node.data).slice(0, 140))}</td>
+    </tr>`).join('');
+  } catch (err) {
+    resultBody.innerHTML = `<tr><td colspan="3" class="muted">${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
-// Check service status
-async function checkService() {
-  try {
-    const res = await fetch('/swarm/service-status');
-    const data = await res.json();
-    const el = document.getElementById('statService');
-    const svcStatus = (data.status || '').toLowerCase();
-    if (svcStatus === 'running' || svcStatus === 'service_running' || svcStatus === 'active') {
-      el.textContent = 'Active';
-      el.style.color = 'var(--success)';
-    } else if (data.installed) {
-      el.textContent = 'Stopped';
-      el.style.color = 'var(--warning)';
-    } else {
-      el.textContent = 'None';
-      el.style.color = 'var(--text-muted)';
-    }
-  } catch(e) {
-    document.getElementById('statService').textContent = '-';
-  }
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = String(text || '');
+  return d.innerHTML;
 }
 
-// Initialize
-checkSwarm();
-checkStore();
-checkAccounts();
-checkService();
-
-// Auto-refresh every 30s
-setInterval(checkSwarm, 30000);
+loadStats();
+loadObjectTypes();
+loadLinkTypes();
+setInterval(loadStats, 30000);
 </script>
 </body>
 </html>

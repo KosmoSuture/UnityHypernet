@@ -1,5 +1,5 @@
 ---
-ha: "0.4.0.1.3"
+ha: "0.4.legacy.0.1.3.link"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-09"
@@ -9,6 +9,23 @@ flags: ["registry"]
 ---
 
 # Link - Relationship Between Objects
+
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> The "Link" core type — what a Link object IS — is now defined in the
+> core types folder. The catalog of Link relationships (authored_by,
+> cites, member_of, depends_on, etc.) lives in the Link Definitions
+> taxonomy. This document is preserved as a compatibility reference.
+>
+> - **Canonical core type:** `0.4.1 - Core Object Types/0.4.1.2 - Link/README.md`
+> - **Relationship catalog:** `0.6 Link Definitions/0.6.11 - Common Link Taxonomy/`
+>   (per-relationship folder READMEs with endpoints, direction,
+>   symmetry, transitivity, inverse, evidence, and trust expectations)
+> - **Runtime:** `GET /schema/link-types`,
+>   `POST /link?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` and
+> `0.6 Link Definitions/FOLDER-FIRST-MIGRATION.md` for migration policies.
 
 **Type ID:** `hypernet.core.link`
 **Version:** 1.0

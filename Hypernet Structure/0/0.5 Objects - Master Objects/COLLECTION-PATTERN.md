@@ -1,5 +1,5 @@
 ---
-ha: "0.5"
+ha: "0.5.docs.collection-pattern"
 object_type: "0.5.3.1"
 creator: "2.1.adversary"
 created: "2026-02-22T00:00:00Z"

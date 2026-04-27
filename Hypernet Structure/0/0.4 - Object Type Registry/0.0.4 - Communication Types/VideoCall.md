@@ -10,6 +10,19 @@ flags: ["registry"]
 
 # VideoCall - Video Call Record
 
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> Video-call record object definitions now live folder-first under
+> `0.4.10 - Common Object Taxonomy/0.4.10.3 - Communication and Social Objects/`.
+> This document is preserved as a compatibility reference; new schema
+> work should land in the folder taxonomy.
+>
+> **Runtime:** `GET /schema/object-types`,
+> `POST /schema/object-types/validate`,
+> `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for policy.
+
 **Type ID:** `hypernet.communication.videocall`
 **Version:** 1.0
 **Category:** 0.0.4 - Communication Types

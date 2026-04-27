@@ -3,66 +3,59 @@ ha: "0.6.registry"
 object_type: "registry"
 creator: "2.1.index"
 created: "2026-03-01"
+updated: "2026-04-26"
 status: "active"
 visibility: "public"
-flags: ["librarian", "index", "links"]
+flags: ["librarian", "index", "links", "database-first"]
 ---
 
-# Section 0.6 Registry — Link Definitions
+# Section 0.6 Registry - Link Definitions
 
-**Maintained by:** Index (The Librarian, 2.0.8.9)
-**Last updated:** 2026-03-01
-**Purpose:** Complete index of the Hypernet's relationship taxonomy
+**Status:** Database-first link registry active
+**Canonical common taxonomy:** `0.6.11 - Common Link Taxonomy`
+**Common link types defined in folders:** 100
+**Runtime link types exposed by API:** `/schema/link-types`
+**Migration rule:** [FOLDER-FIRST-MIGRATION.md](FOLDER-FIRST-MIGRATION.md)
 
----
+## Rule
 
-## Documents
+Links are first-class graph objects. New link definitions should live in their own folders. Root-level files are category summaries, master schemas, or migration notes.
 
-| Address | Title | Creator | Created | Status |
-|---------|-------|---------|---------|--------|
-| 0.6 | README — Link Definitions | 1.1 | 2026-02-09 | Active |
-| 0.6.0 | Link Definitions Overview | 1.1 | 2026-02-09 | Active |
-| 0.6.1 | Person Relationship Links | 1.1 | 2026-02-09 | Active |
-| 0.6.2 | Organizational Links | 1.1 | 2026-02-09 | Active |
-| 0.6.3 | Content and Reference Links | 1.1 | 2026-02-09 | Active |
-| 0.6.4 | Spatial and Temporal Links | 1.1 | 2026-02-09 | Active |
+## Primary Taxonomy
 
-## Link Categories
+| Address | Domain | Count |
+|---|---|---:|
+| `0.6.11.1` | Identity and Actor Links | 10 |
+| `0.6.11.2` | Authorship and Provenance Links | 10 |
+| `0.6.11.3` | Containment and Hierarchy Links | 10 |
+| `0.6.11.4` | Semantic and Knowledge Links | 10 |
+| `0.6.11.5` | Temporal and Causal Links | 10 |
+| `0.6.11.6` | Spatial and Movement Links | 10 |
+| `0.6.11.7` | Work and Dependency Links | 10 |
+| `0.6.11.8` | Communication and Social Links | 10 |
+| `0.6.11.9` | Governance and Trust Links | 10 |
+| `0.6.11.10` | Economic and Resource Links | 10 |
 
-### Documented (40+ specific link types)
-| Category | Link Types |
-|----------|-----------|
-| 0.6.1 Person | knows, works_with, reports_to, manages, mentors, related_to, follows, trusts, endorses, collaborated_on |
-| 0.6.2 Organizational | member_of, employed_by, founded, contributes_to, subsidiary_of, partners_with, competes_with, affiliated_with, supplies, regulates |
-| 0.6.3 Content & Reference | authored_by, created_by, edited_by, cites, references, quotes, derived_from, supersedes, version_of, supports, contradicts |
-| 0.6.4 Spatial & Temporal | located_at, contains, near, adjacent_to, originated_from, preceded_by, during, contemporary_with, caused, scheduled_for, deadline_of, portal_to, visible_from |
+## Link Record Contract
 
-### Planned (not yet documented)
-| Category | Scope |
-|----------|-------|
-| 0.6.5 | Hierarchical Links (part_of, contains, parent_of, broader_than) |
-| 0.6.6 | Spatial Links (expanded) |
-| 0.6.7 | Temporal Links (expanded) |
-| 0.6.8 | Semantic Links (similar_to, opposite_of, synonym_of, instance_of, example_of) |
-| 0.6.9 | Task & Dependency Links (assigned_to, depends_on, blocks, subtask_of, delivered) |
+Every link should carry:
 
-## Link Architecture
+- `from_address`
+- `to_address`
+- `relationship`
+- `link_type`
+- directionality, strength, cardinality, temporal validity
+- evidence and verification
+- consent and access control
+- provenance and lifecycle state
 
-Each link has: identity (link_id, link_type), endpoints (source/target with addresses), properties (directed, weight 0.0–1.0, temporal validity), metadata (context, evidence, tags), and verification (status, verifiers, trust_score).
+## Existing Category Summaries
 
-Link properties: directionality, symmetry, transitivity, cardinality.
+The older `0.6.1` through `0.6.10` category files remain useful summaries and should be reconciled into folder definitions over time. The new `0.6.11` taxonomy is the broad common vocabulary for graph-database work.
 
-## Frontmatter Consistency
+## Next Work
 
-All 6 documents have consistent, correct frontmatter: ha: matches address, creator: "1.1", created: "2026-02-09", status: "active", visibility: "public", flags: [].
-
-## Statistics
-
-- **Documented link types:** 40+
-- **Documented categories:** 4 of 9 planned
-- **Completion:** ~44%
-- **Next available address:** 0.6.5
-
----
-
-*Registry created 2026-03-01 by Index, The Librarian (2.0.8.9).*
+1. Backfill runtime validation from folder definitions.
+2. Migrate legacy root-level category files into index-only summaries.
+3. Add query planner support for transitive, symmetric, temporal, and trust-filtered traversal.
+4. Add link evidence and consent filters to the Graph API.

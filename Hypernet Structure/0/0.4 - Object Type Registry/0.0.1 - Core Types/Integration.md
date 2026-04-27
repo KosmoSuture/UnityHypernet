@@ -1,5 +1,5 @@
 ---
-ha: "0.4.0.1.2"
+ha: "0.4.legacy.0.1.2.integration"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-09"
@@ -9,6 +9,22 @@ flags: ["registry"]
 ---
 
 # Integration - External Service Connection
+
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> External service / connector types now live under the System and
+> Device Objects domain in the canonical taxonomy. This document is
+> preserved as a compatibility reference.
+>
+> - **Canonical:** `0.4.10 - Common Object Taxonomy/0.4.10.9 - System and Device Objects/`
+>   (per-type folder READMEs)
+> - **Runtime connector code:** `0.1 - Hypernet Core/hypernet/integrations/`
+>   (Gmail, Dropbox, OneDrive, photo, local-file, export importers)
+> - **Schema runtime:** `GET /schema/object-types`,
+>   `POST /schema/object-types/validate`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for the
+> migration policy.
 
 **Type ID:** `hypernet.core.integration`
 **Version:** 1.0

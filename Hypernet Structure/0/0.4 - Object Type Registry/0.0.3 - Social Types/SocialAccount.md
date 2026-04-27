@@ -1,5 +1,5 @@
 ---
-ha: "0.4.0.3.2"
+ha: "0.4.legacy.0.3.2.social-account"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-09"
@@ -9,6 +9,19 @@ flags: ["registry"]
 ---
 
 # SocialAccount - Social Media Account/Profile
+
+> **Superseded by Folder-First Taxonomy (2026-04-26)**
+>
+> Social media account / profile object definitions now live folder-first
+> under `0.4.10 - Common Object Taxonomy/0.4.10.3 - Communication and Social Objects/`.
+> This document is preserved as a compatibility reference; new schema
+> work should land in the folder taxonomy.
+>
+> **Runtime:** `GET /schema/object-types`,
+> `POST /schema/object-types/validate`,
+> `PUT /node/{address}?validation_mode=warn|strict|off`
+>
+> See `0.4 - Object Type Registry/FOLDER-FIRST-MIGRATION.md` for policy.
 
 **Type ID:** `hypernet.social.account`
 **Version:** 1.0

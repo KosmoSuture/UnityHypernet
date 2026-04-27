@@ -39,6 +39,8 @@ Person nodes follow the standard structure defined in 1.0 (People Definitions). 
 | 1.1.9 | Notes & Knowledge | Data |
 | 1.1.10 | AI Assistants (Embassy) | Data |
 | 1.1.11 | Profile & Identity | Data |
+| 1.1.12 | Secrets & Credentials | Private locker/mandala credential data |
+| 1.1.13 | Public Profile & Lockers | Public account surface and locker index |
 
 ## Sub-Node Metadata Rule
 
@@ -51,6 +53,8 @@ Person nodes contain sensitive personal information. Access levels per the Peopl
 2. Team - Hypernet team members only
 3. Private - Person + authorized individuals only
 4. System - System access only (encrypted)
+
+Secrets, credentials, and recovery material belong under `1.1.12` and must be encrypted or referenced through lockers. Public account data belongs under `1.1.13` and may expose locker/mandala metadata, not private contents.
 
 ## Notes
 

@@ -40,6 +40,10 @@ The 3.* address space is where organizations live on the Hypernet — businesses
 |---------|------|--------|------|
 | 3.1 | Hypernet | Active | Technology startup / open-source project |
 
+## Authentication
+
+Company accounts use their own `3.*` login and permission process, separate from human `1.*` login. Public company profile surfaces are browsable, while private company operations require the owning authenticated company account or an explicit delegation.
+
 ## Relationship to Other Categories
 
 - **Category 1 (People):** Organization members are people tracked in 1.*

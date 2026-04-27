@@ -11,9 +11,19 @@ flags: []
 # 0.6 - Link Definitions
 
 **Version:** 1.0
-**Last Updated:** February 9, 2026
+**Last Updated:** April 26, 2026
 **Purpose:** Relationship types and patterns connecting objects
 **Status:** Active - Knowledge Graph Foundation
+
+---
+
+## Database-First Update
+
+The canonical broad link taxonomy now lives in folders at:
+
+`0.6.11 - Common Link Taxonomy/`
+
+That folder defines 100 common link types across 10 domains. The older root-level category files remain useful summaries, but new link definitions should be folder-based and should map cleanly to runtime link validation.
 
 ---
 
