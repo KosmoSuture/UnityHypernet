@@ -27,7 +27,7 @@ See: 0.6.0 Master Link Schema
 
 from __future__ import annotations
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any, Optional, TYPE_CHECKING
 
@@ -526,6 +526,72 @@ _register_if_missing(*(
 ))
 
 
+# Focused endpoint constraints for high-confidence canonical 0.6.11
+# relationships. Empty source/target tuples still mean "any typed object";
+# constraints below should stay conservative until import pipelines assign
+# type_address consistently across the graph.
+ACTOR_OBJECT_TYPES = ("0.4.10.1",)
+CONTENT_OBJECT_TYPES = (
+    "0.4.10.2",      # Content and Media Objects
+    "0.4.10.3",      # Communication and Social Objects
+    "0.4.10.8",      # Science and Knowledge Objects
+    "0.4.10.9.9",    # Software Package
+    "0.4.10.10.3",   # Medical Record
+)
+GENERATOR_OBJECT_TYPES = (
+    "0.4.10.1.9",    # Agent Instance
+    "0.4.10.9.3",    # Service
+    "0.4.10.9.9",    # Software Package / script
+)
+PLACE_OBJECT_TYPES = (
+    "0.4.10.4.1",    # Location
+    "0.4.10.4.2",    # Address
+    "0.4.10.4.3",    # Venue
+    "0.4.10.4.4",    # Region
+)
+IDENTITY_OBJECT_TYPES = (
+    "0.4.10.1.6",    # Account
+    "0.4.10.1.7",    # Credential
+    "0.4.10.1.8",    # Persona
+    "0.4.10.1.9",    # Agent Instance
+)
+PERMISSION_OBJECT_TYPES = (
+    "0.4.10.7.4",    # Permission
+    "0.4.10.7.5",    # Consent Grant
+)
+
+LINK_ENDPOINT_CONSTRAINTS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "authored_by": (CONTENT_OBJECT_TYPES, ACTOR_OBJECT_TYPES),
+    "created_by": ((), ACTOR_OBJECT_TYPES),
+    "generated_by": (CONTENT_OBJECT_TYPES, GENERATOR_OBJECT_TYPES),
+    "member_of_household": (("0.4.10.1.1",), ("0.4.10.1.2",)),
+    "owns_identity": (ACTOR_OBJECT_TYPES, IDENTITY_OBJECT_TYPES),
+    "located_at": ((), PLACE_OBJECT_TYPES),
+    "assigned_to": (("0.4.10.5",), ACTOR_OBJECT_TYPES),
+    "governed_by": ((), ("0.4.10.7",)),
+    "permission_grants": (PERMISSION_OBJECT_TYPES, ACTOR_OBJECT_TYPES),
+    "audited_by": ((), ACTOR_OBJECT_TYPES),
+    "paid_for": (("0.4.10.6.1",), ()),
+}
+
+
+def _apply_endpoint_constraints(
+    constraints: dict[str, tuple[tuple[str, ...], tuple[str, ...]]]
+) -> None:
+    for name, (source_types, target_types) in constraints.items():
+        existing = LINK_TYPE_REGISTRY.get(name)
+        if existing is None:
+            continue
+        LINK_TYPE_REGISTRY[name] = replace(
+            existing,
+            source_types=source_types,
+            target_types=target_types,
+        )
+
+
+_apply_endpoint_constraints(LINK_ENDPOINT_CONSTRAINTS)
+
+
 def get_link_type_def(relationship: str) -> Optional[LinkTypeDef]:
     """Look up a link type definition by relationship name."""
     return LINK_TYPE_REGISTRY.get(relationship)
@@ -541,6 +607,9 @@ def list_link_type_defs() -> list[dict[str, Any]]:
             "directed": d.directed,
             "symmetric": d.symmetric,
             "transitive": d.transitive,
+            "source_types": list(d.source_types),
+            "target_types": list(d.target_types),
+            "endpoint_constraints": bool(d.source_types or d.target_types),
             "cardinality": d.cardinality,
             "inverse": d.inverse,
             "auto_create_inverse": d.auto_create_inverse,
@@ -1131,7 +1200,15 @@ class LinkRegistry:
         skipped = 0
         scanned = 0
 
-        for hashes in self._query_hash_sources(relationship, category, status):
+        for hashes in self._query_hash_sources(
+            relationship,
+            category,
+            status,
+            verification_status,
+            min_trust,
+            source_prefix,
+            target_prefix,
+        ):
             for link_hash in hashes:
                 if link_hash in seen:
                     continue
@@ -1190,7 +1267,25 @@ class LinkRegistry:
         relationship: str | None,
         category: str | None,
         status: str | None,
+        verification_status: str | None = None,
+        min_trust: float | None = None,
+        source_prefix: str | None = None,
+        target_prefix: str | None = None,
     ) -> list[list[str]]:
+        embedded_query = getattr(self.store, "query_link_hashes_indexed", None)
+        if embedded_query:
+            embedded_hashes = embedded_query(
+                relationship=relationship,
+                category=category,
+                status=status,
+                verification_status=verification_status,
+                min_trust=min_trust,
+                source_prefix=source_prefix,
+                target_prefix=target_prefix,
+            )
+            if embedded_hashes is not None:
+                return [embedded_hashes]
+
         indexed_sets: list[set[str]] = []
         relationship_index = getattr(self.store, "_links_by_relationship", {})
         category_index = getattr(self.store, "_links_by_category", {})

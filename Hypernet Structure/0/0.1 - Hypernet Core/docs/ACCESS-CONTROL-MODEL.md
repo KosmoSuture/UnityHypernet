@@ -29,9 +29,11 @@ This document defines the account and write-access baseline for the graph databa
 - `hypernet/server.py` no longer treats all `/api/` routes as public when JWT auth is enabled.
 - Anonymous public reads are constrained to `0.*`, `4.*`, account public surfaces, schemas, health/status, and selected UI pages.
 - Mutating routes require authentication when JWT auth is enabled.
-- `POST /link` enforces body-level write authorization on both endpoints
-  (link governance still gates target consent for `consent_required`
-  relationships through the proposed→active flow).
+- `POST /link` enforces body-level authorization as source-write plus
+  target-read. If a relationship type requires target or mutual consent
+  and the actor cannot write the target, the link is stored as
+  `proposed` with `target_consented=false` for the proposed→active
+  acceptance flow.
 
 ## Introspecting Access Decisions
 
@@ -86,4 +88,4 @@ Accounts need a public side and a private side. The public side is browsable. Pr
 2. Implement IoT device credentials with owner binding, rotation, scoped writes, and revocation.
 3. Enforce locker/mandala grants at object/link read time, not just route level.
 4. Add company role/member delegation under `3.*`.
-5. Add link-body authorization for `POST /link`, checking both endpoints and relationship class.
+5. Expose authorized HTTP accept/reject endpoints for proposed link consent.

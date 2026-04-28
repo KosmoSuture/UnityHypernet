@@ -33,12 +33,13 @@ import json
 import hashlib
 import logging
 import os
+import sqlite3
 import tempfile
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .address import HypernetAddress
 from .node import Node
@@ -232,6 +233,245 @@ class LockManager:
         return cleared
 
 
+class SQLiteIndexBackend:
+    """Embedded local index mirror for the file-backed graph store.
+
+    JSON node/link files remain the source of truth. This backend keeps a
+    compact SQLite projection under ``data/indexes`` for faster local query
+    candidates and can be rebuilt from the auditable files at any time.
+    """
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._ensure_schema()
+
+    @contextmanager
+    def _connection(self):
+        conn = sqlite3.connect(str(self.path))
+        try:
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
+            yield conn
+            conn.commit()
+        finally:
+            conn.close()
+
+    def _ensure_schema(self) -> None:
+        with self._connection() as conn:
+            conn.executescript("""
+                CREATE TABLE IF NOT EXISTS nodes (
+                    address TEXT PRIMARY KEY,
+                    path TEXT NOT NULL,
+                    type_address TEXT,
+                    owner TEXT,
+                    updated_at TEXT
+                );
+                CREATE INDEX IF NOT EXISTS idx_nodes_type ON nodes(type_address);
+                CREATE INDEX IF NOT EXISTS idx_nodes_owner ON nodes(owner);
+
+                CREATE TABLE IF NOT EXISTS links (
+                    hash TEXT PRIMARY KEY,
+                    from_address TEXT NOT NULL,
+                    to_address TEXT NOT NULL,
+                    relationship TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    verification_status TEXT,
+                    trust_score REAL,
+                    valid_from TEXT,
+                    valid_until TEXT,
+                    updated_at TEXT
+                );
+                CREATE INDEX IF NOT EXISTS idx_links_from ON links(from_address);
+                CREATE INDEX IF NOT EXISTS idx_links_to ON links(to_address);
+                CREATE INDEX IF NOT EXISTS idx_links_relationship ON links(relationship);
+                CREATE INDEX IF NOT EXISTS idx_links_category ON links(category);
+                CREATE INDEX IF NOT EXISTS idx_links_status ON links(status);
+                CREATE INDEX IF NOT EXISTS idx_links_verification ON links(verification_status);
+            """)
+
+    @staticmethod
+    def _prefix_clause(column: str, prefix: str, params: list[Any]) -> str:
+        params.extend([prefix, f"{prefix}.%"])
+        return f"({column} = ? OR {column} LIKE ?)"
+
+    def upsert_node(self, node: Node, path: Path) -> None:
+        with self._connection() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO nodes
+                  (address, path, type_address, owner, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    str(node.address),
+                    str(path),
+                    str(node.type_address) if node.type_address else None,
+                    str(node.owner) if node.owner else None,
+                    node.updated_at.isoformat() if node.updated_at else None,
+                ),
+            )
+
+    def delete_node(self, address: str) -> None:
+        with self._connection() as conn:
+            conn.execute("DELETE FROM nodes WHERE address = ?", (address,))
+
+    def upsert_link(self, link_hash: str, link: Link) -> None:
+        with self._connection() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO links
+                  (hash, from_address, to_address, relationship, category, status,
+                   verification_status, trust_score, valid_from, valid_until, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    link_hash,
+                    str(link.from_address),
+                    str(link.to_address),
+                    link.relationship,
+                    link.link_type,
+                    link.status,
+                    link.verification_status,
+                    float(link.trust_score),
+                    link.valid_from.isoformat() if link.valid_from else None,
+                    link.valid_until.isoformat() if link.valid_until else None,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+
+    def rebuild(self, nodes: list[tuple[Node, Path]], links: list[tuple[str, Link]]) -> dict:
+        with self._connection() as conn:
+            conn.execute("DELETE FROM nodes")
+            conn.execute("DELETE FROM links")
+            conn.executemany(
+                """
+                INSERT INTO nodes
+                  (address, path, type_address, owner, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        str(node.address),
+                        str(path),
+                        str(node.type_address) if node.type_address else None,
+                        str(node.owner) if node.owner else None,
+                        node.updated_at.isoformat() if node.updated_at else None,
+                    )
+                    for node, path in nodes
+                ],
+            )
+            conn.executemany(
+                """
+                INSERT INTO links
+                  (hash, from_address, to_address, relationship, category, status,
+                   verification_status, trust_score, valid_from, valid_until, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        link_hash,
+                        str(link.from_address),
+                        str(link.to_address),
+                        link.relationship,
+                        link.link_type,
+                        link.status,
+                        link.verification_status,
+                        float(link.trust_score),
+                        link.valid_from.isoformat() if link.valid_from else None,
+                        link.valid_until.isoformat() if link.valid_until else None,
+                        datetime.now(timezone.utc).isoformat(),
+                    )
+                    for link_hash, link in links
+                ],
+            )
+        return self.stats()
+
+    def query_node_addresses(
+        self,
+        *,
+        prefix: str | None = None,
+        type_address: str | None = None,
+        owner: str | None = None,
+    ) -> list[str]:
+        clauses: list[str] = []
+        params: list[Any] = []
+        if prefix:
+            clauses.append(self._prefix_clause("address", prefix, params))
+        if type_address:
+            clauses.append("type_address = ?")
+            params.append(type_address)
+        if owner:
+            clauses.append("owner = ?")
+            params.append(owner)
+        sql = "SELECT address FROM nodes"
+        if clauses:
+            sql += " WHERE " + " AND ".join(clauses)
+        sql += " ORDER BY address"
+        with self._connection() as conn:
+            return [row[0] for row in conn.execute(sql, params)]
+
+    def query_link_hashes(
+        self,
+        *,
+        relationship: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        verification_status: str | None = None,
+        min_trust: float | None = None,
+        source_prefix: str | None = None,
+        target_prefix: str | None = None,
+    ) -> list[str]:
+        clauses: list[str] = []
+        params: list[Any] = []
+        if relationship:
+            clauses.append("relationship = ?")
+            params.append(relationship)
+        if category:
+            clauses.append("category = ?")
+            params.append(category)
+        if status:
+            clauses.append("status = ?")
+            params.append(status)
+        if verification_status:
+            clauses.append("verification_status = ?")
+            params.append(verification_status)
+        if min_trust is not None:
+            clauses.append("trust_score >= ?")
+            params.append(float(min_trust))
+        if source_prefix:
+            clauses.append(self._prefix_clause("from_address", source_prefix, params))
+        if target_prefix:
+            clauses.append(self._prefix_clause("to_address", target_prefix, params))
+
+        sql = "SELECT hash FROM links"
+        if clauses:
+            sql += " WHERE " + " AND ".join(clauses)
+        sql += " ORDER BY rowid"
+        with self._connection() as conn:
+            return [row[0] for row in conn.execute(sql, params)]
+
+    def stats(self) -> dict:
+        with self._connection() as conn:
+            node_count = conn.execute("SELECT COUNT(*) FROM nodes").fetchone()[0]
+            link_count = conn.execute("SELECT COUNT(*) FROM links").fetchone()[0]
+            relationship_count = conn.execute(
+                "SELECT COUNT(DISTINCT relationship) FROM links"
+            ).fetchone()[0]
+            category_count = conn.execute(
+                "SELECT COUNT(DISTINCT category) FROM links"
+            ).fetchone()[0]
+        return {
+            "backend": "sqlite",
+            "path": str(self.path),
+            "total_nodes": node_count,
+            "total_links": link_count,
+            "relationships": relationship_count,
+            "categories": category_count,
+        }
+
+
 class Store:
     """File-backed storage for Hypernet nodes and links.
 
@@ -265,9 +505,11 @@ class Store:
         self._links_by_relationship: dict[str, list[str]] = {}
         self._links_by_category: dict[str, list[str]] = {}
         self._links_by_status: dict[str, list[str]] = {}
+        self._embedded_index: SQLiteIndexBackend | None = None
 
         self._ensure_dirs()
         self._load_indexes()
+        self._embedded_index = SQLiteIndexBackend(self._index_dir / "hypernet_index.sqlite3")
 
     def enable_enforcement(self, strict: bool = True) -> None:
         """Enable address enforcement. All put_node() calls will validate addresses.
@@ -348,6 +590,8 @@ class Store:
                     self._owner_index[owner_str].append(addr_str)
 
             self._save_indexes()
+            if self._embedded_index:
+                self._embedded_index.upsert_node(node, path)
 
     def get_node(self, address: HypernetAddress) -> Optional[Node]:
         """Retrieve a node by address. Returns None if not found."""
@@ -380,6 +624,8 @@ class Store:
                         if addr_str in idx[key]:
                             idx[key].remove(addr_str)
                 self._save_indexes()
+                if self._embedded_index:
+                    self._embedded_index.delete_node(addr_str)
         else:
             node.soft_delete()
             self.put_node(node)  # put_node handles its own locking
@@ -416,6 +662,9 @@ class Store:
                     if key in addr_strs:
                         del link_idx[key]
             self._save_indexes()
+            if self._embedded_index:
+                for addr_str in addr_strs:
+                    self._embedded_index.delete_node(addr_str)
 
         return deleted
 
@@ -428,15 +677,24 @@ class Store:
     ) -> list[Node]:
         """List nodes with optional filtering."""
         addresses: set[str] | None = None
+        indexed_addresses = self.query_node_addresses_indexed(
+            prefix=str(prefix) if prefix else None,
+            type_address=str(type_address) if type_address else None,
+            owner=str(owner) if owner else None,
+        )
 
-        if type_address:
-            type_str = str(type_address)
-            addresses = set(self._type_index.get(type_str, []))
+        if indexed_addresses is not None:
+            addresses = set(indexed_addresses)
 
-        if owner:
-            owner_str = str(owner)
-            owner_addrs = set(self._owner_index.get(owner_str, []))
-            addresses = owner_addrs if addresses is None else addresses & owner_addrs
+        if addresses is None:
+            if type_address:
+                type_str = str(type_address)
+                addresses = set(self._type_index.get(type_str, []))
+
+            if owner:
+                owner_str = str(owner)
+                owner_addrs = set(self._owner_index.get(owner_str, []))
+                addresses = owner_addrs if addresses is None else addresses & owner_addrs
 
         if addresses is None:
             if prefix:
@@ -584,6 +842,8 @@ class Store:
                     index[key].append(link_hash)
 
             self._save_indexes()
+            if self._embedded_index:
+                self._embedded_index.upsert_link(link_hash, link)
 
         return link_hash
 
@@ -616,6 +876,7 @@ class Store:
 
         missing = 0
         indexed = 0
+        embedded_links: list[tuple[str, Link]] = []
         for link_hash in all_hashes:
             link = self.get_link(link_hash)
             if link is None:
@@ -628,12 +889,16 @@ class Store:
             ):
                 index.setdefault(key, []).append(link_hash)
             indexed += 1
+            embedded_links.append((link_hash, link))
 
         with self.locks.index_lock():
             self._links_by_relationship = relationship_index
             self._links_by_category = category_index
             self._links_by_status = status_index
             self._save_indexes()
+            if self._embedded_index:
+                for link_hash, link in embedded_links:
+                    self._embedded_index.upsert_link(link_hash, link)
 
         return {
             "indexed_links": indexed,
@@ -643,6 +908,123 @@ class Store:
             "categories": len(category_index),
             "statuses": len(status_index),
         }
+
+    def _unique_link_hashes(self, max_links: Optional[int] = None) -> list[str]:
+        hashes: list[str] = []
+        seen: set[str] = set()
+        for bucket in self._links_from.values():
+            for link_hash in bucket:
+                if link_hash in seen:
+                    continue
+                seen.add(link_hash)
+                hashes.append(link_hash)
+                if max_links is not None and len(hashes) >= max_links:
+                    return hashes
+        return hashes
+
+    def query_node_addresses_indexed(
+        self,
+        *,
+        prefix: str | None = None,
+        type_address: str | None = None,
+        owner: str | None = None,
+    ) -> list[str] | None:
+        """Return node address candidates from the embedded index if complete."""
+        if not self._embedded_index:
+            return None
+        stats = self._embedded_index.stats()
+        if len(self._node_index) and stats["total_nodes"] < len(self._node_index):
+            return None
+        return self._embedded_index.query_node_addresses(
+            prefix=prefix,
+            type_address=type_address,
+            owner=owner,
+        )
+
+    def query_link_hashes_indexed(
+        self,
+        *,
+        relationship: str | None = None,
+        category: str | None = None,
+        status: str | None = None,
+        verification_status: str | None = None,
+        min_trust: float | None = None,
+        source_prefix: str | None = None,
+        target_prefix: str | None = None,
+    ) -> list[str] | None:
+        """Return link hash candidates from the embedded index if complete."""
+        if not self._embedded_index:
+            return None
+        expected_links = len(self._unique_link_hashes())
+        stats = self._embedded_index.stats()
+        if expected_links and stats["total_links"] < expected_links:
+            return None
+        return self._embedded_index.query_link_hashes(
+            relationship=relationship,
+            category=category,
+            status=status,
+            verification_status=verification_status,
+            min_trust=min_trust,
+            source_prefix=source_prefix,
+            target_prefix=target_prefix,
+        )
+
+    def rebuild_embedded_indexes(
+        self,
+        max_nodes: Optional[int] = None,
+        max_links: Optional[int] = None,
+    ) -> dict:
+        """Rebuild the SQLite index mirror from JSON node/link files."""
+        node_rows: list[tuple[Node, Path]] = []
+        missing_nodes = 0
+        for index, (addr_str, path_str) in enumerate(sorted(self._node_index.items())):
+            if max_nodes is not None and index >= max_nodes:
+                break
+            node = self.get_node(HypernetAddress.parse(addr_str))
+            if node is None:
+                missing_nodes += 1
+                continue
+            node_rows.append((node, Path(path_str)))
+
+        link_rows: list[tuple[str, Link]] = []
+        missing_links = 0
+        for link_hash in self._unique_link_hashes(max_links=max_links):
+            link = self.get_link(link_hash)
+            if link is None:
+                missing_links += 1
+                continue
+            link_rows.append((link_hash, link))
+
+        if self._embedded_index is None:
+            self._embedded_index = SQLiteIndexBackend(self._index_dir / "hypernet_index.sqlite3")
+        stats = self._embedded_index.rebuild(node_rows, link_rows)
+        stats.update({
+            "indexed_nodes": len(node_rows),
+            "missing_nodes": missing_nodes,
+            "indexed_links": len(link_rows),
+            "missing_links": missing_links,
+            "limited_nodes": max_nodes is not None and len(node_rows) + missing_nodes >= max_nodes,
+            "limited_links": max_links is not None and len(link_rows) + missing_links >= max_links,
+            "covers_nodes": stats["total_nodes"] >= len(self._node_index),
+            "covers_links": stats["total_links"] >= len(self._unique_link_hashes()),
+        })
+        return stats
+
+    def embedded_index_stats(self) -> dict:
+        """Return SQLite mirror coverage alongside file-index expectations."""
+        if self._embedded_index is None:
+            return {"backend": "sqlite", "enabled": False}
+        stats = self._embedded_index.stats()
+        expected_nodes = len(self._node_index)
+        expected_links = len(self._unique_link_hashes())
+        stats.update({
+            "enabled": True,
+            "expected_nodes": expected_nodes,
+            "expected_links": expected_links,
+            "covers_nodes": stats["total_nodes"] >= expected_nodes,
+            "covers_links": stats["total_links"] >= expected_links,
+        })
+        return stats
 
     def get_links_from(
         self,
@@ -807,4 +1189,5 @@ class Store:
             "total_links": sum(len(v) for v in self._links_from.values()),
             "types": len(self._type_index),
             "owners": len(self._owner_index),
+            "embedded_index": self.embedded_index_stats(),
         }

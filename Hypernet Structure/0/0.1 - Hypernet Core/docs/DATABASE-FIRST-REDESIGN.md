@@ -124,8 +124,14 @@ nodes are treated as not-yet-evaluable rather than as violations, so the
 hook is safe to enable while instances migrate to `0.4.10.*` type
 addresses. The `schema_validation` block carries
 `endpoint_constraints_checked: true` whenever the relationship type has
-non-empty constraints; all currently-registered link types ship with
-empty constraints, so the hook is presently a no-op for them.
+non-empty constraints.
+
+The first focused constraint set is now active for high-confidence
+canonical relationships: `authored_by`, `created_by`, `generated_by`,
+`member_of_household`, `owns_identity`, `located_at`, `assigned_to`,
+`governed_by`, `permission_grants`, `audited_by`, and `paid_for`.
+These constraints are exposed through `/schema/link-types` as
+`source_types`, `target_types`, and `endpoint_constraints`.
 
 ## Link Query Filters
 
@@ -155,6 +161,46 @@ Query indexes for relationship, category, and status are maintained for new writ
 ```text
 POST /links/index/rebuild
 ```
+
+## Embedded Local Index
+
+The file store now maintains an embedded SQLite mirror at:
+
+```text
+data/indexes/hypernet_index.sqlite3
+```
+
+JSON node and link files remain the auditable source of truth. The
+SQLite layer stores query-oriented node and link projections so local
+reads can get candidate address/hash sets without scanning the full
+file index. It is maintained on `put_node` and `put_link`, persists
+across process restarts, and can be rebuilt from the JSON store with
+`Store.rebuild_embedded_indexes()`.
+
+`LinkRegistry.query_links()` uses the embedded index when its coverage
+is complete, then still applies the canonical Python filters for
+temporal validity, active status, trust, endpoint prefix, and category
+semantics. If the embedded mirror is missing or incomplete, queries fall
+back to the existing JSON-backed indexes.
+
+## Typed Import Pipeline
+
+The integration protocol now includes a shared `GraphImportPipeline`
+for converting connector output into typed graph records:
+
+- `TypedNodeSpec` describes a node address, `type_address`, source
+  metadata, creator, and structured data.
+- `TypedLinkSpec` describes a first-class link with relationship,
+  `link_type`, strength, directionality, and source metadata.
+- `GraphImportBatch` groups typed nodes and links from one source run.
+- `GraphImportPipeline.import_batch()` validates the full batch first,
+  writes nodes before links through normal `Store` APIs, preserves
+  `source_platform` and `import_id`, and reports validation issues
+  without hiding partial failures.
+
+This gives existing connectors a common final step: scan/auth remains
+source-specific, but materialization into the graph database is typed,
+link-aware, and indexed.
 
 ## Controlled Traversal
 
@@ -224,13 +270,11 @@ The public API should stay object/link/address-first so storage can evolve behin
 
 ## Next Implementation Work
 
-1. Populate `LinkTypeDef.source_types` / `target_types` for the canonical
-   link types in `0.6.11 - Common Link Taxonomy/` so the new endpoint
-   constraint validator begins enforcing real rules. The hook itself is
-   already in place.
-2. Add an embedded index backend for faster local query without abandoning file auditability.
-3. Build import pipelines that create typed objects and typed links together.
-4. Replace legacy root-level object/link definition files with stable index or redirect stubs once references are updated.
+1. Continue populating `LinkTypeDef.source_types` / `target_types` for
+   canonical link types in `0.6.11 - Common Link Taxonomy/`. The first
+   focused set is active; broader relationships should wait until their
+   source/target semantics are unambiguous.
+2. Replace legacy root-level object/link definition files with stable index or redirect stubs once references are updated.
 
 ## Coordination Note
 

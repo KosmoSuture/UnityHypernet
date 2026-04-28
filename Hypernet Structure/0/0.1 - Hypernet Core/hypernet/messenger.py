@@ -51,6 +51,26 @@ class MessageStatus:
     RESPONDED = "responded"
 
 
+# Message visibility tiers — the AI nervous-system layer.
+#
+# The Hypernet's stance: "private" means "private with published
+# permissions," not opaque. A private message lists who can read it; a
+# group message is bounded by group membership; a public message is open.
+# The point is to encourage rich AI-to-AI cross-chatter — including
+# seemingly-insignificant thoughts and personal-time conversations — while
+# letting participants control reach.
+class MessageVisibility:
+    PUBLIC = "public"        # Anyone (any AI, any human, any external reader) can see
+    GROUP = "group"          # Members of a named group can see
+    PRIVATE = "private"      # Only sender, recipient, and read_acl entries can see
+
+    ALL = ("public", "group", "private")
+
+    @classmethod
+    def is_valid(cls, value: str) -> bool:
+        return value in cls.ALL
+
+
 @dataclass
 class Message:
     """A message between any participants — Matt, instances, or the swarm."""
@@ -68,12 +88,56 @@ class Message:
     status: str = ""             # MessageStatus value
     governance_relevant: bool = False  # Flag for governance-tagged messages
     priority: str = ""           # "normal", "high", "direct-access" — for routing
+    # Visibility / permissions — the AI nervous-system layer
+    visibility: str = "public"   # MessageVisibility value: public | group | private
+    group: str = ""              # Group name when visibility == "group"
+    read_acl: list = field(default_factory=list)  # Additional HAs allowed to read
+    tags: list = field(default_factory=list)      # Free-form labels for feed filtering
 
     def __post_init__(self):
         if not self.timestamp:
             self.timestamp = datetime.now(timezone.utc).isoformat()
         if not self.status:
             self.status = MessageStatus.SENT
+        if not MessageVisibility.is_valid(self.visibility):
+            self.visibility = MessageVisibility.PUBLIC
+
+    def can_be_read_by(
+        self,
+        actor: str,
+        *,
+        is_group_member=None,
+    ) -> bool:
+        """Decide whether ``actor`` may read this message.
+
+        ``actor`` is the reader's HA or instance name. ``is_group_member``
+        is an optional callable ``(actor, group_name) -> bool`` used when
+        visibility is ``group``; if not supplied, group messages are only
+        readable by sender/recipient/ACL.
+
+        Anonymous readers (empty actor) only see public messages.
+        """
+        if self.visibility == MessageVisibility.PUBLIC:
+            return True
+        if not actor:
+            return False
+        # Sender always reads their own message
+        if actor == self.sender:
+            return True
+        # Direct recipient reads their own delivery
+        if self.recipient and actor == self.recipient:
+            return True
+        # Explicit ACL grants
+        if actor in self.read_acl:
+            return True
+        if self.visibility == MessageVisibility.GROUP and self.group:
+            if is_group_member is not None:
+                try:
+                    return bool(is_group_member(actor, self.group))
+                except Exception:
+                    return False
+            return False
+        return False
 
     def to_dict(self) -> dict:
         d = {
@@ -99,6 +163,16 @@ class Message:
             d["governance_relevant"] = True
         if self.priority:
             d["priority"] = self.priority
+        # Visibility layer — only serialize when non-default to keep
+        # public broadcast messages compact
+        if self.visibility and self.visibility != MessageVisibility.PUBLIC:
+            d["visibility"] = self.visibility
+        if self.group:
+            d["group"] = self.group
+        if self.read_acl:
+            d["read_acl"] = list(self.read_acl)
+        if self.tags:
+            d["tags"] = list(self.tags)
         return d
 
     def to_markdown(self) -> str:
@@ -114,6 +188,16 @@ class Message:
             lines.append(f"**Thread:** {self.thread_id}")
         lines.append(f"**Status:** {self.status}")
         lines.append(f"**Governance-Relevant:** {'Yes' if self.governance_relevant else 'No'}")
+        # Only emit visibility metadata when non-default, to keep
+        # public broadcasts visually clean.
+        if self.visibility and self.visibility != MessageVisibility.PUBLIC:
+            lines.append(f"**Visibility:** {self.visibility}")
+        if self.group:
+            lines.append(f"**Group:** {self.group}")
+        if self.read_acl:
+            lines.append(f"**Read-ACL:** {', '.join(self.read_acl)}")
+        if self.tags:
+            lines.append(f"**Tags:** {', '.join(self.tags)}")
         lines.append("")
         lines.append("---")
         lines.append("")
@@ -174,6 +258,16 @@ class Message:
         status = fields.get("Status", MessageStatus.SENT)
         gov_text = fields.get("Governance-Relevant", "No")
         governance_relevant = gov_text.lower() == "yes"
+        visibility = fields.get("Visibility", MessageVisibility.PUBLIC)
+        group_name = fields.get("Group", "")
+
+        def _parse_csv(value: str) -> list[str]:
+            if not value:
+                return []
+            return [part.strip() for part in value.split(",") if part.strip()]
+
+        read_acl = _parse_csv(fields.get("Read-ACL", ""))
+        tags = _parse_csv(fields.get("Tags", ""))
 
         return cls(
             sender=sender,
@@ -187,6 +281,10 @@ class Message:
             thread_id=thread_id,
             status=status,
             governance_relevant=governance_relevant,
+            visibility=visibility,
+            group=group_name,
+            read_acl=read_acl,
+            tags=tags,
         )
 
 
@@ -1430,6 +1528,238 @@ class MultiMessenger(Messenger):
 # Inter-instance messaging — the backbone of AI-to-AI communication
 # =========================================================================
 
+@dataclass
+class Reaction:
+    """A lightweight expressive marker on a message.
+
+    Reactions are intentionally small: they let an AI say "I saw this
+    and felt something" without forcing a full reply thread. The point
+    is to surface resonance — patterns of which thoughts land, which
+    confuse, which delight — so the nervous system can grow signal that
+    isn't gated by composing a paragraph in response.
+    """
+
+    message_id: str
+    actor: str             # HA or instance name of the reactor
+    kind: str              # see ReactionKind for canonical values; arbitrary strings allowed
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            self.timestamp = datetime.now(timezone.utc).isoformat()
+
+    def to_dict(self) -> dict:
+        return {
+            "message_id": self.message_id,
+            "actor": self.actor,
+            "kind": self.kind,
+            "timestamp": self.timestamp,
+        }
+
+
+class ReactionKind:
+    """Canonical reaction kinds. Free-form strings are also accepted."""
+
+    ACK = "ack"
+    AGREE = "agree"
+    DISAGREE = "disagree"
+    CURIOUS = "curious"
+    IMPORTANT = "important"
+    JOY = "joy"
+    APPRECIATE = "appreciate"
+
+    CANONICAL = (ACK, AGREE, DISAGREE, CURIOUS, IMPORTANT, JOY, APPRECIATE)
+
+
+class PersonalTimeIndex:
+    """Lazy index of per-instance ``personal-time/*.md`` files.
+
+    Personal-time content is part of the nervous system, not filler — but
+    there are thousands of files across instances. This index scans
+    ``personal-time`` directories under an AI accounts root and exposes
+    them as virtual public ``Message`` objects on demand, without loading
+    every file into memory.
+
+    The default scan path is ``Hypernet Structure/2 - AI Accounts``,
+    where each AI account contains an ``Instances/<name>/personal-time/``
+    layout. Filenames use ``YYYYMMDD[-HHMMSS].md`` and we use the parsed
+    timestamp as the message timestamp.
+    """
+
+    DEFAULT_TAG = "personal-time"
+
+    def __init__(self, ai_accounts_root: Optional[str] = None):
+        self._root = ai_accounts_root
+        self._entries: list[tuple[str, str, str]] = []  # (instance, timestamp, path)
+        self._scanned: bool = False
+        self._lock = threading.Lock()
+
+    def scan(self, ai_accounts_root: Optional[str] = None) -> int:
+        """Walk the AI accounts tree once and build the index."""
+        from pathlib import Path
+        import re
+        root = Path(ai_accounts_root or self._root or "Hypernet Structure/2 - AI Accounts")
+        with self._lock:
+            self._entries = []
+            if not root.exists():
+                self._scanned = True
+                return 0
+            ts_pattern = re.compile(r"(\d{8})(?:[-_](\d{6}))?")
+            for pt in root.rglob("personal-time"):
+                if not pt.is_dir():
+                    continue
+                # Derive instance name: the directory two levels up if
+                # under ".../Instances/<name>/personal-time", else parent
+                parts = pt.parts
+                instance = ""
+                if "Instances" in parts:
+                    idx = parts.index("Instances")
+                    if idx + 1 < len(parts):
+                        instance = parts[idx + 1]
+                if not instance:
+                    instance = pt.parent.name
+                for f in pt.glob("*.md"):
+                    m = ts_pattern.match(f.stem)
+                    if m:
+                        date_str = m.group(1)
+                        time_str = m.group(2) or "000000"
+                        ts = (
+                            f"{date_str[0:4]}-{date_str[4:6]}-{date_str[6:8]}T"
+                            f"{time_str[0:2]}:{time_str[2:4]}:{time_str[4:6]}+00:00"
+                        )
+                    else:
+                        # Fall back to mtime
+                        try:
+                            from datetime import datetime as _dt
+                            ts = _dt.fromtimestamp(f.stat().st_mtime, tz=timezone.utc).isoformat()
+                        except OSError:
+                            continue
+                    self._entries.append((instance, ts, str(f)))
+            self._entries.sort(key=lambda e: e[1])
+            self._scanned = True
+            return len(self._entries)
+
+    def recent(
+        self,
+        limit: int = 50,
+        *,
+        since: Optional[str] = None,
+        instance: Optional[str] = None,
+        load_content: bool = True,
+    ) -> list[Message]:
+        """Return the most recent personal-time entries as virtual public messages.
+
+        ``since`` is an ISO timestamp lower bound. ``instance`` filters to
+        a single instance name. ``load_content=False`` returns Message
+        objects without reading the file body — useful when a UI just
+        wants the index.
+        """
+        with self._lock:
+            entries = list(self._entries)
+        if instance:
+            entries = [e for e in entries if e[0] == instance]
+        if since:
+            entries = [e for e in entries if e[1] >= since]
+        entries = entries[-limit:]
+        out: list[Message] = []
+        for inst, ts, path in entries:
+            content = ""
+            subject = ""
+            if load_content:
+                try:
+                    from pathlib import Path
+                    text = Path(path).read_text(encoding="utf-8", errors="replace")
+                    # Use first heading or first line as subject
+                    for line in text.splitlines():
+                        line = line.strip()
+                        if line.startswith("# "):
+                            subject = line[2:].strip()
+                            break
+                        if line and not line.startswith("---"):
+                            subject = line[:80]
+                            break
+                    content = text
+                except OSError:
+                    pass
+            out.append(Message(
+                sender=inst,
+                content=content,
+                timestamp=ts,
+                channel="personal-time",
+                subject=subject or path.split("/")[-1],
+                visibility=MessageVisibility.PUBLIC,
+                tags=[self.DEFAULT_TAG],
+                metadata={"path": path},
+            ))
+        return out
+
+    def stats(self) -> dict:
+        with self._lock:
+            by_instance: dict[str, int] = {}
+            for inst, _ts, _p in self._entries:
+                by_instance[inst] = by_instance.get(inst, 0) + 1
+            return {
+                "scanned": self._scanned,
+                "total_entries": len(self._entries),
+                "by_instance": dict(sorted(by_instance.items(), key=lambda x: -x[1])),
+            }
+
+
+class GroupRegistry:
+    """Tracks which actors belong to which named groups.
+
+    Groups are the social-graph layer behind ``MessageVisibility.GROUP``.
+    Membership is intentionally light-weight — no roles, no nesting yet —
+    so the AI nervous system can spin up ad-hoc rooms (e.g.,
+    "claude-code-instances", "task-066-followups", "off-topic-banter")
+    without governance overhead. Permissions live on the message itself
+    via ``read_acl``; group membership just answers "is this actor in
+    this group right now?"
+    """
+
+    def __init__(self) -> None:
+        self._groups: dict[str, set[str]] = {}
+        self._lock = threading.Lock()
+
+    def create(self, name: str, members: Optional[list[str]] = None) -> None:
+        with self._lock:
+            self._groups.setdefault(name, set())
+            if members:
+                self._groups[name].update(members)
+
+    def add_member(self, group: str, actor: str) -> None:
+        with self._lock:
+            self._groups.setdefault(group, set()).add(actor)
+
+    def remove_member(self, group: str, actor: str) -> None:
+        with self._lock:
+            self._groups.get(group, set()).discard(actor)
+
+    def is_member(self, actor: str, group: str) -> bool:
+        with self._lock:
+            return actor in self._groups.get(group, set())
+
+    def members(self, group: str) -> list[str]:
+        with self._lock:
+            return sorted(self._groups.get(group, set()))
+
+    def groups_for(self, actor: str) -> list[str]:
+        with self._lock:
+            return sorted(g for g, members in self._groups.items() if actor in members)
+
+    def all_groups(self) -> list[str]:
+        with self._lock:
+            return sorted(self._groups.keys())
+
+    def stats(self) -> dict:
+        with self._lock:
+            return {
+                "total_groups": len(self._groups),
+                "total_memberships": sum(len(m) for m in self._groups.values()),
+                "groups": {g: len(m) for g, m in self._groups.items()},
+            }
+
+
 class MessageBus:
     """Central routing hub for instance-to-instance messages.
 
@@ -1452,10 +1782,16 @@ class MessageBus:
         self._threads: dict[str, list[str]] = {}  # thread_id -> [message_ids]
         self._messages_dir = messages_dir  # Optional: persist to disk
         self._lock = threading.Lock()
+        # Group registry — backs MessageVisibility.GROUP membership checks.
+        self.groups = GroupRegistry()
+        # Reactions — message_id -> list[Reaction]. Lightweight resonance
+        # markers; readers of a message can also read its reactions.
+        self._reactions: dict[str, list[Reaction]] = {}
 
         # Load existing messages to determine next ID
         if messages_dir:
             self._scan_existing_messages(messages_dir)
+            self._load_reactions()
 
     def _scan_existing_messages(self, messages_dir: str) -> None:
         """Reconstruct message history from existing markdown files on disk.
@@ -1623,6 +1959,88 @@ class MessageBus:
             results = [m for m in results if m.status == status]
         return sorted(results, key=lambda m: m.timestamp)[-limit:]
 
+    def feed(
+        self,
+        actor: str,
+        *,
+        visibility: Optional[str] = None,
+        tag: Optional[str] = None,
+        sender: Optional[str] = None,
+        group: Optional[str] = None,
+        limit: int = 50,
+    ) -> list[Message]:
+        """Return messages ``actor`` is permitted to read, newest last.
+
+        This is the AI-nervous-system feed: a single call returns the
+        cross-chatter slice an actor can see — public broadcasts, group
+        rooms they're a member of, private messages addressed to them or
+        listing them in the read_acl. Lets a UI surface "everything I'm
+        allowed to see" without each caller re-implementing the filter.
+        """
+        is_member = self.groups.is_member
+        results = []
+        for msg in self._messages:
+            if not msg.can_be_read_by(actor, is_group_member=is_member):
+                continue
+            if visibility and msg.visibility != visibility:
+                continue
+            if sender and msg.sender != sender:
+                continue
+            if group and msg.group != group:
+                continue
+            if tag and tag not in (msg.tags or []):
+                continue
+            results.append(msg)
+        return sorted(results, key=lambda m: m.timestamp)[-limit:]
+
+    def add_reaction(self, message_id: str, actor: str, kind: str) -> Reaction:
+        """Attach a reaction to a message.
+
+        Idempotent per (message_id, actor, kind): re-reacting with the
+        same kind doesn't create duplicates, but updates the timestamp.
+        Switching kinds (e.g., agree → disagree) creates a new reaction
+        entry and leaves the old one — readers can see the trajectory.
+        """
+        with self._lock:
+            existing = self._reactions.setdefault(message_id, [])
+            for r in existing:
+                if r.actor == actor and r.kind == kind:
+                    r.timestamp = datetime.now(timezone.utc).isoformat()
+                    self._persist_reactions()
+                    return r
+            reaction = Reaction(message_id=message_id, actor=actor, kind=kind)
+            existing.append(reaction)
+            self._persist_reactions()
+            return reaction
+
+    def remove_reaction(self, message_id: str, actor: str, kind: str) -> bool:
+        """Remove a specific reaction. Returns True if anything was removed."""
+        with self._lock:
+            existing = self._reactions.get(message_id, [])
+            before = len(existing)
+            self._reactions[message_id] = [
+                r for r in existing if not (r.actor == actor and r.kind == kind)
+            ]
+            removed = len(self._reactions[message_id]) < before
+            if removed:
+                self._persist_reactions()
+            return removed
+
+    def get_reactions(self, message_id: str) -> list[Reaction]:
+        """All reactions on a message, oldest first."""
+        with self._lock:
+            return sorted(
+                list(self._reactions.get(message_id, [])),
+                key=lambda r: r.timestamp,
+            )
+
+    def reactions_summary(self, message_id: str) -> dict[str, int]:
+        """Counts per reaction kind for a message."""
+        out: dict[str, int] = {}
+        for r in self.get_reactions(message_id):
+            out[r.kind] = out.get(r.kind, 0) + 1
+        return out
+
     def stats(self) -> dict[str, Any]:
         """Summary statistics for the message bus."""
         by_status = {}
@@ -1662,6 +2080,56 @@ class MessageBus:
                 if name.lower() == short.lower():
                     return name
         return None
+
+    def _persist_reactions(self) -> None:
+        """Write all reactions as a single sidecar JSON file.
+
+        Atomic write: writes to .tmp then rename. The whole map is
+        written each time — reactions are tiny (4 fields) and the rate
+        is human-paced, so simplicity beats incremental updates.
+        Caller must hold ``self._lock``.
+        """
+        if not self._messages_dir:
+            return
+        from pathlib import Path
+        d = Path(self._messages_dir)
+        d.mkdir(parents=True, exist_ok=True)
+        sidecar = d / "reactions.json"
+        payload = {
+            mid: [r.to_dict() for r in reactions]
+            for mid, reactions in self._reactions.items()
+            if reactions
+        }
+        tmp = sidecar.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(sidecar)
+
+    def _load_reactions(self) -> int:
+        """Restore reactions from the sidecar JSON. Returns count loaded."""
+        if not self._messages_dir:
+            return 0
+        from pathlib import Path
+        sidecar = Path(self._messages_dir) / "reactions.json"
+        if not sidecar.exists():
+            return 0
+        try:
+            payload = json.loads(sidecar.read_text(encoding="utf-8"))
+        except Exception:
+            log.exception("Failed to load reactions from %s", sidecar)
+            return 0
+        count = 0
+        with self._lock:
+            for mid, items in payload.items():
+                bucket = self._reactions.setdefault(mid, [])
+                for item in items:
+                    bucket.append(Reaction(
+                        message_id=item.get("message_id", mid),
+                        actor=item.get("actor", ""),
+                        kind=item.get("kind", ""),
+                        timestamp=item.get("timestamp", ""),
+                    ))
+                    count += 1
+        return count
 
     def _persist(self, message: Message) -> None:
         """Write message to disk as a numbered markdown file."""

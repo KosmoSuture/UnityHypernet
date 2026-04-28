@@ -114,6 +114,242 @@ class ScanResult:
 
 
 @dataclass
+class TypedNodeSpec:
+    """A typed Hypernet node to materialize during import."""
+
+    address: str
+    type_address: str
+    data: dict[str, Any] = field(default_factory=dict)
+    source_type: str = ""
+    source_id: str = ""
+    creator: str = ""
+
+
+@dataclass
+class TypedLinkSpec:
+    """A typed Hypernet link to materialize during import."""
+
+    from_address: str
+    to_address: str
+    relationship: str
+    link_type: str
+    data: dict[str, Any] = field(default_factory=dict)
+    strength: float = 1.0
+    bidirectional: bool = False
+
+
+@dataclass
+class GraphImportBatch:
+    """A batch of typed nodes and links imported from one source."""
+
+    source_platform: str
+    import_id: str = ""
+    nodes: list[TypedNodeSpec] = field(default_factory=list)
+    links: list[TypedLinkSpec] = field(default_factory=list)
+
+
+@dataclass
+class GraphImportResult:
+    """Outcome of applying a typed graph import batch."""
+
+    source_platform: str
+    status: ImportStatus
+    import_id: str = ""
+    node_addresses: list[str] = field(default_factory=list)
+    link_hashes: list[str] = field(default_factory=list)
+    nodes_imported: int = 0
+    links_imported: int = 0
+    nodes_skipped: int = 0
+    links_skipped: int = 0
+    errors: list[str] = field(default_factory=list)
+    validations: list[dict[str, Any]] = field(default_factory=list)
+    duration_seconds: float = 0.0
+
+    def to_dict(self) -> dict[str, Any]:
+        data = asdict(self)
+        data["status"] = self.status.value
+        return data
+
+
+class GraphImportPipeline:
+    """Materialize typed import batches into a Store.
+
+    Connectors can keep source-specific scanning/authentication while
+    sharing this final graph write step. The pipeline validates the whole
+    batch first, then writes nodes before links through normal Store APIs.
+    """
+
+    VALIDATION_MODES = {"off", "warn", "strict"}
+
+    def __init__(self, store):
+        self.store = store
+
+    def import_batch(
+        self,
+        batch: GraphImportBatch,
+        *,
+        validation_mode: str = "warn",
+        upsert: bool = True,
+        dry_run: bool = False,
+    ) -> GraphImportResult:
+        import time
+
+        mode = validation_mode if validation_mode in self.VALIDATION_MODES else "warn"
+        start = time.time()
+        result = GraphImportResult(
+            source_platform=batch.source_platform,
+            import_id=batch.import_id,
+            status=ImportStatus.PENDING,
+        )
+
+        node_records = []
+        link_records = []
+        try:
+            node_records = self._prepare_nodes(batch, result, mode, upsert=upsert)
+            link_records = self._prepare_links(batch, result, mode, upsert=upsert)
+        except Exception as exc:
+            result.errors.append(str(exc))
+
+        if result.errors:
+            result.status = ImportStatus.FAILED
+            result.duration_seconds = time.time() - start
+            return result
+
+        if dry_run:
+            result.status = ImportStatus.SKIPPED
+            result.duration_seconds = time.time() - start
+            return result
+
+        for node in node_records:
+            self.store.put_node(node)
+            result.node_addresses.append(str(node.address))
+            result.nodes_imported += 1
+
+        for link in link_records:
+            link_hash = self.store.put_link(link)
+            result.link_hashes.append(link_hash)
+            result.links_imported += 1
+
+        if result.nodes_imported or result.links_imported:
+            result.status = ImportStatus.IMPORTED
+        elif result.nodes_skipped or result.links_skipped:
+            result.status = ImportStatus.SKIPPED
+        else:
+            result.status = ImportStatus.PENDING
+        result.duration_seconds = time.time() - start
+        return result
+
+    def _prepare_nodes(
+        self,
+        batch: GraphImportBatch,
+        result: GraphImportResult,
+        mode: str,
+        *,
+        upsert: bool,
+    ) -> list:
+        from ..address import HypernetAddress
+        from ..node import Node
+        from ..object_schema import validate_object_payload
+
+        nodes = []
+        for spec in batch.nodes:
+            address = HypernetAddress.parse(spec.address)
+            existing = self.store.get_node(address)
+            if existing is not None and not upsert:
+                result.nodes_skipped += 1
+                continue
+
+            type_address = HypernetAddress.parse(spec.type_address) if spec.type_address else None
+            data = dict(spec.data or {})
+            if batch.source_platform:
+                data.setdefault("source_platform", batch.source_platform)
+            if batch.import_id:
+                data.setdefault("import_id", batch.import_id)
+
+            source_type = spec.source_type or batch.source_platform or "import"
+            source_id = spec.source_id or spec.address
+            if mode != "off" and type_address is not None:
+                validation = validate_object_payload(str(type_address), data)
+                validation.update({
+                    "address": str(address),
+                    "mode": mode,
+                    "kind": "node",
+                })
+                result.validations.append(validation)
+                if mode == "strict" and not validation["valid"]:
+                    result.errors.append(
+                        f"Node {address} failed object validation: {validation['issues']}"
+                    )
+
+            nodes.append(Node(
+                address=address,
+                type_address=type_address,
+                data=data,
+                source_type=source_type,
+                source_id=source_id,
+                creator=HypernetAddress.parse(spec.creator) if spec.creator else None,
+            ))
+        return nodes
+
+    def _prepare_links(
+        self,
+        batch: GraphImportBatch,
+        result: GraphImportResult,
+        mode: str,
+        *,
+        upsert: bool,
+    ) -> list:
+        from ..address import HypernetAddress
+        from ..link import Link, LinkRegistry
+
+        registry = LinkRegistry(self.store)
+        links = []
+        for spec in batch.links:
+            from_address = HypernetAddress.parse(spec.from_address)
+            to_address = HypernetAddress.parse(spec.to_address)
+            if not upsert:
+                existing = self.store.get_links_from(from_address, relationship=spec.relationship)
+                if any(str(link.to_address) == str(to_address) and link.link_type == spec.link_type for link in existing):
+                    result.links_skipped += 1
+                    continue
+
+            data = dict(spec.data or {})
+            if batch.source_platform:
+                data.setdefault("source_platform", batch.source_platform)
+            if batch.import_id:
+                data.setdefault("import_id", batch.import_id)
+            link = Link(
+                from_address=from_address,
+                to_address=to_address,
+                relationship=spec.relationship,
+                link_type=spec.link_type,
+                data=data,
+                strength=float(spec.strength),
+                bidirectional=bool(spec.bidirectional),
+                creation_method="import",
+            )
+            if mode != "off":
+                issues = registry.validate_link(link) + registry.validate_link_endpoints(link)
+                validation = {
+                    "kind": "link",
+                    "from_address": spec.from_address,
+                    "to_address": spec.to_address,
+                    "relationship": spec.relationship,
+                    "link_type": spec.link_type,
+                    "mode": mode,
+                    "valid": not issues,
+                    "issues": issues,
+                }
+                result.validations.append(validation)
+                if mode == "strict" and issues:
+                    result.errors.append(
+                        f"Link {spec.from_address}->{spec.to_address} failed validation: {issues}"
+                    )
+            links.append(link)
+        return links
+
+
+@dataclass
 class ConnectorStatus:
     """Current status of a connector."""
     source_platform: str

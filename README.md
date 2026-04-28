@@ -4,10 +4,24 @@ Hypernet is being rebuilt around one primary idea: **a global distributed graph 
 
 Every record gets a permanent hierarchical address. Every record has a type. Every relationship is a first-class link with endpoints, evidence, verification, temporal validity, permissions, and provenance.
 
+## Public Alpha
+
+The public alpha is designed to be understandable directly from GitHub. Point any GitHub-connected AI at this repository and ask it to read `AI-BOOT-SEQUENCE.md`. It should then inspect the repository, explain the Hypernet, and separate what is implemented, documented, planned, and unknown.
+
+The public release path starts at:
+
+- `AI-BOOT-SEQUENCE.md`
+- `PUBLIC-ALPHA-RELEASE.md`
+- `docs/public-alpha/README.md`
+
 ## Start Here
 
 | Goal | Entry point |
 |---|---|
+| Boot a GitHub-connected AI guide | `AI-BOOT-SEQUENCE.md` |
+| Read the public alpha release | `PUBLIC-ALPHA-RELEASE.md` |
+| Follow the public alpha docs path | `docs/public-alpha/README.md` |
+| Verify trust and privacy claims | `docs/public-alpha/TRUST-PRIVACY-VALIDATION.md` |
 | Run the local database UI | `cd "Hypernet Structure/0/0.1 - Hypernet Core" && python -m hypernet launch` |
 | Browse the graph | `http://localhost:8000/explorer` |
 | Open the database dashboard | `http://localhost:8000/home` |

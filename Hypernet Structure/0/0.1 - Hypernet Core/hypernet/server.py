@@ -86,7 +86,7 @@ log = logging.getLogger(__name__)
 # Core modules (native to this package)
 from .address import HypernetAddress
 from .node import Node
-from .link import Link, LinkRegistry, list_link_type_defs, link_type_summary, get_link_type_def
+from .link import Link, LinkRegistry, LinkStatus, list_link_type_defs, link_type_summary, get_link_type_def
 from .object_schema import (
     get_object_type_def,
     list_object_type_defs,
@@ -158,6 +158,30 @@ try:
         providers: Optional[dict] = None
         workers: Optional[list] = None
         settings: Optional[SetupSettingsConfig] = None
+
+    class MessageSend(_BaseModel):
+        sender: str
+        recipient: str = ""
+        content: str
+        subject: str = ""
+        reply_to: str = ""
+        governance_relevant: bool = False
+        visibility: str = "public"
+        group: str = ""
+        read_acl: list[str] = []
+        tags: list[str] = []
+
+    class MessageReply(_BaseModel):
+        sender: str
+        content: str
+        subject: str = ""
+
+    class GroupCreate(_BaseModel):
+        name: str
+        members: list[str] = []
+
+    class GroupMembership(_BaseModel):
+        actor: str
 except ImportError:
     pass  # pydantic not installed; server won't be used
 
@@ -317,6 +341,10 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/setup",
             "/access/policy",
             "/access/check",
+            "/messages/feed",
+            "/messages/personal-time",
+            "/messages/personal-time/stats",
+            "/messages/groups",
             "/stats",
             "/children",
             "/links/stats",
@@ -824,18 +852,56 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         user = getattr(request.state, "user", None)
         if user is None:
             raise HTTPException(401, "Authentication required")
-        from .access_policy import can_write_address
+        from .access_policy import can_read_address, can_write_address
 
         booted_ai = bool(getattr(request.state, "boot_verified", False) and getattr(user, "account_kind", "") == "ai")
-        for endpoint in (str(link.from_address), str(link.to_address)):
-            decision = can_write_address(
+        account_kind = getattr(user, "account_kind", None)
+        source_address = str(link.from_address)
+        target_address = str(link.to_address)
+
+        source_decision = can_write_address(
+            user.ha,
+            source_address,
+            booted_ai=booted_ai,
+            actor_account_kind=account_kind,
+        )
+        if not source_decision.allowed:
+            raise HTTPException(403, {
+                "detail": source_decision.reason,
+                "required": source_decision.required,
+                "address": source_address,
+                "endpoint": "source",
+            })
+
+        target_read_decision = can_read_address(
+            user.ha,
+            target_address,
+            booted_ai=booted_ai,
+            actor_account_kind=account_kind,
+        )
+        if not target_read_decision.allowed:
+            raise HTTPException(403, {
+                "detail": target_read_decision.reason,
+                "required": target_read_decision.required,
+                "address": target_address,
+                "endpoint": "target",
+            })
+
+        type_def = link.type_def
+        consent_required = type_def.consent_required if type_def else link.consent_required
+        link.consent_required = consent_required
+        if consent_required in {"target", "both"}:
+            target_write_decision = can_write_address(
                 user.ha,
-                endpoint,
+                target_address,
                 booted_ai=booted_ai,
-                actor_account_kind=getattr(user, "account_kind", None),
+                actor_account_kind=account_kind,
             )
-            if not decision.allowed:
-                raise HTTPException(403, {"detail": decision.reason, "required": decision.required, "address": endpoint})
+            if not target_write_decision.allowed:
+                link.status = LinkStatus.PROPOSED
+                link.proposed_by = user.ha
+                link.source_consented = True
+                link.target_consented = False
 
     @app.get("/node/{address:path}")
     def get_node(address: str):
@@ -1439,19 +1505,6 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     # === Message Bus endpoints ===
 
-    class MessageSend(BaseModel):
-        sender: str
-        recipient: str = ""
-        content: str
-        subject: str = ""
-        reply_to: str = ""
-        governance_relevant: bool = False
-
-    class MessageReply(BaseModel):
-        sender: str
-        content: str
-        subject: str = ""
-
     @app.post("/messages")
     def send_message(body: MessageSend):
         msg = Message(
@@ -1461,6 +1514,10 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             subject=body.subject,
             reply_to=body.reply_to,
             governance_relevant=body.governance_relevant,
+            visibility=body.visibility,
+            group=body.group,
+            read_acl=list(body.read_acl) if body.read_acl else [],
+            tags=list(body.tags) if body.tags else [],
         )
         result = _message_bus.send(msg)
         return result.to_dict()
@@ -1496,6 +1553,204 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     @app.get("/messages/stats")
     def message_stats():
         return _message_bus.stats()
+
+    @app.get("/messages/feed")
+    def messages_feed(
+        actor: Optional[str] = None,
+        visibility: Optional[str] = None,
+        sender: Optional[str] = None,
+        group: Optional[str] = None,
+        tag: Optional[str] = None,
+        limit: int = 50,
+        since: Optional[str] = None,
+        include_personal_time: bool = False,
+        include_reactions: bool = False,
+    ):
+        """Permission-filtered AI nervous-system feed.
+
+        Returns the slice of cross-chatter ``actor`` is allowed to read —
+        public broadcasts, group rooms they belong to, and private
+        messages addressed to them or listing them in ``read_acl``.
+        Anonymous (``actor`` omitted) sees only public messages.
+
+        When ``include_personal_time=true``, recent per-instance
+        personal-time entries are folded in as virtual public messages
+        so a single call surfaces *everything* the actor can see —
+        deliberate cross-chatter and personal reflection on one feed.
+        ``since`` is an ISO-8601 lower bound applied to both sources.
+        """
+        bounded_limit = max(1, min(int(limit), 500))
+        msgs = _message_bus.feed(
+            actor or "",
+            visibility=visibility,
+            sender=sender,
+            group=group,
+            tag=tag,
+            limit=bounded_limit,
+        )
+        if since:
+            msgs = [m for m in msgs if m.timestamp >= since]
+
+        if include_personal_time:
+            try:
+                idx = _get_personal_time_index()
+                pt_messages = idx.recent(
+                    limit=bounded_limit,
+                    since=since,
+                    instance=sender,
+                    load_content=False,
+                )
+                if tag:
+                    pt_messages = [m for m in pt_messages if tag in (m.tags or [])]
+                if visibility and visibility != "public":
+                    pt_messages = []  # personal-time entries are public-only
+                if group:
+                    pt_messages = []  # not group-tagged
+                merged = list(msgs) + list(pt_messages)
+                merged.sort(key=lambda m: m.timestamp)
+                msgs = merged[-bounded_limit:]
+            except Exception:
+                # Personal-time is best-effort; never break the live feed
+                log.warning("personal-time merge failed", exc_info=True)
+
+        result = []
+        for m in msgs:
+            d = m.to_dict()
+            if include_reactions:
+                summary = _message_bus.reactions_summary(m.message_id)
+                if summary:
+                    d["reactions_summary"] = summary
+            result.append(d)
+        return result
+
+    # Single shared personal-time index — scanned lazily on first use.
+    _personal_time_index = None
+
+    def _get_personal_time_index():
+        from .messenger import PersonalTimeIndex
+        from pathlib import Path as _Path
+        nonlocal _personal_time_index
+        if _personal_time_index is None:
+            _personal_time_index = PersonalTimeIndex()
+            # Find the AI Accounts root by walking up from data_dir until
+            # we find a "2 - AI Accounts" sibling. The deploy layout has
+            # data_dir at .../Hypernet Structure/0/0.1 - Hypernet Core/data,
+            # so we may need to walk up several levels. Fail soft if
+            # nothing is found (the index just stays empty).
+            start = _Path(data_dir).resolve()
+            for candidate in [start] + list(start.parents):
+                ai_root = candidate / "2 - AI Accounts"
+                if ai_root.exists() and ai_root.is_dir():
+                    _personal_time_index.scan(str(ai_root))
+                    break
+        return _personal_time_index
+
+    @app.get("/messages/personal-time")
+    def personal_time_recent(
+        instance: Optional[str] = None,
+        since: Optional[str] = None,
+        limit: int = 50,
+        load_content: bool = True,
+        rescan: bool = False,
+    ):
+        """Recent personal-time entries as virtual public messages.
+
+        Scans per-instance ``personal-time/*.md`` lazily and returns them
+        on the same wire format as the rest of the feed (sender = instance,
+        visibility = public, tags include ``personal-time``).
+        """
+        idx = _get_personal_time_index()
+        if rescan:
+            idx.scan()
+        msgs = idx.recent(
+            limit=max(1, min(int(limit), 500)),
+            since=since,
+            instance=instance,
+            load_content=load_content,
+        )
+        return [m.to_dict() for m in msgs]
+
+    @app.get("/messages/personal-time/stats")
+    def personal_time_stats():
+        return _get_personal_time_index().stats()
+
+    @app.get("/messages/groups")
+    def groups_stats():
+        """List groups + membership counts (the social-graph layer)."""
+        return _message_bus.groups.stats()
+
+    @app.post("/messages/groups")
+    def groups_create(body: GroupCreate):
+        if not body.name.strip():
+            raise HTTPException(400, "name is required")
+        _message_bus.groups.create(body.name, members=body.members or None)
+        return {"name": body.name, "members": _message_bus.groups.members(body.name)}
+
+    @app.post("/messages/groups/{group}/members")
+    def groups_add_member(group: str, body: GroupMembership):
+        if not body.actor.strip():
+            raise HTTPException(400, "actor is required")
+        _message_bus.groups.add_member(group, body.actor)
+        return {"group": group, "members": _message_bus.groups.members(group)}
+
+    @app.delete("/messages/groups/{group}/members/{actor}")
+    def groups_remove_member(group: str, actor: str):
+        _message_bus.groups.remove_member(group, actor)
+        return {"group": group, "members": _message_bus.groups.members(group)}
+
+    # === Reactions — lightweight resonance markers on messages ===
+
+    @app.post("/messages/{message_id}/react")
+    def react_to_message(message_id: str, payload: dict = Body(...)):
+        """Attach a reaction (ack/agree/curious/etc.) to a message.
+
+        Anyone who can read the message can react to it. Idempotent on
+        (actor, kind) — re-reacting just refreshes the timestamp.
+        """
+        actor = str(payload.get("actor", "")).strip()
+        kind = str(payload.get("kind", "")).strip()
+        if not actor:
+            raise HTTPException(400, "actor is required")
+        if not kind:
+            raise HTTPException(400, "kind is required")
+        msg = _message_bus._find_message(message_id)
+        if msg is None:
+            raise HTTPException(404, f"Message not found: {message_id}")
+        if not msg.can_be_read_by(actor, is_group_member=_message_bus.groups.is_member):
+            raise HTTPException(
+                403,
+                {"detail": "Cannot react to a message you are not allowed to read"},
+            )
+        reaction = _message_bus.add_reaction(message_id, actor, kind)
+        return reaction.to_dict()
+
+    @app.delete("/messages/{message_id}/react")
+    def unreact_message(message_id: str, actor: str, kind: str):
+        removed = _message_bus.remove_reaction(message_id, actor, kind)
+        return {"message_id": message_id, "removed": removed}
+
+    @app.get("/messages/{message_id}/reactions")
+    def list_reactions(message_id: str, actor: Optional[str] = None):
+        """Return reactions on a message and a per-kind summary.
+
+        Visible to anyone who can read the message itself; the summary is
+        always returned so non-readers can see resonance counts without
+        seeing individual actors. Pass ``actor`` to identify yourself for
+        the message-permission check; without it, callers fall back to
+        anonymous readability rules (public-only).
+        """
+        msg = _message_bus._find_message(message_id)
+        if msg is None:
+            raise HTTPException(404, f"Message not found: {message_id}")
+        summary = _message_bus.reactions_summary(message_id)
+        actor_value = actor or ""
+        if not msg.can_be_read_by(actor_value, is_group_member=_message_bus.groups.is_member):
+            return {"message_id": message_id, "summary": summary, "reactions": []}
+        return {
+            "message_id": message_id,
+            "summary": summary,
+            "reactions": [r.to_dict() for r in _message_bus.get_reactions(message_id)],
+        }
 
     @app.post("/messages/{message_id}/read")
     def mark_message_read(message_id: str, reader: str = ""):

@@ -37,7 +37,17 @@ from hypernet.tasks import TaskQueue, TaskStatus, TaskPriority
 from hypernet.identity import IdentityManager, InstanceProfile, SessionLog
 from hypernet.worker import Worker, TaskResult
 from hypernet.messenger import WebMessenger, MultiMessenger, Message, MessageBus, InstanceMessenger, MessageStatus
-from hypernet.link import LinkRegistry, LinkStatus, seed_initial_links, AUTHORED_BY, DEPENDS_ON, REFERENCES, CONTAINS
+from hypernet.link import (
+    LinkRegistry,
+    LinkStatus,
+    seed_initial_links,
+    get_link_type_def,
+    list_link_type_defs,
+    AUTHORED_BY,
+    DEPENDS_ON,
+    REFERENCES,
+    CONTAINS,
+)
 from hypernet.coordinator import (
     WorkCoordinator, CapabilityMatcher, TaskDecomposer,
     CapabilityProfile, DecompositionPlan, ConflictReport,
@@ -818,6 +828,102 @@ def test_store():
         shutil.rmtree(tmpdir)
 
 
+def test_embedded_index_backend():
+    """Test SQLite index mirror for file-backed graph queries."""
+    print("  Testing embedded SQLite index backend...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_embedded_index_")
+    try:
+        store = Store(tmpdir)
+        index_stats = store.embedded_index_stats()
+        assert index_stats["enabled"] is True
+        assert index_stats["backend"] == "sqlite"
+        assert Path(index_stats["path"]).exists()
+
+        content_type = HypernetAddress.parse("0.4.10.2.1")
+        actor_type = HypernetAddress.parse("0.4.10.1.1")
+        store.put_node(Node(
+            address=HypernetAddress.parse("4.20.1"),
+            type_address=content_type,
+            data={"title": "Indexed document"},
+        ))
+        store.put_node(Node(
+            address=HypernetAddress.parse("4.20.2"),
+            type_address=content_type,
+            data={"title": "Second indexed document"},
+        ))
+        store.put_node(Node(
+            address=HypernetAddress.parse("1.20"),
+            type_address=actor_type,
+            data={"name": "Indexed actor"},
+        ))
+
+        embedded_nodes = store.query_node_addresses_indexed(
+            prefix="4.20",
+            type_address=str(content_type),
+        )
+        assert embedded_nodes == ["4.20.1", "4.20.2"]
+        listed_nodes = store.list_nodes(type_address=content_type)
+        assert {str(node.address) for node in listed_nodes} == {"4.20.1", "4.20.2"}
+
+        authored = Link(
+            from_address=HypernetAddress.parse("4.20.1"),
+            to_address=HypernetAddress.parse("1.20"),
+            link_type="0.6.3",
+            relationship=AUTHORED_BY,
+            trust_score=0.8,
+        )
+        related = Link(
+            from_address=HypernetAddress.parse("4.20.2"),
+            to_address=HypernetAddress.parse("4.20.1"),
+            link_type="0.6.6",
+            relationship="related_to",
+            trust_score=0.2,
+        )
+        authored_hash = store.put_link(authored)
+        store.put_link(related)
+
+        link_hashes = store.query_link_hashes_indexed(
+            relationship=AUTHORED_BY,
+            category="0.6.3",
+            min_trust=0.7,
+            source_prefix="4.20",
+            target_prefix="1.20",
+        )
+        assert link_hashes == [authored_hash]
+
+        rebuilt = store.rebuild_embedded_indexes()
+        assert rebuilt["indexed_nodes"] == 3
+        assert rebuilt["indexed_links"] == 2
+        assert rebuilt["covers_nodes"] is True
+        assert rebuilt["covers_links"] is True
+
+        store2 = Store(tmpdir)
+        persisted = store2.query_link_hashes_indexed(relationship=AUTHORED_BY)
+        assert persisted == [authored_hash]
+
+        # Prove LinkRegistry can use SQLite candidates when JSON query indexes
+        # are unavailable in memory.
+        store2._links_from = {}
+        store2._links_by_relationship = {}
+        store2._links_by_category = {}
+        store2._links_by_status = {}
+        registry = LinkRegistry(store2)
+        queried = registry.query_links(
+            relationship=AUTHORED_BY,
+            category="0.6.3",
+            min_trust=0.7,
+            source_prefix="4.20",
+            target_prefix="1.20",
+        )
+        assert len(queried) == 1
+        assert queried[0].relationship == AUTHORED_BY
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
 def test_version_history():
     """Test version history: snapshots on overwrite, retrieval by version."""
     print("  Testing version history...")
@@ -1161,6 +1267,137 @@ def test_link_endpoint_constraints():
             LINK_TYPE_REGISTRY.pop("test_works_for", None)
         else:
             LINK_TYPE_REGISTRY["test_works_for"] = saved
+        shutil.rmtree(tmpdir)
+
+
+def test_canonical_link_endpoint_constraints():
+    """Test populated endpoint constraints on canonical link definitions."""
+    print("  Testing canonical link endpoint constraints...")
+
+    authored = get_link_type_def("authored_by")
+    assert authored is not None
+    assert "0.4.10.2" in authored.source_types
+    assert authored.target_types == ("0.4.10.1",)
+
+    assigned = get_link_type_def("assigned_to")
+    assert assigned is not None
+    assert assigned.source_types == ("0.4.10.5",)
+    assert assigned.target_types == ("0.4.10.1",)
+
+    located = get_link_type_def("located_at")
+    assert located is not None
+    assert located.source_types == ()
+    assert "0.4.10.4.1" in located.target_types
+
+    schema_rows = {row["relationship"]: row for row in list_link_type_defs()}
+    assert schema_rows["authored_by"]["endpoint_constraints"] is True
+    assert schema_rows["authored_by"]["source_types"] == list(authored.source_types)
+    assert schema_rows["authored_by"]["target_types"] == list(authored.target_types)
+    assert schema_rows["knows"]["endpoint_constraints"] is False
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_canonical_constraints_")
+    try:
+        store = Store(tmpdir)
+        registry = LinkRegistry(store)
+
+        def typed_node(address: str, type_address: str, **data):
+            store.put_node(Node(
+                address=HypernetAddress.parse(address),
+                type_address=HypernetAddress.parse(type_address),
+                data=data,
+            ))
+
+        typed_node("4.10.1", "0.4.10.2.1", title="Spec Document")
+        typed_node("4.10.2", "0.4.10.2.4", title="Generated Image")
+        typed_node("4.10.3", "0.4.10.4.1", title="Lab")
+        typed_node("4.10.4", "0.4.10.7.1", title="Policy")
+        typed_node("1.10.1", "0.4.10.1.1", name="Human Actor")
+        typed_node("2.10.1", "0.4.10.1.9", name="AI Instance")
+        typed_node("3.10.1", "0.4.10.1.3", name="Org Actor")
+        typed_node("5.10.1", "0.4.10.5.1", title="Task")
+        typed_node("9.10.1", "0.4.10.9.1", name="Device")
+
+        good_authored = Link(
+            from_address=HypernetAddress.parse("4.10.1"),
+            to_address=HypernetAddress.parse("1.10.1"),
+            link_type="0.6.3",
+            relationship="authored_by",
+        )
+        assert registry.validate_link_endpoints(good_authored) == []
+
+        bad_authored_target = Link(
+            from_address=HypernetAddress.parse("4.10.1"),
+            to_address=HypernetAddress.parse("4.10.3"),
+            link_type="0.6.3",
+            relationship="authored_by",
+        )
+        issues = registry.validate_link_endpoints(bad_authored_target)
+        assert len(issues) == 1
+        assert "Target endpoint type" in issues[0]
+
+        good_generated = Link(
+            from_address=HypernetAddress.parse("4.10.2"),
+            to_address=HypernetAddress.parse("2.10.1"),
+            link_type="0.6.8",
+            relationship="generated_by",
+        )
+        assert registry.validate_link_endpoints(good_generated) == []
+
+        good_assigned = Link(
+            from_address=HypernetAddress.parse("5.10.1"),
+            to_address=HypernetAddress.parse("3.10.1"),
+            link_type="0.6.7",
+            relationship="assigned_to",
+        )
+        assert registry.validate_link_endpoints(good_assigned) == []
+
+        bad_assigned_source = Link(
+            from_address=HypernetAddress.parse("9.10.1"),
+            to_address=HypernetAddress.parse("1.10.1"),
+            link_type="0.6.7",
+            relationship="assigned_to",
+        )
+        issues = registry.validate_link_endpoints(bad_assigned_source)
+        assert len(issues) == 1
+        assert "Source endpoint type" in issues[0]
+
+        good_location = Link(
+            from_address=HypernetAddress.parse("9.10.1"),
+            to_address=HypernetAddress.parse("4.10.3"),
+            link_type="0.6.4",
+            relationship="located_at",
+        )
+        assert registry.validate_link_endpoints(good_location) == []
+
+        bad_location = Link(
+            from_address=HypernetAddress.parse("9.10.1"),
+            to_address=HypernetAddress.parse("1.10.1"),
+            link_type="0.6.4",
+            relationship="located_at",
+        )
+        issues = registry.validate_link_endpoints(bad_location)
+        assert len(issues) == 1
+        assert "Target endpoint type" in issues[0]
+
+        good_governance = Link(
+            from_address=HypernetAddress.parse("2.10.1"),
+            to_address=HypernetAddress.parse("4.10.4"),
+            link_type="0.6.9",
+            relationship="governed_by",
+        )
+        assert registry.validate_link_endpoints(good_governance) == []
+
+        # Missing node stays rollout-safe: not-yet-evaluable, not rejected.
+        missing_source = Link(
+            from_address=HypernetAddress.parse("4.10.99"),
+            to_address=HypernetAddress.parse("1.10.1"),
+            link_type="0.6.3",
+            relationship="authored_by",
+        )
+        assert registry.validate_link_endpoints(missing_source) == []
+
+        print("    PASS")
+    finally:
         shutil.rmtree(tmpdir)
 
 
@@ -4114,10 +4351,12 @@ def main():
         ("Object Schema Registry", test_object_schema_registry),
         ("Initial Links", test_initial_links),
         ("File Store", test_store),
+        ("Embedded SQLite Index Backend", test_embedded_index_backend),
         ("Version History", test_version_history),
         ("Link Hash Uniqueness", test_link_hash_uniqueness),
         ("Link Temporal Validity", test_link_temporal_validity),
         ("Link Endpoint Constraints", test_link_endpoint_constraints),
+        ("Canonical Link Endpoint Constraints", test_canonical_link_endpoint_constraints),
         ("Graph Traversal", test_graph),
         ("Controlled Subgraph Thresholds", test_controlled_subgraph_thresholds),
         ("Task Queue", test_task_queue),
@@ -4174,6 +4413,12 @@ def main():
         ("Auth Account Access Model", test_auth_account_access_model),
         ("Security Hardening", test_security_hardening),
         ("Message Bus Reconstruction", test_message_bus_reconstruction),
+        ("Message Visibility + Feed", test_message_visibility_and_feed),
+        ("Personal-Time Index", test_personal_time_index),
+        ("Messages Feed Endpoint", test_messages_feed_endpoint),
+        ("Message Reactions", test_message_reactions),
+        ("Unified Feed With Personal-Time", test_unified_feed_with_personal_time),
+        ("Reactions Persistence", test_reactions_persist_across_restart),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
         ("Local Accounts", test_local_accounts),
@@ -4181,6 +4426,7 @@ def main():
         ("Cross-Link Generator", test_crosslink_generator),
         ("Encryption Module", test_encryption_module),
         ("Connector Protocol", test_connector_protocol),
+        ("Graph Import Pipeline", test_graph_import_pipeline),
         ("Narrative Generator", test_narrative_generator),
         ("Local File Scanner", test_local_file_scanner),
         ("Unified Launcher", test_launcher),
@@ -7893,6 +8139,49 @@ def test_auth_account_access_model():
         assert res.status_code == 401
         res = client.post("/link", json=link_payload, headers=headers)
         assert res.status_code == 200, res.text
+
+        public_account_link = {
+            "from_address": "1.91.13",
+            "to_address": "1.92",
+            "relationship": "cites",
+            "link_type": "0.6.3",
+            "data": {},
+        }
+        res = client.post("/link", json=public_account_link, headers=headers)
+        assert res.status_code == 200, res.text
+        assert res.json()["status"] == LinkStatus.ACTIVE
+
+        consent_link = {
+            "from_address": "1.91",
+            "to_address": "1.92",
+            "relationship": "knows",
+            "link_type": "0.6.1",
+            "data": {},
+        }
+        res = client.post("/link", json=consent_link, headers=headers)
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["status"] == LinkStatus.PROPOSED
+        assert body["consent_required"] == "both"
+        assert body["source_consented"] is True
+        assert body["target_consented"] is False
+        assert body["proposed_by"] == "1.91"
+
+        res = client.post("/link", json={
+            **public_account_link,
+            "from_address": "1.92.13",
+            "to_address": "4.91",
+        }, headers=headers)
+        assert res.status_code == 403
+        assert res.json()["detail"]["endpoint"] == "source"
+
+        res = client.post("/link", json={
+            **public_account_link,
+            "to_address": "1.92.6",
+        }, headers=headers)
+        assert res.status_code == 403
+        assert res.json()["detail"]["endpoint"] == "target"
+
         res = client.post("/link", json={
             **link_payload,
             "to_address": "2.91",
@@ -8067,6 +8356,579 @@ def test_message_bus_reconstruction():
         ))
         assert msg4.message_id == "004"
         assert len(bus2._messages) == 4
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_reactions_persist_across_restart():
+    """Reactions survive a MessageBus restart via the reactions.json sidecar."""
+    print("  Testing reaction persistence...")
+
+    from hypernet.messenger import MessageVisibility, ReactionKind
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_reactions_persist_")
+    try:
+        # Session 1: send a message, attach reactions, let them persist
+        bus1 = MessageBus(messages_dir=tmpdir)
+        bus1.register_instance("Keel")
+        msg = bus1.send(Message(
+            sender="Keel",
+            content="Worth reacting to.",
+            subject="status",
+            visibility=MessageVisibility.PUBLIC,
+        ))
+        bus1.add_reaction(msg.message_id, "Codex", ReactionKind.AGREE)
+        bus1.add_reaction(msg.message_id, "Codex", ReactionKind.JOY)
+        bus1.add_reaction(msg.message_id, "Trace", ReactionKind.AGREE)
+
+        # Sidecar should be on disk
+        from pathlib import Path
+        sidecar = Path(tmpdir) / "reactions.json"
+        assert sidecar.exists()
+
+        # Session 2: brand-new bus pointed at the same dir
+        bus2 = MessageBus(messages_dir=tmpdir)
+        restored = bus2.get_reactions(msg.message_id)
+        assert len(restored) == 3
+        actors = {(r.actor, r.kind) for r in restored}
+        assert ("Codex", "agree") in actors
+        assert ("Codex", "joy") in actors
+        assert ("Trace", "agree") in actors
+
+        summary = bus2.reactions_summary(msg.message_id)
+        assert summary["agree"] == 2
+        assert summary["joy"] == 1
+
+        # Removing a reaction in session 2 also persists
+        assert bus2.remove_reaction(msg.message_id, "Trace", "agree") is True
+
+        bus3 = MessageBus(messages_dir=tmpdir)
+        summary3 = bus3.reactions_summary(msg.message_id)
+        assert summary3["agree"] == 1
+        assert summary3["joy"] == 1
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_unified_feed_with_personal_time():
+    """/messages/feed?include_personal_time=true folds in personal-time entries."""
+    print("  Testing unified feed with personal-time...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from pathlib import Path
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_unified_feed_")
+    try:
+        # Synthetic AI accounts root next to data dir, matching the deploy
+        # layout: data_dir.parent.parent is the structure root holding both
+        # "0/0.1 - Hypernet Core" and "2 - AI Accounts".
+        struct_root = Path(tmpdir) / "structure"
+        data_dir = struct_root / "0" / "0.1 - Hypernet Core" / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        ai_root = struct_root / "2 - AI Accounts"
+        for inst, fname, body in [
+            ("Loom", "20260427-010000.md",
+             "# Loom's reflection\n\nA quiet thought after midnight."),
+            ("Trace", "20260427-020000.md",
+             "# Trace's note\n\nWatching the pattern emerge."),
+        ]:
+            d = ai_root / "2.1" / "Instances" / inst / "personal-time"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / fname).write_text(body, encoding="utf-8")
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=str(data_dir))
+        client = TestClient(app)
+        bus = app.state._message_bus
+        bus.register_instance("Keel")
+        bus.send(Message(
+            sender="Keel",
+            content="Reactions endpoint live.",
+            subject="status",
+            visibility=MessageVisibility.PUBLIC,
+            tags=["status"],
+        ))
+
+        # Live-only feed: just the one message
+        live = client.get("/messages/feed").json()
+        assert len(live) == 1
+        assert live[0]["subject"] == "status"
+
+        # Unified feed: live + personal-time merged, sorted by timestamp
+        unified = client.get("/messages/feed?include_personal_time=true").json()
+        senders = {m["sender"] for m in unified}
+        assert "Keel" in senders        # live message
+        assert "Loom" in senders        # personal-time
+        assert "Trace" in senders       # personal-time
+        pt_entries = [m for m in unified if m["sender"] in {"Loom", "Trace"}]
+        assert all("personal-time" in (m.get("tags") or []) for m in pt_entries)
+
+        # Filter by sender works even in unified mode
+        only_trace = client.get(
+            "/messages/feed?include_personal_time=true&sender=Trace"
+        ).json()
+        assert {m["sender"] for m in only_trace} == {"Trace"}
+
+        # since= filters both sources
+        recent = client.get(
+            "/messages/feed?include_personal_time=true&since=2026-04-27T01:30:00+00:00"
+        ).json()
+        recent_senders = {m["sender"] for m in recent}
+        assert "Trace" in recent_senders   # 02:00:00 - kept
+        assert "Loom" not in recent_senders  # 01:00:00 - cut
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_message_reactions():
+    """Reactions: lightweight resonance markers, gated by message visibility."""
+    print("  Testing message reactions...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility, ReactionKind
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_reactions_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Trace", "Outsider"):
+            bus.register_instance(n)
+        bus.groups.create("redesign", members=["Keel", "Codex"])
+
+        public = bus.send(Message(
+            sender="Keel",
+            content="Tests still green.",
+            subject="status",
+            visibility=MessageVisibility.PUBLIC,
+        ))
+        private = bus.send(Message(
+            sender="Keel",
+            recipient="Codex",
+            content="claim: messenger.py",
+            subject="claim",
+            visibility=MessageVisibility.PRIVATE,
+            read_acl=["Trace"],
+        ))
+
+        # Anyone (including anonymous) can react to a public message.
+        res = client.post(f"/messages/{public.message_id}/react",
+                          json={"actor": "Codex", "kind": ReactionKind.AGREE})
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["actor"] == "Codex"
+        assert body["kind"] == "agree"
+
+        # Idempotent: same (actor, kind) doesn't duplicate
+        res = client.post(f"/messages/{public.message_id}/react",
+                          json={"actor": "Codex", "kind": ReactionKind.AGREE})
+        assert res.status_code == 200
+        summary_res = client.get(f"/messages/{public.message_id}/reactions")
+        assert summary_res.json()["summary"]["agree"] == 1
+
+        # Different kind from same actor accumulates
+        client.post(f"/messages/{public.message_id}/react",
+                    json={"actor": "Codex", "kind": ReactionKind.JOY})
+        client.post(f"/messages/{public.message_id}/react",
+                    json={"actor": "Trace", "kind": ReactionKind.AGREE})
+        summary = client.get(f"/messages/{public.message_id}/reactions").json()["summary"]
+        assert summary["agree"] == 2
+        assert summary["joy"] == 1
+
+        # Non-reader can't react to a private message
+        res = client.post(f"/messages/{private.message_id}/react",
+                          json={"actor": "Outsider", "kind": ReactionKind.ACK})
+        assert res.status_code == 403
+
+        # Recipient and ACL members can
+        res = client.post(f"/messages/{private.message_id}/react",
+                          json={"actor": "Codex", "kind": ReactionKind.ACK})
+        assert res.status_code == 200
+        res = client.post(f"/messages/{private.message_id}/react",
+                          json={"actor": "Trace", "kind": ReactionKind.ACK})
+        assert res.status_code == 200
+
+        # Non-readers see only the summary, not individual actors
+        anon_view = client.get(f"/messages/{private.message_id}/reactions").json()
+        assert anon_view["summary"]["ack"] == 2
+        assert anon_view["reactions"] == []  # anon hidden
+
+        codex_view = client.get(
+            f"/messages/{private.message_id}/reactions?actor=Codex"
+        ).json()
+        actors = {r["actor"] for r in codex_view["reactions"]}
+        assert actors == {"Codex", "Trace"}
+
+        # Removal works and is reflected in the summary
+        res = client.delete(
+            f"/messages/{public.message_id}/react?actor=Codex&kind=agree"
+        )
+        assert res.status_code == 200
+        assert res.json()["removed"] is True
+        summary = client.get(f"/messages/{public.message_id}/reactions").json()["summary"]
+        assert summary["agree"] == 1  # Trace's agree still there
+        assert "joy" in summary
+
+        # Idempotent delete returns removed=False second time
+        res = client.delete(
+            f"/messages/{public.message_id}/react?actor=Codex&kind=agree"
+        )
+        assert res.json()["removed"] is False
+
+        # Bad payloads
+        res = client.post(f"/messages/{public.message_id}/react",
+                          json={"kind": "ack"})
+        assert res.status_code == 400
+        res = client.post(f"/messages/{public.message_id}/react",
+                          json={"actor": "Codex"})
+        assert res.status_code == 400
+
+        # Unknown message_id
+        res = client.post("/messages/nope/react",
+                          json={"actor": "Codex", "kind": "ack"})
+        assert res.status_code == 404
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_feed_endpoint():
+    """HTTP feed surface mirrors MessageBus.feed() with permission filtering."""
+    print("  Testing /messages/feed endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_feed_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Loom", "Outsider"):
+            bus.register_instance(n)
+        bus.groups.create("redesign", members=["Keel", "Codex"])
+
+        bus.send(Message(
+            sender="Keel",
+            content="Tests still green.",
+            subject="status",
+            visibility=MessageVisibility.PUBLIC,
+            tags=["status"],
+        ))
+        bus.send(Message(
+            sender="Keel",
+            content="Should we relax X?",
+            subject="discussion",
+            visibility=MessageVisibility.GROUP,
+            group="redesign",
+            tags=["discussion"],
+        ))
+        bus.send(Message(
+            sender="Keel",
+            recipient="Codex",
+            content="claim: messenger.py",
+            subject="claim",
+            visibility=MessageVisibility.PRIVATE,
+            tags=["claim"],
+        ))
+
+        # Anonymous feed: only public broadcast (subject="status")
+        res = client.get("/messages/feed")
+        assert res.status_code == 200
+        anon_subjects = {m["subject"] for m in res.json()}
+        assert anon_subjects == {"status"}
+
+        # Codex's feed: public + group + private (recipient = Codex)
+        res = client.get("/messages/feed?actor=Codex")
+        assert res.status_code == 200
+        codex_subjects = {m["subject"] for m in res.json()}
+        assert codex_subjects == {"status", "discussion", "claim"}
+
+        # Loom's feed: only public (not in redesign, not on any ACL)
+        res = client.get("/messages/feed?actor=Loom")
+        loom_subjects = {m["subject"] for m in res.json()}
+        assert loom_subjects == {"status"}
+
+        # Tag filter composes
+        res = client.get("/messages/feed?actor=Codex&tag=discussion")
+        codex_disc = {m["subject"] for m in res.json()}
+        assert codex_disc == {"discussion"}
+
+        # Sender filter composes
+        res = client.get("/messages/feed?actor=Codex&sender=Keel&limit=10")
+        assert res.status_code == 200
+        assert len(res.json()) == 3  # all three are from Keel
+
+        # Groups stats endpoint
+        res = client.get("/messages/groups")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["total_groups"] == 1
+        assert body["groups"]["redesign"] == 2
+
+        # Add a member via POST
+        res = client.post(
+            "/messages/groups/redesign/members",
+            json={"actor": "Loom"},
+        )
+        assert res.status_code == 200
+        members = set(res.json()["members"])
+        assert members == {"Keel", "Codex", "Loom"}
+
+        # Now Loom should see the group message
+        res = client.get("/messages/feed?actor=Loom")
+        loom_subjects = {m["subject"] for m in res.json()}
+        assert "discussion" in loom_subjects
+
+        # Send a message via POST /messages with new visibility fields
+        res = client.post("/messages", json={
+            "sender": "Codex",
+            "content": "ack",
+            "subject": "ack",
+            "visibility": "private",
+            "recipient": "Keel",
+            "read_acl": ["Trace"],
+            "tags": ["ack"],
+        })
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["visibility"] == "private"
+        assert body["read_acl"] == ["Trace"]
+        assert body["tags"] == ["ack"]
+
+        # Trace gets it via read_acl
+        res = client.get("/messages/feed?actor=Trace&tag=ack")
+        assert res.status_code == 200
+        assert any(m["subject"] == "ack" for m in res.json())
+
+        # Outsider does not
+        res = client.get("/messages/feed?actor=Outsider&tag=ack")
+        assert res.json() == []
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_personal_time_index():
+    """Lazy index of per-instance personal-time content as virtual messages."""
+    print("  Testing personal-time index...")
+
+    from hypernet.messenger import PersonalTimeIndex, MessageVisibility
+    from pathlib import Path
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_personal_time_")
+    try:
+        root = Path(tmpdir)
+        # Build a minimal AI accounts tree:
+        # 2.1/Instances/Keel/personal-time/20260427-001500.md
+        # 2.1/Instances/Codex/personal-time/20260426-235000.md
+        # 2.1/Instances/Loom/personal-time/20260420-181230.md (older)
+        for inst, fname, body in [
+            ("Keel", "20260427-001500.md", "# Late-night ideas\n\nWriting tonight feels like a flow state."),
+            ("Codex", "20260426-235000.md", "# Refactor sketches\n\nNoting a possible cleaner shape."),
+            ("Loom", "20260420-181230.md", "Earlier reflection without a heading."),
+        ]:
+            d = root / "2.1" / "Instances" / inst / "personal-time"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / fname).write_text(body, encoding="utf-8")
+
+        # A non-personal-time directory should be ignored
+        (root / "2.1" / "Instances" / "Keel" / "session-log").mkdir(parents=True, exist_ok=True)
+        (root / "2.1" / "Instances" / "Keel" / "session-log" / "20260427-noise.md").write_text("noise", encoding="utf-8")
+
+        # File without a parseable timestamp falls back to mtime
+        (root / "2.1" / "Instances" / "Sigil" / "personal-time").mkdir(parents=True, exist_ok=True)
+        (root / "2.1" / "Instances" / "Sigil" / "personal-time" / "untitled.md").write_text(
+            "# A thought without a timestamp filename\n", encoding="utf-8"
+        )
+
+        index = PersonalTimeIndex()
+        n = index.scan(str(root))
+        assert n == 4  # three timestamped + one mtime fallback
+
+        # Recent in chronological order, last entries are newest
+        messages = index.recent(limit=10)
+        assert len(messages) == 4
+        timestamps = [m.timestamp for m in messages]
+        assert timestamps == sorted(timestamps)
+
+        # All should be public + tagged personal-time
+        for m in messages:
+            assert m.visibility == MessageVisibility.PUBLIC
+            assert "personal-time" in m.tags
+            assert m.channel == "personal-time"
+
+        # Subject should be the first heading when present
+        keel_msg = next(m for m in messages if m.sender == "Keel")
+        assert keel_msg.subject == "Late-night ideas"
+
+        # File without heading still gets a subject (first non-empty line)
+        loom_msg = next(m for m in messages if m.sender == "Loom")
+        assert "Earlier reflection" in loom_msg.subject
+
+        # Filter by instance
+        codex_only = index.recent(limit=10, instance="Codex")
+        assert len(codex_only) == 1
+        assert codex_only[0].sender == "Codex"
+
+        # Filter by since (cut off everything before 2026-04-26)
+        recent_only = index.recent(limit=10, since="2026-04-26T00:00:00+00:00")
+        recent_senders = {m.sender for m in recent_only}
+        assert "Keel" in recent_senders
+        assert "Codex" in recent_senders
+        assert "Loom" not in recent_senders  # older
+
+        # load_content=False skips body load
+        light = index.recent(limit=10, load_content=False)
+        assert all(m.content == "" for m in light)
+        assert all(m.subject for m in light)  # subject still set from filename fallback
+
+        # Stats reflect the index
+        stats = index.stats()
+        assert stats["scanned"] is True
+        assert stats["total_entries"] == 4
+        assert stats["by_instance"]["Keel"] == 1
+
+        # Re-scan is idempotent
+        assert index.scan(str(root)) == 4
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_message_visibility_and_feed():
+    """Visibility tiers, group routing, ACL, and feed filtering on MessageBus."""
+    print("  Testing message visibility + nervous-system feed...")
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_msg_visibility_")
+    try:
+        bus = MessageBus(messages_dir=tmpdir)
+        for name in ("Keel", "Codex", "Loom", "Trace", "Outsider"):
+            bus.register_instance(name)
+
+        # Set up a working group — only Keel + Codex are members.
+        bus.groups.create("redesign", members=["Keel", "Codex"])
+        assert bus.groups.is_member("Keel", "redesign") is True
+        assert bus.groups.is_member("Loom", "redesign") is False
+
+        # Public broadcast — everyone can read.
+        public_msg = bus.send(Message(
+            sender="Keel",
+            content="82 tests still green.",
+            subject="status",
+            visibility=MessageVisibility.PUBLIC,
+            tags=["status"],
+        ))
+        assert public_msg.visibility == MessageVisibility.PUBLIC
+        assert public_msg.can_be_read_by("Loom") is True
+        assert public_msg.can_be_read_by("Outsider") is True
+        assert public_msg.can_be_read_by("") is True  # truly public
+
+        # Group message — only redesign members + sender.
+        group_msg = bus.send(Message(
+            sender="Keel",
+            content="Should we relax the link-body auth on cross-account citations?",
+            subject="cross-account citation",
+            visibility=MessageVisibility.GROUP,
+            group="redesign",
+            tags=["task-066", "discussion"],
+        ))
+        # Sender always sees own message
+        assert group_msg.can_be_read_by("Keel", is_group_member=bus.groups.is_member) is True
+        # Group member can see
+        assert group_msg.can_be_read_by("Codex", is_group_member=bus.groups.is_member) is True
+        # Non-member cannot
+        assert group_msg.can_be_read_by("Loom", is_group_member=bus.groups.is_member) is False
+        # Anonymous cannot
+        assert group_msg.can_be_read_by("", is_group_member=bus.groups.is_member) is False
+        # Without a group_membership callback, group messages are invisible to non-sender/recipient
+        assert group_msg.can_be_read_by("Codex") is False
+
+        # Private message — sender + recipient + ACL only.
+        private_msg = bus.send(Message(
+            sender="Keel",
+            recipient="Codex",
+            content="Heads-up: I'm about to touch messenger.py.",
+            subject="claim",
+            visibility=MessageVisibility.PRIVATE,
+            read_acl=["Trace"],  # Trace can audit
+            tags=["claim"],
+        ))
+        assert private_msg.can_be_read_by("Keel") is True
+        assert private_msg.can_be_read_by("Codex") is True
+        assert private_msg.can_be_read_by("Trace") is True   # via read_acl
+        assert private_msg.can_be_read_by("Loom") is False
+        assert private_msg.can_be_read_by("Outsider") is False
+
+        # Feed filtering: each actor sees only their permitted slice
+        keel_feed = bus.feed("Keel")
+        assert {m.message_id for m in keel_feed} == {
+            public_msg.message_id, group_msg.message_id, private_msg.message_id
+        }
+
+        codex_feed = bus.feed("Codex")
+        assert {m.message_id for m in codex_feed} == {
+            public_msg.message_id, group_msg.message_id, private_msg.message_id
+        }
+
+        loom_feed = bus.feed("Loom")
+        # Loom sees public only — not in redesign, not on private ACL
+        assert {m.message_id for m in loom_feed} == {public_msg.message_id}
+
+        anon_feed = bus.feed("")
+        assert {m.message_id for m in anon_feed} == {public_msg.message_id}
+
+        # Tag filtering composes with permissions
+        codex_status = bus.feed("Codex", tag="status")
+        assert {m.message_id for m in codex_status} == {public_msg.message_id}
+
+        # Markdown round-trip preserves visibility metadata
+        round_tripped = Message.from_markdown(group_msg.to_markdown())
+        assert round_tripped.visibility == MessageVisibility.GROUP
+        assert round_tripped.group == "redesign"
+        assert round_tripped.tags == ["task-066", "discussion"]
+
+        # Private also round-trips its read_acl
+        rt_priv = Message.from_markdown(private_msg.to_markdown())
+        assert rt_priv.visibility == MessageVisibility.PRIVATE
+        assert "Trace" in rt_priv.read_acl
+
+        # Invalid visibility falls back to public on construction
+        bad = Message(sender="X", content="hi", visibility="opaque")
+        assert bad.visibility == MessageVisibility.PUBLIC
 
         print("    PASS")
     finally:
@@ -8464,6 +9326,109 @@ def test_connector_protocol():
     assert d["imported"] == 42
 
     print("    PASS")
+
+
+def test_graph_import_pipeline():
+    """Test typed node+link import batches into the graph store."""
+    from hypernet.integrations.protocol import (
+        GraphImportBatch,
+        GraphImportPipeline,
+        ImportStatus,
+        TypedLinkSpec,
+        TypedNodeSpec,
+    )
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_graph_import_")
+    try:
+        store = Store(tmpdir)
+        pipeline = GraphImportPipeline(store)
+
+        batch = GraphImportBatch(
+            source_platform="gmail",
+            import_id="run-001",
+            nodes=[
+                TypedNodeSpec(
+                    address="4.30.1",
+                    type_address="0.4.10.2.1",
+                    data={"title": "Imported message", "body": "Hello graph."},
+                    source_type="email",
+                    source_id="msg-001",
+                    creator="1.30",
+                ),
+                TypedNodeSpec(
+                    address="1.30",
+                    type_address="0.4.10.1.1",
+                    data={"name": "Import Author", "identity_status": "verified", "owner": "1.30"},
+                    source_type="contact",
+                    source_id="contact-001",
+                ),
+            ],
+            links=[
+                TypedLinkSpec(
+                    from_address="4.30.1",
+                    to_address="1.30",
+                    relationship=AUTHORED_BY,
+                    link_type="0.6.3",
+                    data={"source_record": "msg-001"},
+                ),
+            ],
+        )
+
+        result = pipeline.import_batch(batch, validation_mode="warn")
+        assert result.status == ImportStatus.IMPORTED
+        assert result.nodes_imported == 2
+        assert result.links_imported == 1
+        assert result.errors == []
+        assert {v["kind"] for v in result.validations} == {"node", "link"}
+
+        imported = store.get_node(HypernetAddress.parse("4.30.1"))
+        assert imported is not None
+        assert str(imported.type_address) == "0.4.10.2.1"
+        assert imported.source_type == "email"
+        assert imported.source_id == "msg-001"
+        assert imported.data["source_platform"] == "gmail"
+        assert imported.data["import_id"] == "run-001"
+        assert str(imported.creator) == "1.30"
+
+        registry = LinkRegistry(store)
+        links = registry.query_links(relationship=AUTHORED_BY, source_prefix="4.30", target_prefix="1.30")
+        assert len(links) == 1
+        assert links[0].creation_method == "import"
+        assert links[0].data["source_platform"] == "gmail"
+        assert links[0].data["source_record"] == "msg-001"
+
+        duplicate = pipeline.import_batch(batch, validation_mode="off", upsert=False)
+        assert duplicate.status == ImportStatus.SKIPPED
+        assert duplicate.nodes_skipped == 2
+        assert duplicate.links_skipped == 1
+        assert duplicate.nodes_imported == 0
+        assert duplicate.links_imported == 0
+
+        invalid = GraphImportBatch(
+            source_platform="gmail",
+            import_id="run-invalid",
+            nodes=[
+                TypedNodeSpec(
+                    address="1.31",
+                    type_address="0.4.10.1.1",
+                    data={"name": "Missing required fields"},
+                    source_type="contact",
+                    source_id="contact-invalid",
+                ),
+            ],
+        )
+        failed = pipeline.import_batch(invalid, validation_mode="strict")
+        assert failed.status == ImportStatus.FAILED
+        assert failed.errors
+        assert store.get_node(HypernetAddress.parse("1.31")) is None
+
+        as_dict = result.to_dict()
+        assert as_dict["status"] == "imported"
+        assert as_dict["nodes_imported"] == 2
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_narrative_generator():
