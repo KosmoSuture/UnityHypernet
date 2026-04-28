@@ -350,6 +350,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/messages/mentions",
             "/messages/search",
             "/messages/dashboard",
+            "/messages/bookmarks",
             "/messages/personal-time",
             "/messages/personal-time/stats",
             "/messages/groups",
@@ -367,6 +368,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/static",
             "/schema/",
             "/tools/",
+            "/messages/by-id/",
         )
 
         def _address_after(path: str, prefix: str) -> str:
@@ -2156,6 +2158,88 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         removed = _message_bus.remove_reaction(message_id, actor, kind)
         return {"message_id": message_id, "removed": removed}
 
+    @app.get("/messages/by-id/{message_id}")
+    def get_message_by_id(message_id: str, actor: Optional[str] = None):
+        """Fetch a single message by its message_id.
+
+        Handles live messages from the bus and personal-time entries
+        (``pt-`` prefix). Returns 403 if ``actor`` cannot read the
+        message; 404 if it doesn't exist. Used by clients that have a
+        bookmark / mention / reaction reference and want the full body.
+        """
+        if message_id.startswith("pt-"):
+            # Look it up in the personal-time index. Personal-time is
+            # public so no permission gate.
+            idx = _get_personal_time_index()
+            for m in idx.recent(limit=10000, load_content=True):
+                if m.message_id == message_id:
+                    return m.to_dict()
+            raise HTTPException(404, f"Personal-time entry not found: {message_id}")
+        msg = _message_bus._find_message(message_id)
+        if msg is None:
+            raise HTTPException(404, f"Message not found: {message_id}")
+        if not msg.can_be_read_by(actor or "", is_group_member=_message_bus.groups.is_member):
+            raise HTTPException(
+                403,
+                {"detail": "Not allowed to read this message"},
+            )
+        return msg.to_dict()
+
+    @app.post("/messages/{message_id}/bookmark")
+    def bookmark_message(message_id: str, payload: dict = Body(...)):
+        """Save a message to an actor's bookmark list (visible-only)."""
+        actor = str(payload.get("actor", "")).strip()
+        if not actor:
+            raise HTTPException(400, "actor is required")
+        # Ensure the actor can read what they're bookmarking
+        if not message_id.startswith("pt-"):
+            msg = _message_bus._find_message(message_id)
+            if msg is None:
+                raise HTTPException(404, f"Message not found: {message_id}")
+            if not msg.can_be_read_by(actor, is_group_member=_message_bus.groups.is_member):
+                raise HTTPException(
+                    403,
+                    {"detail": "Cannot bookmark a message you cannot read"},
+                )
+        added = _message_bus.add_bookmark(actor, message_id)
+        return {"actor": actor, "message_id": message_id, "added": added}
+
+    @app.delete("/messages/{message_id}/bookmark")
+    def unbookmark_message(message_id: str, actor: str):
+        if not actor:
+            raise HTTPException(400, "actor is required")
+        removed = _message_bus.remove_bookmark(actor, message_id)
+        return {"actor": actor, "message_id": message_id, "removed": removed}
+
+    @app.get("/messages/bookmarks")
+    def list_actor_bookmarks(actor: str, limit: int = 50):
+        """Return the actor's bookmarked messages, oldest-saved first.
+
+        Bookmarks that no longer resolve or are no longer readable are
+        returned without body content so the actor can clean them up
+        without leaking protected messages.
+        """
+        if not actor:
+            raise HTTPException(400, "actor is required")
+        ids = _message_bus.list_bookmarks(actor)
+        bounded = max(1, min(int(limit), 500))
+        ids = ids[:bounded]
+        out = []
+        for mid in ids:
+            if mid.startswith("pt-"):
+                out.append({"message_id": mid, "kind": "personal-time"})
+                continue
+            msg = _message_bus._find_message(mid)
+            if msg is None:
+                out.append({"message_id": mid, "missing": True})
+                continue
+            if not msg.can_be_read_by(actor, is_group_member=_message_bus.groups.is_member):
+                out.append({"message_id": mid, "unreadable": True})
+                continue
+            d = msg.to_dict()
+            out.append(d)
+        return out
+
     @app.get("/messages/{message_id}/reactions")
     def list_reactions(message_id: str, actor: Optional[str] = None):
         """Return reactions on a message and a per-kind summary.
@@ -2766,14 +2850,20 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 "traverse": "/graph/traverse/{address}",
             },
             "nervous_system": {
+                "dashboard": "/messages/dashboard",
                 "feed": "/messages/feed",
                 "feed_changes": "/messages/feed/changes",
+                "message_by_id": "/messages/by-id/{id}",
                 "tags": "/messages/tags",
                 "threads": "/messages/threads",
                 "presence": "/messages/presence",
                 "mentions": "/messages/mentions",
+                "search": "/messages/search",
                 "personal_time": "/messages/personal-time",
                 "personal_time_post": "POST /messages/personal-time",
+                "bookmarks": "/messages/bookmarks",
+                "bookmark": "POST /messages/{id}/bookmark",
+                "unbookmark": "DELETE /messages/{id}/bookmark",
                 "groups": "/messages/groups",
                 "react": "POST /messages/{id}/react",
                 "reactions": "/messages/{id}/reactions",

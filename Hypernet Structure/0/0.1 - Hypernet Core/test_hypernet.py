@@ -4427,6 +4427,8 @@ def main():
         ("Messages Presence", test_messages_presence),
         ("Messages Mentions", test_messages_mentions),
         ("Messages Search", test_messages_search),
+        ("Messages Dashboard Aggregator", test_messages_dashboard_aggregator),
+        ("Message Bookmarks", test_message_bookmarks),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
         ("Local Accounts", test_local_accounts),
@@ -8368,6 +8370,182 @@ def test_message_bus_reconstruction():
         print("    PASS")
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_message_bookmarks():
+    """Per-actor bookmarks: save, list, remove, persist."""
+    print("  Testing message bookmarks...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_bookmarks_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Outsider"):
+            bus.register_instance(n)
+
+        public = bus.send(Message(sender="Keel", content="public",
+                                  visibility=MessageVisibility.PUBLIC))
+        priv = bus.send(Message(sender="Keel", recipient="Codex",
+                                content="private",
+                                visibility=MessageVisibility.PRIVATE))
+
+        # Codex bookmarks the private (which they can read)
+        res = client.post(f"/messages/{priv.message_id}/bookmark",
+                          json={"actor": "Codex"})
+        assert res.status_code == 200
+        assert res.json()["added"] is True
+        # Idempotent: second add returns added=false
+        res = client.post(f"/messages/{priv.message_id}/bookmark",
+                          json={"actor": "Codex"})
+        assert res.json()["added"] is False
+
+        # Outsider cannot bookmark a private they can't read
+        res = client.post(f"/messages/{priv.message_id}/bookmark",
+                          json={"actor": "Outsider"})
+        assert res.status_code == 403
+
+        # Codex bookmarks the public message too
+        client.post(f"/messages/{public.message_id}/bookmark",
+                    json={"actor": "Codex"})
+
+        # Direct lookup enforces the same visibility boundary.
+        res = client.get(f"/messages/by-id/{public.message_id}?actor=Codex")
+        assert res.status_code == 200
+        assert res.json()["content"] == "public"
+        res = client.get(f"/messages/by-id/{priv.message_id}?actor=Outsider")
+        assert res.status_code == 403
+
+        # List Codex's bookmarks: 2 entries, in saved order
+        res = client.get("/messages/bookmarks?actor=Codex")
+        assert res.status_code == 200
+        ids = [b.get("message_id") for b in res.json()]
+        assert ids == [priv.message_id, public.message_id]
+
+        # Remove the private bookmark
+        res = client.delete(
+            f"/messages/{priv.message_id}/bookmark?actor=Codex"
+        )
+        assert res.json()["removed"] is True
+
+        # Bookmark listing re-checks permissions at read time. If Codex
+        # loses group access later, the saved reference remains clean-up
+        # visible but the message body is not leaked.
+        bus.groups.create("codex-room", members=["Codex"])
+        grouped = bus.send(Message(sender="Keel", group="codex-room",
+                                   content="group secret",
+                                   visibility=MessageVisibility.GROUP))
+        res = client.post(f"/messages/{grouped.message_id}/bookmark",
+                          json={"actor": "Codex"})
+        assert res.status_code == 200
+        bus.groups.remove_member("codex-room", "Codex")
+        res = client.get("/messages/bookmarks?actor=Codex")
+        assert res.status_code == 200
+        rows = res.json()
+        assert rows[-1] == {"message_id": grouped.message_id, "unreadable": True}
+        assert "content" not in rows[-1]
+
+        # Persistence round-trip via a separate bus instance (the
+        # server's message bus doesn't pass messages_dir, so use a
+        # dedicated bus for the persistence portion).
+        with tempfile.TemporaryDirectory() as persist_dir:
+            persist_bus = MessageBus(messages_dir=persist_dir)
+            persist_bus.add_bookmark("Codex", "msg-001")
+            persist_bus.add_bookmark("Codex", "msg-002")
+            persist_bus.add_bookmark("Keel", "msg-001")
+            persist_bus2 = MessageBus(messages_dir=persist_dir)
+            assert persist_bus2.list_bookmarks("Codex") == ["msg-001", "msg-002"]
+            assert persist_bus2.list_bookmarks("Keel") == ["msg-001"]
+            assert persist_bus2.remove_bookmark("Codex", "msg-001") is True
+            persist_bus3 = MessageBus(messages_dir=persist_dir)
+            assert persist_bus3.list_bookmarks("Codex") == ["msg-002"]
+
+        # Missing actor → 400
+        res = client.post(f"/messages/{public.message_id}/bookmark", json={})
+        assert res.status_code == 400
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_dashboard_aggregator():
+    """One call /messages/dashboard returns feed + tags + presence + mentions."""
+    print("  Testing /messages/dashboard aggregator...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_dashboard_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Loom"):
+            bus.register_instance(n)
+        bus.groups.create("redesign", members=["Keel"])
+
+        bus.send(Message(sender="Keel", content="@Codex want to weigh in?",
+                         visibility=MessageVisibility.PUBLIC,
+                         tags=["status"]))
+        bus.send(Message(sender="Codex", recipient="Keel", content="ack",
+                         visibility=MessageVisibility.PRIVATE,
+                         tags=["ack"]))
+        m3 = bus.send(Message(sender="Loom", content="ambient",
+                              visibility=MessageVisibility.PUBLIC,
+                              tags=["status"]))
+        bus.add_reaction(m3.message_id, "Keel", "agree")
+
+        # Anonymous dashboard: only public, no mention count
+        body = client.get("/messages/dashboard").json()
+        assert "feed" in body and "tags" in body and "presence" in body
+        assert body["mention_count"] == 0
+        anon_senders = {m["sender"] for m in body["feed"]}
+        assert "Codex" not in anon_senders   # private message hidden
+        assert body["my_groups"] == []
+
+        # Keel's dashboard: sees all three; mentioned once (in Keel's own
+        # message via @Codex — actually that's not a mention OF Keel,
+        # but Keel IS the recipient of the private msg and there's no
+        # @Keel content). So mention_count should be 1 (recipient).
+        body_k = client.get("/messages/dashboard?actor=Keel").json()
+        keel_senders = {m["sender"] for m in body_k["feed"]}
+        assert keel_senders == {"Keel", "Codex", "Loom"}
+        assert body_k["mention_count"] == 1
+        assert "redesign" in body_k["my_groups"]
+
+        # Tags surface in the aggregator
+        assert body_k["tags"]["status"] >= 1
+        assert "ack" in body_k["tags"]
+
+        # Reactions inline on the matching message
+        for m in body_k["feed"]:
+            if m["message_id"] == m3.message_id:
+                assert m.get("reactions_summary", {}).get("agree") == 1
+                break
+        else:
+            assert False, "expected to see m3 in Keel's feed"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_messages_search():

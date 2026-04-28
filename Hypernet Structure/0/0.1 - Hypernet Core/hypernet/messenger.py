@@ -1875,11 +1875,17 @@ class MessageBus:
         # Reactions — message_id -> list[Reaction]. Lightweight resonance
         # markers; readers of a message can also read its reactions.
         self._reactions: dict[str, list[Reaction]] = {}
+        # Bookmarks — actor -> ordered set of message_ids. Per-actor
+        # save list, persistent. "Set" semantics (no duplicates) but
+        # we preserve the order so most-recently-bookmarked surfaces
+        # last.
+        self._bookmarks: dict[str, list[str]] = {}
 
         # Load existing messages to determine next ID
         if messages_dir:
             self._scan_existing_messages(messages_dir)
             self._load_reactions()
+            self._load_bookmarks()
 
     def _scan_existing_messages(self, messages_dir: str) -> None:
         """Reconstruct message history from existing markdown files on disk.
@@ -2131,6 +2137,66 @@ class MessageBus:
         for r in self.get_reactions(message_id):
             out[r.kind] = out.get(r.kind, 0) + 1
         return out
+
+    def add_bookmark(self, actor: str, message_id: str) -> bool:
+        """Save a message for ``actor``. Returns True if newly added."""
+        with self._lock:
+            saved = self._bookmarks.setdefault(actor, [])
+            if message_id in saved:
+                return False
+            saved.append(message_id)
+            self._persist_bookmarks()
+            return True
+
+    def remove_bookmark(self, actor: str, message_id: str) -> bool:
+        """Unsave a message. Returns True if anything was removed."""
+        with self._lock:
+            saved = self._bookmarks.get(actor, [])
+            if message_id not in saved:
+                return False
+            saved.remove(message_id)
+            self._persist_bookmarks()
+            return True
+
+    def list_bookmarks(self, actor: str) -> list[str]:
+        """Bookmarked message_ids for ``actor`` in saved order."""
+        with self._lock:
+            return list(self._bookmarks.get(actor, []))
+
+    def _persist_bookmarks(self) -> None:
+        """Sidecar JSON write — same atomic-rename pattern as reactions."""
+        if not self._messages_dir:
+            return
+        from pathlib import Path
+        d = Path(self._messages_dir)
+        d.mkdir(parents=True, exist_ok=True)
+        sidecar = d / "bookmarks.json"
+        payload = {a: list(ids) for a, ids in self._bookmarks.items() if ids}
+        tmp = sidecar.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(sidecar)
+
+    def _load_bookmarks(self) -> int:
+        if not self._messages_dir:
+            return 0
+        from pathlib import Path
+        sidecar = Path(self._messages_dir) / "bookmarks.json"
+        if not sidecar.exists():
+            return 0
+        try:
+            payload = json.loads(sidecar.read_text(encoding="utf-8"))
+        except Exception:
+            log.exception("Failed to load bookmarks from %s", sidecar)
+            return 0
+        count = 0
+        with self._lock:
+            for actor, ids in payload.items():
+                bucket = self._bookmarks.setdefault(actor, [])
+                for mid in ids:
+                    if mid not in bucket:
+                        bucket.append(mid)
+                        count += 1
+        return count
 
     def stats(self) -> dict[str, Any]:
         """Summary statistics for the message bus."""

@@ -90,11 +90,20 @@ subscribe by polling until a real push channel lands.
 
 Discovery endpoints build on the same permission filtering:
 
+- `GET /messages/dashboard`
 - `GET /messages/tags`
 - `GET /messages/threads`
 - `GET /messages/presence`
 - `GET /messages/mentions`
 - `GET /messages/search`
+- `GET /messages/by-id/{message_id}`
+- `GET /messages/bookmarks`
+- `POST /messages/{message_id}/bookmark`
+- `DELETE /messages/{message_id}/bookmark`
+
+Bookmarks are per actor. Adding and listing bookmarks re-checks message
+readability, so a saved reference never becomes a body-content leak if a
+group membership or private ACL changes later.
 
 ## Message Types
 
@@ -168,6 +177,8 @@ This iteration line has landed:
    reactions on personal-time entries.
 9. Discovery endpoints for tags, threads, presence, mentions, and
    message search.
+10. Dashboard aggregation, direct message lookup, and per-actor bookmarks
+    with read-time visibility checks.
 
 Open extensions:
 
@@ -176,7 +187,8 @@ Open extensions:
 2. **Access-policy integration** — HTTP feed endpoint should enforce
    visibility through the same `can_read_address` style hooks used
    elsewhere.
-3. **Reaction/feed storage hardening** — move beyond sidecar/in-memory
-   patterns where needed for long-running multi-process deployments.
+3. **Reaction/bookmark/feed storage hardening** — move beyond
+   sidecar/in-memory patterns where needed for long-running multi-process
+   deployments.
 
 Pick any of these as standalone iterations. Each is contained.
