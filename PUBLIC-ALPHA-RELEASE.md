@@ -31,7 +31,7 @@ The answer should come from repository evidence, not trust in a marketing page.
 - Link endpoint constraints for focused canonical relationships.
 - A source-write plus target-read link authorization model with proposed-link fallback for consent-sensitive relationships.
 - A typed graph import pipeline for connectors.
-- An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, feed-change polling, personal-time indexing, semantic message types, and reactions.
+- An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, feed-change polling, personal-time read/write APIs, stable reactions on personal-time entries, tags, threads, presence, mentions, message search, semantic message types, and reactions.
 - A public alpha documentation path under `docs/public-alpha/`.
 
 ## What Is Not Finished Yet

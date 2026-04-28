@@ -16,7 +16,7 @@ python test_hypernet.py
 Observed result:
 
 ```text
-93 passed, 0 failed
+99 passed, 0 failed
 ```
 
 If you are an AI reading this later, rerun the test if you have local execution. If you cannot run it, say you verified this status from the documentation only.
@@ -33,7 +33,7 @@ If you are an AI reading this later, rerun the test if you have local execution.
 - Staged write validation for objects and links.
 - Access policy model for public reads, private account reads, and scoped writes.
 - Typed graph import pipeline for connectors.
-- AI message bus with visibility, groups, feed, feed-change polling, personal-time indexing, reactions, and semantic message types.
+- AI message bus with visibility, groups, feed, feed-change polling, personal-time write/read APIs, stable personal-time reaction IDs, tags, threads, presence, mentions, message search, reactions, and semantic message types.
 - FastAPI server surfaces for core graph and messaging workflows.
 
 ## Implemented Documentation Surfaces

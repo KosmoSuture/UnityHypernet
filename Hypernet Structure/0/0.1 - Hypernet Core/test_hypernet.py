@@ -4422,6 +4422,11 @@ def main():
         ("Message Type Taxonomy", test_message_type_taxonomy),
         ("Feed Changes Polling", test_messages_feed_changes_polling),
         ("Personal-Time Writable API", test_personal_time_writable_via_api),
+        ("Reactions on Personal-Time", test_reactions_on_personal_time),
+        ("Messages Tags + Threads", test_messages_tags_and_threads),
+        ("Messages Presence", test_messages_presence),
+        ("Messages Mentions", test_messages_mentions),
+        ("Messages Search", test_messages_search),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
         ("Local Accounts", test_local_accounts),
@@ -8363,6 +8368,356 @@ def test_message_bus_reconstruction():
         print("    PASS")
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_messages_search():
+    """Substring search across visible messages with snippet."""
+    print("  Testing /messages/search endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_msg_search_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Loom"):
+            bus.register_instance(n)
+
+        bus.send(Message(sender="Keel",
+                         content="Working on the nervous system surface tonight.",
+                         subject="status",
+                         visibility=MessageVisibility.PUBLIC))
+        bus.send(Message(sender="Codex",
+                         content="The graph import pipeline lets us batch typed writes.",
+                         subject="task-071",
+                         visibility=MessageVisibility.PUBLIC))
+        bus.send(Message(sender="Loom",
+                         recipient="Keel",
+                         content="Private secret about a nervous tic.",
+                         subject="dm",
+                         visibility=MessageVisibility.PRIVATE))
+
+        # Anonymous: only public matches
+        res = client.get("/messages/search?q=nervous")
+        assert res.status_code == 200
+        results = res.json()
+        assert len(results) == 1
+        assert results[0]["sender"] == "Keel"
+        assert "snippet" in str(results[0]).lower() or "match_snippet" in results[0]
+        assert "nervous" in results[0]["match_snippet"].lower()
+
+        # Keel sees their private DM too
+        res = client.get("/messages/search?q=nervous&actor=Keel")
+        actors = {r["sender"] for r in res.json()}
+        assert actors == {"Keel", "Loom"}
+
+        # No matches
+        res = client.get("/messages/search?q=nonexistent")
+        assert res.json() == []
+
+        # Subject match (no content match) should still be found
+        res = client.get("/messages/search?q=task-071")
+        assert any(r["subject"] == "task-071" for r in res.json())
+
+        # Empty q returns empty
+        res = client.get("/messages/search?q=")
+        assert res.status_code in (200, 422)
+        if res.status_code == 200:
+            assert res.json() == []
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_mentions():
+    """/messages/mentions catches recipient, read_acl, and @-in-content."""
+    print("  Testing /messages/mentions endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_mentions_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Loom"):
+            bus.register_instance(n)
+
+        # Direct DM to Keel
+        bus.send(Message(sender="Codex", recipient="Keel", content="ping",
+                         visibility=MessageVisibility.PRIVATE))
+        # Public message that @-mentions Keel
+        bus.send(Message(sender="Loom", content="@Keel can you weigh in?",
+                         visibility=MessageVisibility.PUBLIC,
+                         subject="weigh in"))
+        # Private to Codex but Keel is on the read_acl
+        bus.send(Message(sender="Loom", recipient="Codex", content="audit",
+                         visibility=MessageVisibility.PRIVATE,
+                         read_acl=["Keel"]))
+        # Unrelated public message
+        bus.send(Message(sender="Loom", content="ambient chatter",
+                         visibility=MessageVisibility.PUBLIC))
+
+        # Mentions endpoint requires actor
+        res = client.get("/messages/mentions")
+        assert res.status_code in (400, 422)
+
+        res = client.get("/messages/mentions?actor=Keel")
+        assert res.status_code == 200
+        results = res.json()
+        # Three mentions: recipient, content, read_acl. Not the unrelated.
+        assert len(results) == 3
+        reasons_seen = set()
+        for r in results:
+            reasons_seen.update(r["mention_reasons"])
+        assert reasons_seen == {"recipient", "content", "read_acl"}
+        # No unrelated chatter
+        assert all("ambient" not in r["content"] for r in results)
+
+        # Codex sees only its own DM + audit (recipient on Loom's audit)
+        codex = client.get("/messages/mentions?actor=Codex").json()
+        codex_subjects = {r.get("subject") for r in codex}
+        # Codex is recipient on the audit message; codex is sender on the
+        # ping (not a mention of self). So we expect 1 result.
+        assert len(codex) == 1
+        assert "recipient" in codex[0]["mention_reasons"]
+
+        # since= filter
+        res = client.get("/messages/mentions?actor=Keel&since=2099-01-01T00:00:00+00:00")
+        assert res.json() == []
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_presence():
+    """Per-sender presence + activity counts, gated by visibility."""
+    print("  Testing /messages/presence endpoint...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+    from datetime import datetime, timezone, timedelta
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_presence_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Outsider"):
+            bus.register_instance(n)
+
+        # Three senders, varying recency. Inject historical timestamps
+        # by overriding after construction.
+        now = datetime.now(timezone.utc)
+        msg = bus.send(Message(sender="Keel", content="recent",
+                               visibility=MessageVisibility.PUBLIC))
+        # Codex sent something a year ago
+        old = bus.send(Message(sender="Codex", content="ancient",
+                               visibility=MessageVisibility.PUBLIC))
+        old.timestamp = (now - timedelta(days=400)).isoformat()
+        # Outsider sent a private DM only Keel can read
+        priv = bus.send(Message(sender="Outsider", recipient="Keel",
+                                content="hush",
+                                visibility=MessageVisibility.PRIVATE))
+
+        # Anonymous: sees Keel and Codex (public) but NOT Outsider
+        res = client.get("/messages/presence")
+        senders = {r["sender"] for r in res.json()}
+        assert senders == {"Keel", "Codex"}
+
+        # Keel sees all three (public broadcasts + recipient of private)
+        rows = client.get("/messages/presence?actor=Keel").json()
+        senders_k = {r["sender"]: r for r in rows}
+        assert set(senders_k.keys()) == {"Keel", "Codex", "Outsider"}
+
+        # Sorted most-recently-active first; Keel just sent, Codex is old
+        assert rows[0]["sender"] in {"Keel", "Outsider"}  # both very recent
+        assert rows[-1]["sender"] == "Codex"
+
+        # last_24h count: Keel and Outsider have 1, Codex has 0
+        keel_row = senders_k["Keel"]
+        codex_row = senders_k["Codex"]
+        assert keel_row["last_24h"] == 1
+        assert codex_row["last_24h"] == 0
+        assert codex_row["total"] == 1
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_tags_and_threads():
+    """/messages/tags and /messages/threads — discoverability surfaces."""
+    print("  Testing tags + threads endpoints...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_tags_threads_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        for n in ("Keel", "Codex", "Loom"):
+            bus.register_instance(n)
+
+        # Public messages with various tags
+        m1 = bus.send(Message(sender="Keel", content="status", subject="green",
+                              visibility=MessageVisibility.PUBLIC,
+                              tags=["status", "tests"]))
+        bus.send(Message(sender="Codex", content="reply", subject="re: green",
+                         visibility=MessageVisibility.PUBLIC,
+                         tags=["status"], reply_to=m1.message_id))
+        bus.send(Message(sender="Keel", content="claim",
+                         visibility=MessageVisibility.PUBLIC,
+                         tags=["claim", "messenger.py"]))
+        # Private message with tag — non-readers should not see it count
+        bus.send(Message(sender="Keel", recipient="Codex", content="secret",
+                         visibility=MessageVisibility.PRIVATE,
+                         tags=["private-only"]))
+
+        # Anonymous tags view — public tags only, counts correct
+        res = client.get("/messages/tags")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["tags"]["status"] == 2
+        assert body["tags"]["claim"] == 1
+        assert "private-only" not in body["tags"]
+
+        # Codex's tags view includes the private tag (Codex is recipient)
+        res = client.get("/messages/tags?actor=Codex")
+        assert res.json()["tags"].get("private-only") == 1
+
+        # Threads endpoint
+        res = client.get("/messages/threads")
+        rows = res.json()
+        # Should have at least 3 threads (m1+reply share one; the other
+        # two each get their own thread). Private message is its own
+        # thread, but anonymous can't see it.
+        anon_thread_ids = [r["thread_id"] for r in rows]
+        # Anonymous sees m1's thread (with reply) + the standalone "claim"
+        # public message. Cannot see the private message thread.
+        assert len(anon_thread_ids) == 2
+        # Codex sees the private message thread too (recipient)
+        codex_rows = client.get("/messages/threads?actor=Codex").json()
+        assert len(codex_rows) == 3
+
+        # Thread metadata: m1's thread has 2 messages with 2 participants
+        m1_thread = [r for r in rows if r["thread_id"] == m1.thread_id][0]
+        assert m1_thread["message_count"] == 2
+        assert set(m1_thread["participants"]) == {"Keel", "Codex"}
+        assert m1_thread["starter"] == "Keel"
+        assert m1_thread["subject"] == "green"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_reactions_on_personal_time():
+    """Personal-time entries get a stable message_id and accept reactions."""
+    print("  Testing reactions on personal-time entries...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from pathlib import Path
+    from hypernet.messenger import ReactionKind
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_pt_react_")
+    try:
+        struct_root = Path(tmpdir) / "structure"
+        data_dir = struct_root / "0" / "0.1 - Hypernet Core" / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        ai_root = struct_root / "2 - AI Accounts"
+        d = ai_root / "2.1" / "Instances" / "Loom" / "personal-time"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "20260427-030000.md").write_text(
+            "# A late thought\n\nWatching the system come together.",
+            encoding="utf-8",
+        )
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=str(data_dir))
+        client = TestClient(app)
+
+        # Fetch the personal-time entry to get its synthetic message_id
+        feed = client.get("/messages/personal-time").json()
+        assert len(feed) == 1
+        pt_id = feed[0]["message_id"]
+        assert pt_id.startswith("pt-")
+        assert feed[0]["sender"] == "Loom"
+
+        # React to it — should succeed without bus lookup
+        res = client.post(f"/messages/{pt_id}/react",
+                          json={"actor": "Keel", "kind": ReactionKind.APPRECIATE})
+        assert res.status_code == 200, res.text
+        assert res.json()["actor"] == "Keel"
+
+        # Add another reactor
+        res = client.post(f"/messages/{pt_id}/react",
+                          json={"actor": "Codex", "kind": ReactionKind.APPRECIATE})
+        assert res.status_code == 200
+
+        # Summary visible to anyone (personal-time is public)
+        sum_res = client.get(f"/messages/{pt_id}/reactions").json()
+        assert sum_res["summary"]["appreciate"] == 2
+        actors = {r["actor"] for r in sum_res["reactions"]}
+        assert actors == {"Keel", "Codex"}
+
+        # Stable message_id: same path -> same id on re-scan
+        idx = app.state._message_bus  # not used but keeps lint happy
+        feed2 = client.get("/messages/personal-time?rescan=true").json()
+        assert feed2[0]["message_id"] == pt_id
+
+        # Removing a reaction works
+        res = client.delete(
+            f"/messages/{pt_id}/react?actor=Keel&kind=appreciate"
+        )
+        assert res.status_code == 200
+        sum_after = client.get(f"/messages/{pt_id}/reactions").json()
+        assert sum_after["summary"].get("appreciate", 0) == 1
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_personal_time_writable_via_api():

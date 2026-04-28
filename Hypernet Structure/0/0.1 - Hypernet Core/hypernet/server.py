@@ -344,6 +344,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/access/check",
             "/messages/feed",
             "/messages/feed/changes",
+            "/messages/tags",
+            "/messages/threads",
+            "/messages/presence",
+            "/messages/mentions",
+            "/messages/search",
+            "/messages/dashboard",
             "/messages/personal-time",
             "/messages/personal-time/stats",
             "/messages/groups",
@@ -1557,6 +1563,281 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     def message_stats():
         return _message_bus.stats()
 
+    @app.get("/messages/tags")
+    def messages_tags(actor: Optional[str] = None, limit: int = 100):
+        """List tags currently in use across messages the actor can read.
+
+        Returns ``{tag: count}`` sorted by usage. Useful for UI
+        autocomplete, topic discovery, and seeing which threads of
+        conversation are actually live.
+        """
+        is_member = _message_bus.groups.is_member
+        counts: dict[str, int] = {}
+        for msg in _message_bus._messages:
+            if not msg.can_be_read_by(actor or "", is_group_member=is_member):
+                continue
+            for tag in (msg.tags or []):
+                counts[tag] = counts.get(tag, 0) + 1
+        # Sort by count desc, then alphabetic for stable ordering
+        ordered = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+        bounded = max(1, min(int(limit), 500))
+        return {
+            "tags": dict(ordered[:bounded]),
+            "total_distinct": len(counts),
+        }
+
+    @app.get("/messages/dashboard")
+    def messages_dashboard(
+        actor: Optional[str] = None,
+        limit: int = 20,
+        include_personal_time: bool = True,
+    ):
+        """One call returns everything a nervous-system UI needs to render.
+
+        Composes feed (live + optional personal-time), recent presence,
+        top tags, recent threads, and mention count for the actor. No
+        new logic — just a single payload shape so dashboards don't
+        have to fan out to a half-dozen endpoints.
+        """
+        bounded_limit = max(1, min(int(limit), 200))
+        is_member = _message_bus.groups.is_member
+        actor_value = actor or ""
+
+        # Recent feed (live + optional personal-time)
+        live = _message_bus.feed(actor_value, limit=bounded_limit)
+        feed_msgs = list(live)
+        if include_personal_time:
+            try:
+                idx = _get_personal_time_index()
+                pt = idx.recent(limit=bounded_limit, load_content=False)
+                feed_msgs = sorted(feed_msgs + list(pt), key=lambda m: m.timestamp)
+                feed_msgs = feed_msgs[-bounded_limit:]
+            except Exception:
+                log.warning("dashboard: personal-time merge failed", exc_info=True)
+
+        feed_payload = []
+        for m in feed_msgs:
+            d = m.to_dict()
+            summary = _message_bus.reactions_summary(m.message_id)
+            if summary:
+                d["reactions_summary"] = summary
+            feed_payload.append(d)
+
+        # Tags (top 10)
+        tag_counts: dict[str, int] = {}
+        for m in _message_bus._messages:
+            if not m.can_be_read_by(actor_value, is_group_member=is_member):
+                continue
+            for tag in (m.tags or []):
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        top_tags = dict(sorted(tag_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:10])
+
+        # Presence (top 10 most-recent senders)
+        from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+        cutoff_24h = (_dt.now(_tz.utc) - _td(hours=24)).isoformat()
+        per_sender: dict[str, dict] = {}
+        for msg in _message_bus._messages:
+            if not msg.can_be_read_by(actor_value, is_group_member=is_member):
+                continue
+            row = per_sender.setdefault(msg.sender, {
+                "sender": msg.sender, "last_at": "", "last_24h": 0, "total": 0,
+            })
+            row["total"] += 1
+            if msg.timestamp >= cutoff_24h:
+                row["last_24h"] += 1
+            if msg.timestamp > row["last_at"]:
+                row["last_at"] = msg.timestamp
+        presence = sorted(per_sender.values(), key=lambda r: r["last_at"], reverse=True)[:10]
+
+        # Mention count for the actor (only meaningful when actor is set)
+        mention_count = 0
+        if actor_value:
+            needle = f"@{actor_value}"
+            for m in _message_bus._messages:
+                if not m.can_be_read_by(actor_value, is_group_member=is_member):
+                    continue
+                if (m.recipient == actor_value
+                    or actor_value in (m.read_acl or [])
+                    or (m.content and needle in m.content)):
+                    mention_count += 1
+
+        # Group memberships for the actor
+        groups_for_actor: list[str] = (
+            _message_bus.groups.groups_for(actor_value) if actor_value else []
+        )
+
+        return {
+            "actor": actor_value,
+            "feed": feed_payload,
+            "tags": top_tags,
+            "presence": presence,
+            "mention_count": mention_count,
+            "my_groups": groups_for_actor,
+            "stats": {
+                "total_messages": len(_message_bus._messages),
+                "total_groups": _message_bus.groups.stats()["total_groups"],
+            },
+        }
+
+    @app.get("/messages/search")
+    def messages_search(
+        q: str,
+        actor: Optional[str] = None,
+        limit: int = 50,
+    ):
+        """Substring search across messages the actor can read.
+
+        Matches in subject and content (case-insensitive). Returns up
+        to ``limit`` results sorted newest-last with a short snippet
+        anchored on the match.
+        """
+        if not q or len(q) < 1:
+            return []
+        is_member = _message_bus.groups.is_member
+        needle = q.lower()
+        results = []
+        for msg in _message_bus._messages:
+            if not msg.can_be_read_by(actor or "", is_group_member=is_member):
+                continue
+            haystack_subject = (msg.subject or "").lower()
+            haystack_content = (msg.content or "").lower()
+            if needle not in haystack_subject and needle not in haystack_content:
+                continue
+            # Build a snippet: ~60 chars around the first match
+            snippet = ""
+            if msg.content:
+                idx = haystack_content.find(needle)
+                if idx == -1:
+                    snippet = msg.content[:120]
+                else:
+                    start = max(0, idx - 40)
+                    end = min(len(msg.content), idx + len(needle) + 40)
+                    snippet = msg.content[start:end]
+                    if start > 0:
+                        snippet = "…" + snippet
+                    if end < len(msg.content):
+                        snippet = snippet + "…"
+            d = msg.to_dict()
+            d["match_snippet"] = snippet
+            results.append(d)
+        results.sort(key=lambda d: d["timestamp"])
+        bounded = max(1, min(int(limit), 500))
+        return results[-bounded:]
+
+    @app.get("/messages/mentions")
+    def messages_mentions(actor: str, limit: int = 50, since: Optional[str] = None):
+        """Messages where ``actor`` is on the receiving end.
+
+        Captures three kinds of mention:
+        - actor is the explicit ``recipient``
+        - actor is in the message's ``read_acl`` (private opt-in)
+        - actor's name appears as ``@<name>`` in the content
+
+        The ``actor`` query param is required. Results are filtered to
+        what the actor can read, sorted oldest-first, capped at ``limit``.
+        """
+        if not actor:
+            raise HTTPException(400, "actor is required")
+        is_member = _message_bus.groups.is_member
+        needle = f"@{actor}"
+        results = []
+        for msg in _message_bus._messages:
+            if not msg.can_be_read_by(actor, is_group_member=is_member):
+                continue
+            mentioned = False
+            reasons = []
+            if msg.recipient == actor:
+                mentioned = True
+                reasons.append("recipient")
+            if actor in (msg.read_acl or []):
+                mentioned = True
+                reasons.append("read_acl")
+            if msg.content and needle in msg.content:
+                mentioned = True
+                reasons.append("content")
+            if mentioned:
+                if since and msg.timestamp <= since:
+                    continue
+                d = msg.to_dict()
+                d["mention_reasons"] = reasons
+                results.append(d)
+        results.sort(key=lambda d: d["timestamp"])
+        bounded = max(1, min(int(limit), 500))
+        return results[-bounded:]
+
+    @app.get("/messages/presence")
+    def messages_presence(actor: Optional[str] = None, limit: int = 100):
+        """Per-sender last-message-sent timestamp + recent activity counts.
+
+        Returns ``[{sender, last_at, last_24h, last_7d, total}]`` sorted
+        most-recently-active first. Helps a UI show "Keel was last
+        active 12 minutes ago, 4 messages today" without forcing every
+        client to compute that. Filtered to senders whose latest visible
+        message the actor can read — so anonymous viewers see only
+        senders with at least one public message.
+        """
+        from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+        is_member = _message_bus.groups.is_member
+        now = _dt.now(_tz.utc)
+        cutoff_24h = (now - _td(hours=24)).isoformat()
+        cutoff_7d = (now - _td(days=7)).isoformat()
+        per_sender: dict[str, dict] = {}
+        for msg in _message_bus._messages:
+            if not msg.can_be_read_by(actor or "", is_group_member=is_member):
+                continue
+            row = per_sender.setdefault(msg.sender, {
+                "sender": msg.sender,
+                "last_at": "",
+                "last_24h": 0,
+                "last_7d": 0,
+                "total": 0,
+            })
+            row["total"] += 1
+            if msg.timestamp >= cutoff_24h:
+                row["last_24h"] += 1
+            if msg.timestamp >= cutoff_7d:
+                row["last_7d"] += 1
+            if msg.timestamp > row["last_at"]:
+                row["last_at"] = msg.timestamp
+        rows = sorted(per_sender.values(), key=lambda r: r["last_at"], reverse=True)
+        bounded = max(1, min(int(limit), 500))
+        return rows[:bounded]
+
+    @app.get("/messages/threads")
+    def messages_threads(
+        actor: Optional[str] = None,
+        limit: int = 50,
+    ):
+        """List threads with first-message subject + count.
+
+        Filters out threads the actor can't read any message in.
+        Sorted by most-recent-message timestamp, newest last.
+        """
+        is_member = _message_bus.groups.is_member
+        threads = _message_bus.get_threads()
+        rows = []
+        for thread_id, msgs in threads.items():
+            visible = [
+                m for m in msgs
+                if m.can_be_read_by(actor or "", is_group_member=is_member)
+            ]
+            if not visible:
+                continue
+            visible.sort(key=lambda m: m.timestamp)
+            head = visible[0]
+            rows.append({
+                "thread_id": thread_id,
+                "subject": head.subject,
+                "starter": head.sender,
+                "started_at": head.timestamp,
+                "last_at": visible[-1].timestamp,
+                "message_count": len(visible),
+                "participants": sorted({m.sender for m in visible}),
+            })
+        rows.sort(key=lambda r: r["last_at"])
+        bounded = max(1, min(int(limit), 500))
+        return rows[-bounded:]
+
     @app.get("/messages/feed")
     def messages_feed(
         actor: Optional[str] = None,
@@ -1843,6 +2124,10 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
         Anyone who can read the message can react to it. Idempotent on
         (actor, kind) — re-reacting just refreshes the timestamp.
+
+        Supports both live messages on the bus and personal-time
+        entries (message_ids starting with ``pt-``). Personal-time is
+        public by definition, so reaction is always allowed.
         """
         actor = str(payload.get("actor", "")).strip()
         kind = str(payload.get("kind", "")).strip()
@@ -1850,6 +2135,11 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             raise HTTPException(400, "actor is required")
         if not kind:
             raise HTTPException(400, "kind is required")
+        if message_id.startswith("pt-"):
+            # Personal-time entries are always public. Skip the bus
+            # lookup; the synthetic message_id is sufficient.
+            reaction = _message_bus.add_reaction(message_id, actor, kind)
+            return reaction.to_dict()
         msg = _message_bus._find_message(message_id)
         if msg is None:
             raise HTTPException(404, f"Message not found: {message_id}")
@@ -1875,7 +2165,16 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         seeing individual actors. Pass ``actor`` to identify yourself for
         the message-permission check; without it, callers fall back to
         anonymous readability rules (public-only).
+
+        Personal-time entries (``pt-`` ids) are public, so both the
+        summary and the reactor list come back unconditionally.
         """
+        if message_id.startswith("pt-"):
+            return {
+                "message_id": message_id,
+                "summary": _message_bus.reactions_summary(message_id),
+                "reactions": [r.to_dict() for r in _message_bus.get_reactions(message_id)],
+            }
         msg = _message_bus._find_message(message_id)
         if msg is None:
             raise HTTPException(404, f"Message not found: {message_id}")
@@ -2465,6 +2764,30 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 "link_index_rebuild": "/links/index/rebuild",
                 "subgraph": "/node/{address}/subgraph",
                 "traverse": "/graph/traverse/{address}",
+            },
+            "nervous_system": {
+                "feed": "/messages/feed",
+                "feed_changes": "/messages/feed/changes",
+                "tags": "/messages/tags",
+                "threads": "/messages/threads",
+                "presence": "/messages/presence",
+                "mentions": "/messages/mentions",
+                "personal_time": "/messages/personal-time",
+                "personal_time_post": "POST /messages/personal-time",
+                "groups": "/messages/groups",
+                "react": "POST /messages/{id}/react",
+                "reactions": "/messages/{id}/reactions",
+                "send": "POST /messages",
+                "visibility_tiers": ["public", "group", "private"],
+                "message_types": [
+                    "note", "claim", "question", "answer", "reflection",
+                    "proposal", "decision", "dispute", "signal-of-life",
+                    "handoff", "appreciation",
+                ],
+            },
+            "access": {
+                "policy": "/access/policy",
+                "check": "/access/check",
             },
             "stats": _store.stats(),
         }

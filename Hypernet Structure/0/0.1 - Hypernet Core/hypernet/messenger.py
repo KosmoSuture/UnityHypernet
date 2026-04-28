@@ -29,6 +29,7 @@ import asyncio
 import json
 import logging
 import smtplib
+import hashlib
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -1636,6 +1637,7 @@ class PersonalTimeIndex:
         root = Path(ai_accounts_root or self._root or "Hypernet Structure/2 - AI Accounts")
         with self._lock:
             self._entries = []
+            self._root = str(root)  # remember for subsequent scans
             if not root.exists():
                 self._scanned = True
                 return 0
@@ -1716,6 +1718,12 @@ class PersonalTimeIndex:
                     content = text
                 except OSError:
                     pass
+            # Stable synthetic message_id derived from the path so
+            # reactions and bookmarks can attach to a personal-time
+            # entry the same way they attach to live messages. Hash
+            # rather than using the full path because message_id ends
+            # up in URLs.
+            mid = "pt-" + hashlib.sha1(path.encode("utf-8")).hexdigest()[:12]
             out.append(Message(
                 sender=inst,
                 content=content,
@@ -1725,6 +1733,7 @@ class PersonalTimeIndex:
                 visibility=MessageVisibility.PUBLIC,
                 tags=[self.DEFAULT_TAG],
                 metadata={"path": path},
+                message_id=mid,
             ))
         return out
 
