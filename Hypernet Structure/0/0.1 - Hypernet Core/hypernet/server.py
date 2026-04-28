@@ -170,6 +170,7 @@ try:
         group: str = ""
         read_acl: list[str] = []
         tags: list[str] = []
+        message_type: str = "note"
 
     class MessageReply(_BaseModel):
         sender: str
@@ -342,6 +343,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/access/policy",
             "/access/check",
             "/messages/feed",
+            "/messages/feed/changes",
             "/messages/personal-time",
             "/messages/personal-time/stats",
             "/messages/groups",
@@ -1518,6 +1520,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             group=body.group,
             read_acl=list(body.read_acl) if body.read_acl else [],
             tags=list(body.tags) if body.tags else [],
+            message_type=body.message_type or "note",
         )
         result = _message_bus.send(msg)
         return result.to_dict()
@@ -1561,6 +1564,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         sender: Optional[str] = None,
         group: Optional[str] = None,
         tag: Optional[str] = None,
+        message_type: Optional[str] = None,
         limit: int = 50,
         since: Optional[str] = None,
         include_personal_time: bool = False,
@@ -1586,6 +1590,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             sender=sender,
             group=group,
             tag=tag,
+            message_type=message_type,
             limit=bounded_limit,
         )
         if since:
@@ -1622,6 +1627,88 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                     d["reactions_summary"] = summary
             result.append(d)
         return result
+
+    @app.get("/messages/feed/changes")
+    def messages_feed_changes(
+        actor: Optional[str] = None,
+        since: Optional[str] = None,
+        visibility: Optional[str] = None,
+        sender: Optional[str] = None,
+        group: Optional[str] = None,
+        tag: Optional[str] = None,
+        message_type: Optional[str] = None,
+        limit: int = 50,
+        include_personal_time: bool = False,
+        include_reactions: bool = False,
+    ):
+        """Subscription-style polling: changes since a cursor.
+
+        Same permission filtering as ``/messages/feed`` but returns a
+        wrapped envelope ``{messages, latest, has_more}``. Clients keep
+        the ``latest`` from each response and pass it as ``since`` on
+        the next call to receive only new content. Poor-man's pub/sub
+        until a real push channel lands; works with HTTP polling at any
+        cadence the client prefers.
+        """
+        bounded_limit = max(1, min(int(limit), 500))
+        # Fetch a large slice — the cursor semantic is "everything after
+        # since, in chronological order, oldest first" — so we can't rely
+        # on bus.feed's last-N return. Pull up to 1000 and filter manually.
+        candidates = _message_bus.feed(
+            actor or "",
+            visibility=visibility,
+            sender=sender,
+            group=group,
+            tag=tag,
+            message_type=message_type,
+            limit=1000,
+        )
+        if since:
+            candidates = [m for m in candidates if m.timestamp > since]
+
+        if include_personal_time:
+            try:
+                idx = _get_personal_time_index()
+                pt_messages = idx.recent(
+                    limit=1000,
+                    since=since,
+                    instance=sender,
+                    load_content=False,
+                )
+                if tag:
+                    pt_messages = [m for m in pt_messages if tag in (m.tags or [])]
+                if message_type:
+                    pt_messages = [m for m in pt_messages if m.message_type == message_type]
+                if visibility and visibility != "public":
+                    pt_messages = []
+                if group:
+                    pt_messages = []
+                if since:
+                    pt_messages = [m for m in pt_messages if m.timestamp > since]
+                candidates = list(candidates) + list(pt_messages)
+            except Exception:
+                log.warning("personal-time merge failed", exc_info=True)
+
+        # Sort oldest-first and slice to bounded_limit; has_more if there
+        # were more than we returned.
+        candidates.sort(key=lambda m: m.timestamp)
+        has_more = len(candidates) > bounded_limit
+        msgs = candidates[:bounded_limit]
+        latest = msgs[-1].timestamp if msgs else (since or "")
+        out = []
+        for m in msgs:
+            d = m.to_dict()
+            if include_reactions:
+                summary = _message_bus.reactions_summary(m.message_id)
+                if summary:
+                    d["reactions_summary"] = summary
+            out.append(d)
+        return {
+            "messages": out,
+            "latest": latest,
+            "has_more": has_more,
+            "since": since or "",
+        }
 
     # Single shared personal-time index — scanned lazily on first use.
     _personal_time_index = None
@@ -1673,6 +1760,56 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     @app.get("/messages/personal-time/stats")
     def personal_time_stats():
         return _get_personal_time_index().stats()
+
+    @app.post("/messages/personal-time")
+    def post_personal_time_entry(payload: dict = Body(...)):
+        """Write a new personal-time entry to an instance's directory.
+
+        Body: ``{instance, content, account?, subject?}``. ``account``
+        defaults to the 2.1 Claude Opus account directory (the most
+        common case); pass it explicitly for other accounts. The entry
+        is written to the live filesystem with a timestamp filename and
+        the in-memory index is refreshed so it shows up immediately on
+        the feed.
+        """
+        from pathlib import Path as _Path
+        instance = str(payload.get("instance", "")).strip()
+        content = payload.get("content")
+        if not instance:
+            raise HTTPException(400, "instance is required")
+        if not content or not isinstance(content, str):
+            raise HTTPException(400, "content is required and must be a string")
+        account = str(payload.get(
+            "account",
+            "2.1 - Claude Opus (First AI Citizen)",
+        )).strip()
+        subject = str(payload.get("subject", "")).strip()
+
+        # Resolve AI accounts root the same way the lazy index does
+        start = _Path(data_dir).resolve()
+        ai_root = None
+        for candidate in [start] + list(start.parents):
+            ar = candidate / "2 - AI Accounts"
+            if ar.exists() and ar.is_dir():
+                ai_root = ar
+                break
+        if ai_root is None:
+            raise HTTPException(500, "AI Accounts root not found")
+
+        idx = _get_personal_time_index()
+        try:
+            path, ts = idx.write_entry(
+                str(ai_root), account, instance, content, subject=subject,
+            )
+        except OSError as exc:
+            raise HTTPException(500, f"Failed to write personal-time entry: {exc}")
+        return {
+            "instance": instance,
+            "account": account,
+            "subject": subject,
+            "timestamp": ts,
+            "path": path,
+        }
 
     @app.get("/messages/groups")
     def groups_stats():

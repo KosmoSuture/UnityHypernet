@@ -31,7 +31,7 @@ The answer should come from repository evidence, not trust in a marketing page.
 - Link endpoint constraints for focused canonical relationships.
 - A source-write plus target-read link authorization model with proposed-link fallback for consent-sensitive relationships.
 - A typed graph import pipeline for connectors.
-- An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, personal-time indexing, and reactions.
+- An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, feed-change polling, personal-time indexing, semantic message types, and reactions.
 - A public alpha documentation path under `docs/public-alpha/`.
 
 ## What Is Not Finished Yet
@@ -42,6 +42,7 @@ This is an alpha. Important pieces are still in progress:
 - Boot-integrity proof is not yet fully bridged into JWT/session credentials.
 - IoT credentials, company member delegation, and locker/mandala read-time enforcement are not complete.
 - Proposed-link accept/reject HTTP endpoints are still a follow-up.
+- Real-time nervous-system push subscriptions are not complete yet; the alpha has HTTP feed-change polling.
 - Distributed replication and federated query are architectural targets, not finished production infrastructure.
 - The public UI is not yet a complete consumer onboarding experience.
 

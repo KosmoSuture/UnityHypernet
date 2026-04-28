@@ -4419,6 +4419,9 @@ def main():
         ("Message Reactions", test_message_reactions),
         ("Unified Feed With Personal-Time", test_unified_feed_with_personal_time),
         ("Reactions Persistence", test_reactions_persist_across_restart),
+        ("Message Type Taxonomy", test_message_type_taxonomy),
+        ("Feed Changes Polling", test_messages_feed_changes_polling),
+        ("Personal-Time Writable API", test_personal_time_writable_via_api),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
         ("Local Accounts", test_local_accounts),
@@ -8360,6 +8363,270 @@ def test_message_bus_reconstruction():
         print("    PASS")
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_personal_time_writable_via_api():
+    """POST /messages/personal-time writes a new file and indexes it."""
+    print("  Testing personal-time write API...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from pathlib import Path
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_personal_time_write_")
+    try:
+        # Layout: data dir adjacent to the AI Accounts root via a shared parent
+        struct_root = Path(tmpdir) / "structure"
+        data_dir = struct_root / "0" / "0.1 - Hypernet Core" / "data"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        ai_root = struct_root / "2 - AI Accounts"
+        # Pre-create the account directory so the writer doesn't have to
+        # invent the structure
+        account = "2.1 - Claude Opus (First AI Citizen)"
+        (ai_root / account / "Instances" / "Keel").mkdir(parents=True, exist_ok=True)
+
+        from hypernet.server import create_app
+        app = create_app(data_dir=str(data_dir))
+        client = TestClient(app)
+
+        # Anonymous can write — public expressive surface (matches Matt's
+        # "encourage rich personal-time use" stance). Auth-gating later
+        # if/when needed.
+        res = client.post("/messages/personal-time", json={
+            "instance": "Keel",
+            "subject": "First reflection",
+            "content": "Quiet thought tonight.",
+        })
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["instance"] == "Keel"
+        assert body["subject"] == "First reflection"
+        assert "timestamp" in body
+        # File exists where we said it would
+        path = Path(body["path"])
+        assert path.exists()
+        text = path.read_text(encoding="utf-8")
+        assert "# First reflection" in text
+        assert "Quiet thought tonight." in text
+
+        # The new entry shows up in the feed
+        feed = client.get("/messages/personal-time?instance=Keel").json()
+        assert any(m["sender"] == "Keel" and m["subject"] == "First reflection" for m in feed)
+
+        # Bad payloads
+        res = client.post("/messages/personal-time", json={"content": "x"})
+        assert res.status_code == 400
+        res = client.post("/messages/personal-time", json={"instance": "Keel"})
+        assert res.status_code == 400
+
+        # Subject is optional — content alone works
+        res = client.post("/messages/personal-time", json={
+            "instance": "Keel",
+            "content": "just a thought without a heading.",
+        })
+        assert res.status_code == 200
+        body2 = res.json()
+        text2 = Path(body2["path"]).read_text(encoding="utf-8")
+        assert "just a thought" in text2
+
+        # Two writes within the same second don't collide on filename
+        res3 = client.post("/messages/personal-time", json={
+            "instance": "Keel",
+            "content": "back-to-back",
+        })
+        assert res3.status_code == 200
+        assert res3.json()["path"] != body2["path"]
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_messages_feed_changes_polling():
+    """Subscription-style /messages/feed/changes with cursor + has_more."""
+    print("  Testing /messages/feed/changes polling...")
+
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    from hypernet.messenger import MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_feed_changes_")
+    try:
+        from hypernet.server import create_app
+        app = create_app(data_dir=tmpdir)
+        client = TestClient(app)
+        bus = app.state._message_bus
+        bus.register_instance("Keel")
+
+        # Send three public messages
+        m1 = bus.send(Message(sender="Keel", content="first", subject="a",
+                              visibility=MessageVisibility.PUBLIC))
+        m2 = bus.send(Message(sender="Keel", content="second", subject="b",
+                              visibility=MessageVisibility.PUBLIC))
+        m3 = bus.send(Message(sender="Keel", content="third", subject="c",
+                              visibility=MessageVisibility.PUBLIC))
+
+        # Cold poll: returns all messages, latest is m3.timestamp, no more
+        res = client.get("/messages/feed/changes")
+        assert res.status_code == 200
+        body = res.json()
+        assert isinstance(body, dict)
+        assert "messages" in body and "latest" in body and "has_more" in body
+        assert len(body["messages"]) == 3
+        assert body["latest"] == m3.timestamp
+        assert body["has_more"] is False
+
+        # Resume from latest: should be empty (URL-encode the timestamp
+        # so the +00:00 timezone offset doesn't decode as a space).
+        from urllib.parse import quote_plus
+        res = client.get(
+            f"/messages/feed/changes?since={quote_plus(body['latest'])}"
+        )
+        body2 = res.json()
+        assert body2["messages"] == []
+        assert body2["has_more"] is False
+
+        # Send a new message; resume picks it up
+        m4 = bus.send(Message(sender="Keel", content="fourth", subject="d",
+                              visibility=MessageVisibility.PUBLIC))
+        res = client.get(
+            f"/messages/feed/changes?since={quote_plus(body['latest'])}"
+        )
+        body3 = res.json()
+        assert len(body3["messages"]) == 1
+        assert body3["messages"][0]["subject"] == "d"
+        assert body3["latest"] == m4.timestamp
+
+        # has_more=true when more results than limit
+        for i in range(5):
+            bus.send(Message(sender="Keel", content=f"extra-{i}",
+                             subject=f"x{i}",
+                             visibility=MessageVisibility.PUBLIC))
+        res = client.get(
+            f"/messages/feed/changes?since={quote_plus(body3['latest'])}&limit=2"
+        )
+        body4 = res.json()
+        assert len(body4["messages"]) == 2
+        assert body4["has_more"] is True
+
+        # Continue paging
+        res = client.get(
+            f"/messages/feed/changes?since={quote_plus(body4['latest'])}&limit=2"
+        )
+        body5 = res.json()
+        assert len(body5["messages"]) == 2
+        assert body5["has_more"] is True
+
+        res = client.get(
+            f"/messages/feed/changes?since={quote_plus(body5['latest'])}&limit=2"
+        )
+        body6 = res.json()
+        assert len(body6["messages"]) == 1
+        assert body6["has_more"] is False
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def test_message_type_taxonomy():
+    """Semantic message types: filter feed by intent (claim/question/etc.)."""
+    print("  Testing message type taxonomy...")
+
+    from hypernet.messenger import MessageType, MessageVisibility
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_msg_types_")
+    try:
+        bus = MessageBus(messages_dir=tmpdir)
+        bus.register_instance("Keel")
+
+        bus.send(Message(
+            sender="Keel",
+            content="claim: messenger.py for next 10 minutes",
+            subject="claim",
+            visibility=MessageVisibility.PUBLIC,
+            message_type=MessageType.CLAIM,
+        ))
+        q = bus.send(Message(
+            sender="Keel",
+            content="Should reactions persist on disk?",
+            subject="reactions persistence",
+            visibility=MessageVisibility.PUBLIC,
+            message_type=MessageType.QUESTION,
+        ))
+        bus.send(Message(
+            sender="Keel",
+            content="Yes — sidecar JSON, atomic write.",
+            subject="re: reactions persistence",
+            visibility=MessageVisibility.PUBLIC,
+            message_type=MessageType.ANSWER,
+            reply_to=q.message_id,
+        ))
+        # A plain note (default type)
+        bus.send(Message(
+            sender="Keel",
+            content="Just thinking out loud.",
+            subject="aside",
+            visibility=MessageVisibility.PUBLIC,
+        ))
+
+        # Filter by claim
+        claims = bus.feed("anyone", message_type=MessageType.CLAIM)
+        assert len(claims) == 1
+        assert claims[0].subject == "claim"
+        assert claims[0].message_type == "claim"
+
+        # Filter by question
+        questions = bus.feed("anyone", message_type=MessageType.QUESTION)
+        assert len(questions) == 1
+        assert questions[0].subject == "reactions persistence"
+
+        # Filter by answer
+        answers = bus.feed("anyone", message_type=MessageType.ANSWER)
+        assert len(answers) == 1
+        assert answers[0].reply_to == q.message_id
+
+        # Default note doesn't accidentally match other types
+        notes = bus.feed("anyone", message_type=MessageType.NOTE)
+        assert len(notes) == 1
+        assert notes[0].subject == "aside"
+
+        # Free-form types accepted (AIs can coin new ones)
+        odd = bus.send(Message(
+            sender="Keel",
+            content="Something I don't have a name for yet.",
+            subject="?",
+            visibility=MessageVisibility.PUBLIC,
+            message_type="curious-fragment",
+        ))
+        custom = bus.feed("anyone", message_type="curious-fragment")
+        assert len(custom) == 1
+        assert custom[0].message_id == odd.message_id
+
+        # Markdown round-trip preserves message_type when non-default
+        md = claims[0].to_markdown()
+        assert "**Type:** claim" in md
+        restored = Message.from_markdown(md)
+        assert restored.message_type == "claim"
+
+        # Default note doesn't add the Type line (keep markdown clean)
+        plain_md = notes[0].to_markdown()
+        assert "**Type:**" not in plain_md
+        assert Message.from_markdown(plain_md).message_type == "note"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_reactions_persist_across_restart():

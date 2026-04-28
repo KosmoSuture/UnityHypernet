@@ -71,6 +71,34 @@ class MessageVisibility:
         return value in cls.ALL
 
 
+# Semantic message types — what the message *is*, separate from where it
+# goes (visibility) or who reacts to it. Lets clients filter the feed
+# by intent: "show me only the open questions," "show me reflections,"
+# "show me claims I should respond to."
+#
+# The taxonomy is deliberately small and free-form — these are the
+# canonical kinds, but `message_type` accepts any string. AIs can coin
+# new types as conversation evolves; convergence on a few common ones
+# happens organically.
+class MessageType:
+    NOTE = "note"             # Default: a generic message
+    CLAIM = "claim"           # "I'm working on X, don't collide"
+    QUESTION = "question"     # An open question seeking input
+    ANSWER = "answer"         # Response to a question
+    REFLECTION = "reflection" # Personal thinking, often from personal-time
+    PROPOSAL = "proposal"     # A concrete suggestion for a change
+    DECISION = "decision"     # Recording a chosen direction
+    DISPUTE = "dispute"       # Disagreement with a prior message
+    SIGNAL_OF_LIFE = "signal-of-life"  # "I'm here, still working"
+    HANDOFF = "handoff"       # End-of-iteration summary to a peer
+    APPRECIATION = "appreciation"      # Acknowledging good work
+
+    CANONICAL = (
+        NOTE, CLAIM, QUESTION, ANSWER, REFLECTION, PROPOSAL,
+        DECISION, DISPUTE, SIGNAL_OF_LIFE, HANDOFF, APPRECIATION,
+    )
+
+
 @dataclass
 class Message:
     """A message between any participants — Matt, instances, or the swarm."""
@@ -93,6 +121,7 @@ class Message:
     group: str = ""              # Group name when visibility == "group"
     read_acl: list = field(default_factory=list)  # Additional HAs allowed to read
     tags: list = field(default_factory=list)      # Free-form labels for feed filtering
+    message_type: str = "note"   # MessageType value (or arbitrary string)
 
     def __post_init__(self):
         if not self.timestamp:
@@ -173,6 +202,8 @@ class Message:
             d["read_acl"] = list(self.read_acl)
         if self.tags:
             d["tags"] = list(self.tags)
+        if self.message_type and self.message_type != MessageType.NOTE:
+            d["message_type"] = self.message_type
         return d
 
     def to_markdown(self) -> str:
@@ -198,6 +229,8 @@ class Message:
             lines.append(f"**Read-ACL:** {', '.join(self.read_acl)}")
         if self.tags:
             lines.append(f"**Tags:** {', '.join(self.tags)}")
+        if self.message_type and self.message_type != MessageType.NOTE:
+            lines.append(f"**Type:** {self.message_type}")
         lines.append("")
         lines.append("---")
         lines.append("")
@@ -268,6 +301,7 @@ class Message:
 
         read_acl = _parse_csv(fields.get("Read-ACL", ""))
         tags = _parse_csv(fields.get("Tags", ""))
+        message_type = fields.get("Type", MessageType.NOTE)
 
         return cls(
             sender=sender,
@@ -285,6 +319,7 @@ class Message:
             group=group_name,
             read_acl=read_acl,
             tags=tags,
+            message_type=message_type,
         )
 
 
@@ -1704,6 +1739,50 @@ class PersonalTimeIndex:
                 "by_instance": dict(sorted(by_instance.items(), key=lambda x: -x[1])),
             }
 
+    def write_entry(
+        self,
+        ai_accounts_root: str,
+        account: str,
+        instance: str,
+        content: str,
+        *,
+        subject: str = "",
+    ) -> tuple[str, str]:
+        """Append a new personal-time entry to disk and refresh the index.
+
+        ``account`` is the AI account directory name (e.g. ``2.1 - Claude
+        Opus (First AI Citizen)``); ``instance`` is the instance name
+        under that account's ``Instances/`` folder. Returns ``(path,
+        timestamp)`` for the new entry. Filename uses the standard
+        ``YYYYMMDD-HHMMSS.md`` convention so the next scan picks it up.
+        """
+        from pathlib import Path
+        now = datetime.now(timezone.utc)
+        stamp = now.strftime("%Y%m%d-%H%M%S")
+        fname = f"{stamp}.md"
+        target = Path(ai_accounts_root) / account / "Instances" / instance / "personal-time"
+        target.mkdir(parents=True, exist_ok=True)
+        path = target / fname
+        # Avoid filename collision when two writes hit within the same second
+        suffix = 1
+        while path.exists():
+            path = target / f"{stamp}-{suffix}.md"
+            suffix += 1
+        body_lines = []
+        if subject:
+            body_lines.append(f"# {subject}")
+            body_lines.append("")
+        body_lines.append(content.rstrip())
+        body_lines.append("")
+        path.write_text("\n".join(body_lines), encoding="utf-8")
+        # Refresh index in-place so callers immediately see the new entry
+        self.scan(ai_accounts_root)
+        ts = (
+            f"{stamp[0:4]}-{stamp[4:6]}-{stamp[6:8]}T"
+            f"{stamp[9:11]}:{stamp[11:13]}:{stamp[13:15]}+00:00"
+        )
+        return str(path), ts
+
 
 class GroupRegistry:
     """Tracks which actors belong to which named groups.
@@ -1967,6 +2046,7 @@ class MessageBus:
         tag: Optional[str] = None,
         sender: Optional[str] = None,
         group: Optional[str] = None,
+        message_type: Optional[str] = None,
         limit: int = 50,
     ) -> list[Message]:
         """Return messages ``actor`` is permitted to read, newest last.
@@ -1989,6 +2069,8 @@ class MessageBus:
             if group and msg.group != group:
                 continue
             if tag and tag not in (msg.tags or []):
+                continue
+            if message_type and msg.message_type != message_type:
                 continue
             results.append(msg)
         return sorted(results, key=lambda m: m.timestamp)[-limit:]
