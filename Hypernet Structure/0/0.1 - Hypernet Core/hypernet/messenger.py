@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 
 log = logging.getLogger(__name__)
 
@@ -1808,20 +1808,35 @@ class GroupRegistry:
     def __init__(self) -> None:
         self._groups: dict[str, set[str]] = {}
         self._lock = threading.Lock()
+        # Optional callback invoked after any mutation so the owning
+        # bus can persist groups to its sidecar. The bus sets this
+        # after attaching the registry.
+        self._on_change: Optional[Callable[[], None]] = None
+
+    def _notify_change(self) -> None:
+        cb = self._on_change
+        if cb is not None:
+            try:
+                cb()
+            except Exception:
+                pass
 
     def create(self, name: str, members: Optional[list[str]] = None) -> None:
         with self._lock:
             self._groups.setdefault(name, set())
             if members:
                 self._groups[name].update(members)
+        self._notify_change()
 
     def add_member(self, group: str, actor: str) -> None:
         with self._lock:
             self._groups.setdefault(group, set()).add(actor)
+        self._notify_change()
 
     def remove_member(self, group: str, actor: str) -> None:
         with self._lock:
             self._groups.get(group, set()).discard(actor)
+        self._notify_change()
 
     def is_member(self, actor: str, group: str) -> bool:
         with self._lock:
@@ -1846,6 +1861,27 @@ class GroupRegistry:
                 "total_memberships": sum(len(m) for m in self._groups.values()),
                 "groups": {g: len(m) for g, m in self._groups.items()},
             }
+
+    def to_dict(self) -> dict[str, list[str]]:
+        """Serialize all groups as ``{name: [members]}`` for sidecar storage."""
+        with self._lock:
+            return {name: sorted(members) for name, members in self._groups.items()}
+
+    def load(self, payload: dict[str, list[str]]) -> int:
+        """Restore groups from a serialized payload. Returns count loaded."""
+        if not isinstance(payload, dict):
+            return 0
+        loaded = 0
+        with self._lock:
+            for name, members in payload.items():
+                if not isinstance(members, list):
+                    continue
+                bucket = self._groups.setdefault(name, set())
+                for m in members:
+                    if isinstance(m, str):
+                        bucket.add(m)
+                        loaded += 1
+        return loaded
 
 
 class MessageBus:
@@ -1872,6 +1908,7 @@ class MessageBus:
         self._lock = threading.Lock()
         # Group registry — backs MessageVisibility.GROUP membership checks.
         self.groups = GroupRegistry()
+        self.groups._on_change = self._persist_groups
         # Reactions — message_id -> list[Reaction]. Lightweight resonance
         # markers; readers of a message can also read its reactions.
         self._reactions: dict[str, list[Reaction]] = {}
@@ -1886,6 +1923,7 @@ class MessageBus:
             self._scan_existing_messages(messages_dir)
             self._load_reactions()
             self._load_bookmarks()
+            self._load_groups()
 
     def _scan_existing_messages(self, messages_dir: str) -> None:
         """Reconstruct message history from existing markdown files on disk.
@@ -2162,6 +2200,33 @@ class MessageBus:
         """Bookmarked message_ids for ``actor`` in saved order."""
         with self._lock:
             return list(self._bookmarks.get(actor, []))
+
+    def _persist_groups(self) -> None:
+        """Sidecar JSON write for groups — same atomic-rename pattern."""
+        if not self._messages_dir:
+            return
+        from pathlib import Path
+        d = Path(self._messages_dir)
+        d.mkdir(parents=True, exist_ok=True)
+        sidecar = d / "groups.json"
+        payload = self.groups.to_dict()
+        tmp = sidecar.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(sidecar)
+
+    def _load_groups(self) -> int:
+        if not self._messages_dir:
+            return 0
+        from pathlib import Path
+        sidecar = Path(self._messages_dir) / "groups.json"
+        if not sidecar.exists():
+            return 0
+        try:
+            payload = json.loads(sidecar.read_text(encoding="utf-8"))
+        except Exception:
+            log.exception("Failed to load groups from %s", sidecar)
+            return 0
+        return self.groups.load(payload)
 
     def _persist_bookmarks(self) -> None:
         """Sidecar JSON write — same atomic-rename pattern as reactions."""

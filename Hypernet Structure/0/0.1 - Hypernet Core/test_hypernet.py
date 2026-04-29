@@ -4429,6 +4429,7 @@ def main():
         ("Messages Search", test_messages_search),
         ("Messages Dashboard Aggregator", test_messages_dashboard_aggregator),
         ("Message Bookmarks", test_message_bookmarks),
+        ("Group Persistence", test_group_persistence),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
         ("Local Accounts", test_local_accounts),
@@ -8370,6 +8371,34 @@ def test_message_bus_reconstruction():
         print("    PASS")
     finally:
         shutil.rmtree(tmpdir)
+
+
+def test_group_persistence():
+    """Groups survive a MessageBus restart via the groups.json sidecar."""
+    print("  Testing group persistence...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_groups_persist_")
+    try:
+        bus1 = MessageBus(messages_dir=tmpdir)
+        bus1.groups.create("redesign", members=["Keel", "Codex"])
+        bus1.groups.add_member("redesign", "Loom")
+        bus1.groups.create("late-night", members=["Keel"])
+
+        from pathlib import Path
+        sidecar = Path(tmpdir) / "groups.json"
+        assert sidecar.exists()
+
+        bus2 = MessageBus(messages_dir=tmpdir)
+        assert set(bus2.groups.members("redesign")) == {"Keel", "Codex", "Loom"}
+        assert set(bus2.groups.members("late-night")) == {"Keel"}
+
+        bus2.groups.remove_member("redesign", "Loom")
+        bus3 = MessageBus(messages_dir=tmpdir)
+        assert set(bus3.groups.members("redesign")) == {"Keel", "Codex"}
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_message_bookmarks():
