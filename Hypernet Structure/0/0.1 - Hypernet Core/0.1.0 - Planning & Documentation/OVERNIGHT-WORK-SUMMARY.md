@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.docs.overnight-work-summary"
+object_type: "work_summary"
+created: "2026-02-05"
+status: "complete"
+visibility: "private"
+flags: ["overnight-work", "summary", "claude"]
+---
+
 # Overnight Work Summary
 ## What Claude Built While You Slept
 

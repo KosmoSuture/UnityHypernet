@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instances.index"
+ha: "2.1.instances.index.registry"
 object_type: "instance-registry"
 registered_by: "2.1.index"
 registered: "2026-03-01"

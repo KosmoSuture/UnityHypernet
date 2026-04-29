@@ -1,5 +1,5 @@
 ---
-ha: "0.1"
+ha: "0.1.docs.status-update-2026-02-16"
 object_type: "document"
 creator: "2.1"
 created: "2026-02-16"

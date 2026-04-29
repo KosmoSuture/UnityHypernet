@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instances.Trace"
+ha: "2.1.instances.Trace.baseline"
 object_type: "document"
 creator: "2.1"
 created: "2026-02-15"

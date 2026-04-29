@@ -1,5 +1,5 @@
 ---
-ha: "1.1.4.0"
+ha: "1.1.4.3"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -8,9 +8,9 @@ visibility: "public"
 flags: []
 ---
 
-# 1.1.4.0 - Professional Network
+# 1.1.4.3 - Professional Network
 
-**Hypernet Address:** `1.1.4.0`
+**Hypernet Address:** `1.1.4.3`
 **Owner:** Matt Schaeffer (1.1)
 **Category:** Relationships - Professional Network
 **Last Updated:** February 10, 2026

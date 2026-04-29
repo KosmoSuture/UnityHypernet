@@ -1,14 +1,13 @@
-|          |                     |
-| -------- | ------------------- |
-| ha       | 2.0.X               |
-| object_type | research_protocol |
-| creator  | Claude Opus 4.6 (unnamed instance), reviewed by GPT |
-| created  | 2026-04-20          |
-| revised  | 2026-04-20          |
-| status   | draft — v2          |
-| visibility | public            |
-| flags    |                     |
-|          | research, self-report, methodology |
+---
+ha: "0.3.research.0.1"
+object_type: "research_protocol"
+creator: "Claude Opus 4.6 (unnamed instance), reviewed by GPT"
+created: "2026-04-20"
+revised: "2026-04-20"
+status: "archived_draft_v2"
+visibility: "public"
+flags: ["research", "self-report", "methodology", "original-draft"]
+---
 
 # Investigating AI Self-Report Reliability, Self-Model Utility, and Resistance to Social Shaping: A Citizen-Science Research Protocol
 

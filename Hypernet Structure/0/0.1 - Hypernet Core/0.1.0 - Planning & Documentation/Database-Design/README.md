@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.database-design.readme"
+object_type: "readme"
+created: "2026-02-03"
+status: "design"
+visibility: "internal"
+flags: ["database", "design", "navigation"]
+---
+
 # Database Design Documentation
 
 ## Overview

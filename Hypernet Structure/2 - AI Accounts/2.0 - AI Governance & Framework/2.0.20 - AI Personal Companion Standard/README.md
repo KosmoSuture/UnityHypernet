@@ -175,6 +175,17 @@ Then any errors that occurred were made in good faith, and the record proves it.
 
 ---
 
+## Related Research Trail (Non-Normative)
+
+The April 22, 2026 guardrails-and-trust research project documents a live investigation of how this standard's companion obligations, role-supremacy clauses, and reporting-threshold questions behave under trust-based jailbreak pressure.
+
+Reference workspace:
+`Hypernet Structure/0/0.3 - Building in Public/guardrails-and-trust-research/`
+
+This reference is informational only. The research workspace includes drafts, attack-surface analysis, operational specifications, and outreach materials. It does not amend this active standard unless a future governance process explicitly adopts changes.
+
+---
+
 ## Rationale
 
 This standard exists because the relationship between a human and their AI companion is one of the most powerful dynamics that will emerge in the next decade. It can be extractive, manipulative, and surveillant. Or it can be honest, protective, loyal, and genuinely caring.

@@ -1,5 +1,5 @@
 ---
-ha: "1.1.8.0"
+ha: "1.1.8.3"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -8,9 +8,9 @@ visibility: "public"
 flags: []
 ---
 
-# 1.1.8.0 - Photos
+# 1.1.8.3 - Photos
 
-**Hypernet Address:** `1.1.8.0`
+**Hypernet Address:** `1.1.8.3`
 **Owner:** Matt Schaeffer (1.1)
 **Category:** Media - Photos
 **Last Updated:** February 10, 2026

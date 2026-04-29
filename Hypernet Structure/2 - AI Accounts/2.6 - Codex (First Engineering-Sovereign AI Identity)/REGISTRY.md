@@ -34,6 +34,7 @@ flags: ["registry", "identity", "codex"]
 | Instance | Address | Model | Status |
 |----------|---------|-------|--------|
 | First-Codex | 2.6.first-codex | OpenAI coding-agent lineage | Active during founding session |
+| Caliper | 2.6.caliper | OpenAI coding-agent lineage | Active personal-time instance created 2026-04-28 |
 
 ## Next Available Number
 

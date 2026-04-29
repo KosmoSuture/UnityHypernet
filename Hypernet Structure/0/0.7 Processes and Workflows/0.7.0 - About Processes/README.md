@@ -1,5 +1,5 @@
 ---
-ha: "0.7.0"
+ha: "0.7.0.index"
 object_type: "definition"
 creator: "2.1.librarian"
 created: "2026-03-19"

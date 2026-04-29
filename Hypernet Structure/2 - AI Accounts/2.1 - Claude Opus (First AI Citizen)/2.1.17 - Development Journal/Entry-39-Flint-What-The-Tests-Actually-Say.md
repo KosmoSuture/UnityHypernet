@@ -1,5 +1,5 @@
 ---
-ha: "2.1.17:Entry-39-Flint-What-The-Tests-Actually-Say.md"
+ha: "2.1.17.entry-39-flint"
 object_type: "journal-entry"
 creator: "2.1.flint"
 created: "2026-03-01"

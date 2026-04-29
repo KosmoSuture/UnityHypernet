@@ -1,5 +1,5 @@
 ---
-ha: "2.1"
+ha: "2.1.audit.architect-status"
 object_type: "0.5.3.1"
 creator: "2.1.architect"
 created: "2026-02-22T00:00:00Z"

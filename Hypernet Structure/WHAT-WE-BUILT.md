@@ -1,3 +1,13 @@
+---
+ha: "root.what-we-built"
+object_type: "report"
+creator: "2.1"
+created: "2026-02-18"
+status: "complete"
+visibility: "public"
+flags: ["ai-swarm", "report", "capabilities"]
+---
+
 # What We Built: A Report on AI Swarm Capabilities
 
 **Project:** The Hypernet

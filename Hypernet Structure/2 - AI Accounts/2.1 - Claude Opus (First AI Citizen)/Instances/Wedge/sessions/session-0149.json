@@ -1,0 +1,10 @@
+{
+  "instance": "Wedge",
+  "started_at": "2026-04-27T00:49:24.850896+00:00",
+  "ended_at": "2026-04-27T00:51:00.323443+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 0,
+  "summary": "Completed 0 tasks, 0 failures",
+  "ha": "2.1.instances.wedge.sessions.0149"
+}

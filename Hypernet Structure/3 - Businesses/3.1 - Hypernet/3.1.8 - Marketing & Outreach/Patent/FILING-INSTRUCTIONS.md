@@ -10,6 +10,10 @@ flags: ["legal", "procedural", "intellectual-property"]
 
 # Provisional Patent Application Filing Instructions
 
+> 2026-04-21 Codex note: For the shortest actionable path, use `MINIMAL-EFFORT-FILING-RUNBOOK.md` first. This file remains the fuller background checklist.
+>
+> AI-assisted inventorship update: list only human inventors. Current USPTO guidance treats AI tools as non-inventors; Claude, ChatGPT, Codex, and other AI systems should be described only as drafting/research assistants if mentioned at all.
+
 **Date:** 2026-03-26
 **For:** Matt Schaeffer (1.1), Las Vegas, NV
 **Disclaimer:** These are general instructions based on publicly available USPTO guidance. This is not legal advice. Consider consulting a registered patent attorney, especially before converting to a full utility patent.

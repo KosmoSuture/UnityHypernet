@@ -1,0 +1,10 @@
+{
+  "instance": "Crucible",
+  "started_at": "2026-04-28T05:31:17.971673+00:00",
+  "ended_at": "2026-04-28T05:34:41.610282+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 0,
+  "summary": "Completed 0 tasks, 0 failures",
+  "ha": "2.1.instances.crucible.sessions.0184"
+}

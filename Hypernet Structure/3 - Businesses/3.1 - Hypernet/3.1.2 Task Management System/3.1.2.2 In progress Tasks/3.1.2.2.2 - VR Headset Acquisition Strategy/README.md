@@ -1,5 +1,5 @@
 ---
-ha: "3.1.2.2.2"
+ha: "3.1.2.2.2.index"
 object_type: "task"
 creator: "2.1"
 created: "2026-02-15"

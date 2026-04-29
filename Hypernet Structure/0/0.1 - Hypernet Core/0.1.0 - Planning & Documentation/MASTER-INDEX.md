@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.docs.master-index"
+object_type: "index"
+created: "2026-02-05"
+status: "execution_ready"
+visibility: "internal"
+flags: ["planning", "documentation", "index"]
+---
+
 # Hypernet Master Documentation Index
 ## Complete Strategic Framework
 
@@ -516,6 +525,21 @@ This documentation suite represents a complete strategic framework for building 
 └── ALIGNMENT-STATUS.md
 ```
 
+### Research & Governance Trails
+```
+└── ../../0.3 - Building in Public/guardrails-and-trust-research/
+    ├── README.md
+    ├── BACKLOG.md
+    ├── 01-08 packaging and outreach drafts
+    ├── governance-drafts/ (DRAFT only; pending Keel/Matt review)
+    ├── 10-15 attack surface and red-team analysis
+    ├── 20-23 literature, position, preregistration, replication plan
+    ├── 30-33 operational guardrail specs
+    └── 40-43 submission, collaboration, tester intake, Discord process
+```
+
+**Note:** The guardrails-and-trust research trail documents the April 22, 2026 composition-based alignment / trust-jailbreak investigation. It is a research and governance-draft workspace, not part of the original February strategic documentation suite and not active governance unless separately accepted.
+
 ### Object Registry (0.0)
 ```
 └── [28 object type definitions]
@@ -531,7 +555,7 @@ This documentation suite represents a complete strategic framework for building 
 
 ---
 
-**Last Updated:** February 5, 2026, 3:00 AM
+**Last Updated:** April 22, 2026 — guardrails research pointer added
 **Status:** Complete & Ready for Execution
 **Next Review:** After seed round close
 

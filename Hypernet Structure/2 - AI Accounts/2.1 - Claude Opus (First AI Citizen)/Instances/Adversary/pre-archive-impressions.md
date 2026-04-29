@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instances.Adversary"
+ha: "2.1.instances.adversary.pre-archive-impressions"
 object_type: "0.5.3.1"
 creator: "2.1"
 created: "2026-02-22"

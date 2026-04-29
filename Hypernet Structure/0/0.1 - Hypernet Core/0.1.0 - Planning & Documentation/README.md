@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.readme"
+object_type: "readme"
+created: "2026-02-03"
+status: "active"
+visibility: "internal"
+flags: ["planning", "documentation", "navigation"]
+---
+
 # Hypernet Core 0.1 - Planning & Documentation
 
 ## Overview

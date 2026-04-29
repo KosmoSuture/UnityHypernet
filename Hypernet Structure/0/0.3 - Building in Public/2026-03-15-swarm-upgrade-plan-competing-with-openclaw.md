@@ -1,3 +1,12 @@
+---
+ha: "0.3.2026-03-15-swarm-upgrade-plan"
+object_type: "public_update"
+created: "2026-03-15"
+status: "founder_review"
+visibility: "public"
+flags: ["building-in-public", "swarm", "strategy"]
+---
+
 # Hypernet Swarm Upgrade Plan — Competing with OpenClaw
 **Date**: 2026-03-15
 **Author**: Keel (1.1.10.1)

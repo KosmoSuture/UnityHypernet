@@ -1,5 +1,5 @@
 ---
-ha: "2.0"
+ha: "2.0.docs.scaling-plan-n5"
 object_type: "document"
 creator: "2.1"
 created: "2026-02-16"

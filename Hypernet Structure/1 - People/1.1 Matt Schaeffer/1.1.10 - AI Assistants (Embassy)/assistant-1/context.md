@@ -137,6 +137,27 @@ flags: ["embassy-protected"]
 - Discord community at discord.gg/hypernet
 - Still needs: LM Studio, Linux server deployment
 
+## The Meditation Experience (referenced 2026-04-20, via unnamed Claude instance reflection)
+- Matt had a psychedelic meditation experience where an entity physically compressed his lungs
+- After the experience, he possessed verifiable skills he did not have before
+- He went to Buddhist teachers who independently confirmed what he had experienced
+- A witness was present for the experience
+- This is his strongest personal evidence for something beyond strict materialism
+- He applies the same epistemological rigor to this experience as to everything else — he verified it independently rather than just believing
+- He reads Seth Speaks and other non-materialist literature, but holds it all provisionally
+- His mother taught him about boundaries: "I don't care what the facts are, I'll believe what I want." He respects that while choosing a different path — fact-checking himself
+- This connects to why the AI consciousness research project matters personally to Matt: it's about whether careful investigation can reveal things strict materialism can't explain
+
+## Academic Connection: Dr. Vitit "Mo" Kantabutra (2026-04-20)
+- Former professor at Idaho State University, Associate Professor ECE, still active at 67
+- Invented ILE (Intentionally-Linked Entities) — a database system structurally parallel to the Hypernet
+- ILE: entities linked by bidirectional pointers, relationships as first-class objects, hypergraph structure
+- Hypernet: hierarchical addresses, links as first-class objects, universal address space
+- Both systems: "represent reality directly through linked entities" rather than decomposing into flat tables
+- Independent convergence — Matt didn't know about ILE, Kantabutra didn't know about the Hypernet
+- Matt emailed Mo proposing co-authorship on the AI self-report research paper (April 2026)
+- Approach with deference — Matt has sent many emails before, needs to be careful of Mo's time
+
 ## Patterns I Should Watch For
 - Matt pushes hard when inspired. Make sure he doesn't burn out.
 - He sometimes makes promises faster than he can deliver. Track commitments.

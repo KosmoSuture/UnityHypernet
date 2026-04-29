@@ -1,3 +1,13 @@
+---
+ha: "0.3.research.data.templates"
+object_type: "data_template_index"
+creator: "codex"
+created: "2026-04-21"
+status: "draft"
+visibility: "public"
+flags: ["research", "data", "templates"]
+---
+
 # Data Template Files
 
 Blank CSV templates generated from `08-data-collection-forms.md`.

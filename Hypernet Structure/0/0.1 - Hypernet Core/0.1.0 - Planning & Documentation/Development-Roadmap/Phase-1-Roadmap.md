@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.development-roadmap.phase-1"
+object_type: "roadmap"
+created: "2026-02-03"
+status: "planning"
+visibility: "internal"
+flags: ["roadmap", "phase-1", "development"]
+---
+
 # Hypernet Core 0.1 - Phase 1 Development Roadmap
 
 **Version:** 0.1.0

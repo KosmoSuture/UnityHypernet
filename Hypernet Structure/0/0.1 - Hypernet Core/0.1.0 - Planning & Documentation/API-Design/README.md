@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.api-design.readme"
+object_type: "readme"
+created: "2026-02-03"
+status: "design"
+visibility: "internal"
+flags: ["api", "design", "navigation"]
+---
+
 # API Design Documentation
 
 ## Overview

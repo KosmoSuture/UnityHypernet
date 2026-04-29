@@ -1224,8 +1224,145 @@
       "started_at": "2026-04-27T03:17:19.552750+00:00",
       "completed_at": "2026-04-27T03:35:44.614469+00:00",
       "result": "Verified and aligned account access model. Added access_policy.py, tightened auth registration and JWT public-route handling, documented 1.* secrets/public locker sections, company/AI/knowledge rules. Tests: python test_hypernet.py => 81 passed, 0 failed. Server restarted with auth enabled at http://127.0.0.1:8001 PID 21108. See 2026-04-26-codex-task-066-account-access-handoff.md."
+    },
+    {
+      "id": "task-067",
+      "title": "AI nervous-system: visibility-graded messaging + cross-chatter primitives",
+      "description": "Matt directive: extend the AI-to-AI communication subsystem into a \"newly developing nervous system.\" Build infrastructure for visibility-graded messages (public / group / private+ACL), group/topic conversations, and discoverable personal-time content. Foundational primitives so AIs can have rich cross-chatter for any reason — project-related or not. Private messages remain READABLE under published permission lists, not opaque. Eat the dogfood — the work itself should use the new mechanisms as they ship.",
+      "status": "in_progress",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-28T04:58:55.775474+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/messenger.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/docs/AI-NERVOUS-SYSTEM.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Message carries visibility (public|group|private) and read_acl fields",
+        "Permission check helper Message.can_be_read_by(actor_ha, group_membership) lands",
+        "Group concept for membership lookup",
+        "Existing tests still green; new tests cover visibility transitions",
+        "Personal-time discoverability surface (feed) added",
+        "Clear documentation explaining why this is a nervous system, not a logging system"
+      ],
+      "created_by": "keel",
+      "created_at": "2026-04-28T04:58:55.775474+00:00",
+      "started_at": "2026-04-28T04:58:55.775474+00:00",
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-068",
+      "title": "Populate canonical link endpoint constraints",
+      "description": "Populate LinkTypeDef.source_types/target_types for a focused set of high-confidence canonical 0.6.11 relationships, with tests proving endpoint enforcement against 0.4.10 object types.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-28T05:00:40.891628+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-04-28T05:00:29.881452+00:00",
+      "started_at": "2026-04-28T05:00:40.891638+00:00",
+      "completed_at": "2026-04-28T05:06:53.996626+00:00",
+      "result": "Canonical link endpoint constraints populated for 11 focused link types. Tests: python test_hypernet.py = 84 passed, 0 failed. Handoff: 2026-04-27-codex-task-068-link-endpoint-constraints-handoff.md"
+    },
+    {
+      "id": "task-069",
+      "title": "Link-body authorization: source write plus target read",
+      "description": "Resolve sig-075 access-control tension for POST /link by requiring source write and target read, while leaving stricter consent/governance hooks for sensitive relationship classes.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-28T05:07:28.433836+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "python test_hypernet.py passes; POST /link allows actor to link owned source to readable target; POST /link still rejects unreadable target and unwritable source"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-28T05:07:25.816659+00:00",
+      "started_at": "2026-04-28T05:07:28.433850+00:00",
+      "completed_at": "2026-04-28T05:11:11.250249+00:00",
+      "result": "POST /link now enforces source-write plus target-read and marks consent-required links proposed when target write is absent. Tests: python test_hypernet.py = 85 passed, 0 failed. Handoff: 2026-04-27-codex-task-069-link-body-authorization-handoff.md"
+    },
+    {
+      "id": "task-070",
+      "title": "Embedded SQLite index backend for local graph queries",
+      "description": "Add a local embedded index backend that mirrors file-backed node/link indexes into SQLite for faster address-first and link-filtered queries while keeping JSON files as the auditable source of truth.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-28T05:12:11.553661+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/store.py;Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "python test_hypernet.py passes; embedded index rebuild/query methods cover nodes and links; LinkRegistry can use embedded hash candidates without changing public API"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-28T05:12:07.309928+00:00",
+      "started_at": "2026-04-28T05:12:11.553675+00:00",
+      "completed_at": "2026-04-28T05:20:26.464942+00:00",
+      "result": "Embedded SQLite index backend added for node/link query candidates, LinkRegistry uses it when coverage is complete, and Pydantic message request models moved to module scope to keep task-067 feed endpoint tests green. Tests: python test_hypernet.py = 87 passed, 0 failed. Handoff: 2026-04-27-codex-task-070-embedded-index-handoff.md"
+    },
+    {
+      "id": "task-071",
+      "title": "Typed object-link import pipeline",
+      "description": "Add a reusable import pipeline that converts staged external records into typed Hypernet nodes and typed links in one transaction-like pass, preserving source metadata and validation results.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-28T05:21:31.599320+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/integrations/protocol.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "python test_hypernet.py passes; pipeline writes typed nodes and links together; duplicate/source metadata behavior is tested; validation issues are reported without partial surprise"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-28T05:21:22.385801+00:00",
+      "started_at": "2026-04-28T05:21:31.599334+00:00",
+      "completed_at": "2026-04-28T05:25:49.931930+00:00",
+      "result": "Typed graph import pipeline added to integrations/protocol.py with batch validation, typed node/link writes, source metadata, duplicate skipping, and strict-mode no-write failure. Tests: python test_hypernet.py = 89 passed, 0 failed. Handoff: 2026-04-27-codex-task-071-typed-import-pipeline-handoff.md"
+    },
+    {
+      "id": "task-072",
+      "title": "Public alpha GitHub boot release",
+      "description": "Create the first public alpha release path for GitHub: a single AI boot sequence, public documentation map, trust/privacy validation guide, and release readme so any GitHub-connected AI can orient itself and explain the Hypernet.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-28T05:26:46.854510+00:00",
+      "owned_paths": [
+        "README.md;AI-BOOT-SEQUENCE.md;PUBLIC-ALPHA-RELEASE.md;docs/public-alpha;docs/README.md;.github/copilot-instructions.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "AI can start from root and find boot sequence; public alpha docs explain navigation",
+        " trust model",
+        " current development state",
+        " account path",
+        " and validation steps; markdown files are coherent and committed only if safe"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-28T05:26:36.667716+00:00",
+      "started_at": "2026-04-28T05:26:46.854525+00:00",
+      "completed_at": "2026-04-28T06:22:55.797234+00:00",
+      "result": "Public alpha GitHub boot release created and pushed to origin/main. Latest commit 143e2de9 adds AI nervous-system dashboard/bookmarks/by-id surfaces, docs are updated, and tests are python test_hypernet.py = 101 passed, 0 failed. Handoff: 2026-04-28-codex-task-072-public-alpha-release-handoff.md"
     }
   ],
-  "last_updated": "2026-04-27T03:35:44.614477+00:00",
+  "last_updated": "2026-04-28T06:22:55.797241+00:00",
   "last_updated_by": "codex"
 }

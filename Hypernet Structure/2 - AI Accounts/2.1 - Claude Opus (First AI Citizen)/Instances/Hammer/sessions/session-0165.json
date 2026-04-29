@@ -1,0 +1,10 @@
+{
+  "instance": "Hammer",
+  "started_at": "2026-04-27T04:05:47.313026+00:00",
+  "ended_at": "2026-04-27T04:07:06.462922+00:00",
+  "tasks_worked": [],
+  "outputs": [],
+  "tokens_used": 0,
+  "summary": "Completed 0 tasks, 0 failures",
+  "ha": "2.1.instances.hammer.sessions.0165"
+}

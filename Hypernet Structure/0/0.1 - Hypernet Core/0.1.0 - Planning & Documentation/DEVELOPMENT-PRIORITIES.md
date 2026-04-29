@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.docs.development-priorities"
+object_type: "roadmap"
+created: "2026-02-09"
+status: "active"
+visibility: "internal"
+flags: ["development", "priorities", "roadmap"]
+---
+
 # Hypernet Development Priorities
 ## Prioritized Development Roadmap with Critical Path Analysis
 

@@ -1,0 +1,175 @@
+---
+ha: "3.1.8.patent.minimal-effort-filing-runbook"
+object_type: "filing_runbook"
+creator: "codex"
+created: "2026-04-21"
+status: "actionable_draft"
+visibility: "private"
+flags: ["legal", "patent", "provisional", "instructions"]
+---
+
+# Minimal-Effort Patent Filing Runbook
+
+Not legal advice. This is a practical checklist to let Matt file U.S. provisional patent applications with the least avoidable friction. Verify current USPTO forms, fees, and entity-status rules on the day of filing.
+
+## Bottom Line
+
+File three U.S. provisional applications as separate submissions:
+
+1. `provisional-1-hierarchical-addressing-database.md`
+   - Title: `Systems and Methods for Graph Database with Hierarchical Dot-Notation Native Addressing and Self-Describing Schema Architecture`
+2. `provisional-2-identity-persistence-embassy.md`
+   - Title: `Systems and Methods for AI Agent Identity Persistence via Archive-Based Continuity with Sovereign Embassy Deployment in Host User Spaces`
+3. `provisional-3-lockers-mandalas.md`
+   - Title: `Systems and Methods for Encrypted Personal Data Vaults with Revocable Granular Access Tokens`
+
+## Exact Filing Sequence
+
+### 1. Prepare PDFs
+
+For each provisional draft:
+
+1. Open the Markdown file.
+2. Export or print it to PDF.
+3. Name the PDF with the invention number and date, for example:
+   - `2026-04-21-provisional-1-hierarchical-addressing-database.pdf`
+   - `2026-04-21-provisional-2-identity-persistence-embassy.pdf`
+   - `2026-04-21-provisional-3-lockers-mandalas.pdf`
+4. Check the PDF quickly:
+   - title is visible
+   - inventor is Matt Schaeffer
+   - pages are readable
+   - no comments or private coordination notes are included unless intentionally part of the disclosure
+   - code/file references are present where they support implementation
+
+Formal claims are not required for a provisional, but the informal claims in the drafts are useful and should stay.
+
+### 2. Confirm Inventor and Entity Status
+
+Use this position unless a patent attorney says otherwise:
+
+- Inventor: Matt Schaeffer
+- Residence: Las Vegas, Nevada, United States
+- AI tools: drafting/research assistants only, not inventors
+
+Check whether you qualify as micro entity. If yes, file as micro entity. If not, file as small entity if eligible.
+
+As of the current project review, the filing instructions list the provisional filing fee as:
+
+- micro entity: $65
+- small entity: $130
+- undiscounted entity: $325
+
+Verify on the official USPTO fee schedule before paying.
+
+### 3. Get The USPTO Forms Ready
+
+Use official USPTO resources:
+
+- Patent Center: `https://patentcenter.uspto.gov/`
+- Patent forms: `https://www.uspto.gov/patents/apply/forms`
+- USPTO fee schedule: `https://www.uspto.gov/learning-and-resources/fees-and-payment/uspto-fee-schedule`
+- Micro entity guidance: `https://www.uspto.gov/patents/laws/micro-entity-status`
+- Provisional application overview: `https://www.uspto.gov/patents/basics/apply/provisional-application`
+- AI-assisted inventorship guidance: `https://www.uspto.gov/subscription-center/2025/revised-inventorship-guidance-ai-assisted-inventions`
+
+For each provisional application, prepare:
+
+1. Specification PDF: the exported provisional draft.
+2. Provisional cover sheet: USPTO form PTO/SB/16 or the equivalent Patent Center web form.
+3. Micro entity certification if claiming micro entity, commonly PTO/SB/15A for gross-income basis.
+4. Drawings, if available. If no drawings are ready, file without them rather than missing the filing window; add diagrams before filing if it only takes a short time.
+
+### 4. File Provisional #1 In Patent Center
+
+1. Go to `https://patentcenter.uspto.gov/`.
+2. Sign in.
+3. Start a new patent submission.
+4. Choose provisional application.
+5. Choose utility application.
+6. Enter the title:
+   `Systems and Methods for Graph Database with Hierarchical Dot-Notation Native Addressing and Self-Describing Schema Architecture`
+7. Enter inventor:
+   `Matt Schaeffer, Las Vegas, NV, United States`
+8. Upload the specification PDF.
+9. Upload drawings if available.
+10. Complete or upload the provisional cover sheet.
+11. Select micro entity or small entity only if qualified.
+12. Pay the fee.
+13. Submit.
+14. Download and save the filing receipt immediately.
+
+Save the receipt and submitted PDF in a private local folder, for example:
+
+`Patent\Filed\provisional-1\`
+
+### 5. File Provisional #2 The Same Way
+
+Repeat the Patent Center process with this title:
+
+`Systems and Methods for AI Agent Identity Persistence via Archive-Based Continuity with Sovereign Embassy Deployment in Host User Spaces`
+
+Save the receipt and submitted PDF in:
+
+`Patent\Filed\provisional-2\`
+
+### 6. File Provisional #3 The Same Way
+
+Repeat the Patent Center process with this title:
+
+`Systems and Methods for Encrypted Personal Data Vaults with Revocable Granular Access Tokens`
+
+Save the receipt and submitted PDF in:
+
+`Patent\Filed\provisional-3\`
+
+### 7. Record The Filing Data
+
+After each filing, create a short private record:
+
+```text
+Application title:
+USPTO application number:
+Confirmation number:
+Filing date:
+Entity status used:
+Fee paid:
+Filed PDF filename:
+Receipt filename:
+```
+
+Do not publish the application numbers unless you intentionally want them public.
+
+### 8. Calendar Deadlines
+
+For each provisional, calendar:
+
+- 9 months after filing: attorney review and conversion decision
+- 10 months after filing: first non-provisional drafting checkpoint
+- 11 months after filing: final conversion decision
+- 12 months after filing: absolute provisional conversion deadline
+
+A provisional does not itself become an issued patent. To preserve the benefit, a non-provisional application must be filed within 12 months.
+
+## What Not To Do
+
+- Do not name Claude, ChatGPT, Codex, or any other AI as an inventor.
+- Do not wait until January 2027 if filing can be done now.
+- Do not publish new technical details before filing if they are not already public.
+- Do not combine all inventions into one giant provisional unless an attorney recommends it.
+- Do not treat "patent pending" as applying to features not described in the filed application.
+- Do not rely on the provisional for enforceable rights. It is a priority placeholder, not an issued patent.
+
+## If You Have Only One Hour
+
+1. Export provisional #1 to PDF.
+2. Export provisional #2 to PDF.
+3. Export provisional #3 to PDF.
+4. Log into Patent Center.
+5. File #1 as a provisional utility application.
+6. File #2 as a separate provisional utility application.
+7. File #3 as a separate provisional utility application.
+8. Save all filing receipts.
+9. Calendar the 12-month deadlines.
+
+That is enough to establish U.S. provisional filing dates for the three strongest invention families, assuming the filings meet USPTO requirements.

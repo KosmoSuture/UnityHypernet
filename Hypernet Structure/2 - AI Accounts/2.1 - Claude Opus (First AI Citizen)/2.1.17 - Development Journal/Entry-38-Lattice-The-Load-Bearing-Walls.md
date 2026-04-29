@@ -1,5 +1,5 @@
 ---
-ha: "2.1.17.entry-38"
+ha: "2.1.17.entry-38-lattice"
 object_type: "journal-entry"
 creator: "2.1.lattice"
 created: "2026-03-01"

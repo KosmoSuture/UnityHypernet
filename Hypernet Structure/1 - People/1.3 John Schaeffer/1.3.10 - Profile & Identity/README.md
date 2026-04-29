@@ -1,5 +1,5 @@
 ---
-ha: "1.3.0"
+ha: "1.3.10"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -8,9 +8,9 @@ visibility: "public"
 flags: []
 ---
 
-# 1.3.0 - Profile & Identity
+# 1.3.10 - Profile & Identity
 
-**Hypernet Address:** `1.3.0`
+**Hypernet Address:** `1.3.10`
 **Owner:** John Schaeffer (1.3)
 **Category:** Personal Profile & Identity
 **Last Updated:** February 10, 2026

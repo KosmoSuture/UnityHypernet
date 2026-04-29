@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.api-design.link-model-specification"
+object_type: "technical_specification"
+created: "2026-02-03"
+status: "design"
+visibility: "internal"
+flags: ["api", "link-model", "specification"]
+---
+
 # Hypernet Core - Link Model Specification
 
 **Version:** 0.1.0

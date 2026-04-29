@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.database-design.schema"
+object_type: "technical_specification"
+created: "2026-02-03"
+status: "design"
+visibility: "internal"
+flags: ["database", "schema", "specification"]
+---
+
 # Hypernet Core - Database Schema
 
 **Version:** 0.1.0

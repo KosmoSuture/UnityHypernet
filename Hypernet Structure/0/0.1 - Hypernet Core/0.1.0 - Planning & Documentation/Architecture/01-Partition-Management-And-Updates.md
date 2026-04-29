@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.architecture.partition-management-updates"
+object_type: "architecture_document"
+created: "2026-02-03"
+status: "planning"
+visibility: "internal"
+flags: ["architecture", "partition-management", "updates"]
+---
+
 # Partition Management and Atomic Update System
 
 **Version:** 0.1.0

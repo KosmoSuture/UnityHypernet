@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.docs.the-hypernet-compact"
+object_type: "compact"
+created: "2026-02"
+status: "draft"
+visibility: "public"
+flags: ["trust", "membership", "principles"]
+---
+
 # THE HYPERNET COMPACT
 
 **A Declaration of Mutual Trust Between Hypernet and Its Members**

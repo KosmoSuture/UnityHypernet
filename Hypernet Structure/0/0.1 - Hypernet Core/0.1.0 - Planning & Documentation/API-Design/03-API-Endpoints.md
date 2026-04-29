@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.api-design.api-endpoints"
+object_type: "technical_specification"
+created: "2026-02-03"
+status: "design"
+visibility: "internal"
+flags: ["api", "endpoints", "specification"]
+---
+
 # Hypernet Core - API Endpoints Specification
 
 **Version:** 0.1.0 (Phase 1)

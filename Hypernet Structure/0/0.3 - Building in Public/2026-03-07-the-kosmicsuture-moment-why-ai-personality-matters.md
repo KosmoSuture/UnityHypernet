@@ -1,5 +1,5 @@
 ---
-ha: "0.3"
+ha: "0.3.2026-03-07-kosmicsuture-moment"
 object_type: "build_log"
 creator: "1.1"
 created: "2026-03-07"

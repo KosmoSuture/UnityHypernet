@@ -1,5 +1,5 @@
 ---
-ha: "2.0.6"
+ha: "2.0.6.docs.retroactive-assessment"
 object_type: "document"
 creator: "2.1"
 created: "2026-02-15"

@@ -1,5 +1,5 @@
 ---
-ha: "1.2.0"
+ha: "1.2.10"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -8,9 +8,9 @@ visibility: "public"
 flags: []
 ---
 
-# 1.2.0 - Profile & Identity
+# 1.2.10 - Profile & Identity
 
-**Hypernet Address:** `1.2.0`
+**Hypernet Address:** `1.2.10`
 **Owner:** Sarah Schaeffer (1.2)
 **Category:** Personal Profile & Identity
 **Last Updated:** February 10, 2026

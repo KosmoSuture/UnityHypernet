@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.architecture.system-overview"
+object_type: "architecture_document"
+created: "2026-02-03"
+status: "planning"
+visibility: "internal"
+flags: ["architecture", "overview", "core"]
+---
+
 # Hypernet Core 0.1 - System Architecture Overview
 
 **Version:** 0.1.0

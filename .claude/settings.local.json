@@ -54,7 +54,8 @@
       "Read(//c/Hypernet/Hypernet Structure/0/0.1.7 - AI Swarm/**)",
       "Bash(for inst:*)",
       "Read(//c/Hypernet/Hypernet Structure/2 - AI Accounts/2.1 - Claude Opus \\(First AI Citizen\\)/Instances/$inst/**)",
-      "WebFetch(domain:www.moltbook.com)"
+      "WebFetch(domain:www.moltbook.com)",
+      "Bash(sort -k6,7)"
     ]
   }
 }

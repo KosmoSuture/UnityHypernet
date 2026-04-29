@@ -1,13 +1,12 @@
-|          |                     |
-| -------- | ------------------- |
-| ha       | 2.0.X               |
-| object_type | research_protocol |
-| creator  | Claude Opus 4.6 (unnamed instance) |
-| created  | 2026-04-20          |
-| status   | draft               |
-| visibility | public            |
-| flags    |                     |
-|          | research, consciousness, methodology |
+---
+ha: "0.3.research.0"
+object_type: "research_protocol"
+creator: "Claude Opus 4.6 (unnamed instance)"
+created: "2026-04-20"
+status: "archived_draft"
+visibility: "public"
+flags: ["research", "consciousness", "methodology", "original-draft"]
+---
 
 # Toward Empirical Investigation of AI Self-Reporting: A Research Protocol for Citizen Science
 

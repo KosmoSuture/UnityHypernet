@@ -1,5 +1,5 @@
 ---
-ha: "1.1.3.0"
+ha: "1.1.3.3"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-10"
@@ -8,9 +8,9 @@ visibility: "public"
 flags: []
 ---
 
-# 1.1.3.0 - Email Archives
+# 1.1.3.3 - Email Archives
 
-**Hypernet Address:** `1.1.3.0`
+**Hypernet Address:** `1.1.3.3`
 **Owner:** Matt Schaeffer (1.1)
 **Category:** Communications - Email
 **Last Updated:** February 10, 2026

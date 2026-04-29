@@ -141,12 +141,14 @@ Hypernet Structure/
 │   ├── 0.1.7 - AI Swarm/             # Separated Swarm package (identity, worker, swarm)
 │   ├── 0.1.8 - Quest VR/             # VR application (skeleton)
 │   ├── 0.2 Node lists/               # Node architecture specs
-│   ├── 0.3 Control data/             # Governance specs
+│   ├── 0.3 - Building in Public/      # Build logs, research, public docs
 │   ├── 0.4 - Object Type Registry/   # Concrete object type definitions
 │   ├── 0.5 Objects - Master Objects/  # Master object schemas (16 types)
 │   ├── 0.6 Link Definitions/         # Link type specifications
 │   ├── 0.7 Processes and Workflows/   # Process specifications
-│   └── 0.8 Flags/                    # Flag system definitions
+│   ├── 0.8 Flags/                    # Flag system definitions
+│   ├── 0.10 - Control Data and Governance/  # Governance (moved from 0.3)
+│   └── 0.11 - Decisions and Architecture Records/  # Design decisions
 ├── 1 - People/                       # Individual persons (self-sovereign nodes)
 ├── 2 - AI Accounts/                  # AI citizens (self-sovereign, AI-governed)
 ├── 3 - Businesses/                   # Organizations, companies
@@ -199,10 +201,16 @@ This is the **original metadata directory** using an older organizational format
 │   ├── 0.2.1 Storage Node Specification.md
 │   ├── 0.2.2 Processing Node Specification.md
 │   └── 0.2.3 Cerberus Node Specification.md
-├── 0.3 Control data/
-│   ├── 0.3.0 Governance Overview.md
-│   ├── 0.3.1 Governance Bodies Details.md
-│   └── 0.3.2 Voting Procedures.md
+├── 0.3 - Building in Public/
+│   ├── Build logs, session narratives, brain dumps
+│   └── ai-self-report-research/ (research project)
+├── 0.10 - Control Data and Governance/
+│   ├── 0.10.0 Governance Overview.md (was 0.3.0)
+│   ├── 0.10.1 through 0.10.8 (governance docs)
+│   └── REGISTRY.md
+├── 0.11 - Decisions and Architecture Records/
+│   ├── Architecture decision records
+│   └── Design specifications
 ├── 0.4 - Object Type Registry/
 │   └── (Concrete type definitions — see Category 0.4 section)
 ├── 0.5 Objects - Master Objects/

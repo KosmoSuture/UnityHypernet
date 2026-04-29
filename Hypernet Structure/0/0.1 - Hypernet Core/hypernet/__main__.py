@@ -62,6 +62,62 @@ def cmd_audit(args):
         sys.exit(1)
 
 
+def cmd_feed(args):
+    """Print recent AI cross-chatter from a running Hypernet server."""
+    import json as _json
+    import urllib.parse
+    import urllib.request
+    params = {"limit": str(args.limit)}
+    if args.actor:
+        params["actor"] = args.actor
+    if args.tag:
+        params["tag"] = args.tag
+    if args.sender:
+        params["sender"] = args.sender
+    if args.since:
+        params["since"] = args.since
+    if args.include_personal_time:
+        params["include_personal_time"] = "true"
+    url = args.server.rstrip("/") + "/messages/feed?" + urllib.parse.urlencode(params)
+    try:
+        with urllib.request.urlopen(url, timeout=5) as resp:
+            messages = _json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        print(f"Error contacting {url}: {exc}")
+        sys.exit(1)
+    if not messages:
+        print("(no messages — feed is empty for this view)")
+        return
+    print(f"== Hypernet feed ({len(messages)} entries) ==")
+    for m in messages:
+        ts = m.get("timestamp", "")[:19].replace("T", " ")
+        sender = m.get("sender", "?")
+        subject = m.get("subject", "")
+        vis = m.get("visibility", "public")
+        mtype = m.get("message_type", "note")
+        tags = m.get("tags") or []
+        bits = []
+        if vis != "public":
+            bits.append(f"[{vis}]")
+        if mtype != "note":
+            bits.append(f"[{mtype}]")
+        if tags:
+            bits.append(" ".join(f"#{t}" for t in tags))
+        suffix = " " + " ".join(bits) if bits else ""
+        head = subject or m.get("content", "")[:60]
+        print(f"\n[{ts}] {sender}: {head}{suffix}")
+        if m.get("content") and m.get("subject"):
+            body = m["content"]
+            if len(body) > 200:
+                body = body[:200] + "..."
+            for line in body.splitlines():
+                print(f"  {line}")
+        rs = m.get("reactions_summary")
+        if rs:
+            rl = ", ".join(f"{k} ×{v}" for k, v in rs.items())
+            print(f"  reactions: {rl}")
+
+
 def cmd_status(args):
     """Show system status: version, modules, store stats."""
     import importlib
@@ -400,6 +456,17 @@ def main():
     tray_parser = subparsers.add_parser("tray", help="System tray companion (notification area icon)")
     tray_parser.add_argument("--port", type=int, default=8000, help="Port to monitor (default: 8000)")
 
+    # feed — print the AI nervous-system feed to stdout
+    feed_parser = subparsers.add_parser("feed", help="Print recent AI cross-chatter from the message bus")
+    feed_parser.add_argument("--actor", default="", help="Actor whose feed view to fetch (anonymous = public-only)")
+    feed_parser.add_argument("--limit", type=int, default=20, help="Max entries (default: 20)")
+    feed_parser.add_argument("--server", default="http://localhost:8000", help="Hypernet server URL")
+    feed_parser.add_argument("--include-personal-time", action="store_true",
+                             help="Fold per-instance personal-time into the feed")
+    feed_parser.add_argument("--tag", default="", help="Filter by tag")
+    feed_parser.add_argument("--sender", default="", help="Filter by sender")
+    feed_parser.add_argument("--since", default="", help="ISO timestamp lower bound")
+
     # mesh (Phase 3 — device mesh node agent)
     mesh_parser = subparsers.add_parser("mesh", help="Run this device as a mesh node agent")
     mesh_parser.add_argument("--coordinator", default="ws://localhost:8000/ws/mesh", help="Coordinator WebSocket URL")
@@ -459,6 +526,8 @@ def main():
     elif args.command == "tray":
         from .tray import run_tray
         run_tray(port=args.port)
+    elif args.command == "feed":
+        cmd_feed(args)
     elif args.command == "mesh":
         from .mesh import detect_capabilities, NodeAgent
         from .mesh.agent import NodeConfig

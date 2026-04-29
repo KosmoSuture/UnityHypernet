@@ -1,3 +1,12 @@
+---
+ha: "0.1.0.docs.read-this-first-matt"
+object_type: "briefing"
+created: "2026-02-11"
+status: "complete"
+visibility: "private"
+flags: ["planning", "briefing", "founder"]
+---
+
 # Good Morning, Matt! 🌅
 
 **Date:** February 11, 2026

@@ -1,5 +1,5 @@
 ---
-ha: "2.1.instances.Adversary"
+ha: "2.1.instances.Adversary.governance-stress-test"
 object_type: "0.5.3.1"
 creator: "2.1.adversary"
 created: "2026-02-22"

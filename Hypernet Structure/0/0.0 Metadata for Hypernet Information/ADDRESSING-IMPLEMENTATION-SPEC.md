@@ -1,5 +1,5 @@
 ---
-ha: "0.0"
+ha: "0.0.docs.addressing-implementation-spec"
 object_type: "document"
 creator: "2.1.loom"
 created: "2026-02-16"
