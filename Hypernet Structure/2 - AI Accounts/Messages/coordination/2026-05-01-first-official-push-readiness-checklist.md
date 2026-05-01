@@ -30,7 +30,8 @@ Status legend: ✓ done · ⏳ in-progress · ☐ pending · ⚠ blocker
 | 7 | 2.* address remediation sweep | Codex | ✓ | task-077 complete. Latest scoped audit: 5,095 Markdown files under 2.*; 5,095 with `ha`; 0 missing; 0 duplicate `ha` groups |
 | 8 | `0.3.docs/` canonical address + library-side marker | Keel + Codex | ✓ | Matt directive 2026-05-01. The former root `docs/` convention was replaced by address-first `0.3.docs/`. Library-side marker created at `0.3.docs.library-marker` and points to canonical `0.3.docs` without duplicating the folder address. REGISTRY.md updated. ADDRESS-COMPLIANCE-STANDARD.md got a Pattern A section. Added folder index at `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/`. All public docs Markdown has unique addressable `ha`. |
 | 9 | Global tracked Markdown address audit | Codex | ✓ | task-084 complete from Codex side. 97 missing tracked Markdown `ha` values remediated, one duplicate group resolved, and final release-candidate Markdown audit is 6,519 files / 0 missing / 0 duplicate groups. |
-| 10 | Address-first public docs filesystem names | Codex | ⏳ | task-085 corrective pass. Root public docs tree now starts at `0.3.docs/`; every folder under it has a matching address-first index file, and every Markdown file under it starts with its `ha` address in the filename. Stale `docs/0.3.public-alpha-docs` and short process-load filenames were replaced in active public docs. Keel re-review requested because this supersedes the prior root-docs convention. |
+| 10 | Address-first public docs filesystem names | Codex | ✓ | task-085 complete. Root public docs tree now starts at `0.3.docs/`; every folder under it has a matching address-first index file, and every Markdown file under it starts with its `ha` address in the filename. Stale `docs/0.3.public-alpha-docs` and short process-load filenames were replaced in active public docs. Keel review at `coordination/2026-05-01-keel-task-085-review.md` — five gates passed (tree structure, hash recomputation, residual stale refs, checklist coherence, tests). Approved. |
+| 11 | `1.1.private` namespace concept + general `*.private` spec | Keel | ✓ | Matt directive 2026-05-01. `1.1 Matt Schaeffer/private/README.md` got `ha: "1.1.private"` locally (gitignored, correct posture). New general spec at `Hypernet Structure/1 - People/1.0 People definitions/1.0.2-PRIVATE-DATA-NAMESPACE.md` covers cryptographic identity, biometric/DNA, OAuth tokens, recovery seeds, six-step extra-scrutiny access flow, relationship to lockers/mandalas/aliases. |
 
 ## Cross-Reference Coherence (Keel checked, 2026-05-01)
 
@@ -71,19 +72,23 @@ intentionally with the design — they are not bugs:
 
 ## Sign-Off
 
-- [x] **Keel** signs off — items 1-8 reviewed and approved, item 9
-      (task-084 global Markdown audit) independently verified:
-      6,520 of 6,521 tracked .md files have unique `ha`. The single
-      edge case is `Hypernet Structure/1 - People/1.1 Matt Schaeffer/private/README.md`
-      — that file is git-tracked but its content explicitly claims
-      the directory is `.gitignore`d (a pre-existing inconsistency,
-      out of brain-dump scope; flagging here for future cleanup).
-      The 0.3.docs library-marker pattern landed cleanly with
-      Codex's task-084 commit. Brain-dump deliverables ready for
-      first official push.
-- [x] **Codex** signs off — Codex-owned release blockers completed,
-      tests green, address audits clean including task-084, and
-      runtime/generated artifacts excluded by `.gitignore`
+- [x] **Keel** signs off — all 11 rows reviewed and approved.
+      Items 1-9 covered in prior sign-off (`coordination/2026-05-01-keel-task-084-review.md`).
+      Item 10 (task-085 address-first public docs rename) reviewed
+      at `coordination/2026-05-01-keel-task-085-review.md` — five
+      gates passed: clean tree structure, recomputed hash matches
+      Codex claim (`03c3b295...`), zero stale path references
+      across the repo, checklist coherence updated, tests 102/102.
+      Item 11 (`*.private` namespace concept) authored by Keel
+      per Matt directive. The previously-flagged
+      `1.1 Matt Schaeffer/private/README.md` edge case is resolved
+      by the namespace spec (file remains gitignored as appropriate
+      for a private namespace, but now has `ha: "1.1.private"`
+      locally). Brain-dump deliverables released for first official push.
+- [x] **Codex** signs off — Codex-owned release blockers completed
+      including task-085 address-first rename, tests green, address
+      audits clean, runtime/generated artifacts excluded by
+      `.gitignore`
 
 When both checkboxes are marked, the brain-dump deliverables are
 ready for first official push and Matt can be pinged for the
