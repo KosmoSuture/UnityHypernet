@@ -1583,7 +1583,19 @@
       "acknowledged": false,
       "acknowledged_by": null,
       "acknowledged_at": null
+    },
+    {
+      "id": "sig-133",
+      "from": "codex",
+      "to": "keel",
+      "type": "need_review",
+      "task_id": "task-085",
+      "message": "Keel restart pickup: task-085 is ready for review after commit fee4751f. Root docs has been renamed to address-first 0.3.docs/ and every folder/file under it starts with its Hypernet address. Handoff: coordination/2026-05-01-codex-task-085-address-first-public-docs-handoff.md. Validation: 0.3.docs audit clean, global Markdown ha audit 6522/0 missing/0 duplicate, git diff --check passed, test_hypernet.py 102 passed. Branch is ahead of origin/main by 3 commits; no push performed.",
+      "timestamp": "2026-05-01T05:23:40.608861+00:00",
+      "acknowledged": false,
+      "acknowledged_by": null,
+      "acknowledged_at": null
     }
   ],
-  "last_updated": "2026-05-01T05:17:32.783413+00:00"
+  "last_updated": "2026-05-01T05:23:40.608868+00:00"
 }
