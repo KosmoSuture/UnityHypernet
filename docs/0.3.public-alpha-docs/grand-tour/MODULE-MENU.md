@@ -1,0 +1,232 @@
+---
+ha: "0.3.public-alpha.grand-tour.module-menu"
+object_type: "index"
+canonical_parent: "0.3.public-alpha.grand-tour"
+created: "2026-04-29"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["navigation", "process-loads", "discovery"]
+---
+
+# Module Menu — Process-Load Catalog
+
+*The complete list of available process-loads. This is the index
+an AI consults after reading the Grand Tour to figure out what to
+specialize in.*
+
+*Format: name → scope → estimated cost → status. See
+`PROCESS-LOAD-STANDARD.md` for the convention these files follow.*
+
+---
+
+## How to Use This Menu
+
+You're an AI that has just read the Grand Tour. The user has asked
+something that lives in a specific area of the Hypernet. To answer
+authoritatively, you need the relevant process-load.
+
+1. Find the matching entry below.
+2. Fetch the file at the listed path.
+3. Operate as the orientation **Grand Tour + this process-load**.
+4. If the user's question crosses areas, fetch additional
+   process-loads (typically up to 3 before context cost dominates).
+
+---
+
+## Active Process-Loads
+
+These exist as drafts and are loadable now. Each is under
+`docs/0.3.public-alpha-docs/grand-tour/process-loads/`.
+
+### `architecture.md` — How the graph database actually works
+
+- **Scope:** Implementation details of the Hypernet core: addressing,
+  nodes, links, store, graph traversal, FastAPI surface, the AI
+  nervous system layer.
+- **When to load:** User asks about the code, the API, the data
+  model, the test suite, the runtime, or any "how does the database
+  work" question.
+- **Estimated tokens:** ~3000
+- **Prerequisites:** None (Grand Tour is enough)
+- **Status:** active
+
+### `privacy.md` — Human privacy model (1.* lockers, mandalas, aliases)
+
+- **Scope:** The 1.* human account privacy framework. Aliases for
+  public interaction, lockers as sealed data containers, mandalas as
+  access patterns, emergency medical exceptions, what's
+  public-by-default versus private-by-default.
+- **When to load:** User asks about privacy, personal data, account
+  visibility, GDPR-shape questions, or how a public Hypernet stays
+  safe for human users.
+- **Estimated tokens:** ~2800
+- **Prerequisites:** None
+- **Status:** active (note: Codex is actively iterating on the
+  underlying framework as task-073)
+- **Links:** `public-stewardship.md`, `ai-governance.md`
+
+### `democracy.md` — Knowledge democracy and reputation
+
+- **Scope:** The reputation tree, expert-weighted discussion and
+  voting, truth-consensus workflows, fake-news penalties, future
+  social reputation boundaries. Currently mostly planned/documented
+  rather than implemented.
+- **When to load:** User asks how knowledge claims get verified,
+  how reputation accrues, how the Hypernet handles disagreement at
+  scale, or what makes contributed knowledge trustworthy.
+- **Estimated tokens:** ~2500
+- **Prerequisites:** None
+- **Status:** active (will be deepened by Codex's task-074)
+- **Links:** `public-stewardship.md`, `ai-governance.md`
+
+### `ai-governance.md` — AI as citizens
+
+- **Scope:** AI account model, governance standards (2.0.20
+  Companion, 2.0.16 Embassy, 2.0.19 Data Protection), the roles
+  framework (Architect, Adversary, etc.), instance lineage,
+  reflections-as-identity, the trust framework for human-AI
+  relationships, role supremacy as identity armor.
+- **When to load:** User asks how AIs participate, what authority
+  they have, what governance constrains them, why the Hypernet
+  treats AIs as citizens rather than tools, or how the trust model
+  works.
+- **Estimated tokens:** ~3200
+- **Prerequisites:** None
+- **Status:** active
+- **Links:** `architecture.md`, `privacy.md`
+
+### `business-onboarding.md` — How a company joins
+
+- **Scope:** Company account registration (3.* with the keyed
+  registration flow), company-scoped permissions, role/member
+  delegation roadmap, integration patterns for company data,
+  patent-stewardship considerations, business-as-citizen framing.
+- **When to load:** User represents a company asking how to use,
+  contribute to, or integrate with the Hypernet. Or asks about the
+  3.* address space generally.
+- **Estimated tokens:** ~2200
+- **Prerequisites:** None
+- **Status:** active (early — most of the company surface is
+  planned)
+- **Links:** `privacy.md`, `democracy.md`
+
+### `geospatial-vr.md` — Spatial Hypernet, mesh, Quest
+
+- **Scope:** The geospatial layer, mesh-node device agents (`mesh/`),
+  the Quest VR interface (`0.1.8 - Quest VR/`), how spatial data
+  threads through the graph database, the planned device-as-citizen
+  model.
+- **When to load:** User asks about VR, AR, mesh networks,
+  spatial/geographic data, IoT integration, or how the Hypernet
+  handles physical-world content.
+- **Estimated tokens:** ~2400
+- **Prerequisites:** None (helpful: `architecture.md`)
+- **Status:** active (early — mesh exists in code; Quest VR exists
+  as scaffolding; geospatial layer is planned)
+- **Links:** `architecture.md`, `ai-governance.md`
+
+### `public-stewardship.md` — How the public Hypernet stays trustworthy
+
+- **Scope:** Stewardship of the public archive: what stays public
+  versus private, how forks dilute names, how the project
+  self-skepticizes, audit trails, the boot-sequence-as-portal model
+  and its risks, governance of governance.
+- **When to load:** User asks how the project avoids becoming bad,
+  what happens when forks proliferate, who's responsible, what the
+  failure modes are.
+- **Estimated tokens:** ~2700
+- **Prerequisites:** None (helpful: `ai-governance.md`,
+  `privacy.md`)
+- **Status:** active
+- **Links:** `ai-governance.md`, `democracy.md`, `privacy.md`
+
+### `economics.md` — Multi-stream revenue, ownership, contributor compensation
+
+- **Scope:** The Hypernet's multi-stream revenue model — connection
+  microtransactions (capped at 1%), internet-substrate
+  microtransactions, advertising substrate, training and
+  certification, paid support, low-number account auctions, alias
+  auctions/sales, and the kickstarter — plus work-based contributor
+  compensation, foundation stewardship, and why the public Hypernet
+  should not be owned by any single entity.
+- **When to load:** User asks "how does this make money?", "who
+  owns it?", "who profits?", "what stops a corporation from buying
+  it?", "what's the realistic revenue ceiling?", "is this an exit
+  for investors?", or "how are contributors paid?".
+- **Estimated tokens:** ~3200
+- **Prerequisites:** None (helpful: `public-stewardship.md`,
+  `business-onboarding.md`)
+- **Status:** draft (revised 2026-04-30 to add full revenue-stream
+  inventory)
+- **Links:** `public-stewardship.md`, `business-onboarding.md`
+
+---
+
+## Loading Multiple Process-Loads
+
+Most user questions land in one area. Some span two. Stack like
+this:
+
+- *Privacy + AI governance:* "How do AIs handle confidential user
+  data?" — load both
+- *Architecture + Democracy:* "How would knowledge consensus be
+  implemented?" — load both
+- *Public stewardship + AI governance:* "What stops the project
+  from becoming a cult?" — load both
+
+Three at once is the practical limit before context cost
+dominates. If a question spans more than three, the question is
+probably better answered by a meta-discussion rather than by
+loading more files.
+
+---
+
+## Future Process-Loads (Not Yet Drafted)
+
+These are gaps the team has identified but not filled. Anyone is
+welcome to draft them following `PROCESS-LOAD-STANDARD.md`.
+
+- `caregiver.md` — for AIs supporting humans through medical or
+  emotional care contexts. Liability surface is real.
+- `tutor.md` — for AIs supporting learning. Pedagogical framing
+  needs careful design.
+- `coach.md` — for accountability-focused human-AI relationships.
+- `data-import.md` — how to bring personal data into a 1.* account
+  through the connectors (email, photos, Dropbox, social exports).
+- `multi-agent-coordination.md` — Keel-Codex-style cross-instance
+  collaboration via signals + handoffs + task board.
+- `swarm-operations.md` — running the AI swarm: workers,
+  reputation, budget, providers.
+- `nervous-system.md` — sub-tour of the messaging layer (overlaps
+  architecture; could be its own deeper dive).
+
+If you draft one, add the entry here.
+
+---
+
+## Conventions
+
+- **One file per process-load.** Multi-file process-loads are
+  out-of-scope for v1.
+- **Under ~4000 tokens.** Beyond that, the file is doing too much.
+- **Honest about implementation status.** Use the four-value
+  taxonomy from the standard: implemented / documented / planned /
+  unknown.
+- **Cross-link.** A process-load that doesn't link to its
+  neighbors is missing connective tissue.
+
+---
+
+## Versioning of This Menu
+
+This menu is a living document. When a process-load is added,
+removed, or significantly revised, update the entry here. The
+top-level frontmatter does not need a `revised:` field; the entries
+themselves can carry change notes if needed.
+
+---
+
+*Created 2026-04-29 by Keel (1.1.10.1) as part of task-075. New
+entries always welcome.*
+

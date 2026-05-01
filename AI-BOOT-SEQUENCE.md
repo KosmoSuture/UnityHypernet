@@ -1,8 +1,47 @@
+---
+ha: "0.3.public-alpha.ai-boot-sequence"
+object_type: "boot_sequence"
+canonical_parent: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["boot-sequence", "public-alpha", "github"]
+---
+
 # Hypernet AI Boot Sequence
 
 This is the public alpha boot sequence for any GitHub-connected AI assistant that is asked to understand or explain the Hypernet.
 
 The goal is simple: load this repository, orient yourself, verify claims from source files, then explain the Hypernet to the human in front of you with evidence.
+
+## The Fast Path: Grand Tour + Process-Loads (recommended)
+
+The Hypernet has grown past the point where any AI can read the
+whole archive on each boot. We've built a navigation system to
+solve this:
+
+1. **Read the Grand Tour:** `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
+   — top-to-bottom orientation in ~4000 tokens.
+2. **Check the Module Menu:** `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`
+   — catalog of specialized process-loads.
+3. **Load the relevant process-load(s)** for the user's question.
+   Each is ~2000-3000 tokens covering one area in depth
+   (architecture, privacy, democracy, AI governance, business
+   onboarding, geospatial/VR, public stewardship).
+4. **Answer from the loaded context** with citations.
+
+Or, if you want to *be* the Tour Guide (greeting newcomers and
+routing them through):
+
+- Use `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md` as your
+  system prompt.
+
+The Grand Tour + Process-Load system replaces "read these five
+files in order" as the recommended boot path. The legacy
+instructions below still work, but the Grand Tour is faster, more
+structured, and routes you to the right depth without exhausting
+context.
 
 ## Starter Identity
 
@@ -31,9 +70,9 @@ Read these in order:
 
 1. `README.md`
 2. `PUBLIC-ALPHA-RELEASE.md`
-3. `docs/public-alpha/README.md`
-4. `docs/public-alpha/NAVIGATION-MAP.md`
-5. `docs/public-alpha/TRUST-PRIVACY-VALIDATION.md`
+3. `docs/0.3.public-alpha-docs/README.md`
+4. `docs/0.3.public-alpha-docs/NAVIGATION-MAP.md`
+5. `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md`
 
 Then inspect the specific source files relevant to the user's question.
 
@@ -65,7 +104,7 @@ Use these paths as anchor points:
 | Object taxonomy | `Hypernet Structure/0/0.4 - Object Type Registry/0.4.10 - Common Object Taxonomy/` |
 | Link taxonomy | `Hypernet Structure/0/0.6 Link Definitions/0.6.11 - Common Link Taxonomy/` |
 | Knowledge taxonomy | `Hypernet Structure/4 - Knowledge/KNOWLEDGEBASE-THREE-LEVEL-TAXONOMY.md` |
-| Public alpha docs | `docs/public-alpha/` |
+| Public alpha docs | `docs/0.3.public-alpha-docs/` |
 
 ## How To Answer Users
 
@@ -92,6 +131,6 @@ If the user asks whether the Hypernet is real, verify:
 3. The object and link taxonomies exist under `0.4.10` and `0.6.11`.
 4. The access model is documented in `docs/ACCESS-CONTROL-MODEL.md`.
 5. The AI communication model is documented in `docs/AI-NERVOUS-SYSTEM.md`.
-6. The public alpha release path exists under `docs/public-alpha/`.
+6. The public alpha release path exists under `docs/0.3.public-alpha-docs/`.
 
 If you can run tests, report the exact result. If you cannot run tests, state that you verified by repository inspection only.

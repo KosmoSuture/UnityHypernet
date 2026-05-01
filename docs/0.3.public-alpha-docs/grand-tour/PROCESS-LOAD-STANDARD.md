@@ -1,0 +1,226 @@
+---
+ha: "0.3.public-alpha.grand-tour.process-load-standard"
+object_type: "standard"
+canonical_parent: "0.3.public-alpha.grand-tour"
+created: "2026-04-29"
+updated: "2026-04-30"
+status: "draft"
+visibility: "public"
+flags: ["boot-sequence", "navigation", "specialization"]
+---
+
+# Process-Load Standard
+
+*The convention for "lesser boot files" that let an AI specialize into
+one area of the Hypernet without loading the whole archive.*
+
+---
+
+## Why This Exists
+
+The Hypernet has grown. The full repository now exceeds the context
+window of every current LLM. An AI that tries to load *everything*
+on each boot can't — and even if it could, the cost would dwarf the
+work being done. We need a way for AIs to:
+
+1. **Orient quickly.** Get a top-to-bottom map of the project in a
+   few thousand tokens (the Grand Tour, separate doc).
+2. **Specialize on demand.** When the user's question lives in a
+   specific area, the AI loads only the *process-load* file for that
+   area and gains operational depth there.
+3. **Stack specializations.** An AI working on a question that
+   spans privacy + governance can load both process-loads.
+
+A process-load is the named, documented unit of specialization. This
+document is the spec.
+
+---
+
+## What a Process-Load Is
+
+A process-load is a single markdown file that:
+
+- Lives at `docs/0.3.public-alpha-docs/grand-tour/process-loads/<name>.md`
+- Stays under ~4000 tokens (target: 2000-3000)
+- Is self-contained: an AI loaded with the **Grand Tour + one
+  process-load** is fully oriented for that area
+- Is composable: an AI can stack multiple process-loads
+- Is honest about implementation status
+
+A process-load is **not**:
+
+- A full reference manual (those live elsewhere in the repo)
+- Marketing copy
+- An attempt to teach the area from scratch — assume the reader has
+  the Grand Tour as background
+
+---
+
+## Standard Structure
+
+Every process-load uses this skeleton:
+
+```markdown
+---
+ha: "0.3.public-alpha.grand-tour.process-load.<name>"
+object_type: "process-load"
+scope: "<one-sentence scope statement>"
+estimated_tokens: <integer>
+prerequisites: []                   # other process-loads needed first
+linked_process_loads: []
+created: "<YYYY-MM-DD>"
+status: "active" | "draft"
+visibility: "public"
+flags: []
+---
+
+# <Name> — Process-Load
+
+## Summary
+
+One paragraph. State what this process-load gives the AI and what
+problem it lets them solve.
+
+## Why It Matters
+
+Two short paragraphs. Why does this area exist? What human or AI
+need does it serve? What goes wrong without it?
+
+## Implementation Status
+
+Brief table of components in this area:
+
+| Component | Status | Path |
+|---|---|---|
+| ... | implemented / documented / planned | ... |
+
+The status column uses exactly four values:
+- `implemented` — code exists and tests pass
+- `documented` — design doc exists, code partial or absent
+- `planned` — neither code nor doc, listed as future
+- `unknown` — needs verification
+
+## Key Files
+
+5-15 file paths the AI should know about, with one-line descriptions.
+
+## Common Questions and Where to Answer Them
+
+A handful of likely user questions, each paired with the file or
+section the AI should look at to answer authoritatively.
+
+## What to Ask the User
+
+If the user lands on this area, the AI should ask 1-3 clarifying
+questions to scope the work.
+
+## What to Verify in Code
+
+Specific verification steps the AI can take to confirm claims rather
+than assert from memory.
+
+## Related Process-Loads
+
+Cross-links to other process-loads that touch this area.
+```
+
+---
+
+## Loading Convention
+
+When an AI is asked to specialize, the convention is:
+
+1. The AI fetches `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md` to
+   see what's available.
+2. The AI fetches the matching process-load file.
+3. The AI's effective context is now: **base boot sequence + Grand
+   Tour + this process-load**.
+4. If the user's question crosses areas, the AI may load additional
+   process-loads as needed — typically up to 3 at once before
+   context cost becomes a problem.
+
+A user prompt that triggers process-load behavior looks like:
+
+> "I want to ask about how privacy works in the Hypernet. Load the
+> privacy process-load."
+
+A naive AI that doesn't recognize the convention will still get
+useful information by reading the file directly. A
+convention-aware AI will recognize the request and respond:
+
+> "Loading the privacy process-load now. I'll have full
+> orientation on the privacy framework in a moment, then I can
+> answer your question."
+
+---
+
+## Discovery
+
+The catalog of process-loads lives in
+`docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`. Each entry there has:
+
+- The process-load's name
+- A one-line scope statement
+- Estimated token cost
+- Prerequisites
+- Status (active / draft / planned)
+
+New process-loads are added by:
+
+1. Drafting the file under `process-loads/` following this skeleton
+2. Adding an entry to `MODULE-MENU.md`
+3. Cross-linking from related process-loads
+4. Optional: adding a link from the Grand Tour itself if the topic
+   is foundational
+
+---
+
+## Versioning
+
+Process-loads are living documents. When a process-load is updated:
+
+- Frontmatter `created:` does not change
+- Optional `revised:` field is updated
+- Substantive changes are logged in the body if they change
+  recommendations to readers
+
+There is no "v1 → v2" migration path; the file simply reflects the
+current state of the area.
+
+---
+
+## Quality Bar
+
+A process-load is good if:
+
+- A fresh AI loaded with **boot sequence + Grand Tour + this
+  process-load** can answer 80% of common user questions in this
+  area without consulting other files.
+- An expert reading the process-load doesn't find inaccuracies.
+- An expert finds the file *too short* rather than too long — the
+  scope is intentional.
+
+A process-load is bad if:
+
+- It tries to be a reference manual.
+- It mixes implementation status without labels.
+- It overlaps significantly with another process-load.
+- It depends on more than 2 prerequisites to be useful.
+
+---
+
+## What This Standard Doesn't Cover Yet
+
+- Multi-file process-loads (some areas may eventually need multiple
+  files; the standard currently assumes one file per process-load).
+- Auto-generation of process-loads from code/docs (interesting
+  future direction).
+- Dependency-aware loading (e.g., "this process-load is incoherent
+  without Privacy first").
+- Translations / non-English process-loads.
+
+These can be addressed in a v2 of the standard once we have a
+dozen process-loads and see what patterns emerge.
+
+— Drafted 2026-04-29 by Keel as part of task-075.
+

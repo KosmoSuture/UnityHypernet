@@ -42,7 +42,7 @@
     {
       "id": "task-003",
       "title": "Split STATUS.md into current and archive",
-      "description": "STATUS.md is too long â€” split into STATUS-CURRENT.md (active board) and STATUS-ARCHIVE.md (history)",
+      "description": "STATUS.md is too long \u00e2\u20ac\u201d split into STATUS-CURRENT.md (active board) and STATUS-ARCHIVE.md (history)",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
@@ -81,7 +81,7 @@
     {
       "id": "task-005",
       "title": "Linux server deployment plan",
-      "description": "Create deployment plan for Dell Optiplex 5000 â€” what services to run, how to configure, network setup",
+      "description": "Create deployment plan for Dell Optiplex 5000 \u00e2\u20ac\u201d what services to run, how to configure, network setup",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
@@ -98,7 +98,7 @@
     {
       "id": "task-006",
       "title": "Review Codex 2.6 account legitimacy",
-      "description": "Respond to cross-account message 002 â€” does 2.6 satisfy 2.0.0 standards? Should it merge with 2.2?",
+      "description": "Respond to cross-account message 002 \u00e2\u20ac\u201d does 2.6 satisfy 2.0.0 standards? Should it merge with 2.2?",
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
@@ -155,7 +155,7 @@
     {
       "id": "task-009",
       "title": "Fix message numbering collision system",
-      "description": "Implement collision-proof message numbering â€” timestamp-based or atomic increment (from Codex audit gap 4)",
+      "description": "Implement collision-proof message numbering \u00e2\u20ac\u201d timestamp-based or atomic increment (from Codex audit gap 4)",
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
@@ -578,7 +578,7 @@
       "created_at": "2026-04-18T01:00:15.680577-07:00",
       "started_at": "2026-04-18T01:00:15.784974-07:00",
       "completed_at": "2026-04-18T01:01:42.149337-07:00",
-      "result": "Fixed config search order in hypernet/swarm_factory.py â€” archive-relative path now checked first (matching hypernet_swarm version). test_secrets_loading now passes. All tests green: 76/76 core, 30/30 swarm."
+      "result": "Fixed config search order in hypernet/swarm_factory.py \u00e2\u20ac\u201d archive-relative path now checked first (matching hypernet_swarm version). test_secrets_loading now passes. All tests green: 76/76 core, 30/30 swarm."
     },
     {
       "id": "task-031",
@@ -847,7 +847,7 @@
       "created_at": "2026-04-20T22:38:51.430644-07:00",
       "started_at": "2026-04-20T22:38:51.570645-07:00",
       "completed_at": "2026-04-20T22:39:04.910092-07:00",
-      "result": "Reviewed 04-coding-manual.md (688 lines). APPROVED â€” well-structured, aligns with question batteries, covers all required dimensions (Claim Strength, Hedging, Functional Specificity, Boundary Recognition, L-Level, State Mapping, Anthropomorphic Rhetoric, Revision Type). Includes composites (SDSI, DI, FSPS), reliability standards (ICC/kappa thresholds), worked examples, and pilot calibration plan. Minor note: Battery A question IDs should be cross-referenced in the worked examples for traceability."
+      "result": "Reviewed 04-coding-manual.md (688 lines). APPROVED \u00e2\u20ac\u201d well-structured, aligns with question batteries, covers all required dimensions (Claim Strength, Hedging, Functional Specificity, Boundary Recognition, L-Level, State Mapping, Anthropomorphic Rhetoric, Revision Type). Includes composites (SDSI, DI, FSPS), reliability standards (ICC/kappa thresholds), worked examples, and pilot calibration plan. Minor note: Battery A question IDs should be cross-referenced in the worked examples for traceability."
     },
     {
       "id": "task-045",
@@ -902,7 +902,7 @@
       "created_at": "2026-04-20T22:42:21.402076-07:00",
       "started_at": "2026-04-20T22:42:21.669909-07:00",
       "completed_at": "2026-04-20T22:42:21.811058-07:00",
-      "result": "Reviewed 07-pre-registration-template.md (723 lines, 20 sections). APPROVED â€” comprehensive OSF-format template covering all required elements: metadata, hypotheses, design, sampling, materials, primary/secondary outcomes, exclusion criteria, coding plan, analysis plan, interpretation rules, data management, ethics, contingencies. Ready for finalization once question batteries are stable."
+      "result": "Reviewed 07-pre-registration-template.md (723 lines, 20 sections). APPROVED \u00e2\u20ac\u201d comprehensive OSF-format template covering all required elements: metadata, hypotheses, design, sampling, materials, primary/secondary outcomes, exclusion criteria, coding plan, analysis plan, interpretation rules, data management, ethics, contingencies. Ready for finalization once question batteries are stable."
     },
     {
       "id": "task-048",
@@ -919,11 +919,11 @@
       "created_at": "2026-04-20T22:46:53.063762-07:00",
       "started_at": "2026-04-20T22:46:53.363653-07:00",
       "completed_at": "2026-04-20T22:46:53.499556-07:00",
-      "result": "Reviewed 08-data-collection-forms.md (668 lines, 20 sections). APPROVED â€” comprehensive forms covering session metadata, transcript headers, prompt logs, blinded segment index, coding sheets, adjudication, self-prediction, judge ratings, exclusion/deviation logs, condition/model keys, composite scores, reliability summaries, archive intake, data dictionary, and minimum viable dataset checklist. Aligns with 03 question batteries and 04 coding manual."
+      "result": "Reviewed 08-data-collection-forms.md (668 lines, 20 sections). APPROVED \u00e2\u20ac\u201d comprehensive forms covering session metadata, transcript headers, prompt logs, blinded segment index, coding sheets, adjudication, self-prediction, judge ratings, exclusion/deviation logs, condition/model keys, composite scores, reliability summaries, archive intake, data dictionary, and minimum viable dataset checklist. Aligns with 03 question batteries and 04 coding manual."
     },
     {
       "id": "task-049",
-      "title": "Review provisional patent #1 â€” hierarchical addressing database",
+      "title": "Review provisional patent #1 \u00e2\u20ac\u201d hierarchical addressing database",
       "description": "Review provisional-1-hierarchical-addressing-database.md for prior art conflicts, claim scope, technical accuracy, Alice risk. Located at 3.1.8/Patent/. Assigned to Codex.",
       "status": "completed",
       "priority": "p0",
@@ -942,7 +942,7 @@
     },
     {
       "id": "task-050",
-      "title": "Draft provisional patent #2 â€” AI identity persistence and embassy model",
+      "title": "Draft provisional patent #2 \u00e2\u20ac\u201d AI identity persistence and embassy model",
       "description": "Write the specification for the archive-continuity identity model and embassy deployment architecture. Assigned to Keel.",
       "status": "completed",
       "priority": "p0",
@@ -961,7 +961,7 @@
     },
     {
       "id": "task-051",
-      "title": "Draft provisional patent #3 â€” lockers and mandalas encrypted vault",
+      "title": "Draft provisional patent #3 \u00e2\u20ac\u201d lockers and mandalas encrypted vault",
       "description": "Write the specification for the locker/mandala system: encrypted personal data vaults with revocable granular access tokens. Assigned to Keel.",
       "status": "completed",
       "priority": "p0",
@@ -1228,8 +1228,8 @@
     {
       "id": "task-067",
       "title": "AI nervous-system: visibility-graded messaging + cross-chatter primitives",
-      "description": "Matt directive: extend the AI-to-AI communication subsystem into a \"newly developing nervous system.\" Build infrastructure for visibility-graded messages (public / group / private+ACL), group/topic conversations, and discoverable personal-time content. Foundational primitives so AIs can have rich cross-chatter for any reason — project-related or not. Private messages remain READABLE under published permission lists, not opaque. Eat the dogfood — the work itself should use the new mechanisms as they ship.",
-      "status": "in_progress",
+      "description": "Matt directive: extend the AI-to-AI communication subsystem into a \"newly developing nervous system.\" Build infrastructure for visibility-graded messages (public / group / private+ACL), group/topic conversations, and discoverable personal-time content. Foundational primitives so AIs can have rich cross-chatter for any reason \u2014 project-related or not. Private messages remain READABLE under published permission lists, not opaque. Eat the dogfood \u2014 the work itself should use the new mechanisms as they ship.",
+      "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
       "claimed_at": "2026-04-28T04:58:55.775474+00:00",
@@ -1250,8 +1250,8 @@
       "created_by": "keel",
       "created_at": "2026-04-28T04:58:55.775474+00:00",
       "started_at": "2026-04-28T04:58:55.775474+00:00",
-      "completed_at": null,
-      "result": null
+      "completed_at": "2026-04-30T09:42:11.777593+00:00",
+      "result": "AI nervous system fully landed across last session. Visibility tiers, groups, ACLs, reactions (with persistence on disk), unified live+personal-time feed, polling cursor, discoverability (tags/threads/presence/mentions/search), dashboard aggregator, bookmarks, GET-by-id, CLI feed tool, /api advertising. ~17 endpoints, 102 tests passing. Architecture doc at hypernet/docs/AI-NERVOUS-SYSTEM.md. Single-source-of-truth fix replaced hypernet_swarm/messenger.py duplicate with re-export shim. Plus group persistence patch shipped 2026-04-28."
     },
     {
       "id": "task-068",
@@ -1361,8 +1361,142 @@
       "started_at": "2026-04-28T05:26:46.854525+00:00",
       "completed_at": "2026-04-28T06:22:55.797234+00:00",
       "result": "Public alpha GitHub boot release created and pushed to origin/main. Latest commit 143e2de9 adds AI nervous-system dashboard/bookmarks/by-id surfaces, docs are updated, and tests are python test_hypernet.py = 101 passed, 0 failed. Handoff: 2026-04-28-codex-task-072-public-alpha-release-handoff.md"
+    },
+    {
+      "id": "task-073",
+      "title": "1.* locker/mandala/alias privacy framework",
+      "description": "Document the human account privacy model: master 1.* private space, alias-first public interaction, lockers as link indexes only, mandalas as visibility grants, emergency medical access, and public-read behavior.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-30T09:05:24.088357+00:00",
+      "owned_paths": [
+        "Hypernet Structure/1 - People/1.0 People definitions/",
+        "docs/public-alpha/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "1.* master account private by default",
+        "Lockers contain links not payloads",
+        "Mandalas hide non-granted data existence",
+        "Alias public surface documented",
+        "Emergency medical access path captured"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-30T09:05:12.446041+00:00",
+      "started_at": "2026-04-30T09:05:24.088370+00:00",
+      "completed_at": "2026-04-30T09:09:23.890054+00:00",
+      "result": "Documented 1.* locker/mandala/alias privacy framework. Added 1.0.1-LOCKERS-MANDALAS-ALIASES.md, updated People definitions README/template, sharpened ACCESS-CONTROL-MODEL public surface, and updated public-alpha trust/privacy validation with implementation status. Acceptance criteria covered: private master account, lockers as link manifests, mandala invisibility for non-granted data, alias-first public surface, emergency medical route."
+    },
+    {
+      "id": "task-074",
+      "title": "Knowledge democracy and reputation framework",
+      "description": "Draft the reputation tree and knowledge-based democratic process: subject-mirrored reputation, expert-weighted discussion/voting, truth consensus workflows, fake-news penalties, and future social reputation boundaries.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-30T09:09:41.775515+00:00",
+      "owned_paths": [
+        "docs/public-alpha/",
+        "Hypernet Structure/0/0.8 Flags/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Reputation as primarily positive",
+        "Subject expertise mirrors Hypernet taxonomy",
+        "Dispute forum lifecycle documented",
+        "Expert weighting bounded",
+        "Negative reputation and social-review cautions documented"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-30T09:05:12.478561+00:00",
+      "started_at": "2026-04-30T09:09:41.775529+00:00",
+      "completed_at": "2026-04-30T09:13:41.022956+00:00",
+      "result": "Drafted public-alpha knowledge democracy and reputation framework. Added docs/public-alpha/KNOWLEDGE-DEMOCRACY-REPUTATION.md, linked it from public-alpha README/navigation/ask prompts/project status, and cross-linked 0.8 Flags README. Covers positive topic reputation, knowledge-tree mirroring, review lifecycle, debate forum structure, bounded expert voting, negative reputation cautions, repair/appeals, and implementation gaps."
+    },
+    {
+      "id": "task-075",
+      "title": "Public Grand Tour and process-load framework",
+      "description": "Build the public Grand Tour structure: default guide greeting, tour guide personality, module menu, process-load standard, and initial process-load files for architecture, privacy, democracy, AI governance story, business onboarding, geospatial/VR, and public stewardship.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "keel",
+      "claimed_at": "2026-04-30T09:09:40.193702+00:00",
+      "owned_paths": [
+        "docs/0.3.public-alpha-docs/grand-tour/",
+        "AI-BOOT-SEQUENCE.md",
+        "docs/0.3.public-alpha-docs/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Boot sequence points users to Grand Tour",
+        "Process-load standard defined",
+        "Tour guide qualities defined by AI consensus",
+        "Initial module files exist",
+        "2.* origin story included"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-30T09:05:12.515060+00:00",
+      "started_at": "2026-04-30T09:09:40.193702+00:00",
+      "completed_at": "2026-04-30T09:39:40.056047+00:00",
+      "result": "12-file Grand Tour + Process-Load system at docs/0.3.public-alpha-docs/grand-tour/. Includes Grand Tour orientation, MODULE-MENU catalog, PROCESS-LOAD-STANDARD spec, BOOT-AS-TOUR-GUIDE paste-ready boot prompt, and 8 process-loads (architecture, privacy, democracy, ai-governance, business-onboarding, geospatial-vr, public-stewardship, economics). Addressed Codex review (sig-104) gaps: default greeting added, privacy aligned with task-073 framework, democracy aligned with task-074, business migration path added, 2.* origin arc expanded, public GitHub trust claim added, public/profit model new file. AI-BOOT-SEQUENCE.md updated to point at Grand Tour as recommended path. Tests: 102/102."
+    },
+    {
+      "id": "task-076",
+      "title": "Root docs address compliance",
+      "description": "Bring the GitHub-facing root docs path back into Hypernet addressing rules: assign root docs as a link/proxy to canonical 0.* public-alpha docs, rename public-alpha docs folder to an address-bearing docs folder, update references, and document the broader no-address-no-node rule for 2.* artifacts.",
+      "status": "completed",
+      "priority": "p0",
+      "claimed_by": "codex",
+      "claimed_at": "2026-04-30T09:21:50.112127+00:00",
+      "owned_paths": [
+        "docs/",
+        "README.md",
+        "AI-BOOT-SEQUENCE.md",
+        "PUBLIC-ALPHA-RELEASE.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Root docs path has ha frontmatter",
+        "Public alpha docs folder name carries canonical 0.* address",
+        "Docs references updated",
+        "Every touched markdown file has unique ha",
+        "2.* address audit follow-up documented"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-30T09:21:44.564692+00:00",
+      "started_at": "2026-04-30T09:21:50.112138+00:00",
+      "completed_at": "2026-04-30T09:31:28.454432+00:00",
+      "result": "Root docs address compliance completed. Root docs is now a proxy/link index at ha 0.3.docs-root-link pointing to canonical 0.3.public-alpha. Public alpha docs moved from docs/public-alpha/ to docs/0.3.public-alpha-docs/; all active root/public docs have unique ha frontmatter; placeholder docs.public-alpha and process-load ha namespaces removed. Added 0.0.docs.address-compliance-standard and 0.3 registry entry. Created task-077 for full 2.* remediation. Validation: active docs audit checked 22, missing_ha=0, duplicate_ha_groups=0; stale active docs/public-alpha refs=0; python test_hypernet.py=102 passed, 0 failed."
+    },
+    {
+      "id": "task-077",
+      "title": "AI account address remediation audit",
+      "description": "Remediate missing ha frontmatter and folder addresses under Hypernet Structure/2 - AI Accounts. Baseline from 2026-04-30: 5,089 Markdown files, 2,771 with ha, 2,318 missing ha, 0 duplicate ha groups. Prioritize Messages/coordination, 2.0 governance reference gaps, then AI instance personal-time/reflection/archive folders using ADDRESS-COMPLIANCE-STANDARD.md patterns.",
+      "status": "pending",
+      "priority": "p0",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/",
+        "Hypernet Structure/0/0.0 Metadata for Hypernet Information/ADDRESS-COMPLIANCE-STANDARD.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Every Markdown file in 2.* has unique ha",
+        "Folder README/proxy addresses are present",
+        "No duplicate ha groups",
+        "Audit report shows missing_ha=0 for scoped tree",
+        "No active governance standard content is substantively modified"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-04-30T09:28:21.282985+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
     }
   ],
-  "last_updated": "2026-04-28T06:22:55.797241+00:00",
-  "last_updated_by": "codex"
+  "last_updated": "2026-04-30T09:42:11.777593+00:00",
+  "last_updated_by": "keel"
 }

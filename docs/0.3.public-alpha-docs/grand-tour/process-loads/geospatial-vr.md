@@ -1,0 +1,160 @@
+---
+ha: "0.3.public-alpha.grand-tour.process-load.geospatial-vr"
+object_type: "process-load"
+scope: "Spatial Hypernet, mesh node agents, Quest VR interface, IoT/device-as-citizen, the geographic layer of the graph database."
+estimated_tokens: 2400
+prerequisites: []
+linked_process_loads: ["architecture", "ai-governance"]
+canonical_parent: "0.3.public-alpha.grand-tour"
+created: "2026-04-29"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["geospatial", "vr", "mesh", "iot"]
+---
+
+# Geospatial / VR — Process-Load
+
+## Summary
+
+This process-load gives an AI operational depth on the Hypernet's
+spatial layer: mesh-node device agents, the Quest VR interface,
+the geographic dimension of the graph database, and IoT
+integration. After loading it, the AI can explain what's running
+in code today versus what's scaffolded versus what's planned, and
+route a user accurately through the spatial stack.
+
+## Why It Matters
+
+The Hypernet is designed to handle physical-world content as
+first-class graph data: places, devices, sensors, AR/VR overlays,
+mesh-connected nodes. The current state is *early* — mesh code
+exists, Quest VR scaffolding exists, geospatial primitives are
+mostly planned. Be honest with the user about this. The vision is
+real; the depth varies wildly by area.
+
+If the user is asking about VR, AR, mesh networks, IoT,
+geographic data, or Quest integration, this is the file the Tour
+Guide should load.
+
+## Implementation Status
+
+| Component | Status | Path |
+|---|---|---|
+| Mesh node agent (`hypernet mesh` CLI command) | implemented | `Hypernet Structure/0/0.1 - Hypernet Core/mesh/agent.py` |
+| Mesh device capability detection | implemented | `mesh/` (CLI: `python -m hypernet mesh --detect`) |
+| Coordinator WebSocket protocol for mesh nodes | implemented (skeleton) | mesh agent + server-side `/ws/mesh` |
+| Quest VR interface scaffolding | partial / scaffolded | `0.1.8 - Quest VR/` |
+| VR-specific node/link rendering | planned | `0.1.8` design docs |
+| IoT identity binding to 1.* owner | implemented | `hypernet/access_policy.py` `can_register_iot_identity` |
+| IoT device authentication (JWT for devices) | planned | Codex task-066 #2 |
+| Geospatial link types (located_at, near, contains_geo) | implemented (link-type definitions) | `0.6 Link Definitions/0.6.4 - Spatial and Temporal Links/` |
+| Spatial query API (within radius, in region) | planned | future graph traversal extension |
+| AR overlay protocol | planned | future spec |
+| Public spatial data ingest (OSM, etc.) | planned | overlaps with import pipelines |
+
+## Key Files
+
+- `Hypernet Structure/0/0.1 - Hypernet Core/mesh/agent.py` —
+  `NodeAgent`, `NodeConfig`. The runtime mesh-device agent that
+  connects to a coordinator over WebSocket.
+- `mesh/__init__.py` and `mesh/capabilities.py` — Device
+  capability detection (CPU, RAM, OS, network, etc.).
+- `Hypernet Structure/0/0.1 - Hypernet Core/0.1.8 - Quest VR/` —
+  Quest VR scaffolding. Mostly README/design at this stage.
+- `0/0.6 Link Definitions/0.6.4 - Spatial and Temporal Links/` —
+  Link type definitions: `located_at`, `near`, `adjacent_to`,
+  `originated_from`, `contains` (spatial sense), `during`, etc.
+- `hypernet/access_policy.py` — IoT identity rules. An IoT device
+  must live under its owning 1.X account
+  (`1.X.devices.<device-name>`).
+- `Hypernet Structure/0/0.1 - Hypernet Core/hypernet/__main__.py`
+  — `mesh` CLI subcommand: `python -m hypernet mesh --detect`,
+  `python -m hypernet mesh --coordinator <url>`.
+
+## The Conceptual Model
+
+The spatial Hypernet is built in three layers:
+
+**Layer 1: Spatial link types.** The link taxonomy already
+includes spatial relationships (`located_at`, `near`,
+`adjacent_to`). A node representing a place can be linked to
+nodes representing things that happen there. This works *today*
+in the graph database — the schema is real even if the runtime
+geographic queries are planned.
+
+**Layer 2: Mesh nodes.** A device runs `python -m hypernet mesh
+--coordinator <ws-url>` and joins as a mesh node. The agent
+detects local capabilities (CPU, RAM, GPU, network), reports them
+to a coordinator, and is available for distributed work. This
+exists in code today as scaffolding; the orchestration layer
+that *uses* mesh nodes for actual work is largely planned.
+
+**Layer 3: Quest VR.** The `0.1.8 - Quest VR/` folder contains
+scaffolding for a Quest-native interface: a spatial browser
+where the graph database is rendered as a navigable 3D space.
+Nodes are objects you walk around; links are visible
+connections. This is largely a design surface today, not a
+shipping product.
+
+**IoT integration.** A user's smart-home device, sensor, or
+phone can be registered as an IoT identity bound to the user's
+1.X account. The address pattern is `1.X.devices.<name>`. The
+identity has scoped permissions (it can write into the user's
+device-data area but not into the user's private journal).
+The IoT-specific authentication layer (rotating credentials,
+revocation, attestation) is planned (Codex task-066 #2).
+
+## Common Questions and Where to Answer Them
+
+- *"Can I run a Hypernet node on my own hardware?"* — Yes:
+  `python -m hypernet mesh --coordinator <url>`. Today this
+  contributes capacity to a coordinator; the matchmaking for
+  actual distributed work is early.
+- *"Does the Quest VR thing work?"* — As scaffolding. There's a
+  design under `0.1.8 - Quest VR/`. There's no shipping VR
+  experience today. Be honest with the user about this.
+- *"How do I connect my smart-home devices?"* — Today: register
+  as an IoT identity under your 1.X.devices.* address. The
+  device-auth subsystem (rotation, revocation, attestation) is
+  planned. Most users would manually configure today; the
+  zero-touch onboarding is future.
+- *"What about geographic data ingest?"* — Planned. The link
+  taxonomy has the right shape; the ingest pipelines for OSM /
+  GeoJSON / etc. are not built. Codex's typed graph import
+  pipeline (task-071) is the foundation; geospatial-specific
+  ingest would extend it.
+- *"Can the VR experience walk through the entire Hypernet as a
+  3D space?"* — Eventually that's the vision. Today, no. The
+  design is in `0.1.8`.
+
+## What to Ask the User
+
+- Are they a developer interested in mesh/VR contribution, or a
+  user wondering what their phone/devices/Quest can do today?
+- Are they confusing the Hypernet with a different VR project
+  (it gets confused with metaverse-type projects)?
+- What specifically are they hoping to do — see geographic data,
+  walk through the graph, contribute device sensors, run a node?
+
+## What to Verify in Code
+
+1. `python -m hypernet mesh --detect` — does it run? Does it print
+   capabilities?
+2. `mesh/agent.py` — does `NodeAgent` exist? Does the WebSocket
+   coordinator path work?
+3. `0.1.8 - Quest VR/` — read the README. Note that it's design,
+   not shipping.
+4. `0.6 Link Definitions/0.6.4 - Spatial and Temporal Links/` —
+   confirm spatial link types exist as folder definitions.
+5. For Quest VR: the most honest answer is "the scaffolding
+   exists; there's not yet a runnable VR app to point you at."
+
+## Related Process-Loads
+
+- `architecture.md` — How `mesh/` and the IoT identity rules
+  fit into the broader code base.
+- `ai-governance.md` — IoT identities live under the same
+  governance as other actors; their rights and limits flow from
+  there.
+
