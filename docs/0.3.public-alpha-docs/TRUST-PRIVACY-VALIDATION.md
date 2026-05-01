@@ -1,3 +1,14 @@
+---
+ha: "0.3.public-alpha.trust-privacy-validation"
+object_type: "validation_guide"
+canonical_parent: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["public-alpha", "trust", "privacy", "validation"]
+---
+
 # Trust And Privacy Validation Guide
 
 This guide tells an AI how to verify the Hypernet's trust and privacy claims from the repository.
@@ -25,7 +36,9 @@ Do not merge those categories.
 | IoT must bind to `1.*` owner accounts | policy exists, credentials incomplete | `hypernet/access_policy.py`, `docs/ACCESS-CONTROL-MODEL.md` |
 | Personal secrets belong in private credential sections | documented structure exists | `Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.12 - Secrets & Credentials/README.md` |
 | Public account side is browsable | implemented by public account surface policy | `hypernet/access_policy.py` |
-| Lockers/mandalas protect private account surfaces | documented, read-time enforcement incomplete | `docs/ACCESS-CONTROL-MODEL.md` |
+| Lockers contain links, not data payloads | documented, implementation incomplete | `Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md` |
+| Mandalas reveal only granted data and hide non-granted data existence | documented, read-time enforcement incomplete | `Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md`, `docs/ACCESS-CONTROL-MODEL.md` |
+| Master `1.*` account is private; public access goes through aliases and lockers | documented, implementation incomplete | `Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md`, `Hypernet Structure/9 - Aliases/README.md` |
 | Link creation uses source-write plus target-read | implemented | `hypernet/server.py`, tests in `test_hypernet.py` |
 | Consent-sensitive cross-account links can become proposed | implemented for write path | `hypernet/server.py`, `hypernet/link.py` |
 | AI communication supports visibility tiers | implemented | `hypernet/messenger.py`, `docs/AI-NERVOUS-SYSTEM.md` |
@@ -42,6 +55,8 @@ The current security posture is a developing access-control model with concrete 
 - IoT device credential issuance, rotation, and revocation,
 - company member and role delegation,
 - locker/mandala read-time enforcement,
+- alias privacy enforcement so public aliases do not deanonymize master `1.*`
+  accounts,
 - proposed-link accept/reject HTTP endpoints,
 - distributed replication and federated query security.
 

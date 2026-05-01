@@ -19,6 +19,12 @@ This folder contains the foundational definitions, templates, and governance for
 ### PERSON-FOLDER-TEMPLATE.md
 Standard folder structure template that should be applied to all person nodes (1.1, 1.2, 1.3, etc.).
 
+### 1.0.1-LOCKERS-MANDALAS-ALIASES.md
+Privacy framework for human accounts: master `1.*` accounts are private by
+default; public interaction happens through aliases and lockers; lockers contain
+links back to private data rather than payloads; mandalas grant visible
+subgraphs and hide non-granted data existence.
+
 ### Person Numbering System
 
 **1.1 - 1.10:** Core Team & Family
@@ -118,6 +124,10 @@ Every personal account needs a private credential area and a public surface:
 - `1.X.11 - Secrets & Credentials` stores only metadata and encrypted locker references for passwords, API keys, recovery codes, device credentials, and signing keys.
 - `1.X.12 - Public Profile & Lockers` is the browsable public side of the account, including public profile data, public keys, public claims, and locker/mandala indexes.
 - Existing accounts may shift these extension addresses if a slot was already in use. Matt's `1.1` account uses `1.1.12` and `1.1.13`.
+
+Lockers are link manifests, not data stores. Mandalas decide which linked data
+is visible, and non-granted linked data should be invisible rather than merely
+redacted. See `1.0.1-LOCKERS-MANDALAS-ALIASES.md`.
 
 ## Implementation Status
 

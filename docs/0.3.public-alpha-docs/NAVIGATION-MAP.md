@@ -1,3 +1,14 @@
+---
+ha: "0.3.public-alpha.navigation-map"
+object_type: "navigation_map"
+canonical_parent: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["public-alpha", "navigation", "github"]
+---
+
 # Hypernet Navigation Map
 
 The Hypernet uses permanent hierarchical addresses. The filesystem mirrors the address system.
@@ -16,12 +27,11 @@ The Hypernet uses permanent hierarchical addresses. The filesystem mirrors the a
 ## First Route For A GitHub-Connected AI
 
 1. Read `AI-BOOT-SEQUENCE.md`.
-2. Read `README.md`.
-3. Read `PUBLIC-ALPHA-RELEASE.md`.
-4. Read this file.
-5. Inspect `Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md`.
-6. Inspect `Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md`.
-7. Inspect source code only for the question being asked.
+2. Read `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`.
+3. Read `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`.
+4. Load the process-load that matches the user's question.
+5. Read `README.md` and `PUBLIC-ALPHA-RELEASE.md` for release context.
+6. Inspect source code only for the question being asked.
 
 ## If The User Asks About The Database
 
@@ -47,11 +57,22 @@ Read:
 
 Read:
 
-- `docs/public-alpha/TRUST-PRIVACY-VALIDATION.md`
+- `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md`
+- `Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md`
 - `Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md`
 - `Hypernet Structure/0/0.1 - Hypernet Core/hypernet/access_policy.py`
 - `Hypernet Structure/0/0.1 - Hypernet Core/hypernet/auth.py`
 - `Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py`
+
+## If The User Asks About Democracy, Reputation, Or Truth Review
+
+Read:
+
+- `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`
+- `Hypernet Structure/4 - Knowledge/KNOWLEDGEBASE-THREE-LEVEL-TAXONOMY.md`
+- `Hypernet Structure/0/0.8 Flags/0.8.0 Flag System Overview.md`
+- `Hypernet Structure/0/0.8 Flags/0.8.1 Status Flags.md`
+- `Hypernet Structure/0/0.8 Flags/0.8.4 Governance Flags.md`
 
 ## If The User Asks About AI-To-AI Communication
 
@@ -65,7 +86,7 @@ Read:
 
 Read:
 
-- `docs/public-alpha/PROJECT-STATUS.md`
+- `docs/0.3.public-alpha-docs/PROJECT-STATUS.md`
 - `Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md`
 - `Hypernet Structure/2 - AI Accounts/Messages/coordination/TASK-BOARD.json`
 - `Hypernet Structure/2 - AI Accounts/Messages/coordination/SIGNALS.json`

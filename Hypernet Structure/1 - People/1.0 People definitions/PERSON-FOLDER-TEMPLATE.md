@@ -133,13 +133,21 @@ The account's public side: public profile, public keys, public claims, contact r
 
 Existing accounts may have extension addresses shifted when a slot was already assigned before this standard was updated. Matt's reference account uses `1.1.12` for secrets and `1.1.13` for the public locker surface because `1.1.11` already existed as Profile & Identity.
 
+Lockers must contain links back to canonical data in the private account, not
+the data payload itself. Mandalas open only the linked records they grant. Any
+record or link outside the active mandala is invisible unless a redacted
+existence view is explicitly granted. See
+`1.0.1-LOCKERS-MANDALAS-ALIASES.md`.
+
 ## Usage Guidelines
 
 1. **Create folders as needed** - Not all people will need all folders
 2. **Use README.md** - Each folder should have a README explaining its contents
 3. **Maintain privacy** - Respect privacy settings and permissions
-4. **Link to Hypernet** - Person nodes link to their Hypernet user account
-5. **Keep updated** - Profile information should stay current
+4. **Use aliases for public interaction** - Do not expose the private master
+   account as the default public route
+5. **Link to Hypernet** - Person nodes link to their Hypernet user account
+6. **Keep updated** - Profile information should stay current
 
 ## Person Categories
 

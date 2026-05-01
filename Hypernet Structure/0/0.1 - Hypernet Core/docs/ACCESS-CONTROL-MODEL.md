@@ -78,9 +78,24 @@ IoT identities must be tied to a `1.*` owner account and should live under that 
 
 Accounts need a public side and a private side. The public side is browsable. Private records are sealed behind lockers and mandalas:
 
-- A locker is the sealed data container or vault reference.
-- A mandala is the access pattern: who can open it, under what conditions, and for what scope.
-- Public metadata can describe that a locker exists without exposing its contents.
+- A locker is a link manifest: it contains links back to private account data,
+  not the private data payload itself.
+- A mandala is the access pattern: who can open a locker, under what
+  conditions, for which linked records, and for what duration.
+- Non-granted records and links should be invisible to the requester, including
+  their existence, unless the mandala explicitly grants a redacted existence
+  view.
+- The master `1.*` account should be treated as the person's private home.
+  Public interaction should go through public profile surfaces, aliases, and
+  lockers rather than direct browsing of the master account.
+- Truly public data still uses a mandala; the public mandala is simply
+  auto-granted.
+
+The current detailed design is in:
+
+```text
+Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md
+```
 
 ## Remaining Security Work
 

@@ -17,6 +17,7 @@ This registry records the 2026-04-21 collision resolution that made `0.3` the ca
 | Address | Title | Notes |
 |---------|-------|-------|
 | `0.3` | Building in Public | Canonical public build/research section |
+| `0.3.public-alpha` | Public Alpha Documentation | GitHub-facing docs physically mirrored at `docs/0.3.public-alpha-docs/`; root `docs/` is only a proxy/link index |
 | `0.3.research` | AI Self-Report Reliability Research Project | External links exist; do not move without redirect plan |
 
 ## Readdressed Former Collisions
@@ -29,4 +30,3 @@ This registry records the 2026-04-21 collision resolution that made `0.3` the ca
 ## Maintenance Rule
 
 New files in this section must use unique addresses under `0.3.*`. Do not reuse bare `0.3` except for this section README.
-

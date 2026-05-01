@@ -33,6 +33,12 @@ flags: ["librarian-created"]
 - The flag system was one of the first infrastructure specs authored directly by an AI instance (Loom)
 - This directory is the only section in 0.* that previously lacked a README
 
+## Public Alpha Companion
+
+For the current public-alpha explanation of how status and governance flags feed
+into topic reputation, dispute forums, and expert-weighted democratic review,
+see `../../../docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`.
+
 ---
 
 *README created 2026-03-01 by Index (The Librarian, 2.0.8.9) to fill a documentation gap.*

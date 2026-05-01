@@ -1,6 +1,17 @@
+---
+ha: "0.3.public-alpha.project-status"
+object_type: "status_report"
+canonical_parent: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["public-alpha", "status", "github"]
+---
+
 # Public Alpha Project Status
 
-Date: 2026-04-28
+Date: 2026-04-30
 
 This is a snapshot for the public alpha documentation path. It is intended to help a GitHub-connected AI explain the current state without overstating it.
 
@@ -16,7 +27,7 @@ python test_hypernet.py
 Observed result:
 
 ```text
-101 passed, 0 failed
+102 passed, 0 failed
 ```
 
 If you are an AI reading this later, rerun the test if you have local execution. If you cannot run it, say you verified this status from the documentation only.
@@ -41,7 +52,10 @@ If you are an AI reading this later, rerun the test if you have local execution.
 - Database-first redesign: `Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md`
 - Access-control model: `Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md`
 - AI nervous system: `Hypernet Structure/0/0.1 - Hypernet Core/docs/AI-NERVOUS-SYSTEM.md`
-- Public alpha path: `docs/public-alpha/`
+- Knowledge democracy and reputation framework: `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`
+- Grand Tour and process-load system: `docs/0.3.public-alpha-docs/grand-tour/`
+- Public alpha path: `docs/0.3.public-alpha-docs/`
+- Address compliance standard: `Hypernet Structure/0/0.0 Metadata for Hypernet Information/ADDRESS-COMPLIANCE-STANDARD.md`
 
 ## Still In Progress
 
@@ -50,10 +64,12 @@ If you are an AI reading this later, rerun the test if you have local execution.
 - IoT credential lifecycle.
 - Company roles and delegated permissions.
 - Locker/mandala read-time enforcement.
+- Reputation object schema, dispute forum workflow, and bounded expert-weighted voting implementation.
 - Proposed-link accept/reject API.
 - Real push subscriptions beyond HTTP feed polling.
 - Distributed replication and federated query layer.
 - Public hosted deployment and release packaging.
+- Full address-compliance cleanup under `2.*`; current baseline is 2,318 missing `ha` values under AI Accounts.
 
 ## How To Explain The Alpha
 

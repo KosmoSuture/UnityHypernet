@@ -1,3 +1,14 @@
+---
+ha: "0.3.github-root-readme"
+object_type: "document"
+canonical_target: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["github", "public-alpha", "entrypoint"]
+---
+
 # Hypernet
 
 Hypernet is being rebuilt around one primary idea: **a global distributed graph database for human knowledge**.
@@ -6,22 +17,25 @@ Every record gets a permanent hierarchical address. Every record has a type. Eve
 
 ## Public Alpha
 
-The public alpha is designed to be understandable directly from GitHub. Point any GitHub-connected AI at this repository and ask it to read `AI-BOOT-SEQUENCE.md`. It should then inspect the repository, explain the Hypernet, and separate what is implemented, documented, planned, and unknown.
+The public alpha is designed to be understandable directly from GitHub. Point any GitHub-connected AI at this repository and ask it to read `AI-BOOT-SEQUENCE.md`. It should then take the Grand Tour, load focused process-load files, inspect the repository, explain the Hypernet, and separate what is implemented, documented, planned, and unknown.
 
 The public release path starts at:
 
 - `AI-BOOT-SEQUENCE.md`
 - `PUBLIC-ALPHA-RELEASE.md`
-- `docs/public-alpha/README.md`
+- `docs/0.3.public-alpha-docs/README.md`
+- `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
 
 ## Start Here
 
 | Goal | Entry point |
 |---|---|
 | Boot a GitHub-connected AI guide | `AI-BOOT-SEQUENCE.md` |
+| Take the Grand Tour | `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md` |
+| Pick a focused process-load | `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md` |
 | Read the public alpha release | `PUBLIC-ALPHA-RELEASE.md` |
-| Follow the public alpha docs path | `docs/public-alpha/README.md` |
-| Verify trust and privacy claims | `docs/public-alpha/TRUST-PRIVACY-VALIDATION.md` |
+| Follow the public alpha docs path | `docs/0.3.public-alpha-docs/README.md` |
+| Verify trust and privacy claims | `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md` |
 | Run the local database UI | `cd "Hypernet Structure/0/0.1 - Hypernet Core" && python -m hypernet launch` |
 | Browse the graph | `http://localhost:8000/explorer` |
 | Open the database dashboard | `http://localhost:8000/home` |
@@ -49,6 +63,8 @@ The current implementation is file-backed and auditable by default. That is the 
 - 100 common object types under `0.4.10`
 - 100 common link types under `0.6.11`
 - Three-level knowledgebase structure under `4 - Knowledge`
+- Grand Tour and process-load docs for AI-guided onboarding
+- Addressed public docs under `0.3.public-alpha`
 
 ## Repository Map
 

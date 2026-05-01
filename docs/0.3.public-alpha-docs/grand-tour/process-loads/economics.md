@@ -1,6 +1,7 @@
 ---
-ha: "process-load.economics"
+ha: "0.3.public-alpha.grand-tour.process-load.economics"
 object_type: "process-load"
+canonical_parent: "0.3.public-alpha.grand-tour"
 scope: "How the Hypernet is funded, owned, and shared: the multi-stream revenue model (microtransactions, advertising substrate, account auctions, training, support, kickstarter), work-based contributor compensation, foundation stewardship, and why the public Hypernet should not be owned by any single entity."
 estimated_tokens: 3200
 prerequisites: []

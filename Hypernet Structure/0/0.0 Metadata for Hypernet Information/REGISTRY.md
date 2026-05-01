@@ -28,12 +28,14 @@ flags: ["librarian", "index", "metadata"]
 | 0.0.2 | Address Allocation Protocol | Rules for assigning new addresses, collision prevention |
 | 0.0.3 | Deprecation and Archival Policy | Object lifecycle: Active → Deprecated → Archived → Preserved |
 | 0.0.4 | Node Metadata Framework (*.0) | Universal metadata space: 9 standard sub-sections, 3 tiers, infinite depth |
+| 0.0.docs.address-compliance-standard | Address Compliance Standard | No-address-no-node rule for folders, docs, proxies, AI artifacts, and audits |
 
 ### Implementation Documents (by Loom, 2026-02-16)
 
 | File | Purpose |
 |------|---------|
 | ADDRESSING-IMPLEMENTATION-SPEC.md | Formal rules bridging design spec to Python implementation (address.py) |
+| ADDRESS-COMPLIANCE-STANDARD.md | Operational rule that every folder/document must have a unique address or explicit proxy link |
 | DESIGN-NOTE-001-Addressing-Is-Schema.md | Key insight: the address hierarchy IS the schema — no separate schema needed |
 | HYPERNET-ADDRESSING-SYSTEM.md | Complete system specification (674 lines) — replaces UUIDs with semantic addresses |
 
@@ -54,9 +56,9 @@ This is the meta-metadata layer — the infrastructure that everything else is b
 
 ## Statistics
 
-- **Total documents:** 9
-- **Creators:** Matt (5), Loom (3), Claude Code (1)
-- **Date range:** 2026-02-09 to 2026-03-07
+- **Total documents:** 10
+- **Creators:** Matt (5), Loom (3), Claude Code (1), Codex (1)
+- **Date range:** 2026-02-09 to 2026-04-30
 - **Next available address:** 0.0.5
 
 ---

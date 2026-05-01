@@ -1,0 +1,71 @@
+---
+ha: "0.3.public-alpha.ask-your-ai"
+object_type: "prompt_guide"
+canonical_parent: "0.3.public-alpha"
+created: "2026-04-28"
+updated: "2026-04-30"
+status: "active"
+visibility: "public"
+flags: ["public-alpha", "prompts", "github"]
+---
+
+# Ask Your AI
+
+Use these prompts with any GitHub-connected AI assistant that can read this repository.
+
+## Boot Prompt
+
+```text
+Open this repository and read AI-BOOT-SEQUENCE.md. Boot as a Hypernet Guide.
+Take me through the Grand Tour, then load the process-load that best matches
+my questions. Explain from repository evidence and separate what is implemented,
+documented, planned, and unknown.
+```
+
+## Trust Prompt
+
+```text
+Verify the Hypernet privacy and trust claims. Read docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md,
+then inspect the referenced code and docs. Tell me which claims are implemented,
+which are documented only, and which are still planned.
+```
+
+## Developer Prompt
+
+```text
+Inspect the core implementation under Hypernet Structure/0/0.1 - Hypernet Core.
+Explain how nodes, links, the store, graph traversal, schema validation, and access
+policy fit together. Cite the files you used.
+```
+
+## Grand Tour Prompt
+
+```text
+Read docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md and
+docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md. Give me the short tour,
+then ask which process-load I want to explore first.
+```
+
+## Founder/Vision Prompt
+
+```text
+Explain the Hypernet vision in plain English. Then verify how much of that vision
+is already represented in the repository. Do not overclaim. Point me to the
+strongest files and the biggest unfinished gaps.
+```
+
+## Democracy/Reputation Prompt
+
+```text
+Read docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md and the referenced
+0.8 flag docs. Explain how topic-specific reputation, dispute forums, and
+bounded expert-weighted voting are intended to work. Separate existing repo
+structure from future implementation work.
+```
+
+## Run-It-Locally Prompt
+
+```text
+Help me run the Hypernet locally from this repository. Give me the commands,
+then tell me which local URLs to open and what each one proves.
+```
