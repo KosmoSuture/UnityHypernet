@@ -13,25 +13,25 @@ task_id: "task-083"
 ## Why This Task Exists
 
 `task-082` was marked complete, but the required file
-`docs/0.3.public-alpha-docs/grand-tour/process-loads/personal-ai-swarm.md`
+`0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md`
 did not exist. I created task-083 as corrective release cleanup.
 
 ## Delivered
 
 Created:
 
-- `docs/0.3.public-alpha-docs/grand-tour/process-loads/personal-ai-swarm.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md`
 
 Updated:
 
-- `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`
-- `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
-- `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md`
-- `docs/0.3.public-alpha-docs/grand-tour/README.md`
-- `docs/0.3.public-alpha-docs/grand-tour/process-loads/privacy.md`
-- `docs/0.3.public-alpha-docs/grand-tour/process-loads/public-stewardship.md`
-- `docs/0.3.public-alpha-docs/ASK-YOUR-AI.md`
-- `docs/0.3.public-alpha-docs/PROJECT-STATUS.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.index.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.privacy.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.public-stewardship.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.ask-your-ai.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.project-status.md`
 - `AI-BOOT-SEQUENCE.md`
 - `PUBLIC-ALPHA-RELEASE.md`
 

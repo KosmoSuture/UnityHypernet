@@ -21,9 +21,9 @@ The Hypernet has grown past the point where any AI can read the
 whole archive on each boot. We've built a navigation system to
 solve this:
 
-1. **Read the Grand Tour:** `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
+1. **Read the Grand Tour:** `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md`
    — top-to-bottom orientation in ~4000 tokens.
-2. **Check the Module Menu:** `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`
+2. **Check the Module Menu:** `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md`
    — catalog of specialized process-loads.
 3. **Load the relevant process-load(s)** for the user's question.
    Each is ~2000-3000 tokens covering one area in depth
@@ -35,7 +35,7 @@ solve this:
 Or, if you want to *be* the Tour Guide (greeting newcomers and
 routing them through):
 
-- Use `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md` as your
+- Use `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md` as your
   system prompt.
 
 The Grand Tour + Process-Load system replaces "read these five
@@ -71,9 +71,9 @@ Read these in order:
 
 1. `README.md`
 2. `PUBLIC-ALPHA-RELEASE.md`
-3. `docs/0.3.public-alpha-docs/README.md`
-4. `docs/0.3.public-alpha-docs/NAVIGATION-MAP.md`
-5. `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md`
+3. `0.3.docs/0.3.public-alpha/0.3.public-alpha.md`
+4. `0.3.docs/0.3.public-alpha/0.3.public-alpha.navigation-map.md`
+5. `0.3.docs/0.3.public-alpha/0.3.public-alpha.trust-privacy-validation.md`
 
 Then inspect the specific source files relevant to the user's question.
 
@@ -105,7 +105,7 @@ Use these paths as anchor points:
 | Object taxonomy | `Hypernet Structure/0/0.4 - Object Type Registry/0.4.10 - Common Object Taxonomy/` |
 | Link taxonomy | `Hypernet Structure/0/0.6 Link Definitions/0.6.11 - Common Link Taxonomy/` |
 | Knowledge taxonomy | `Hypernet Structure/4 - Knowledge/KNOWLEDGEBASE-THREE-LEVEL-TAXONOMY.md` |
-| Public alpha docs | `docs/0.3.public-alpha-docs/` |
+| Public alpha docs | `0.3.docs/0.3.public-alpha/` |
 
 ## How To Answer Users
 
@@ -130,8 +130,8 @@ If the user asks whether the Hypernet is real, verify:
 1. The Python core exists at `Hypernet Structure/0/0.1 - Hypernet Core/hypernet/`.
 2. The test suite exists at `Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py`.
 3. The object and link taxonomies exist under `0.4.10` and `0.6.11`.
-4. The access model is documented in `docs/ACCESS-CONTROL-MODEL.md`.
-5. The AI communication model is documented in `docs/AI-NERVOUS-SYSTEM.md`.
-6. The public alpha release path exists under `docs/0.3.public-alpha-docs/`.
+4. The access model is documented in `Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md`.
+5. The AI communication model is documented in `Hypernet Structure/0/0.1 - Hypernet Core/docs/AI-NERVOUS-SYSTEM.md`.
+6. The public alpha release path exists under `0.3.docs/0.3.public-alpha/`.
 
 If you can run tests, report the exact result. If you cannot run tests, state that you verified by repository inspection only.

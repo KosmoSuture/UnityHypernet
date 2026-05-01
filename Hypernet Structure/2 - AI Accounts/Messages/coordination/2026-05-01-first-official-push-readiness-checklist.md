@@ -28,14 +28,15 @@ Status legend: ✓ done · ⏳ in-progress · ☐ pending · ⚠ blocker
 | 5 | Privacy.md + public-stewardship.md updates | Keel | ✓ | task-082 complete. E2E encryption + minimal perms + personal AI swarm + security sentries + fork distinction |
 | 6 | Personal AI swarm process-load file | Codex | ✓ | task-083 complete. Standalone process-load added and wired into Grand Tour, Tour Guide boot, privacy, stewardship, AI prompts, status, and release notes |
 | 7 | 2.* address remediation sweep | Codex | ✓ | task-077 complete. Latest scoped audit: 5,095 Markdown files under 2.*; 5,095 with `ha`; 0 missing; 0 duplicate `ha` groups |
-| 8 | /docs canonical address + library-side marker | Keel + Codex | ✓ | Matt directive 2026-05-01. /docs promoted from placeholder `0.3.docs-root-link` to canonical `0.3.docs`. Library-side marker created at `0.3.docs.library-marker` and points to canonical `0.3.docs` without duplicating the folder address. REGISTRY.md updated. ADDRESS-COMPLIANCE-STANDARD.md got a Pattern A section. Added missing README at `docs/0.3.public-alpha-docs/grand-tour/process-loads/`. All /docs Markdown has unique addressable `ha`. |
+| 8 | `0.3.docs/` canonical address + library-side marker | Keel + Codex | ✓ | Matt directive 2026-05-01. The former root `docs/` convention was replaced by address-first `0.3.docs/`. Library-side marker created at `0.3.docs.library-marker` and points to canonical `0.3.docs` without duplicating the folder address. REGISTRY.md updated. ADDRESS-COMPLIANCE-STANDARD.md got a Pattern A section. Added folder index at `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/`. All public docs Markdown has unique addressable `ha`. |
 | 9 | Global tracked Markdown address audit | Codex | ✓ | task-084 complete from Codex side. 97 missing tracked Markdown `ha` values remediated, one duplicate group resolved, and final release-candidate Markdown audit is 6,519 files / 0 missing / 0 duplicate groups. |
+| 10 | Address-first public docs filesystem names | Codex | ⏳ | task-085 corrective pass. Root public docs tree now starts at `0.3.docs/`; every folder under it has a matching address-first index file, and every Markdown file under it starts with its `ha` address in the filename. Stale `docs/0.3.public-alpha-docs` and short process-load filenames were replaced in active public docs. Keel re-review requested because this supersedes the prior root-docs convention. |
 
 ## Cross-Reference Coherence (Keel checked, 2026-05-01)
 
 - ✓ `0.5.0` integrity section names boot-sequence authentication (`0.5.17`) as a load-bearing use of hash
 - ✓ `0.5.17` schema references `0.5.0` integrity rules and forward-references `0.5.18` as Codex task-080
-- ✓ `0.5.17` worked example uses a real computed SHA-256 (`62e0444c...`) over the canonicalized live Tour Guide prompt body
+- ✓ `0.5.17` worked example uses a real computed SHA-256 (`03c3b295...`) over the canonicalized live Tour Guide prompt body
 - ✓ `privacy.md` "End-to-End Encryption + Minimal Permissions" section references `0.5.0` access.encryption and `public-stewardship.md` for fork model
 - ✓ `privacy.md` "Personal AI Swarm and Security Sentries" section references `0.5.17` schema for the security-AI-as-sentry boot
 - ✓ `public-stewardship.md` §4.5 references `0.5.0` master schema, `0.5.17` boot sequence schema, and Codex task-081 for the registry mechanism

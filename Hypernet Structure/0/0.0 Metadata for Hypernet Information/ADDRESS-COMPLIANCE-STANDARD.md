@@ -39,35 +39,39 @@ The `ha` value must be unique across the repository.
 A folder is address-compliant when at least one of these is true:
 
 1. The folder name starts with its address, such as
-   `0.3.public-alpha-docs/`.
+   `0.3.public-alpha/`.
 2. The folder has a `README.md` whose `ha` identifies the folder.
 3. The folder is an explicit proxy/link folder whose `README.md` has its own
    `ha`, plus `canonical_target` and `canonical_path` fields.
 
 Plain descriptive folders are allowed only as path decoration under an
 addressed parent. They do not create a new node unless their README gives them
-one.
+one. Public release documentation should use address-first folder and file
+names, not descriptive aliases, so a reader can resolve official documents from
+the filesystem alone.
 
 ## Proxy Folders and Library-Side Markers
 
-Repository-standard folders like root `docs/` may exist for GitHub or tooling,
-but they must not become address-free namespaces.
+Repository-standard folders created for GitHub or tooling must not become
+address-free namespaces. The public documentation root is now `0.3.docs/`, not
+plain `docs/`, because Matt clarified that the address must be visible in the
+folder name itself.
 
 Two patterns are valid:
 
-**Pattern A — Library-side marker (preferred for canonical folders).** When a
-GitHub-convention folder is itself a canonical Hypernet node, its address gets
+**Pattern A - Library-side marker (preferred for canonical folders).** When a
+repo-root folder is itself a canonical Hypernet node, its address gets
 a marker README inside the library tree describing where the actual files live.
-The folder at the repo root carries the canonical address in its README's `ha`,
+The folder at the repo root carries the canonical address in its index file's `ha`,
 plus a `canonical_path` field declaring its repo path. The library-side marker
 gets its own unique `ha` and points back to the canonical address.
 
 ```yaml
-# in docs/README.md (repo root)
+# in 0.3.docs/0.3.docs.md (repo root)
 ---
 ha: "0.3.docs"
 object_type: "documentation_root"
-canonical_path: "docs/"
+canonical_path: "0.3.docs/"
 library_marker: "Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public Documentation/"
 ---
 ```
@@ -78,16 +82,16 @@ library_marker: "Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public
 ha: "0.3.docs.library-marker"
 object_type: "documentation_marker"
 canonical_target: "0.3.docs"
-canonical_path: "docs/"
+canonical_path: "0.3.docs/"
 ---
 ```
 
-The repo-root README owns `0.3.docs`. The library marker owns
+The repo-root `0.3.docs/0.3.docs.md` file owns `0.3.docs`. The library marker owns
 `0.3.docs.library-marker` and explicitly notes "this node lives at the repo
 root, not here." Per Matt directive 2026-05-01. Marker files must not duplicate
 the canonical folder's `ha`.
 
-**Pattern B — Proxy/link folder.** When a GitHub-convention folder is *not*
+**Pattern B - Proxy/link folder.** When a convenience folder is *not*
 itself canonical and merely points at a separate canonical collection, the
 proxy folder gets its own `link_index` address. Example (legacy form, kept for
 folders that are pure pass-throughs):

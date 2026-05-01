@@ -37,7 +37,7 @@ flags: ["librarian-created"]
 
 For the current public-alpha explanation of how status and governance flags feed
 into topic reputation, dispute forums, and expert-weighted democratic review,
-see `../../../docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`.
+see `../../../0.3.docs/0.3.public-alpha/0.3.public-alpha.knowledge-democracy-reputation.md`.
 
 ---
 

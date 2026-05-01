@@ -22,7 +22,7 @@ Public alpha entry points now exist at the repository root and docs path:
 - `AI-BOOT-SEQUENCE.md`
 - `PUBLIC-ALPHA-RELEASE.md`
 - `.github/copilot-instructions.md`
-- `docs/README.md`
+- `0.3.docs/0.3.docs.md`
 - `docs/public-alpha/README.md`
 - `docs/public-alpha/NAVIGATION-MAP.md`
 - `docs/public-alpha/TRUST-PRIVACY-VALIDATION.md`

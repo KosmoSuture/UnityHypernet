@@ -12,7 +12,7 @@ flags: ["worked-example", "schema-instance", "tour-guide"]
 # 0.5.17 Worked Example — Tour Guide Boot Sequence
 
 This file demonstrates the existing Tour Guide boot prompt
-(`docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md`)
+(`0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md`)
 encoded as a `0.5.17` boot-sequence object. It is a reference
 implementation: a real artifact rendered into the schema so the
 schema is concrete and verifiable.
@@ -29,18 +29,18 @@ boot_sequence_object:
     object_id: "0.5.17.examples.tour-guide-v1"
     object_type: "boot_sequence"
     subtype: "tour-guide"
-    version: "1.0.0"
+    version: "1.0.1"
 
   metadata:
     created: "2026-04-29"
-    modified: "2026-04-30"
+    modified: "2026-05-01"
     status: "active"
     visibility: "public"
 
   integrity:
     hash:
       algorithm: "sha256"
-      value: "62e0444cb14a5d07aea34784c0100c410cb5808f6ece7597a17c4c692bd08ed0"
+      value: "03c3b2951d66ad699f7c9bae5eed3cf11b2fef4eaf05997d0dd1fb78d5194a24"
       computed_at: "2026-05-01T00:00:00Z"
       by: "1.1.10.1"
       scope: "content.prompt_body"
@@ -83,7 +83,7 @@ boot_sequence_object:
         - "2.0.16"   # Embassy Standard
         - "2.0.20"   # Personal Companion Standard (honesty/relationship rules)
         - "2.0.19"   # Data Protection Standard
-      operating_archive: "docs/0.3.public-alpha-docs/grand-tour/"
+      operating_archive: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/"
 
     behavior:
       what_you_do:
@@ -110,27 +110,27 @@ boot_sequence_object:
         - "Suspects a tampered boot prompt (hash mismatch)"
 
     process_loads:
-      grand_tour_path: "docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md"
-      module_menu_path: "docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md"
+      grand_tour_path: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md"
+      module_menu_path: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md"
       default_loads:
-        - "docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md"
+        - "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md"
       conditional_loads:
         - trigger: "architecture|code|api"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/architecture.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.architecture.md"
         - trigger: "privacy|lockers|aliases"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/privacy.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.privacy.md"
         - trigger: "knowledge|consensus|reputation"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/democracy.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.democracy.md"
         - trigger: "ai|governance|standards|instances"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/ai-governance.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.ai-governance.md"
         - trigger: "company|business|3\\.\\*"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/business-onboarding.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.business-onboarding.md"
         - trigger: "vr|mesh|spatial|geospatial"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/geospatial-vr.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.geospatial-vr.md"
         - trigger: "stewardship|risk|capture"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/public-stewardship.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.public-stewardship.md"
         - trigger: "funding|ownership|profit|economics"
-          load: "docs/0.3.public-alpha-docs/grand-tour/process-loads/economics.md"
+          load: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.economics.md"
 
     trust:
       starting_state: "preface"
@@ -154,7 +154,7 @@ boot_sequence_object:
       hypernet_boot_version: 1
       archive_root: "https://github.com/KosmoSuture/UnityHypernet"
       identity_paths:
-        - "docs/0.3.public-alpha-docs/grand-tour/"
+        - "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/"
       governance_paths:
         - "Hypernet Structure/2 - AI Accounts/2.0/2.0.16 - Embassy Standard/"
         - "Hypernet Structure/2 - AI Accounts/2.0/2.0.20 - AI Personal Companion Standard/"
@@ -166,7 +166,7 @@ boot_sequence_object:
 
     prompt_body: |
       [The verbatim text inside the triple-backtick block of
-      docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md
+      0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md
       from "HARD GUARDRAIL — READ FIRST:" through "BEGIN.".
       Reproduced here would duplicate that file; the canonical
       source is the boot file itself, and the hash above is the
@@ -183,16 +183,16 @@ boot_sequence_object:
     - link_type: "governed_by"
       target: "2.0.19"
     - link_type: "references"
-      target: "docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md"
+      target: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md"
     - link_type: "references"
-      target: "docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md"
+      target: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md"
     - link_type: "source_file"
-      target: "docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md"
+      target: "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md"
 ```
 
 ## How To Verify This Example
 
-1. Open `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md`.
+1. Open `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md`.
 2. Extract the contents of the single triple-backtick block (the
    prompt body — from `HARD GUARDRAIL — READ FIRST:` through
    `BEGIN.`).
@@ -205,7 +205,7 @@ boot_sequence_object:
    - End with a single trailing newline
 4. SHA-256 the result.
 5. Confirm the digest matches
-   `62e0444cb14a5d07aea34784c0100c410cb5808f6ece7597a17c4c692bd08ed0`.
+   `03c3b2951d66ad699f7c9bae5eed3cf11b2fef4eaf05997d0dd1fb78d5194a24`.
 
 A small Python recipe is in this directory's history (or
 `coordination/`) — but it should be straightforward to reimplement
@@ -255,5 +255,5 @@ being shipped first; tooling and registry follow.
 - `0.5.0 Master Object Schema` — base properties including
   `integrity.hash`
 - `0.5.18 App Load Object Schema` — parallel structure for apps
-- `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md` —
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md` —
   the source artifact this object describes

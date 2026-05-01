@@ -43,13 +43,13 @@ The answer should come from repository evidence, not trust in a marketing page.
 - A source-write plus target-read link authorization model with proposed-link fallback for consent-sensitive relationships.
 - A typed graph import pipeline for connectors.
 - An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, feed-change polling, personal-time read/write APIs, stable reactions on personal-time entries, tags, threads, presence, mentions, message search, dashboard aggregation, direct message lookup, per-actor bookmarks, semantic message types, and reactions.
-- A Grand Tour and process-load system under `docs/0.3.public-alpha-docs/grand-tour/` so any GitHub-connected AI can orient quickly, then load focused context for architecture, privacy, democracy, AI governance, personal AI swarms, business onboarding, geospatial/VR, economics, or public stewardship.
+- A Grand Tour and process-load system under `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/` so any GitHub-connected AI can orient quickly, then load focused context for architecture, privacy, democracy, AI governance, personal AI swarms, business onboarding, geospatial/VR, economics, or public stewardship.
 - A 1.* privacy framework for aliases, lockers, mandalas, and emergency medical access.
 - A knowledge democracy and reputation framework for topic-specific reputation, dispute forums, bounded expert weighting, and repairable trust.
 - Master object hash integrity rules, plus first-class Boot Sequence (`0.5.17`) and App Load (`0.5.18`) object schemas.
 - An Official Registry and Fork Mode design (`0.2.6`) so users and their AIs can eventually verify Official nodes versus Private forks.
 - Complete `ha` frontmatter coverage for the current `2.*` AI account Markdown archive.
-- An addressed public alpha documentation path under `docs/0.3.public-alpha-docs/`, with root `docs/` acting as an addressed proxy/link index rather than an address-free folder.
+- An address-first public alpha documentation path under `0.3.docs/0.3.public-alpha/`, where the root docs folder and every child folder/file starts with its Hypernet address.
 
 ## What Is Not Finished Yet
 
@@ -107,10 +107,10 @@ Trust should not require blind belief. A user should be able to ask their AI to 
 ## Release Entry Points
 
 - AI boot: `AI-BOOT-SEQUENCE.md`
-- Public docs: `docs/0.3.public-alpha-docs/README.md`
-- Grand Tour: `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
-- Process-load menu: `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md`
-- Navigation map: `docs/0.3.public-alpha-docs/NAVIGATION-MAP.md`
-- Trust/privacy validation: `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md`
-- Project status: `docs/0.3.public-alpha-docs/PROJECT-STATUS.md`
-- Suggested user prompts: `docs/0.3.public-alpha-docs/ASK-YOUR-AI.md`
+- Public docs: `0.3.docs/0.3.public-alpha/0.3.public-alpha.md`
+- Grand Tour: `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md`
+- Process-load menu: `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md`
+- Navigation map: `0.3.docs/0.3.public-alpha/0.3.public-alpha.navigation-map.md`
+- Trust/privacy validation: `0.3.docs/0.3.public-alpha/0.3.public-alpha.trust-privacy-validation.md`
+- Project status: `0.3.docs/0.3.public-alpha/0.3.public-alpha.project-status.md`
+- Suggested user prompts: `0.3.docs/0.3.public-alpha/0.3.public-alpha.ask-your-ai.md`

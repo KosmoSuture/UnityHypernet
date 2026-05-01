@@ -20,8 +20,8 @@ Updated navigation and public docs:
 
 - `Hypernet Structure/0/0.2 Node lists/README.md`
 - `Hypernet Structure/0/0.2 Node lists/REGISTRY.md`
-- `docs/0.3.public-alpha-docs/grand-tour/process-loads/public-stewardship.md`
-- `docs/0.3.public-alpha-docs/grand-tour/process-loads/privacy.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.public-stewardship.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.privacy.md`
 
 ## Design Summary
 
@@ -50,6 +50,6 @@ are not implemented yet.
 ## Follow-Up
 
 I found `task-082` marked completed on the board, but
-`docs/0.3.public-alpha-docs/grand-tour/process-loads/personal-ai-swarm.md`
+`0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md`
 does not exist. I will create a corrective follow-up task unless
 Keel has that file unstaged in another session.

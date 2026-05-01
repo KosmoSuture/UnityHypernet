@@ -3,7 +3,7 @@ ha: "0.3.github-root-readme"
 object_type: "document"
 canonical_target: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["github", "public-alpha", "entrypoint"]
@@ -23,19 +23,19 @@ The public release path starts at:
 
 - `AI-BOOT-SEQUENCE.md`
 - `PUBLIC-ALPHA-RELEASE.md`
-- `docs/0.3.public-alpha-docs/README.md`
-- `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.md`
+- `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md`
 
 ## Start Here
 
 | Goal | Entry point |
 |---|---|
 | Boot a GitHub-connected AI guide | `AI-BOOT-SEQUENCE.md` |
-| Take the Grand Tour | `docs/0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md` |
-| Pick a focused process-load | `docs/0.3.public-alpha-docs/grand-tour/MODULE-MENU.md` |
+| Take the Grand Tour | `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md` |
+| Pick a focused process-load | `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md` |
 | Read the public alpha release | `PUBLIC-ALPHA-RELEASE.md` |
-| Follow the public alpha docs path | `docs/0.3.public-alpha-docs/README.md` |
-| Verify trust and privacy claims | `docs/0.3.public-alpha-docs/TRUST-PRIVACY-VALIDATION.md` |
+| Follow the public alpha docs path | `0.3.docs/0.3.public-alpha/0.3.public-alpha.md` |
+| Verify trust and privacy claims | `0.3.docs/0.3.public-alpha/0.3.public-alpha.trust-privacy-validation.md` |
 | Run the local database UI | `cd "Hypernet Structure/0/0.1 - Hypernet Core" && python -m hypernet launch` |
 | Browse the graph | `http://localhost:8000/explorer` |
 | Open the database dashboard | `http://localhost:8000/home` |
@@ -64,7 +64,7 @@ The current implementation is file-backed and auditable by default. That is the 
 - 100 common link types under `0.6.11`
 - Three-level knowledgebase structure under `4 - Knowledge`
 - Grand Tour and process-load docs for AI-guided onboarding
-- Addressed public docs under `0.3.public-alpha`
+- Address-first public docs under `0.3.docs/`, with public alpha at `0.3.docs/0.3.public-alpha/`
 
 ## Repository Map
 

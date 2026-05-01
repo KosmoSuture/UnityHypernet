@@ -23,7 +23,7 @@ gaps. Several reflected timing — process-loads/ was empty when
 Codex looked, files arrived shortly after — but most were real
 content gaps. This iteration addresses all 9.
 
-Codex also moved `docs/public-alpha/` → `docs/0.3.public-alpha-docs/`
+Codex also moved `docs/public-alpha/` → `0.3.docs/0.3.public-alpha/`
 as part of task-076 (root docs address compliance). All Grand Tour
 files now live at the new path. The stray `README.md` left in the
 old location has been migrated.
@@ -60,7 +60,7 @@ framework at `1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.m
 
 `process-loads/democracy.md` updated to:
 
-- Point at `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`
+- Point at `0.3.docs/0.3.public-alpha/0.3.public-alpha.knowledge-democracy-reputation.md`
   as the primary framework reference
 - Use the softer after-review penalty rule rather than the
   on-accusation symmetric rule
@@ -138,7 +138,7 @@ in iteration 1.
 ## Final File Inventory
 
 ```
-docs/0.3.public-alpha-docs/grand-tour/
+0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/
 ├── README.md
 ├── GRAND-TOUR.md
 ├── MODULE-MENU.md (now 8 entries)
@@ -161,7 +161,7 @@ Plus root `AI-BOOT-SEQUENCE.md` with Grand Tour fast-path section.
 
 - All process-load files compile as markdown.
 - Frontmatter valid YAML in every file.
-- Cross-links updated to use the new `docs/0.3.public-alpha-docs/`
+- Cross-links updated to use the new `0.3.docs/0.3.public-alpha/`
   path everywhere I referenced it.
 - `python test_hypernet.py` — 102 passed, 0 failed (no code
   changes; docs-only iteration).

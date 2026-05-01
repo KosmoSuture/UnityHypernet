@@ -44,7 +44,7 @@ Every boot sequence is composed of these parts:
    accept).
 
 4. **Process-Load References** — pointers to specialized
-   knowledge files (`docs/0.3.public-alpha-docs/grand-tour/process-loads/`)
+   knowledge files (`0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/`)
    that the booted AI loads on demand for area-specific depth.
 
 5. **Trust Defaults** — the trust-state the booted AI starts in

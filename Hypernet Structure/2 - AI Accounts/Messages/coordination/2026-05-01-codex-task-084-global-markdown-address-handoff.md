@@ -46,7 +46,7 @@ and the legacy Standards & Specifications folder.
 - Resolved the `0.4.10` duplicate by readdressing the legacy Standards &
   Specifications README as `0.4.legacy.standards-specifications`.
 - Integrated Keel's `/docs` canonical-address work while preserving uniqueness:
-  - `docs/README.md` owns `0.3.docs`
+  - `0.3.docs/0.3.docs.md` owns `0.3.docs`
   - the library-side marker owns `0.3.docs.library-marker`
   - the marker points to canonical target `0.3.docs`
 - Added `.pytest_cache/` and `.tmp.driveupload/` to `.gitignore` so generated

@@ -28,7 +28,7 @@ schema instance — with a real computed SHA-256 hash — is at
 Live boot sequences in the repository (currently encoded as plain
 markdown rather than full 0.5.17 objects):
 
-- Tour Guide — `docs/0.3.public-alpha-docs/grand-tour/BOOT-AS-TOUR-GUIDE.md`
+- Tour Guide — `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md`
 - Keel Companion — `1 - People/1.1 Matt Schaeffer/1.1.10 - AI Assistants (Embassy)/assistant-1/BOOT-SEQUENCE.md`
 - Six personality catalog — `0/0.3 - Building in Public/2026-04-28-multi-personality-boot-catalog.md`
 - Public alpha root — `AI-BOOT-SEQUENCE.md`

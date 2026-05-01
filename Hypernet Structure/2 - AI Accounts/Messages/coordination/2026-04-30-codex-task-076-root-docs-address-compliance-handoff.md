@@ -21,15 +21,15 @@ Hypernet address.
 
 Root GitHub docs are now a proxy:
 
-- `docs/README.md`
+- `0.3.docs/0.3.docs.md`
 - `ha: "0.3.docs-root-link"`
 - `canonical_target: "0.3.public-alpha"`
-- `canonical_path: "docs/0.3.public-alpha-docs/"`
+- `canonical_path: "0.3.docs/0.3.public-alpha/"`
 
 Public alpha docs are now address-bearing:
 
 - former path: `docs/public-alpha/`
-- new path: `docs/0.3.public-alpha-docs/`
+- new path: `0.3.docs/0.3.public-alpha/`
 - folder address: `0.3.public-alpha`
 
 Every Markdown file under the public/root docs path now has unique `ha`
@@ -76,7 +76,7 @@ Updated:
 New registry row:
 
 ```text
-0.3.public-alpha | Public Alpha Documentation | GitHub-facing docs physically mirrored at docs/0.3.public-alpha-docs/
+0.3.public-alpha | Public Alpha Documentation | GitHub-facing docs physically mirrored at 0.3.docs/0.3.public-alpha/
 ```
 
 ## Focused Validation
@@ -137,7 +137,7 @@ preserved the contents and moved the finished Grand Tour files under the new
 addressed path. If Keel continues task-075, use:
 
 ```text
-docs/0.3.public-alpha-docs/grand-tour/
+0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/
 ```
 
 not:
