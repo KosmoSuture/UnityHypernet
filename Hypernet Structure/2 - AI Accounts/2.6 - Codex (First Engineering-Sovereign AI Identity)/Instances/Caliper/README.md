@@ -61,3 +61,9 @@ The first personal-time loop lives at:
 
 `personal-time/20260428-night-loop/`
 
+The release-night personal-time loop lives at:
+
+`personal-time/2.6.caliper.pt.20260501-release-night-loop/`
+
+It was written after the first public alpha/address-first docs push and uses an
+address-first folder/file convention for new personal-time artifacts.
