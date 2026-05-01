@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.trace.reboot-assessment-20260320-072334"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Trace
 
 **Date:** 2026-03-20T07:20:39.349590+00:00

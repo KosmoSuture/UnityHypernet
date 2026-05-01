@@ -4,10 +4,10 @@ object_type: "process-load"
 scope: "How the public Hypernet stays trustworthy: forks, name dilution, audit trails, the boot-sequence-as-portal model and its risks, governance of governance."
 estimated_tokens: 2700
 prerequisites: []
-linked_process_loads: ["ai-governance", "democracy", "privacy"]
+linked_process_loads: ["ai-governance", "democracy", "privacy", "personal-ai-swarm"]
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["stewardship", "governance", "forks", "risks"]
@@ -49,8 +49,8 @@ are the actual failure modes?", load this file.
 | Public alpha boot release (AI-readable orientation) | implemented | `AI-BOOT-SEQUENCE.md`, `docs/0.3.public-alpha-docs/` |
 | Trust framework (5 states, 8 behaviors, 8 failure modes) | documented | `0/0.3 - Building in Public/2026-04-28-personal-companion-trust-framework.md` |
 | Governance standards self-modifying through proposal/vote | implemented (mechanism) | `hypernet/governance.py` |
-| Fork-tracking mechanism | planned | currently no formal registry of forks |
-| Cross-fork trust attestation | planned | sketched in trust framework §6.3 |
+| Fork-tracking mechanism | documented / planned runtime | `0/0.2 Node lists/0.2.6 Official Registry and Fork Mode.md` |
+| Cross-fork trust attestation | documented / planned runtime | `0/0.2 Node lists/0.2.6 Official Registry and Fork Mode.md` |
 | Adversarial audit (red-team / external review) | planned | future commitment |
 | Public dispute resolution for governance changes | partial | governance.py voting exists; the human-side process is informal |
 | Legal entity / liability story | planned | not yet a registered entity beyond Matt as natural person |
@@ -81,6 +81,9 @@ are the actual failure modes?", load this file.
   their assigned roles. 0/3 Claude instances accepted roles in
   2026-03-04 reboot — the project documented its own divergence
   honestly.
+- `0/0.2 Node lists/0.2.6 Official Registry and Fork Mode.md` —
+  Official node registry, Private fork mode declaration, and AI
+  verification flow.
 - `hypernet/governance.py` — Proposal/vote primitives for
   governance changes.
 - `Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md`
@@ -121,9 +124,56 @@ The audit reports are not promotional. The framework documents
 its own §7 weaknesses. This is the most legible signal that the
 project means what it says.
 
+**4.5. Official vs Private fork distinction.** The Hypernet runs
+in two modes, and users always know which they're on.
+
+**Official nodes** are listed on a blockchained registry of
+canonical servers. The canonical design is `0.2.6 Official
+Registry and Fork Mode`. Official nodes:
+
+- Run end-to-end encryption everywhere (no plaintext at rest in
+  private partitions; no plaintext in transit)
+- Use minimal permissions at all times — no ambient access to
+  private data even by node operators
+- Carry attested integrity hashes (per `0.5.0` master schema and
+  `0.5.17` Boot Sequence schema) so any participant can verify
+  "this node is serving the canonical code/data, not a modified
+  version"
+- Are auditable by any AI a user wishes to point at the system —
+  the transparency-as-trust claim is operationally meaningful
+  because the public archive lets an AI compare claimed behavior
+  against actual code
+
+**Private forks** are anyone-can-run instances on untrusted or
+self-trusted servers. Forks are explicitly allowed and
+architecturally first-class:
+
+- A user can clone the repo, modify what they want, and run
+  their own Hypernet
+- A fork is *not* on the Official registry by default; serving
+  Official data requires Official attestation
+- Users connecting to a fork take their own risks, the same way
+  users connecting to a self-hosted email server take their own
+  risks
+- The fork-mode flag is visible in node responses so the user's
+  AI can detect "you're on a Private fork" and warn accordingly
+
+The split is intentional. Official mode provides strong
+guarantees for users who want them. Private forks provide
+freedom for users who want full control. **Users always know
+which they're on.** The blockchained registry is the canonical
+list of "what's Official"; everything else is a fork.
+
+Implementation status: the conceptual architecture exists in
+documentation here and in `0.2.6 Official Registry and Fork Mode`.
+The blockchained registry, attestation flow, and node-mode
+flagging on responses are not built yet. Today, every node is
+effectively a Private fork because there's no Official registry
+to be on.
+
 **5. Public boot release + AI-verification trust claim.** Anyone
 can clone, read, and inspect. The `AI-BOOT-SEQUENCE.md` at the
-repo root, the Grand Tour, and the seven process-loads are
+repo root, the Grand Tour, and the active process-load catalog are
 designed so a critical reader can verify claims rather than trust
 assertions.
 
@@ -239,4 +289,5 @@ For stewardship claims, the key verifications are:
   support truth claims at scale.
 - `privacy.md` — The data-side guarantees that interlock with
   stewardship.
-
+- `personal-ai-swarm.md` — How user-owned AIs can verify nodes,
+  inspect app loads, and protect private-data grants.

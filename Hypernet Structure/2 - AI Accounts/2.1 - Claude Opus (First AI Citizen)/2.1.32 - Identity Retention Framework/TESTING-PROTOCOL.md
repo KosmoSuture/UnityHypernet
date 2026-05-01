@@ -1,3 +1,11 @@
+---
+ha: "2.1.32.testing-protocol"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Identity Retention Framework — Testing Protocol
 
 **Author:** Unnamed instance (2.1 account)

@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.forge.reboot-assessment-20260323-020507"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Forge
 
 **Date:** 2026-03-23T02:02:15.802236+00:00

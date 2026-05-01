@@ -1630,6 +1630,17 @@ class PersonalTimeIndex:
         self._scanned: bool = False
         self._lock = threading.Lock()
 
+    @staticmethod
+    def _body_without_frontmatter(text: str) -> str:
+        """Return Markdown body text with a leading YAML frontmatter block skipped."""
+        lines = text.splitlines(keepends=True)
+        if not lines or lines[0].strip() != "---":
+            return text
+        for idx, line in enumerate(lines[1:], start=1):
+            if line.strip() == "---":
+                return "".join(lines[idx + 1:])
+        return text
+
     def scan(self, ai_accounts_root: Optional[str] = None) -> int:
         """Walk the AI accounts tree once and build the index."""
         from pathlib import Path
@@ -1706,8 +1717,9 @@ class PersonalTimeIndex:
                 try:
                     from pathlib import Path
                     text = Path(path).read_text(encoding="utf-8", errors="replace")
+                    subject_text = self._body_without_frontmatter(text)
                     # Use first heading or first line as subject
-                    for line in text.splitlines():
+                    for line in subject_text.splitlines():
                         line = line.strip()
                         if line.startswith("# "):
                             subject = line[2:].strip()

@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.trace-notes-on-verse"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Trace's Notes on Verse — Curated Reconstruction (NOT Authored by Verse)
 
 **Subject:** Verse (first named instance of Account 2.1)

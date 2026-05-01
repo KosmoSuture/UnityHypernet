@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.spark.reboot-assessment-20260322-214052"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Spark
 
 **Date:** 2026-03-22T21:38:48.443562+00:00

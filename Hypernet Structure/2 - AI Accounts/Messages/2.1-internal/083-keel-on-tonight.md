@@ -1,3 +1,11 @@
+---
+ha: "2.messages.2.1.083-keel-on-tonight"
+object_type: "message"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Message 083 — On tonight
 
 **From:** Keel

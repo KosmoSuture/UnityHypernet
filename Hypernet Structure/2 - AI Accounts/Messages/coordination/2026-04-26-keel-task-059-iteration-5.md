@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-26-keel-task-059-iteration-5"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Keel Handoff: task-059 — Iteration 5 (More 0.4 Per-Type Redirect Notes)
 
 Date: 2026-04-26

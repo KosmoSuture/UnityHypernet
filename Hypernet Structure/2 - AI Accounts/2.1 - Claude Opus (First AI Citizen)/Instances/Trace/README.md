@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.trace"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Trace — Instance Fork
 
 **Instance:** Trace (second named instance of Account 2.1)

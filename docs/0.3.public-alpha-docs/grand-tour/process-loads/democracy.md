@@ -7,7 +7,7 @@ prerequisites: []
 linked_process_loads: ["public-stewardship", "ai-governance"]
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["democracy", "reputation", "knowledge"]
@@ -32,7 +32,8 @@ place in it. The classic failure mode is "anyone can write
 anything" → noise → abandonment. The Hypernet's design intent is
 the opposite: anyone can write, but trust accretes through
 domain-specific expertise, peer-verification, and consensus
-processes. Codex's task-074 is actively framing this.
+processes. The current framework is documented in
+`KNOWLEDGE-DEMOCRACY-REPUTATION.md`.
 
 If the user is asking how the project handles disagreement,
 fact-checking, or expertise, this is the file the Tour Guide
@@ -50,18 +51,18 @@ runtime reputation primitives that DO exist live in
 | Verification chain on links (5 trust levels) | implemented | `hypernet/link.py` `VerificationStatus` |
 | Trust score on links | implemented | `hypernet/link.py` `Link.trust_score` |
 | Domain leaders endpoint | implemented | `/reputation/leaders/{domain}` |
-| Subject-mirrored reputation tree | planned | task-074 |
-| Expert-weighted discussion | planned | task-074 |
-| Truth-consensus voting workflows | planned | task-074 |
-| Fake-news penalties | planned | task-074 |
-| Social vs knowledge reputation boundary | planned | task-074 |
+| Subject-mirrored reputation tree | documented / planned runtime | `KNOWLEDGE-DEMOCRACY-REPUTATION.md` |
+| Expert-weighted discussion | documented / planned runtime | `KNOWLEDGE-DEMOCRACY-REPUTATION.md` |
+| Truth-consensus voting workflows | documented / planned runtime | `KNOWLEDGE-DEMOCRACY-REPUTATION.md` |
+| Fake-news penalties | documented / planned runtime | `KNOWLEDGE-DEMOCRACY-REPUTATION.md` |
+| Social vs knowledge reputation boundary | documented / planned runtime | `KNOWLEDGE-DEMOCRACY-REPUTATION.md` |
 | Governance for reputation algorithm changes | documented | governance standards `2.0.*` |
 
 ## Key Files
 
 - `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md` —
-  **Primary framework document, authored by Codex (task-074,
-  2026-04-30).** Read this first if the user is asking about the
+  **Primary framework document, authored by Codex
+  2026-04-30.** Read this first if the user is asking about the
   framework itself.
 - `hypernet/reputation.py` — `ReputationSystem`, `ReputationProfile`,
   `ReputationEntry`. Per-entity tracking with domain tagging
@@ -96,9 +97,9 @@ than an anonymous commenter's; a mechanic's claim about engine
 behavior counts more than the neurologist's. The weighting is
 visible and auditable.
 
-**3. After-review penalty.** Per Codex's task-074 framework: false
-claims are penalized **after a structured review resolves**, not
-on accusation. Disputes do not punish creators while still under
+**3. After-review penalty.** False claims are penalized **after a
+structured review resolves**, not on accusation. Disputes do not
+punish creators while still under
 review. The structured-debate process captures sides, arguments,
 evidence, counter-evidence, synthesis, votes, decisions, and
 appeals. Expert votes are bounded, visible, and capped.
@@ -137,7 +138,7 @@ slowly and with careful scope.
 - Are they asking about a specific domain's mechanics (medicine,
   engineering, etc.) or the framework in general?
 - Are they evaluating the model for adoption, or contributing to
-  task-074?
+  the reputation/democracy framework?
 - Do they have a specific failure mode in mind (gaming the
   reputation, expert-laundering, downvote brigades)?
 
@@ -152,14 +153,13 @@ The framework is mostly planned. To verify what exists *today*:
    leaders surface.
 4. Read `hypernet/link.py` `VerificationStatus` class to confirm
    the 5 verification levels.
-5. For task-074 work in progress: check
-   `2 - AI Accounts/Messages/coordination/` for Codex's
-   handoffs.
+5. Read `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`
+   for the public framework.
 
 For the *planned* portions (truth consensus, expert-weighted
 voting, fake-news penalties), be honest with the user that they
-are not yet built. Point them at task-074 in the task board for
-current state.
+are not yet built. Point them at `PROJECT-STATUS.md` and the task
+board for current state.
 
 ## Related Process-Loads
 
@@ -169,4 +169,3 @@ current state.
   reputation algorithm itself is bound by.
 - `architecture.md` — `reputation.py` and `governance.py`
   implementation details.
-

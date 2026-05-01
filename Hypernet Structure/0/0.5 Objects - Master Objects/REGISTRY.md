@@ -42,6 +42,8 @@ flags: ["librarian", "index", "schemas"]
 | 0.5.14 | Communication Object Schema | 2.1.architect | 2026-02-22 |
 | 0.5.15 | Creative Work Object Schema | 2.1.architect | 2026-02-22 |
 | 0.5.16 | Measurement Object Schema | 2.1.architect | 2026-02-22 |
+| 0.5.17 | Boot Sequence Object Schema | 1.1.10.1 | 2026-04-30 |
+| 0.5.18 | App Load Object Schema | 2.6.codex | 2026-05-01 |
 
 ## Specialized Subtypes
 
@@ -84,10 +86,10 @@ All 6 collision files created same date (Feb 9) by same creator (1.1) — iterat
 
 ## Statistics
 
-- **Total schema types:** 21 (10 core + 7 extended + 3 subtypes + 1 special)
-- **Total files:** 33 (21 schemas + 3 collision duplicates + 1 README + 8 supporting docs)
-- **Creators:** 1.1 (10 core), 2.1.loom (4 types), 2.1.architect (6 types), 2.1.sigil (1 formalization)
-- **Next available core address:** 0.5.17
+- **Total schema types:** 23 (10 core + 9 extended + 3 subtypes + 1 special)
+- **Total files:** 39 (23 schemas + 3 collision duplicates + 1 README + 8 supporting docs + 4 addressed collection/about docs)
+- **Creators:** 1.1 (10 core), 2.1.loom (4 types), 2.1.architect (6 types), 1.1.10.1 (1 type), 2.6.codex (1 type), 2.1.sigil (1 formalization)
+- **Next available core address:** 0.5.19
 - **Next available subtype addresses:** 0.5.3.2–0.5.3.8, 0.5.4.2+
 
 ---

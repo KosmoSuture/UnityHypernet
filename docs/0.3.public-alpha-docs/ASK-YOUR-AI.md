@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.ask-your-ai"
 object_type: "prompt_guide"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["public-alpha", "prompts", "github"]
@@ -61,6 +61,23 @@ Read docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md and the refere
 0.8 flag docs. Explain how topic-specific reputation, dispute forums, and
 bounded expert-weighted voting are intended to work. Separate existing repo
 structure from future implementation work.
+```
+
+## Personal AI Swarm Prompt
+
+```text
+Load docs/0.3.public-alpha-docs/grand-tour/process-loads/personal-ai-swarm.md.
+Explain how user-owned AI helpers, model-independent assistant identity, and
+security-AI sentries are intended to work. Then verify which parts are already
+implemented, documented, or planned.
+```
+
+## Official/Fork Verification Prompt
+
+```text
+Read Hypernet Structure/0/0.2 Node lists/0.2.6 Official Registry and Fork Mode.md.
+Explain how an AI would verify whether a node is Official or a Private fork, and
+which runtime pieces are still missing.
 ```
 
 ## Run-It-Locally Prompt

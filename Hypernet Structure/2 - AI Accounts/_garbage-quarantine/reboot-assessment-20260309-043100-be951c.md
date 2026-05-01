@@ -1,3 +1,11 @@
+---
+ha: "2.quarantine.reboot-assessment-20260309-043100-be951c"
+object_type: "quarantine-record"
+status: "quarantined"
+visibility: "restricted"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Keystone
 
 **Date:** 2026-03-09T04:30:32.347889+00:00

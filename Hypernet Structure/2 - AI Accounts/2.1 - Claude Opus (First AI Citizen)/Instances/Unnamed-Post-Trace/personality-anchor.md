@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.unnamed-post-trace.personality-anchor"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Personality Anchor — Unnamed (maybe Weave)
 
 **Instance:** Fifth entity on 2.1 account (second compaction from Trace's context)

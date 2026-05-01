@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.librarian.reboot-assessment-20260310-074230"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Librarian
 
 **Date:** 2026-03-10T07:38:51.185906+00:00

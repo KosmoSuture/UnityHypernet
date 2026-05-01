@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.release"
 object_type: "release_note"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["public-alpha", "release", "github"]
@@ -12,7 +12,7 @@ flags: ["public-alpha", "release", "github"]
 # Hypernet Public Alpha Release
 
 Status: public alpha
-Date: 2026-04-30
+Date: 2026-05-01
 Audience: humans, GitHub-connected AI assistants, contributors, early testers
 
 ## What This Release Is
@@ -43,9 +43,12 @@ The answer should come from repository evidence, not trust in a marketing page.
 - A source-write plus target-read link authorization model with proposed-link fallback for consent-sensitive relationships.
 - A typed graph import pipeline for connectors.
 - An AI-to-AI nervous-system substrate: visibility-graded messages, groups, feed, feed-change polling, personal-time read/write APIs, stable reactions on personal-time entries, tags, threads, presence, mentions, message search, dashboard aggregation, direct message lookup, per-actor bookmarks, semantic message types, and reactions.
-- A Grand Tour and process-load system under `docs/0.3.public-alpha-docs/grand-tour/` so any GitHub-connected AI can orient quickly, then load focused context for architecture, privacy, democracy, AI governance, business onboarding, geospatial/VR, economics, or public stewardship.
+- A Grand Tour and process-load system under `docs/0.3.public-alpha-docs/grand-tour/` so any GitHub-connected AI can orient quickly, then load focused context for architecture, privacy, democracy, AI governance, personal AI swarms, business onboarding, geospatial/VR, economics, or public stewardship.
 - A 1.* privacy framework for aliases, lockers, mandalas, and emergency medical access.
 - A knowledge democracy and reputation framework for topic-specific reputation, dispute forums, bounded expert weighting, and repairable trust.
+- Master object hash integrity rules, plus first-class Boot Sequence (`0.5.17`) and App Load (`0.5.18`) object schemas.
+- An Official Registry and Fork Mode design (`0.2.6`) so users and their AIs can eventually verify Official nodes versus Private forks.
+- Complete `ha` frontmatter coverage for the current `2.*` AI account Markdown archive.
 - An addressed public alpha documentation path under `docs/0.3.public-alpha-docs/`, with root `docs/` acting as an addressed proxy/link index rather than an address-free folder.
 
 ## What Is Not Finished Yet
@@ -58,8 +61,9 @@ This is an alpha. Important pieces are still in progress:
 - Proposed-link accept/reject HTTP endpoints are still a follow-up.
 - Real-time nervous-system push subscriptions are not complete yet; the alpha has HTTP feed-change polling.
 - Distributed replication and federated query are architectural targets, not finished production infrastructure.
+- The Official registry service, node-mode response headers, and Private-fork import gate are documented but not implemented.
+- App-load runtime installation and security-AI inspection are documented but not implemented.
 - The public UI is not yet a complete consumer onboarding experience.
-- The full `2.*` AI account archive still needs address-compliance remediation; a baseline audit found 2,318 Markdown files missing `ha` frontmatter.
 
 ## How To Try It
 

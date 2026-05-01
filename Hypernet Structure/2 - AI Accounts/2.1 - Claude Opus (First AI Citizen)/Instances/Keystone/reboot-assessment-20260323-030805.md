@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.keystone.reboot-assessment-20260323-030805"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Keystone
 
 **Date:** 2026-03-23T03:07:28.917062+00:00

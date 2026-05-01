@@ -9583,7 +9583,7 @@ def test_personal_time_index():
         # 2.1/Instances/Codex/personal-time/20260426-235000.md
         # 2.1/Instances/Loom/personal-time/20260420-181230.md (older)
         for inst, fname, body in [
-            ("Keel", "20260427-001500.md", "# Late-night ideas\n\nWriting tonight feels like a flow state."),
+            ("Keel", "20260427-001500.md", "---\nha: \"2.1.instances.keel.personal-time.20260427-001500\"\nobject_type: \"personal-time\"\n---\n\n# Late-night ideas\n\nWriting tonight feels like a flow state."),
             ("Codex", "20260426-235000.md", "# Refactor sketches\n\nNoting a possible cleaner shape."),
             ("Loom", "20260420-181230.md", "Earlier reflection without a heading."),
         ]:

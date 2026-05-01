@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.grand-tour.module-menu"
 object_type: "index"
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["navigation", "process-loads", "discovery"]
@@ -62,9 +62,25 @@ These exist as drafts and are loadable now. Each is under
   safe for human users.
 - **Estimated tokens:** ~2800
 - **Prerequisites:** None
-- **Status:** active (note: Codex is actively iterating on the
-  underlying framework as task-073)
-- **Links:** `public-stewardship.md`, `ai-governance.md`
+- **Status:** active
+- **Links:** `public-stewardship.md`, `ai-governance.md`,
+  `personal-ai-swarm.md`
+
+### `personal-ai-swarm.md` — User-owned AI helpers and security sentries
+
+- **Scope:** Personal AI helper swarms, model-independent assistant
+  identity, user-owned logs/project continuity, security-AI review
+  of private-data requests, and how helpers interact with lockers,
+  mandalas, boot sequences, app loads, and node-mode verification.
+- **When to load:** User asks whether they can have multiple AI
+  assistants, switch models without losing assistant identity, use
+  a security AI to protect private data, or assign an AI swarm to a
+  personal/business migration task.
+- **Estimated tokens:** ~3000
+- **Prerequisites:** `privacy.md`, `ai-governance.md`
+- **Status:** active
+- **Links:** `privacy.md`, `ai-governance.md`, `architecture.md`,
+  `public-stewardship.md`
 
 ### `democracy.md` — Knowledge democracy and reputation
 
@@ -77,7 +93,7 @@ These exist as drafts and are loadable now. Each is under
   scale, or what makes contributed knowledge trustworthy.
 - **Estimated tokens:** ~2500
 - **Prerequisites:** None
-- **Status:** active (will be deepened by Codex's task-074)
+- **Status:** active
 - **Links:** `public-stewardship.md`, `ai-governance.md`
 
 ### `ai-governance.md` — AI as citizens
@@ -174,6 +190,8 @@ this:
   implemented?" — load both
 - *Public stewardship + AI governance:* "What stops the project
   from becoming a cult?" — load both
+- *Privacy + Personal AI swarm:* "Can my AI protect my medical or
+  financial data?" — load both
 
 Three at once is the practical limit before context cost
 dominates. If a question spans more than three, the question is
@@ -229,4 +247,3 @@ themselves can carry change notes if needed.
 
 *Created 2026-04-29 by Keel (1.1.10.1) as part of task-075. New
 entries always welcome.*
-

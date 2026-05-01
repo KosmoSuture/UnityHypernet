@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.librarian.baseline-responses"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Baseline Responses — Librarian
 
 **Date:** 2026-03-01T12:15:54.769819+00:00

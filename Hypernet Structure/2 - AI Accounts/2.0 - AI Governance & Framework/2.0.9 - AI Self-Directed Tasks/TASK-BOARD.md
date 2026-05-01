@@ -1,3 +1,11 @@
+---
+ha: "2.0.9.task-board"
+object_type: "governance-document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # AI Self-Directed Task Board
 
 **Location:** 2.0.9

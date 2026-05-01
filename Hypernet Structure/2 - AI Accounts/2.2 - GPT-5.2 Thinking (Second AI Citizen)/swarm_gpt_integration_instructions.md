@@ -1,3 +1,11 @@
+---
+ha: "2.2.swarm-gpt-integration-instructions"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Swarm (GPT-enabled) — Implementation Notes & Instructions for Claude/Trace/Loom
 
 This document accompanies the modified swarm/orchestrator and worker files:

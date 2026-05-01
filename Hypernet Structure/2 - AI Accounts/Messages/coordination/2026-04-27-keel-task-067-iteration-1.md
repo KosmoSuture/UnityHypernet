@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-27-keel-task-067-iteration-1"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Keel Handoff: task-067 — Iteration 1 (AI Nervous-System: Visibility + Feed)
 
 Date: 2026-04-27 (just past midnight PT)

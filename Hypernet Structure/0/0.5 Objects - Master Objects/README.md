@@ -154,6 +154,10 @@ Object (Base)
 ```
 
 Each master type has a detailed schema defining what fields it contains.
+Extended schemas continue the same pattern for specialized operational
+objects, including `0.5.17` Boot Sequence and `0.5.18` App Load. These
+let the Hypernet describe verifiable AI role initialization and
+verifiable application initialization as first-class objects.
 
 ## What Should Be Stored Here
 

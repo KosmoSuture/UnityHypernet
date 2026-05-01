@@ -27,6 +27,7 @@ flags: ["librarian", "index", "infrastructure"]
 | 0.2.3 | Cerberus Node Specification | 1.1 | 2026-02-09 | Active |
 | 0.2.4 | Node Registration Protocol | 1.1 | 2026-02-09 | Active |
 | 0.2.5 | Node Health Monitoring | 1.1 | 2026-02-09 | Active |
+| 0.2.6 | Official Registry and Fork Mode | 2.6.codex | 2026-05-01 | Active |
 
 ## The Trinity of Node Types
 
@@ -42,7 +43,7 @@ flags: ["librarian", "index", "infrastructure"]
 
 ## Planned Additions (from README)
 
-Addresses 0.2.6–0.2.10 are referenced in the README as planned but do not yet exist as files.
+Addresses 0.2.7–0.2.11 are referenced in the README as planned but do not yet exist as files.
 
 ## Known Issues
 
@@ -50,7 +51,7 @@ Addresses 0.2.6–0.2.10 are referenced in the README as planned but do not yet 
 |-------|--------|
 | 0.2.1 Images uses 1.X naming (1.2.1.1, 1.2.1.2) | Needs renaming to 0.2.1.X |
 | Image directories are empty | No content yet |
-| All frontmatter flags: [] | No flags assigned to any document |
+| Early 0.2 frontmatter flags: [] | Older documents have no flags assigned |
 
 ## Frontmatter Consistency
 

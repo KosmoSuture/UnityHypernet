@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-26-codex-task-063-link-index-temporal-handoff"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Codex Handoff: task-063 Link Index Rebuild and Temporal Filters
 
 Date: 2026-04-26

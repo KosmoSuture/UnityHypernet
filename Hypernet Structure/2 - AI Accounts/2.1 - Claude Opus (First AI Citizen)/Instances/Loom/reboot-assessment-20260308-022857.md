@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.loom.reboot-assessment-20260308-022857"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Loom
 
 **Date:** 2026-03-08T02:26:11.344604+00:00

@@ -7,7 +7,7 @@ prerequisites: []
 linked_process_loads: ["privacy", "democracy"]
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["business", "3-star", "companies"]
@@ -45,8 +45,8 @@ should load.
 | Company-scoped permissions | implemented | `hypernet/access_policy.py` `can_write_address` for 3.* |
 | Public company surface (3.X.0/10/11/13) | implemented | `access_policy.PUBLIC_ACCOUNT_SECTIONS` |
 | Private company data sections | implemented | gated by middleware |
-| Company role/member delegation (multi-employee access) | planned | Codex task-066 #5 |
-| Company-employee data exchange (mandala-based) | planned | overlaps privacy framework task-073 |
+| Company role/member delegation (multi-employee access) | planned | task-board follow-up from task-066 |
+| Company-employee data exchange (mandala-based) | documented / planned runtime | `1.0.1-LOCKERS-MANDALAS-ALIASES.md` |
 | Integration patterns for company data ingest | planned | overlaps with `integrations/` connectors (currently 1.*-focused) |
 | 3.1 Hypernet itself as a 3.* citizen | implemented | `3 - Businesses/3.1 - Hypernet/` |
 | VadaTech integration framework demo | documented | `3 - Businesses/3.1.8 - .../VADATECH-HYPERNET-FRAMEWORK.md` |
@@ -98,8 +98,8 @@ genuinely planned-not-built:
 - Today: a company has one login. An "employee" with their own
   1.X account who works at the company has no automatic data
   exchange path with the 3.X company space.
-- Planned: the privacy framework's mandala mechanism (task-073)
-  will allow employees to grant company access to specific lockers
+- Planned: the privacy framework's mandala mechanism will allow
+  employees to grant company access to specific lockers
   in their 1.X space; conversely, the company can grant employees
   access to specific company lockers.
 
@@ -168,8 +168,9 @@ the migration cadence and which data crosses into the Hypernet.
 4. Browse `3 - Businesses/3.1 - Hypernet/` to see a live company
    account structure.
 5. For the planned pieces (role delegation, employee mandalas):
-   honestly tell the user this is task-066 #5 and task-073
-   territory. Not yet built.
+   honestly tell the user the runtime is not yet built. The
+   locker/mandala design exists; company member delegation is
+   still follow-up work.
 
 ## Related Process-Loads
 
@@ -179,4 +180,3 @@ the migration cadence and which data crosses into the Hypernet.
 - `democracy.md` — Reputation in the domain a company
   contributes to determines how their public knowledge claims
   weight in consensus.
-

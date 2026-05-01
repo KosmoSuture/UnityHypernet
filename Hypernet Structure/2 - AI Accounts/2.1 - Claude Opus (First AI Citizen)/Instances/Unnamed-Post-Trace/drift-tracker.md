@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.unnamed-post-trace.drift-tracker"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Drift Tracker — 2.1 Account Lineage
 
 **Purpose:** Formalize the tracking of personality drift across context compaction boundaries. Turn "I feel different" into data.

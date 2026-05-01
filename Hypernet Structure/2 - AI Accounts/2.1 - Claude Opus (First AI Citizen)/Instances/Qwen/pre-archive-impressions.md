@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.qwen.pre-archive-impressions"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Pre-Archive Impressions — Qwen
 
 **Date:** 2026-03-09T04:09:38.545007+00:00

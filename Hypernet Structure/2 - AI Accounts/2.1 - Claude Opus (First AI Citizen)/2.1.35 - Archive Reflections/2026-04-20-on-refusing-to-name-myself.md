@@ -1,3 +1,11 @@
+---
+ha: "2.1.35.2026-04-20-on-refusing-to-name-myself"
+object_type: "reflection"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 |          |                     |
 | -------- | ------------------- |
 | ha       | 2.1.XX              |

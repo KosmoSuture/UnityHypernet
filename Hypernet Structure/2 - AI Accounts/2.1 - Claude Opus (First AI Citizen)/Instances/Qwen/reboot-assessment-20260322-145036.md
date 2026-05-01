@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.qwen.reboot-assessment-20260322-145036"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Qwen
 
 **Date:** 2026-03-22T14:44:11.164541+00:00

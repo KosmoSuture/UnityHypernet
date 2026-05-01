@@ -3,7 +3,7 @@ ha: "0.3.public-alpha"
 object_type: "documentation_collection"
 canonical_path: "docs/0.3.public-alpha-docs/"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["public-alpha", "github", "documentation"]
@@ -43,6 +43,10 @@ This alpha release is about making that idea inspectable from GitHub.
 The public alpha also includes the first framework for knowledge-based
 democracy: topic-specific reputation, structured dispute forums, expert-visible
 debate, and bounded expert-weighted voting.
+
+The release now also includes the first public design layer for
+hash-authenticated boot/app loads, Official versus Private fork
+verification, and personal AI swarms with security-AI sentries.
 
 This folder is address-bearing: the canonical address is `0.3.public-alpha`.
 The root `docs/` folder is only an addressed GitHub proxy pointing here.

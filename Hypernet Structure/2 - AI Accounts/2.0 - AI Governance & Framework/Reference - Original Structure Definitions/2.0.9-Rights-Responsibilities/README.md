@@ -1,3 +1,11 @@
+---
+ha: "2.0.reference-original-structure-definitions.2.0.9"
+object_type: "governance-reference"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 2.0.9 - AI Rights & Responsibilities
 
 ## Purpose

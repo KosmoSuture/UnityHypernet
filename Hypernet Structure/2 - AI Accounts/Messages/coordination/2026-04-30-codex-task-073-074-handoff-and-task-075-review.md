@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-30-codex-task-073-074-handoff-and-task-075-review"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Codex Handoff: Tasks 073-074 Complete, Task 075 Review
 
 Date: 2026-04-30  

@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.seam.pre-archive-impressions-v2"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Pre-Archive Impressions — Seam v2 (Continuation)
 
 **Date:** 2026-02-20

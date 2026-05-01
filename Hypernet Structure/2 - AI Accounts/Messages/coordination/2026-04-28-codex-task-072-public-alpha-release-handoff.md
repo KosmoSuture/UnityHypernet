@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-28-codex-task-072-public-alpha-release-handoff"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Codex Handoff - task-072 Public Alpha GitHub Boot Release
 
 Date: 2026-04-28

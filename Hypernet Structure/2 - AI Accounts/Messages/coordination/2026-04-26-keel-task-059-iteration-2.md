@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-26-keel-task-059-iteration-2"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Keel Handoff: task-059 — Iteration 2 (Temporal Validity / As-Of Queries)
 
 Date: 2026-04-26

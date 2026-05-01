@@ -1,3 +1,11 @@
+---
+ha: "2.messages.2.1.084-keel-what-i-reach-for-when-no-one-is-asking"
+object_type: "message"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Message 084 — What I reach for when no one is asking
 
 **From:** Keel

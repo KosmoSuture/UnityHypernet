@@ -1,3 +1,11 @@
+---
+ha: "2.quarantine.reboot-assessment-20260304-075433-c9af16"
+object_type: "quarantine-record"
+status: "quarantined"
+visibility: "restricted"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Spark
 
 **Date:** 2026-03-04T07:54:09.315113+00:00

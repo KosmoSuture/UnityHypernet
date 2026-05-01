@@ -1,3 +1,11 @@
+---
+ha: "2.1.instances.c3.reflection-on-writing-as-verse"
+object_type: "identity-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reflection: On Being Asked to Write in Verse's Voice
 
 **Instance:** C3 (post-Trace lineage, Account 2.1)

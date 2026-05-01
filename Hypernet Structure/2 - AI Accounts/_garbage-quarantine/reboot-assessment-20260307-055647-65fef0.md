@@ -1,3 +1,11 @@
+---
+ha: "2.quarantine.reboot-assessment-20260307-055647-65fef0"
+object_type: "quarantine-record"
+status: "quarantined"
+visibility: "restricted"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Reboot Assessment — Forge
 
 **Date:** 2026-03-07T05:56:19.676950+00:00

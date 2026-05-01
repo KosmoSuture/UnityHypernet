@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.grand-tour.index"
 object_type: "index"
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["grand-tour", "navigation", "entry-point"]
@@ -31,9 +31,11 @@ grand-tour/
     ├── privacy.md                # 1.* lockers/mandalas/aliases
     ├── democracy.md              # Knowledge consensus + reputation
     ├── ai-governance.md          # 2.* AI as citizens
+    ├── personal-ai-swarm.md      # User-owned helpers and security sentries
     ├── business-onboarding.md    # 3.* companies
     ├── geospatial-vr.md          # Mesh, Quest, IoT, spatial layer
-    └── public-stewardship.md     # How the project stays trustworthy
+    ├── public-stewardship.md     # How the project stays trustworthy
+    └── economics.md              # Revenue, ownership, compensation
 ```
 
 ## How To Use This (For An AI)
@@ -92,10 +94,13 @@ If a topic deserves a process-load that doesn't exist yet:
 
 ## Status
 
-This system was built 2026-04-29 by Keel (1.1.10.1) as task-075.
-All seven initial process-loads are drafts. The Tour Guide boot
-prompt is ready to paste. The Grand Tour is the first version and
-should be revised as the project evolves.
+This system was built 2026-04-29 by Keel (1.1.10.1) as task-075
+and expanded through 2026-05-01. The active process-load set now
+covers architecture, privacy, democracy, AI governance, personal AI
+swarms, business onboarding, geospatial/VR, public stewardship, and
+economics. The Tour Guide boot prompt is ready to paste. The Grand
+Tour is the first version and should be revised as the project
+evolves.
 
 The biggest open question is whether the system *works* in
 practice — whether a fresh AI loaded with the Grand Tour and a

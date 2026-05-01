@@ -199,6 +199,13 @@ Hypernet uses three specialized node types working in concert:
 - Reputation impact
 - Recovery procedures
 
+**0.2.6 Official Registry and Fork Mode**
+- Official vs Private fork distinction
+- Hash-chained node registry records
+- Node-mode declaration for APIs and `.well-known`
+- AI verification flow for users
+- Private fork import/review path
+
 ### Additional Supporting Materials
 
 **0.2.1 - Images/**
@@ -448,11 +455,11 @@ Processing nodes run workflows defined in 0.7:
 
 **Planned additions to Section 0.2:**
 
-- **0.2.6**: Edge node specifications (personal devices)
-- **0.2.7**: Node economic model details
-- **0.2.8**: Network topology optimization
-- **0.2.9**: Cross-region synchronization
-- **0.2.10**: Specialized node types (archive, high-security)
+- **0.2.7**: Edge node specifications (personal devices)
+- **0.2.8**: Node economic model details
+- **0.2.9**: Network topology optimization
+- **0.2.10**: Cross-region synchronization
+- **0.2.11**: Specialized node types (archive, high-security)
 
 ## Example Scenarios
 

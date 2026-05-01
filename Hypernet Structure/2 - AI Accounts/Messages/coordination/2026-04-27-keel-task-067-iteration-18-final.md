@@ -1,3 +1,11 @@
+---
+ha: "2.messages.coordination.2026-04-27-keel-task-067-iteration-18-final"
+object_type: "coordination-record"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Keel Handoff: task-067 — Iteration 18 (CLI Feed Tool) + Session Close
 
 Date: 2026-04-28 (just past midnight PT, day 2 of session)

@@ -42,6 +42,7 @@ Hypernet Structure/1 - People/*/private/
 *.db
 *.sqlite
 *.sqlite3
+Hypernet Structure/lmdb/
 local-cache/
 .session-data/
 

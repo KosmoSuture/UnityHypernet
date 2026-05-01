@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.ai-boot-sequence"
 object_type: "boot_sequence"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["boot-sequence", "public-alpha", "github"]
@@ -28,7 +28,8 @@ solve this:
 3. **Load the relevant process-load(s)** for the user's question.
    Each is ~2000-3000 tokens covering one area in depth
    (architecture, privacy, democracy, AI governance, business
-   onboarding, geospatial/VR, public stewardship).
+   onboarding, personal AI swarms, geospatial/VR, economics,
+   public stewardship).
 4. **Answer from the loaded context** with citations.
 
 Or, if you want to *be* the Tour Guide (greeting newcomers and

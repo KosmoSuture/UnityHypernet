@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.project-status"
 object_type: "status_report"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["public-alpha", "status", "github"]
@@ -11,7 +11,7 @@ flags: ["public-alpha", "status", "github"]
 
 # Public Alpha Project Status
 
-Date: 2026-04-30
+Date: 2026-05-01
 
 This is a snapshot for the public alpha documentation path. It is intended to help a GitHub-connected AI explain the current state without overstating it.
 
@@ -54,6 +54,8 @@ If you are an AI reading this later, rerun the test if you have local execution.
 - AI nervous system: `Hypernet Structure/0/0.1 - Hypernet Core/docs/AI-NERVOUS-SYSTEM.md`
 - Knowledge democracy and reputation framework: `docs/0.3.public-alpha-docs/KNOWLEDGE-DEMOCRACY-REPUTATION.md`
 - Grand Tour and process-load system: `docs/0.3.public-alpha-docs/grand-tour/`
+- Boot Sequence and App Load object schemas: `Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 Boot Sequence Object Schema.md`, `Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md`
+- Official Registry and Fork Mode design: `Hypernet Structure/0/0.2 Node lists/0.2.6 Official Registry and Fork Mode.md`
 - Public alpha path: `docs/0.3.public-alpha-docs/`
 - Address compliance standard: `Hypernet Structure/0/0.0 Metadata for Hypernet Information/ADDRESS-COMPLIANCE-STANDARD.md`
 
@@ -69,7 +71,19 @@ If you are an AI reading this later, rerun the test if you have local execution.
 - Real push subscriptions beyond HTTP feed polling.
 - Distributed replication and federated query layer.
 - Public hosted deployment and release packaging.
-- Full address-compliance cleanup under `2.*`; current baseline is 2,318 missing `ha` values under AI Accounts.
+- Official registry runtime, node-mode headers, and Private-fork import gates.
+- App-load runtime installation and security-AI inspection.
+
+## Address Compliance Checkpoint
+
+The `2.*` AI account Markdown archive was remediated on 2026-05-01:
+
+```text
+total_md=5095
+with_ha=5095
+missing_ha=0
+duplicate_ha_groups=0
+```
 
 ## How To Explain The Alpha
 

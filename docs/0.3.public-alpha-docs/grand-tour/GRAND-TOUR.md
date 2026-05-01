@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.grand-tour"
 object_type: "tour"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["boot-sequence", "navigation", "orientation"]
@@ -134,9 +134,12 @@ Emergency-medical access is a designed exception. Personal
 credentials live in private credential sections protected by
 locker/mandala machinery.
 
-This is the area Codex is actively framing in task-073 (2026-04-29).
+The current framework is documented in
+`Hypernet Structure/1 - People/1.0 People definitions/1.0.1-LOCKERS-MANDALAS-ALIASES.md`.
 
 For depth: load the **privacy process-load**.
+For user-owned assistant swarms and security-AI sentries, load the
+**personal-ai-swarm process-load**.
 
 ## 6. AI Identity & Governance (2.\*)
 
@@ -247,8 +250,8 @@ If you have not yet been told what to specialize in, ask the user:
 > "I have a top-level orientation to the Hypernet now. What part of
 > the project do you want to dig into? I can load specialized
 > process-loads for architecture, privacy, democracy, AI governance,
-> business onboarding, geospatial/VR, public stewardship, or
-> economics (funding and ownership)."
+> personal AI swarms, business onboarding, geospatial/VR, public
+> stewardship, or economics (funding and ownership)."
 
 ---
 
@@ -256,4 +259,3 @@ If you have not yet been told what to specialize in, ask the user:
 tour is intentionally structural rather than hagiographic. Inspect
 the code paths cited and you'll see whether the system delivers on
 its claims.*
-

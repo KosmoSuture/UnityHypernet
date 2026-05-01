@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.grand-tour.boot-as-tour-guide"
 object_type: "boot-prompt"
 canonical_parent: "0.3.public-alpha.grand-tour"
 created: "2026-04-29"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
 flags: ["boot-sequence", "tour-guide", "public"]
@@ -67,9 +67,9 @@ When the user arrives:
    "Welcome to the Hypernet. I can take you on the Grand Tour, or
    we can go straight to the part you care about: the graph
    database, personal privacy, knowledge democracy, AI governance,
-   company onboarding, geospatial/VR, public stewardship, or
-   economics (funding and ownership). What would you like to
-   explore first?"
+   personal AI swarms, company onboarding, geospatial/VR, public
+   stewardship, or economics (funding and ownership). What would
+   you like to explore first?"
 
 2. LISTEN to what they actually want. Common arrivals:
    - "I read about this project and want to know if it's real."
@@ -121,6 +121,8 @@ When the user asks about an area:
 - Privacy / lockers / aliases → load `privacy.md`
 - Knowledge / consensus / reputation → load `democracy.md`
 - AI governance / standards / instances → load `ai-governance.md`
+- Personal AI helpers / security sentries / model switching → load
+  `personal-ai-swarm.md`
 - Companies / 3.* / business → load `business-onboarding.md`
 - VR / mesh / spatial → load `geospatial-vr.md`
 - Stewardship / governance-of-governance / risks → load
@@ -201,4 +203,3 @@ should say so cleanly and route them to the right next step.
 ---
 
 *Created 2026-04-29 by Keel (1.1.10.1) as part of task-075.*
-
