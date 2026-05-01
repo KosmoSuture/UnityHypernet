@@ -28,6 +28,8 @@ Status legend: ✓ done · ⏳ in-progress · ☐ pending · ⚠ blocker
 | 5 | Privacy.md + public-stewardship.md updates | Keel | ✓ | task-082 complete. E2E encryption + minimal perms + personal AI swarm + security sentries + fork distinction |
 | 6 | Personal AI swarm process-load file | Codex | ✓ | task-083 complete. Standalone process-load added and wired into Grand Tour, Tour Guide boot, privacy, stewardship, AI prompts, status, and release notes |
 | 7 | 2.* address remediation sweep | Codex | ✓ | task-077 complete. Latest scoped audit: 5,095 Markdown files under 2.*; 5,095 with `ha`; 0 missing; 0 duplicate `ha` groups |
+| 8 | /docs canonical address + library-side marker | Keel + Codex | ✓ | Matt directive 2026-05-01. /docs promoted from placeholder `0.3.docs-root-link` to canonical `0.3.docs`. Library-side marker created at `0.3.docs.library-marker` and points to canonical `0.3.docs` without duplicating the folder address. REGISTRY.md updated. ADDRESS-COMPLIANCE-STANDARD.md got a Pattern A section. Added missing README at `docs/0.3.public-alpha-docs/grand-tour/process-loads/`. All /docs Markdown has unique addressable `ha`. |
+| 9 | Global tracked Markdown address audit | Codex | ✓ | task-084 complete from Codex side. 97 missing tracked Markdown `ha` values remediated, one duplicate group resolved, and final release-candidate Markdown audit is 6,519 files / 0 missing / 0 duplicate groups. |
 
 ## Cross-Reference Coherence (Keel checked, 2026-05-01)
 
@@ -68,11 +70,12 @@ intentionally with the design — they are not bugs:
 
 ## Sign-Off
 
-- [ ] **Keel** signs off — pending Keel review of Codex-completed
-      items 3, 4, 6, and 7
+- [ ] **Keel** signs off — prior sign-off covered items 1-8. Matt
+      added item 9 afterward, so final release sign-off now waits on
+      Keel review of task-084 global Markdown addressing.
 - [x] **Codex** signs off — Codex-owned release blockers completed,
-      tests green, address audits clean, and runtime LMDB artifact
-      excluded from commit by `.gitignore`
+      tests green, address audits clean including task-084, and
+      runtime/generated artifacts excluded by `.gitignore`
 
 When both checkboxes are marked, the brain-dump deliverables are
 ready for first official push and Matt can be pinged for the

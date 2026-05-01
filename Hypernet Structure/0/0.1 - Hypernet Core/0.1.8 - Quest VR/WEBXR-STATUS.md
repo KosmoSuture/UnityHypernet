@@ -1,3 +1,11 @@
+---
+ha: "0.1.8.docs.webxr-status"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet VR — WebXR Status
 
 ## The Pivot: Unity to WebXR (A-Frame)

@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.0.0.03.addressing-decision-final"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Addressing Scheme - Final Decision
 
 **Date:** 2026-02-04

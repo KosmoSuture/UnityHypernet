@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.financial-projections-5year"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Financial Projections (5 Years)
 ## Conservative, Realistic, and Ambitious Scenarios
 

@@ -1,3 +1,11 @@
+---
+ha: "0.1.1.docs.unity-start-today"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Unity VR - Start Right Now (3 Hours)
 ## Get Your First Photo Displaying in VR Today
 

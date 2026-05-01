@@ -1,3 +1,11 @@
+---
+ha: "0.3.legacy-docs.hypernet-business-plan"
+object_type: "legacy-document"
+status: "archived"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Business Plan
 
 # Executive Summary

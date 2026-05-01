@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.2.1"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 6.2.1 - Task Specialization
 
 **Created:** 2026-02-06

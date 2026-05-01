@@ -1,5 +1,5 @@
 ---
-ha: "0.4.10"
+ha: "0.4.legacy.standards-specifications"
 object_type: "document"
 creator: "1.1"
 created: "2026-02-09"

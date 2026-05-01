@@ -1,3 +1,11 @@
+---
+ha: "0.3.legacy-docs.hypernet-technical-architecture-with-cover"
+object_type: "legacy-document"
+status: "archived"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 ![][image1]
 
 **Hypernet Technical Architecture – Extended Draft v1.5**

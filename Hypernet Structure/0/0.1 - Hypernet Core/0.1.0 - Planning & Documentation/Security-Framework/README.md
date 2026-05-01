@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.security-framework.index"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Security Framework
 
 **Purpose:** Security architecture, specifications, and implementation guidelines for Hypernet Core

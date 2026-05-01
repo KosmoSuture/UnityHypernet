@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.pitch-deck-detailed"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Pitch Deck - Detailed Outline
 ## Your Personal Operating System in Virtual Reality
 

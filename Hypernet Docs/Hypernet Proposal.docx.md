@@ -1,3 +1,11 @@
+---
+ha: "0.3.legacy-docs.hypernet-proposal"
+object_type: "legacy-document"
+status: "archived"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 ![A picture containing outdoor object, webDescription automatically generated][image1]
 
 Table of Contents  

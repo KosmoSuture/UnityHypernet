@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.0.0.02.ai-implementation-thoughts"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # AI Implementation Thoughts: How to Build This
 
 **Created:** 2026-02-04

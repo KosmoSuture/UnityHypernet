@@ -1,3 +1,11 @@
+---
+ha: "3.1.8.nist-response-2026-04.submission-instructions"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # NIST NCCoE Public Comment — Submission Instructions
 
 ## Deadline

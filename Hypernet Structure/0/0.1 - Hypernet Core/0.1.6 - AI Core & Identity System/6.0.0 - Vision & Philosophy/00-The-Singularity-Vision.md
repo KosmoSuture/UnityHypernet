@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.0.0.00.the-singularity-vision"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # The Singularity Vision: Hypernet as Universal Knowledge Framework
 
 **Created:** 2026-02-04

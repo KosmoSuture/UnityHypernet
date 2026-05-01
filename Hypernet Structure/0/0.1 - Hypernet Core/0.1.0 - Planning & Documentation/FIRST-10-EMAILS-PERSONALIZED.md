@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.first-10-emails-personalized"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Your First 10 Investor Emails - Ready to Send Monday
 
 **Status:** Personalized for Matt Schaeffer / Hypernet

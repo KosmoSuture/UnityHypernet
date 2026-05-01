@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.demo-video-production-guide"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Demo Video - Production Guide
 ## Movie-Quality AI-Generated Viral Video
 

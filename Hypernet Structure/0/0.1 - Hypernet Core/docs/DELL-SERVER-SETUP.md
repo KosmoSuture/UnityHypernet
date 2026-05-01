@@ -1,3 +1,11 @@
+---
+ha: "0.1.docs.dell-server-setup"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Dell Server Setup — HypernetServer
 
 **Last verified:** 2026-04-26 by Keel (1.1.10.1)

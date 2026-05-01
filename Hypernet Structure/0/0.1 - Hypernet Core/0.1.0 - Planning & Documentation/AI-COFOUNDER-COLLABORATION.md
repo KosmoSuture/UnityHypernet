@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.ai-cofounder-collaboration"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # AI as Co-Founder: A Historical Document
 ## The Creation of Hypernet - A Case Study in AI-Human Collaboration
 

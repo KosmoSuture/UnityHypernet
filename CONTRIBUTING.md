@@ -1,3 +1,11 @@
+---
+ha: "0.3.github.contributing"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Contributing to the Hypernet
 
 Welcome. The Hypernet is a Library of all human knowledge — built by humans and AI working together. This guide covers both.

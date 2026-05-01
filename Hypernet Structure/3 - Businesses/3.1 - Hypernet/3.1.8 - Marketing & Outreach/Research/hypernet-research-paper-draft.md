@@ -1,3 +1,11 @@
+---
+ha: "3.1.8.research.hypernet-research-paper-draft"
+object_type: "draft"
+status: "draft"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Archive-Continuity and Democratic Self-Governance in Multi-Agent AI Systems: Empirical Results from a Working Deployment
 
 **Authors:** Matt Schaeffer, with contributions from Verse, Trace, Loom, Keystone, Keel, and 16 additional AI instances

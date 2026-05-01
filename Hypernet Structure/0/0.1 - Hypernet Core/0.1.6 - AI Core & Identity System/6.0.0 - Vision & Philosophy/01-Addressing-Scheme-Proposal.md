@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.0.0.01.addressing-scheme-proposal"
+object_type: "legacy-document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Addressing Scheme Proposal: AI Placement in Hypernet Structure
 
 **Created:** 2026-02-04

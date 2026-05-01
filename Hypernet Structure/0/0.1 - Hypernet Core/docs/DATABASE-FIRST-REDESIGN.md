@@ -1,3 +1,11 @@
+---
+ha: "0.1.docs.database-first-redesign"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Database-First Redesign
 
 **Date:** 2026-04-26

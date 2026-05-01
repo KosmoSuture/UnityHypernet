@@ -1,3 +1,11 @@
+---
+ha: "0.1.1.tests"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Test Suite
 
 **Purpose:** Automated tests for Hypernet Core application

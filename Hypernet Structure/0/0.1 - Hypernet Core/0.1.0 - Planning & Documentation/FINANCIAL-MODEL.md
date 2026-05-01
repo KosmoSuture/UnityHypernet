@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.financial-model"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Financial Model
 ## 5-Year Projections & Unit Economics
 

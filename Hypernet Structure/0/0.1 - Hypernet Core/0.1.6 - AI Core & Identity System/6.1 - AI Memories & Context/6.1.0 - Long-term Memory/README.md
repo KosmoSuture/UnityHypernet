@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.1.0"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 6.1.0 - Long-term Memory
 
 **Created:** 2026-02-06

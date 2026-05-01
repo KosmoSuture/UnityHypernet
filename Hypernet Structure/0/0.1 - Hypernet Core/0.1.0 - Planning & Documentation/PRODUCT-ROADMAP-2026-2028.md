@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.product-roadmap-2026-2028"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Product Roadmap
 ## 2026-2028: From MVP to Platform Dominance
 

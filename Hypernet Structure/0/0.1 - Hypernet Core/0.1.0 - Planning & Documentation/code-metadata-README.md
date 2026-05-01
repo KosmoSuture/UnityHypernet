@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.code-metadata-readme"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 0.1 - Code Metadata
 
 **Version:** 1.0

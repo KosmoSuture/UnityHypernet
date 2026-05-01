@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.funding-strategy-2026"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Funding Strategy 2026
 ## Target: $100M First-Year Funding
 

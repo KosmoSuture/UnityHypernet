@@ -1,3 +1,11 @@
+---
+ha: "0.1.4"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 0.1.4 - Integration Plugins
 
 ## Overview

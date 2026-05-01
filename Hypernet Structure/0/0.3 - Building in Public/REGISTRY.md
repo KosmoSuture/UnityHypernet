@@ -17,7 +17,9 @@ This registry records the 2026-04-21 collision resolution that made `0.3` the ca
 | Address | Title | Notes |
 |---------|-------|-------|
 | `0.3` | Building in Public | Canonical public build/research section |
-| `0.3.public-alpha` | Public Alpha Documentation | GitHub-facing docs physically mirrored at `docs/0.3.public-alpha-docs/`; root `docs/` is only a proxy/link index |
+| `0.3.docs` | Public Documentation Root | Canonical address for the root `docs/` folder. Library marker at `0.3.docs.library-marker`; physical files at `docs/` at repo root (GitHub convention). Per Matt directive 2026-05-01. |
+| `0.3.docs.library-marker` | Public Documentation Root Marker | Addressed marker under the library tree pointing to canonical `0.3.docs`; keeps the marker document unique while preserving the GitHub-facing docs path. |
+| `0.3.public-alpha` | Public Alpha Documentation | Documentation collection living inside `0.3.docs` at `docs/0.3.public-alpha-docs/`. Sibling-addressed (not a child of `0.3.docs`) to preserve existing cross-references. |
 | `0.3.research` | AI Self-Report Reliability Research Project | External links exist; do not move without redirect plan |
 
 ## Readdressed Former Collisions

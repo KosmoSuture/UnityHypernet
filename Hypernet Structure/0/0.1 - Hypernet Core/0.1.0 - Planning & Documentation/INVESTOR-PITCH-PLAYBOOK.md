@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.investor-pitch-playbook"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Investor Pitch Playbook
 ## Messaging, Positioning & Outreach Strategy
 

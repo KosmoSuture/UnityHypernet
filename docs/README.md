@@ -1,23 +1,24 @@
 ---
-ha: "0.3.docs-root-link"
-object_type: "link_index"
-canonical_target: "0.3.public-alpha"
-canonical_path: "docs/0.3.public-alpha-docs/"
+ha: "0.3.docs"
+object_type: "documentation_root"
+canonical_path: "docs/"
+library_marker: "Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public Documentation/"
 created: "2026-04-28"
-updated: "2026-04-30"
+updated: "2026-05-01"
 status: "active"
 visibility: "public"
-flags: ["github-docs", "link", "public-alpha"]
+flags: ["github-docs", "documentation", "public-alpha"]
 ---
 
 # Hypernet Documentation
 
-This folder is the GitHub-facing documentation entry point. It is a proxy, not
-a separate address namespace. The canonical public alpha docs live at
-`0.3.public-alpha` and are physically stored under
-`docs/0.3.public-alpha-docs/`.
+This folder is the public-facing documentation entry point of the
+Hypernet repository. Its canonical Hypernet address is **`0.3.docs`**.
+The library-side marker for this address is at
+`Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public Documentation/README.md`,
+which describes the address and points back at this folder.
 
-For the public alpha, start here:
+For the public alpha docs collection, start here:
 
 - `0.3.public-alpha-docs/README.md`
 - `0.3.public-alpha-docs/grand-tour/GRAND-TOUR.md`
@@ -27,4 +28,10 @@ For the public alpha, start here:
 - `0.3.public-alpha-docs/PROJECT-STATUS.md`
 - `0.3.public-alpha-docs/ASK-YOUR-AI.md`
 
-The deeper archive still lives under `Hypernet Structure/`, where the address-based knowledge graph, accounts, business records, and core implementation are stored.
+Every file in this folder carries its own `ha` frontmatter, so
+any document can be referenced by its canonical Hypernet address
+even if the file's path on disk moves.
+
+The deeper archive lives under `Hypernet Structure/`, where the
+address-based knowledge graph, accounts, business records, and
+core implementation are stored.

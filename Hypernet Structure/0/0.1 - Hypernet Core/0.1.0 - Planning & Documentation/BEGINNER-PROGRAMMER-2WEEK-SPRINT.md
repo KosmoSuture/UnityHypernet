@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.beginner-programmer-2week-sprint"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Beginner Programmer 2-Week Sprint
 ## Clear, Achievable Tasks for Junior Developer
 

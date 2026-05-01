@@ -1,3 +1,11 @@
+---
+ha: "0.1.1.docs.implementation-progress"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 0.1 Implementation Progress Report
 
 **Date:** 2026-02-04

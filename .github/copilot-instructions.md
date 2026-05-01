@@ -1,3 +1,11 @@
+---
+ha: "0.3.github.copilot-instructions"
+object_type: "agent-instruction"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # GitHub AI Instructions For Hypernet
 
 Start by reading `AI-BOOT-SEQUENCE.md`.

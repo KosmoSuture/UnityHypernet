@@ -1,3 +1,11 @@
+---
+ha: "3.1.8.nist-response-2026-04.nist-nccoe-comment-draft"
+object_type: "draft"
+status: "draft"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 Matt Schaeffer
 Founder, The Hypernet Project
 github.com/KosmoSuture/UnityHypernet

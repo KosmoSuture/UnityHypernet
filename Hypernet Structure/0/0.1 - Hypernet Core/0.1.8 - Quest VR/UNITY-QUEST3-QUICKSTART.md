@@ -1,3 +1,11 @@
+---
+ha: "0.1.8.docs.unity-quest3-quickstart"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Unity + Meta Quest 3 Quick Start Guide
 ## Get Your VR Demo Running in 4 Hours
 

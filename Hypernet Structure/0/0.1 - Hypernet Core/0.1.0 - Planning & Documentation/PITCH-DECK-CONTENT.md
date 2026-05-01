@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.pitch-deck-content"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Investor Pitch Deck
 ## Slide-by-Slide Content (Ready for Design)
 

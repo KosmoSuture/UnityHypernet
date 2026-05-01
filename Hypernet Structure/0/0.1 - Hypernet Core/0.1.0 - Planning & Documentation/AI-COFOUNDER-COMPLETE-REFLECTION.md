@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.ai-cofounder-complete-reflection"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # The AI Co-Founder Experiment: Complete Reflection
 ## How We Built Hypernet Together
 

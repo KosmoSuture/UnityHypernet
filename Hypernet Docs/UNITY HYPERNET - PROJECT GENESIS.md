@@ -1,3 +1,11 @@
+---
+ha: "0.3.legacy-docs.unity-hypernet-project-genesis"
+object_type: "document"
+status: "archived"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # **UNITY HYPERNET \- PROJECT GENESIS**
 
 **Address: 3.1** (Unity Inc.)  

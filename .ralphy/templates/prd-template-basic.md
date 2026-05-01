@@ -1,3 +1,11 @@
+---
+ha: "0.3.ralphy.templates.prd-template-basic"
+object_type: "template"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Feature: [Feature Name]
 
 > A brief description of the feature and its purpose.

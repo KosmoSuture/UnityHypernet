@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.go-to-market-strategy"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Go-to-Market Strategy
 ## From 0 to 100,000 Users in 18 Months
 

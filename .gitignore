@@ -9,6 +9,8 @@ env/
 
 # System and temp files
 __pycache__/
+.pytest_cache/
+**/.tmp.driveupload/
 *.py[cod]
 *.DS_Store
 *.swp

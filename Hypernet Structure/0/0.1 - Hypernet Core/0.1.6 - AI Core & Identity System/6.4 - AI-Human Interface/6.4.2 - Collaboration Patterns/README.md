@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.4.2"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # 6.4.2 - Collaboration Patterns
 
 **Created:** 2026-02-06

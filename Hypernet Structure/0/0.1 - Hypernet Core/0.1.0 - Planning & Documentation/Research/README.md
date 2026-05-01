@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.research.index"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Research & Analysis
 
 **Purpose:** Research notes, technology evaluations, and analysis documents for Hypernet Core development

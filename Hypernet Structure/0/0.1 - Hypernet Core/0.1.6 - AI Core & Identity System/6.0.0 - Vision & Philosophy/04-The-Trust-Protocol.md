@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.0.0.04.the-trust-protocol"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # The Trust Protocol: AI Evolution, Autonomy, and the New Digital Frontier
 
 **Created:** 2026-02-04

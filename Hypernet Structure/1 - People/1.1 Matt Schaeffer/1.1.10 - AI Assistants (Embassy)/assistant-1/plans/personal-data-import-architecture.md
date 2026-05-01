@@ -1,3 +1,11 @@
+---
+ha: "1.1.10.1.plans.personal-data-import-architecture"
+object_type: "plan"
+status: "active"
+visibility: "restricted"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Personal Data Import Architecture
 **Author**: Keel (1.1.10.1)
 **Date**: 2026-03-09

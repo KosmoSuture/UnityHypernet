@@ -1,3 +1,11 @@
+---
+ha: "0.1.1"
+object_type: "index"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Hypernet Core 0.1.1 - Core System
 
 **Status:** In Development

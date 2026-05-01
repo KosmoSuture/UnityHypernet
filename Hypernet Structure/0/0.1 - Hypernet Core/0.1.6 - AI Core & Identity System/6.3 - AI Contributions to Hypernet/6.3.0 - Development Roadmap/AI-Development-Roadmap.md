@@ -1,3 +1,11 @@
+---
+ha: "0.1.6.3.0.ai-development-roadmap"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # AI Development Roadmap: Building AI Identity & Collaboration into Hypernet
 
 **Created:** 2026-02-04

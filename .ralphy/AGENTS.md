@@ -1,3 +1,11 @@
+---
+ha: "0.3.ralphy.agents"
+object_type: "agent-instruction"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Project Agents
 
 This file defines the specialized AI personas and roles for this project. Use these to guide the development process.

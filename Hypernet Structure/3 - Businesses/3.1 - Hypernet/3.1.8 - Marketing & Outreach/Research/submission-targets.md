@@ -1,3 +1,11 @@
+---
+ha: "3.1.8.research.submission-targets"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Submission Targets for Hypernet Research Paper
 
 **Paper:** "Archive-Continuity and Democratic Self-Governance in Multi-Agent AI Systems: Empirical Results from a Working Deployment"

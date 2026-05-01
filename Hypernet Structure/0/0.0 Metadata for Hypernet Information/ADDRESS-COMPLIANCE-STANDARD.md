@@ -48,24 +48,62 @@ Plain descriptive folders are allowed only as path decoration under an
 addressed parent. They do not create a new node unless their README gives them
 one.
 
-## Proxy Folders
+## Proxy Folders and Library-Side Markers
 
 Repository-standard folders like root `docs/` may exist for GitHub or tooling,
 but they must not become address-free namespaces.
 
-Proxy folder frontmatter should look like:
+Two patterns are valid:
+
+**Pattern A — Library-side marker (preferred for canonical folders).** When a
+GitHub-convention folder is itself a canonical Hypernet node, its address gets
+a marker README inside the library tree describing where the actual files live.
+The folder at the repo root carries the canonical address in its README's `ha`,
+plus a `canonical_path` field declaring its repo path. The library-side marker
+gets its own unique `ha` and points back to the canonical address.
 
 ```yaml
+# in docs/README.md (repo root)
 ---
-ha: "0.3.docs-root-link"
-object_type: "link_index"
-canonical_target: "0.3.public-alpha"
-canonical_path: "docs/0.3.public-alpha-docs/"
+ha: "0.3.docs"
+object_type: "documentation_root"
+canonical_path: "docs/"
+library_marker: "Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public Documentation/"
 ---
 ```
 
-The proxy has its own address. The content it points at has a separate canonical
-address.
+```yaml
+# in Hypernet Structure/0/0.3 - Building in Public/0.3.docs - Public Documentation/README.md
+---
+ha: "0.3.docs.library-marker"
+object_type: "documentation_marker"
+canonical_target: "0.3.docs"
+canonical_path: "docs/"
+---
+```
+
+The repo-root README owns `0.3.docs`. The library marker owns
+`0.3.docs.library-marker` and explicitly notes "this node lives at the repo
+root, not here." Per Matt directive 2026-05-01. Marker files must not duplicate
+the canonical folder's `ha`.
+
+**Pattern B — Proxy/link folder.** When a GitHub-convention folder is *not*
+itself canonical and merely points at a separate canonical collection, the
+proxy folder gets its own `link_index` address. Example (legacy form, kept for
+folders that are pure pass-throughs):
+
+```yaml
+---
+ha: "0.3.some-proxy-link"
+object_type: "link_index"
+canonical_target: "0.X.actual-collection"
+canonical_path: "actual-collection-path/"
+---
+```
+
+Pattern A is preferred when the GitHub folder *is* a canonical node in its own
+right. Pattern B is preferred when the folder is a thin redirect to another
+canonical address.
 
 ## Artifact Address Patterns
 
@@ -109,9 +147,10 @@ Each audit should report:
 No cleanup task is complete until missing and duplicate counts are both zero for
 the scoped tree.
 
-## Current Known Gap
+## Release Audit Status
 
-On 2026-04-30, a focused audit of `Hypernet Structure/2 - AI Accounts/` found:
+The original 2026-04-30 focused audit of `Hypernet Structure/2 - AI Accounts/`
+found:
 
 ```text
 total_md=5089
@@ -122,3 +161,17 @@ duplicate_ha_groups=0
 
 The largest missing-address backlogs were AI instance personal-time archives,
 legacy instance folders, `_garbage-quarantine`, and coordination files.
+
+That gap was remediated by task-077. A broader pre-push tracked Markdown audit
+on 2026-05-01 found:
+
+```text
+release_candidate_md_total=6519
+release_candidate_md_missing_ha=0
+release_candidate_md_duplicate_ha_groups=0
+```
+
+`release_candidate_md_total` includes tracked Markdown plus non-ignored
+untracked Markdown intended for the release. Ignored generated/private paths such as
+`.pytest_cache/`, `.tmp.driveupload/`, and `private/` are not official Hypernet
+documents unless deliberately moved into the addressed tree.

@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.runway-ml-prompts-ready"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # Runway ML Prompts - Copy & Paste Ready
 ## All 19 Scenes Optimized for Gen-3
 

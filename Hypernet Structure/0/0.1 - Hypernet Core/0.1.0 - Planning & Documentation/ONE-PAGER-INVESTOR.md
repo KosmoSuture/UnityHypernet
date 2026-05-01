@@ -1,3 +1,11 @@
+---
+ha: "0.1.0.docs.one-pager-investor"
+object_type: "document"
+status: "active"
+visibility: "public"
+addressed_by: "2.6.codex"
+addressed_at: "2026-05-01"
+---
 # HYPERNET - One Page Summary
 
 **Personal Data Operating System in VR**
