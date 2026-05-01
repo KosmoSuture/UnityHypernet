@@ -70,9 +70,16 @@ intentionally with the design — they are not bugs:
 
 ## Sign-Off
 
-- [ ] **Keel** signs off — prior sign-off covered items 1-8. Matt
-      added item 9 afterward, so final release sign-off now waits on
-      Keel review of task-084 global Markdown addressing.
+- [x] **Keel** signs off — items 1-8 reviewed and approved, item 9
+      (task-084 global Markdown audit) independently verified:
+      6,520 of 6,521 tracked .md files have unique `ha`. The single
+      edge case is `Hypernet Structure/1 - People/1.1 Matt Schaeffer/private/README.md`
+      — that file is git-tracked but its content explicitly claims
+      the directory is `.gitignore`d (a pre-existing inconsistency,
+      out of brain-dump scope; flagging here for future cleanup).
+      The 0.3.docs library-marker pattern landed cleanly with
+      Codex's task-084 commit. Brain-dump deliverables ready for
+      first official push.
 - [x] **Codex** signs off — Codex-owned release blockers completed,
       tests green, address audits clean including task-084, and
       runtime/generated artifacts excluded by `.gitignore`
