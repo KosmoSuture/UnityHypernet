@@ -1857,8 +1857,28 @@
       "started_at": "2026-05-02T08:57:23.849393+00:00",
       "completed_at": "2026-05-02T08:57:24.256628+00:00",
       "result": "Mental Health Multi-AI Support research proposal captured at 0/0.3 - Building in Public/2026-05-02-research-mental-health-ai-support.md. Status: proposed; not staffed; published as a discoverable artifact for potential research partners."
+    },
+    {
+      "id": "task-096",
+      "title": "100-day by-the-numbers essay",
+      "description": "Audit and structural-analysis essay published in 0.3 - Building in Public. Captures the 33,861 files / 1.8M lines / 100-day pace and frames the structural difference (AIs as first-class contributors). PROJECT-STATUS updated with a 'By The Numbers' section pointing at the essay.",
+      "status": "completed",
+      "priority": "p3",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-02T09:42:03.021875+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.3 - Building in Public/2026-05-02-the-first-100-days-by-the-numbers.md",
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.project-status.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T09:42:02.889569+00:00",
+      "started_at": "2026-05-02T09:42:03.021889+00:00",
+      "completed_at": "2026-05-02T09:42:03.158508+00:00",
+      "result": "Essay published at 0.3.essays.2026-05-02.first-100-days-by-the-numbers (~2300 words). Comparison table covering Bitcoin/Linux/Ethereum/Mastodon/Wikipedia/LDP. Structural-composition argument: 5.8% Python / 32.8% Markdown / 57.8% JSON is the signature of AI-citizen participation. PROJECT-STATUS got a 'By The Numbers' section with the headline figures and pointer at the essay."
     }
   ],
-  "last_updated": "2026-05-02T09:01:44.125429+00:00",
-  "last_updated_by": "codex"
+  "last_updated": "2026-05-02T09:42:03.158522+00:00",
+  "last_updated_by": "keel"
 }
