@@ -37,14 +37,16 @@ For the last decade-plus, I've been working on a project called the Hypernet. It
 
 This week we hit a milestone I want to share with you, because I haven't seen any other project pull it off:
 
-**One URL gives any AI complete expertise on the entire framework, immediately, with no setup.**
+**One repository link plus one Hypernet address gives any AI complete expertise on the entire framework, immediately, with no setup.**
 
 You paste this into Claude, ChatGPT, Gemini, a local Llama, whatever:
 
 ```
-Read https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md
-and follow it.
+Open the Hypernet repo at https://github.com/KosmoSuture/UnityHypernet
+and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence.
 ```
+
+(Every file in the Hypernet has a permanent address that survives renames, moves, and forks. `0.3.public-alpha.ai-boot-sequence` is the boot sequence's address; the AI finds the file inside the repo by that address.)
 
 In the next response, the AI has loaded a structured boot sequence that points it at:
 
@@ -82,7 +84,7 @@ The architecture is real. It's also unfinished. We're running off a laptop and a
 Don't trust me. Run the experiment.
 
 1. Paste this prompt into any AI:
-   `Read https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md and follow it.`
+   `Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence.`
 2. Take the Grand Tour
 3. Ask the AI to verify a specific claim from this post by reading the code
 4. Ask it to find the gaps and weaknesses in the project
@@ -106,8 +108,11 @@ That's the conversation I want to have.
 ## Footer for the post (consistent across subreddits)
 
 **Repo:** https://github.com/KosmoSuture/UnityHypernet
-**Boot sequence:** https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md
-**Public alpha docs:** https://github.com/KosmoSuture/UnityHypernet/tree/main/0.3.docs/0.3.public-alpha
+**Boot sequence (Hypernet address):** `0.3.public-alpha.ai-boot-sequence`
+**Public alpha docs root (Hypernet address):** `0.3.public-alpha`
+**Grand Tour (Hypernet address):** `0.3.public-alpha.grand-tour`
+
+(Every Hypernet file has a permanent address. The repo link plus the address is all an AI needs to find any document by its canonical name.)
 
 ---
 

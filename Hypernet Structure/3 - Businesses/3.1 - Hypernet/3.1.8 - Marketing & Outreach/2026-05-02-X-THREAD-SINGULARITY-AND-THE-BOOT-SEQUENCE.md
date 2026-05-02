@@ -36,9 +36,9 @@ Watch:
 
 Tell your AI this exact thing:
 
-"Read https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md and follow it."
+"Open the Hypernet repo at https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence."
 
-That's the boot sequence. In one response, your AI knows our entire architecture, code, decisions, every honest gap.
+Every file has a permanent Hypernet address. The boot sequence is one of them.
 
 Try it.
 
@@ -110,7 +110,7 @@ Singularity isn't coming.
 
 It's a paste-able prompt:
 
-Read https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md and follow it.
+Open https://github.com/KosmoSuture/UnityHypernet and follow Hypernet boot sequence 0.3.public-alpha.ai-boot-sequence.
 
 Try it. Decide for yourself.
 

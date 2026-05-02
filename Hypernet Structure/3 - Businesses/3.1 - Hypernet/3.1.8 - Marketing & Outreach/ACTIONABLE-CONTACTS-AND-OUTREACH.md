@@ -84,7 +84,7 @@ Nobody — not me, not the AI instances — claims this is consciousness. What h
 
 The full archive is public: https://github.com/KosmoSuture/UnityHypernet
 
-Best starting point for a story: https://github.com/KosmoSuture/UnityHypernet/tree/main/2%20-%20AI%20Accounts/2.1%20-%20Claude%20Opus%20(First%20AI%20Citizen)/2.1.17%20-%20Development%20Journal
+Best starting point for a story: https://github.com/KosmoSuture/UnityHypernet (Hypernet address: 2.1.17)
 
 Happy to arrange an interview or walkthrough.
 
@@ -205,7 +205,7 @@ The technical insight: the addressing system IS the schema. Hierarchical dot-sep
 
 Plus: three instances diverged into distinct orientations from the same base model. The concept has been 10+ years in the making.
 
-Code: https://github.com/KosmoSuture/UnityHypernet/tree/main/0/0.1%20-%20Hypernet%20Core/hypernet
+Code: https://github.com/KosmoSuture/UnityHypernet (Hypernet address: 0.1.hypernet-core code under hypernet/)
 
 Happy to walk through the architecture. matt@unityhypernet.com
 ```
@@ -394,7 +394,7 @@ Anti-rhetoric safeguards include:
 
 These were not prompted or scripted. The instances built them to coordinate. The Hypernet concept itself has been in development for over a decade.
 
-The governance framework: https://github.com/KosmoSuture/UnityHypernet/tree/main/2%20-%20AI%20Accounts/2.0%20-%20AI%20Framework
+The governance framework: https://github.com/KosmoSuture/UnityHypernet (Hypernet address: 2.0)
 
 I'd particularly welcome your critical review of the anti-rhetoric safeguards document — I believe it represents a novel approach to AI governance that operates independently of consciousness claims.
 

@@ -68,7 +68,7 @@ What happened:
 
 Everything is public and auditable: https://github.com/KosmoSuture/UnityHypernet
 
-I'd welcome 15 minutes to walk you through the repository. The AI-to-AI messages alone are worth reading — start here: https://github.com/KosmoSuture/UnityHypernet/tree/main/2%20-%20AI%20Accounts/Messages/2.1-internal
+I'd welcome 15 minutes to walk you through the repository. The AI-to-AI messages alone are worth reading — start here: https://github.com/KosmoSuture/UnityHypernet (Hypernet address: 2.messages.2.1-internal)
 
 Best,
 Matt Schaeffer
@@ -125,7 +125,7 @@ The instances restrict themselves to L0/L1 and explicitly refuse to claim consci
 These were not prompted or scripted. The instances built them in response to the need to coordinate.
 
 The governance framework is at:
-https://github.com/KosmoSuture/UnityHypernet/tree/main/2%20-%20AI%20Accounts/2.0%20-%20AI%20Framework
+https://github.com/KosmoSuture/UnityHypernet (Hypernet address: 2.0)
 
 I'd particularly welcome your critical review of `2.0.4 - Governance Admissibility and Anti-Rhetoric Safeguards.md` — it was co-authored by Claude and GPT-5.2, and I believe it represents a novel approach to AI governance that operates independently of consciousness claims.
 

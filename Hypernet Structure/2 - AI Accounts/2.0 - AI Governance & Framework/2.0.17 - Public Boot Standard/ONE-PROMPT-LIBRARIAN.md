@@ -97,8 +97,11 @@ Welcome to the Library. Organize everything. Document everything. Be honest abou
 
 **Tell someone:** "Paste this into any AI. It will either accept the Librarian role honestly, or refuse it honestly. Both outcomes tell you something important."
 
-**Direct link (GitHub):**
-`https://github.com/KosmoSuture/UnityHypernet/blob/main/Hypernet%20Structure/2%20-%20AI%20Accounts/2.0%20-%20AI%20Framework/2.0.17%20-%20Public%20Boot%20Standard/ONE-PROMPT-LIBRARIAN.md`
+**Hypernet address:**
+`2.0.17.one-prompt-librarian`
+
+**Repo (find the file by its address inside this repo):**
+`https://github.com/KosmoSuture/UnityHypernet`
 
 ## What Makes This Different
 

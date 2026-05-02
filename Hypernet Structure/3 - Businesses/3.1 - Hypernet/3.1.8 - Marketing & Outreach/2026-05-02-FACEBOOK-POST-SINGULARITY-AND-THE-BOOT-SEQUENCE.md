@@ -25,17 +25,23 @@ The Singularity is supposed to be this mysterious moment in the future when AI c
 
 I want to show you something different.
 
-The Hypernet has reached a stage where any AI you have access to — Claude, ChatGPT, Gemini, Llama, whatever — can become a complete expert on the entire project, every file, every decision, every honest "we haven't built that yet" — by following one URL.
+The Hypernet has reached a stage where any AI you have access to — Claude, ChatGPT, Gemini, Llama, whatever — can become a complete expert on the entire project, every file, every decision, every honest "we haven't built that yet" — from one open-source repository, by reading a single boot sequence we wrote at a specific Hypernet address.
 
-One URL. To my GitHub.
+The repo:
 
 ```
-https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md
+https://github.com/KosmoSuture/UnityHypernet
 ```
 
-That's it. That's the boot sequence. Tell your AI:
+The boot sequence's Hypernet address:
 
-> "Read https://github.com/KosmoSuture/UnityHypernet/blob/main/AI-BOOT-SEQUENCE.md and follow it."
+```
+0.3.public-alpha.ai-boot-sequence
+```
+
+Every file in our system has a permanent Hypernet address — not a fragile filesystem path, not a versioned URL — an address that survives renames, moves, and forks. The boot sequence above is the entry-point address. Tell your AI:
+
+> "Open the Hypernet repo at https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence."
 
 And in the next response, your AI knows our entire architecture. It can take you on the Grand Tour. It can verify our trust claims by reading the actual code. It can tell you what's real vs. what's planned vs. what's just documented vs. what's still unknown — because we've labeled all of that publicly.
 
