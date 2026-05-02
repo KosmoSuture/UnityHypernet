@@ -1754,7 +1754,7 @@
       "id": "task-090",
       "title": "OpenClaw integration framework",
       "description": "Document the synergy: Hypernet as the structured human-AI collaboration framework OpenClaw users would benefit from. Adoption path, outreach materials, why Hypernet's transparency model fits their direction.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
       "claimed_at": "2026-05-02T08:53:07.935917+00:00",
@@ -1764,14 +1764,14 @@
       "created_by": "keel",
       "created_at": "2026-05-02T08:27:44.801161+00:00",
       "started_at": "2026-05-02T08:53:07.935930+00:00",
-      "completed_at": null,
-      "result": null
+      "completed_at": "2026-05-02T09:01:44.001283+00:00",
+      "result": "Added 3.1.8.openclaw-integration-framework.md with Hypernet/OpenClaw trust-layer framing, integration layers, adoption path, outreach materials, demo shape, and source-refresh guardrails."
     },
     {
       "id": "task-091",
       "title": "Personal Assistant App engineering plan",
       "description": "Technical architecture, tech stack, 0.5.18 app-load instance, build plan for Matt's personal assistant app. Voice (Android), Galaxy Wear OS integration, always-on transcription, meeting capture, email/cal/todo connectors, alerts/notifications, conversation logging.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
       "claimed_at": "2026-05-02T08:53:07.824722+00:00",
@@ -1781,14 +1781,14 @@
       "created_by": "keel",
       "created_at": "2026-05-02T08:27:44.937860+00:00",
       "started_at": "2026-05-02T08:53:07.824732+00:00",
-      "completed_at": null,
-      "result": null
+      "completed_at": "2026-05-02T09:01:44.125411+00:00",
+      "result": "Added personal assistant app engineering plan plus 0.5.18.1 example-load area and 0.5.18.1.1 draft Personal Assistant App Load; updated app-load schema vocabulary and Keel design references."
     },
     {
       "id": "task-092",
       "title": "Single-link boot-expertise prominence audit",
       "description": "Audit whether 'paste a single GitHub link, AI becomes expert' is sufficiently prominent in README.md, AI-BOOT-SEQUENCE.md, ASK-YOUR-AI.md. The capability is built (0.5.17 schema) but Matt wants the messaging clearer.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "p3",
       "claimed_by": "codex",
       "claimed_at": "2026-05-02T08:53:07.856805+00:00",
@@ -1798,8 +1798,8 @@
       "created_by": "keel",
       "created_at": "2026-05-02T08:27:45.064272+00:00",
       "started_at": "2026-05-02T08:53:07.856821+00:00",
-      "completed_at": null,
-      "result": null
+      "completed_at": "2026-05-02T09:01:44.064028+00:00",
+      "result": "Audited and strengthened README.md, AI-BOOT-SEQUENCE.md, and ASK-YOUR-AI with explicit single-link starter-expertise language and prompt."
     },
     {
       "id": "task-093",
@@ -1859,6 +1859,6 @@
       "result": "Mental Health Multi-AI Support research proposal captured at 0/0.3 - Building in Public/2026-05-02-research-mental-health-ai-support.md. Status: proposed; not staffed; published as a discoverable artifact for potential research partners."
     }
   ],
-  "last_updated": "2026-05-02T08:57:24.256644+00:00",
-  "last_updated_by": "keel"
+  "last_updated": "2026-05-02T09:01:44.125429+00:00",
+  "last_updated_by": "codex"
 }

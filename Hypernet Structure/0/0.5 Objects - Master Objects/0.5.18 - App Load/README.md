@@ -34,5 +34,9 @@ Initial app-load candidates in the repository:
 - Future personal-account onboarding apps
 - Future business migration apps
 
-These are not yet encoded as full `0.5.18` instances. This schema
-defines the target structure.
+Example app-load instances live under `0.5.18.1 - Example App
+Loads/`. The first draft instance is `0.5.18.1.1 - Personal
+Assistant App Load.md`.
+
+Most candidates are not yet encoded as full `0.5.18` instances.
+This schema defines the target structure.

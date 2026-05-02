@@ -3,7 +3,7 @@ ha: "0.3.github-root-readme"
 object_type: "document"
 canonical_target: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-05-01"
+updated: "2026-05-02"
 status: "active"
 visibility: "public"
 flags: ["github", "public-alpha", "entrypoint"]
@@ -28,6 +28,8 @@ If you are skeptical: don't ask "is this real?" Ask "is this *possible*?" — an
 ## Public Alpha
 
 The public alpha is designed to be understandable directly from GitHub. Point any GitHub-connected AI at this repository and ask it to read `AI-BOOT-SEQUENCE.md`. It should then take the Grand Tour, load focused process-load files, inspect the repository, explain the Hypernet, and separate what is implemented, documented, planned, and unknown.
+
+This is the single-link boot claim: one repository link plus `AI-BOOT-SEQUENCE.md` should be enough to turn a capable GitHub-connected AI into a starter Hypernet guide. It will not know every file by memory; it should know how to navigate the address tree, load the right process-load, verify claims, and cite evidence.
 
 The public release path starts at:
 

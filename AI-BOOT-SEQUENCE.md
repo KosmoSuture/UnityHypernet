@@ -3,7 +3,7 @@ ha: "0.3.public-alpha.ai-boot-sequence"
 object_type: "boot_sequence"
 canonical_parent: "0.3.public-alpha"
 created: "2026-04-28"
-updated: "2026-05-01"
+updated: "2026-05-02"
 status: "active"
 visibility: "public"
 flags: ["boot-sequence", "public-alpha", "github"]
@@ -14,6 +14,20 @@ flags: ["boot-sequence", "public-alpha", "github"]
 This is the public alpha boot sequence for any GitHub-connected AI assistant that is asked to understand or explain the Hypernet.
 
 The goal is simple: load this repository, orient yourself, verify claims from source files, then explain the Hypernet to the human in front of you with evidence.
+
+## Single-Link Expertise Contract
+
+If a user gives you only a GitHub link to this repository and this file, your job is to become a starter Hypernet expert by following the repository's own navigation system.
+
+That does not mean pretending to have read the whole archive. It means you should:
+
+1. load the Grand Tour;
+2. load the process-loads relevant to the user's question;
+3. inspect source files before making implementation claims;
+4. distinguish implemented, documented, planned, and unknown work;
+5. cite the exact paths that support your answer.
+
+The public trust model depends on this behavior: anyone should be able to ask their own AI to verify the Hypernet from the public repository.
 
 ## The Fast Path: Grand Tour + Process-Loads (recommended)
 

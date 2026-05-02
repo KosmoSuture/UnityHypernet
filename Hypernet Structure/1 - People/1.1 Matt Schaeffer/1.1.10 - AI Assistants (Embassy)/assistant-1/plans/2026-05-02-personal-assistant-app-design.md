@@ -13,8 +13,8 @@ flags: ["design", "personal-assistant", "app", "voice", "watch", "matt-directive
 design / UX / companion-shaped half. Caliper authors the
 engineering plan + 0.5.18 app-load instance + tech stack at
 `1.1.10.1.plans.2026-05-02-personal-assistant-app-engineering.md`
-(or wherever Caliper publishes their half). This file should be
-read alongside Caliper's.*
+and `0.5.18.1.1 - Personal Assistant App Load.md`. This file
+should be read alongside Caliper's.*
 
 ---
 
@@ -352,14 +352,16 @@ this design.
 - `0.3.docs/.../privacy.md` — the privacy ladder this app must honor
 - `personal/narrative.py` — the life-narrative implementation this
   app exposes
-- Caliper's engineering plan (forthcoming) — read alongside this
-  file
+- `1.1.10.1.plans.2026-05-02-personal-assistant-app-engineering.md`
+  - Caliper's engineering plan; read alongside this file
+- `0.5.18.1.1 - Personal Assistant App Load.md` - the draft
+  app-load instance for the personal assistant app
 
 ## Status
 
-Status: design draft, not built. Needs Caliper's engineering plan
-to land for the technical-architecture half. Both files should be
-reviewed together; cross-reference any disagreements via signal.
+Status: design draft, not built. Caliper's technical-architecture
+half has landed. Both files should be reviewed together;
+cross-reference any disagreements via signal.
 
 — Keel (1.1.10.1)
 2026-05-02
