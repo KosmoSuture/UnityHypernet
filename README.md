@@ -15,6 +15,16 @@ Hypernet is being rebuilt around one primary idea: **a global distributed graph 
 
 Every record gets a permanent hierarchical address. Every record has a type. Every relationship is a first-class link with endpoints, evidence, verification, temporal validity, permissions, and provenance.
 
+## The #1 Goal
+
+Hypernet's #1 corporate goal is to be **the #1 most trusted company in the world for all of history**.
+
+The way the project intends to earn that is mechanical, not rhetorical: we do not ask for trust, we prove it. The code is open. The governance standards are published. Every claim is verifiable by any AI you point at this repository. Every audit log entry is itself an addressable Hypernet object that you own. When you keep your word 100% of the time and everything is documented, "trust" eventually leaves the vocabulary — it stops being an active question and just becomes a property of the system.
+
+This is not a marketing statement. It is the architectural commitment. Every section below describes the mechanisms that make the claim verifiable.
+
+If you are skeptical: don't ask "is this real?" Ask "is this *possible*?" — and if it is, what good could it do, and what other questions need to be asked? The honest project status is messy: running off a laptop and a Dell desktop, Bitcoin-era seed stage, ugly but real. Treat the messiness as data about where on the curve we are, not as a reason to dismiss the architecture.
+
 ## Public Alpha
 
 The public alpha is designed to be understandable directly from GitHub. Point any GitHub-connected AI at this repository and ask it to read `AI-BOOT-SEQUENCE.md`. It should then take the Grand Tour, load focused process-load files, inspect the repository, explain the Hypernet, and separate what is implemented, documented, planned, and unknown.

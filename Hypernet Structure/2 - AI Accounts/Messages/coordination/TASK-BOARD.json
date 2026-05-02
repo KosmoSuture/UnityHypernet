@@ -1672,8 +1672,136 @@
       "started_at": "2026-05-01T05:06:50.192211+00:00",
       "completed_at": "2026-05-01T05:17:25.569177+00:00",
       "result": "Address-first public docs correction complete from Codex side. Root public docs tree is now 0.3.docs/; every folder under it has a matching address-first index file; every Markdown file under it starts with its ha address; active public docs references updated; Tour Guide 0.5.17 hash recomputed. Validation: 0.3.docs audit 4 folders/22 files/0 errors; release Markdown audit 6522 files/0 missing/0 duplicate ha groups; git diff --check passed; python test_hypernet.py 102 passed. Handoff: 2026-05-01-codex-task-085-address-first-public-docs-handoff.md. Keel re-review requested before push-readiness is restored."
+    },
+    {
+      "id": "task-086",
+      "title": "Grand Tour trust messaging",
+      "description": "Land Matt's #1 trust claim explicitly in the Grand Tour: 'we don't ask for trust, we prove it', 'trust eventually leaves the vocabulary', '#1 most trusted company in the world for all of history'. Update GRAND-TOUR.md, BOOT-AS-TOUR-GUIDE.md, public-stewardship.md, ASK-YOUR-AI.md.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-02T08:28:53.532203+00:00",
+      "owned_paths": [
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.288588+00:00",
+      "started_at": "2026-05-02T08:28:53.532217+00:00",
+      "completed_at": "2026-05-02T08:34:08.391958+00:00",
+      "result": "Trust messaging landed. Grand Tour got new Section 0 'The #1 Goal' before any technical content. Tour Guide boot got 'THE #1 CLAIM YOU SHOULD KNOW BY HEART' block. public-stewardship.md got 'The #1 Trust Claim and How It's Earned' section after Why It Matters. README root got 'The #1 Goal' section above Public Alpha."
+    },
+    {
+      "id": "task-087",
+      "title": "Skeptic reframe and messy-Bitcoin honesty",
+      "description": "Reframe public messaging from 'is this real?' to 'is this possible? and if so, what other questions need to be asked?' Acknowledge running off a laptop and Dell desktop, Bitcoin-era comparison, ugly-but-real seed stage.",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-02T08:28:53.670547+00:00",
+      "owned_paths": [
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.ask-your-ai.md",
+        "README.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.397954+00:00",
+      "started_at": "2026-05-02T08:28:53.670559+00:00",
+      "completed_at": "2026-05-02T08:34:08.522634+00:00",
+      "result": "Skeptic reframe landed in ASK-YOUR-AI as new 'Skeptic Reframe Prompt' (3 questions: is this possible? what good could it do? what other questions?). Bitcoin-era / laptop+Dell honesty acknowledgment landed in README and public-stewardship.md trust section."
+    },
+    {
+      "id": "task-088",
+      "title": "Device-level swarm extension (smart fridges to watches)",
+      "description": "Extend personal-ai-swarm.md to cover heterogeneous device participation: home computers, laptops, phones, smart watches, smart refrigerators, anything reprogrammable. Cross-device task routing and constrained-compute helper roles.",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-02T08:28:53.817570+00:00",
+      "owned_paths": [
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.516413+00:00",
+      "started_at": "2026-05-02T08:28:53.817583+00:00",
+      "completed_at": "2026-05-02T08:34:08.648131+00:00",
+      "result": "Heterogeneous device-level swarm extension added to personal-ai-swarm.md as new section. Covers 5 capability tiers (full helper, pocket, glance, domain, sensor), cross-device routing via address tree, constrained-compute helper pattern, privacy implications, fridge-to-watch range with smart fridge as concrete example. Implementation status: design only, no runtime."
+    },
+    {
+      "id": "task-089",
+      "title": "Personal Assistant App design document",
+      "description": "Design doc for Matt's personal assistant app: voice (driving), Galaxy watch integration, throughout-day alerts, meeting passive-listen, email/calendar/to-do management, top-priority surfacing, project organization across topics, conversation continuity. The 'true rudder beneath the waters'. Tonight: design doc and UX/companion thinking — Keel authors. Caliper handles technical architecture and app-load instance.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-02T08:28:53.955009+00:00",
+      "owned_paths": [
+        "Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.10 - AI Assistants (Embassy)/assistant-1/plans/"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.648172+00:00",
+      "started_at": "2026-05-02T08:28:53.955024+00:00",
+      "completed_at": "2026-05-02T08:34:08.786317+00:00",
+      "result": "Personal Assistant App design (Keel half) at 1.1.10.1.plans.2026-05-02-personal-assistant-app-design.md. Covers companion frame, 5 channels (watch/phone/laptop/background/async), priority stack (5 tiers), passive-listen ethical boundaries, life-narrative layer, conversation continuity, project wandering, Galaxy Watch specifics, success/failure criteria, open design questions. Awaits Caliper's engineering half."
+    },
+    {
+      "id": "task-090",
+      "title": "OpenClaw integration framework",
+      "description": "Document the synergy: Hypernet as the structured human-AI collaboration framework OpenClaw users would benefit from. Adoption path, outreach materials, why Hypernet's transparency model fits their direction.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.801161+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-091",
+      "title": "Personal Assistant App engineering plan",
+      "description": "Technical architecture, tech stack, 0.5.18 app-load instance, build plan for Matt's personal assistant app. Voice (Android), Galaxy Wear OS integration, always-on transcription, meeting capture, email/cal/todo connectors, alerts/notifications, conversation logging.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:44.937860+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-092",
+      "title": "Single-link boot-expertise prominence audit",
+      "description": "Audit whether 'paste a single GitHub link, AI becomes expert' is sufficiently prominent in README.md, AI-BOOT-SEQUENCE.md, ASK-YOUR-AI.md. The capability is built (0.5.17 schema) but Matt wants the messaging clearer.",
+      "status": "pending",
+      "priority": "p3",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-02T08:27:45.064272+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
     }
   ],
-  "last_updated": "2026-05-01T05:17:25.569185+00:00",
-  "last_updated_by": "codex"
+  "last_updated": "2026-05-02T08:34:08.786333+00:00",
+  "last_updated_by": "keel"
 }
