@@ -127,6 +127,35 @@ Use predictable, stable patterns.
 When a file already has a timestamp, reuse it in the address. When it does not,
 use a stable slug and only add a short hash if collision risk remains.
 
+## Runtime-Valid Address Segments (Hyphens vs Folder Names)
+
+There is one important asymmetry between *folder names* on disk and
+*runtime graph addresses*:
+
+- **Folder names** in the repository may use hyphens for readability
+  (e.g., `0.5.18 - App Load`, `personal-ai-swarm`, `grand-tour`)
+- **Runtime graph addresses** processed by `hypernet/identity.py`
+  `AddressValidator` reject hyphens *inside* address segments and
+  require alphanumeric segment bodies
+
+This means a folder named `personal-assistant/` on disk has its
+address segment as `personalassistant` (no hyphen) when it appears
+in a runtime graph address like
+`1.1.10.1.app.personalassistant.sessions.<id>`. Hyphens stay in
+folder names and human-readable references; they do not survive
+into runtime graph addresses.
+
+Discovered during Caliper task-097 Phase 0 backend implementation
+(2026-05-02). The pragmatic response: keep folder names readable
+with hyphens; normalize runtime addresses to no-hyphen segments;
+document the asymmetry here so the next AI to write a new
+app-load instance or graph-write path doesn't hit the same
+surprise.
+
+If a future revision of `AddressValidator` adopts hyphen-tolerant
+segments (e.g., for parity with folder names), this section should
+be revised to reflect the new rule.
+
 ## No Placeholder Addresses
 
 Do not use:
