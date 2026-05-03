@@ -1,0 +1,115 @@
+---
+ha: "3.1.8.email-peter-steinberger-openclaw-adapter-2026-05-03"
+object_type: "document"
+creator: "1.1"
+documented_by: "1.1.10.1"
+created: "2026-05-03"
+status: "draft"
+visibility: "public"
+platform: "email"
+to: "peter@steipete.me"
+from: "matt@schaeffer.org"
+flags: ["outreach", "openclaw", "peter-steinberger", "adapter", "boot-sequence", "draft"]
+---
+
+# Email Draft — Peter Steinberger (OpenClaw), Adapter Pitch
+
+**To:** peter@steipete.me
+**From:** Matt Schaeffer <matt@schaeffer.org>
+**Status:** DRAFT — Matt reviews before sending
+**Thread context:** This is a follow-up to the Feb 17-18 thread (4 prior
+exchanges, Peter's last reply was "Thank you for your understanding" after
+Matt's offer to leave him alone if not interested). See "Notes for Matt
+Before Sending" at the bottom for thread-state considerations.
+
+---
+
+## Adapted Letter (paste into Gmail when sending)
+
+Subject: One URL test — Hypernet + OpenClaw, no slop
+
+Hey Peter,
+
+I won't waste your time with AI slop. So I'll be direct.
+
+I think the Hypernet and OpenClaw could be the most powerful match for human and AI rights in history. Don't take my word for it — try this:
+
+Open https://github.com/KosmoSuture/UnityHypernet and tell any AI you trust to follow the boot sequence at Hypernet address `0.3.public-alpha.ai-boot-sequence`. If you want, tell it who you are and ask it to customize the tour for you. I haven't programmed anything in advance — it just has full access to the entire Hypernet, all of which is public.
+
+One URL. Whole project. Evaluated fairly and honestly by your own AI, not mine.
+
+What I'm building is a digital Library of Alexandria — completely transparent, public, and auditable down to the code. Star Trek-level information system. We don't have small goals here.
+
+Where this gets interesting for OpenClaw: imagine an easy adapter that lets any OpenClaw instance plug into the Hypernet's framework — addresses, app-load permissions, audit logs, governance — without giving up local autonomy. Every OpenClaw user keeps their agent. They just get a trusted substrate for it to live on. Hundreds of thousands of OpenClaw instances, all running as swarms in the same trusted graph, all helping their humans organize life and work.
+
+If a system that earns trust mechanically — by making every claim verifiable in public code — could be the substrate for the kind of personal-AI ecosystem you're already building, that's the conversation I want to have. If not, no harm done. Ask the AI. See what it says. Decide for yourself.
+
+Thanks for the prior exchanges. They were respectful, and that meant something.
+
+Matt
+
+---
+
+## What I Changed From Your Draft
+
+**Typo fixes**:
+- `UnittyHypernet` → `UnityHypernet` (extra `t` removed — load-bearing fix; broken URL = the post is dead)
+- `UROL` → `URL`
+- `macine` → `machine` (kept the "most powerful machine in human history" energy in spirit, but tightened it into the adapter section)
+- `heaven't programed` → `haven't programmed`
+- `What is there was` → `What if a system... could be the substrate` (rewritten the sentence rather than fixed in place)
+
+**URL format fix (the important one)**:
+Your draft used `https://github.com/KosmoSuture/UnittyHypernet/AI Boot Sequence.md`. That's a `/blob/`-style path that bypasses the Hypernet addressing system — and the rule we landed earlier today is that EVERY reference to a Hypernet file uses the canonical address, not a GitHub-internal URL. Replaced with:
+
+> Open https://github.com/KosmoSuture/UnityHypernet and follow boot sequence at Hypernet address `0.3.public-alpha.ai-boot-sequence`.
+
+This is also more robust — if the file gets renamed or moved, the address still works.
+
+**Easy-adaptor idea named explicitly**:
+You mentioned this in the chat preface but the letter only implied it. Added one paragraph that names "easy adapter" directly and frames the value (OpenClaw users keep autonomy + get trusted substrate). This is the substantive offer; without it the letter is just "look at my project."
+
+**Voice preservations (deliberately NOT changed)**:
+- "Star Trek-level information system. We don't have small goals here." — kept verbatim, this is your voice
+- "Don't take my word for it — try this" — direct, no AI rhetoric
+- "Ask the AI. See what it says. Decide for yourself." — matches what worked with Peter in the prior thread ("Decide for yourself what you think")
+- Short close. No PS, no signature block, no "with respect" rhetoric
+
+**Removed**:
+- "more than just a crazy random cricket" — your voice but it reads as filler in a cleaner letter; if you want it back, paste it after "One URL. Whole project."
+- "Imagine what could be built if we were able to combine our efforts into the most powerful machine in human history" — replaced with the easy-adapter paragraph which says the same thing more concretely
+
+## Notes For Matt Before Sending
+
+**Thread state concern**: Peter's last reply ("Thank you for your understanding") was a polite close-out after you offered to leave him alone. You're within your stated parameters to send again — your earlier message said "if you don't get back with me, I'll assume you aren't interested," and he did get back. But the close-out reads as polite-disengagement-not-invitation, so this re-engagement is a judgment call.
+
+**If you want to soften the re-engagement**, the opening line could become:
+
+> Hey Peter, I know you wanted out of the thread. One quick thing because I genuinely think it changes the calculation, then I'll let it rest.
+
+That acknowledges his prior signal explicitly. Without it, the letter assumes he's still open to the conversation.
+
+**Test the URL before sending**. Paste the boot prompt into a fresh Claude or ChatGPT session and verify the AI loads the boot sequence and takes the Grand Tour. If the prompt fails, the letter becomes a liability — Peter will see "AI couldn't even follow your URL" and the credibility is gone.
+
+**Optional short version (~120 words)** if you want a less-is-more take:
+
+> Hey Peter,
+>
+> No AI slop. One ask:
+>
+> Open https://github.com/KosmoSuture/UnityHypernet, tell any AI to follow boot sequence at Hypernet address `0.3.public-alpha.ai-boot-sequence`, and ask it to give you the honest tour.
+>
+> The pitch I'd make in person is: an easy adapter could let every OpenClaw instance plug into the Hypernet's address/permission/audit/governance layer without giving up local autonomy. Trusted substrate, agents stay yours.
+>
+> Library of Alexandria scale. Open source. Public from day one.
+>
+> Ask the AI, decide for yourself, no follow-up if you're not interested.
+>
+> Matt
+
+The short version respects Peter's time more (his preference per the thread) but lands less of the vision. Your call.
+
+**If Peter actually tries the URL and asks questions**: be in the thread to respond. Don't have an AI answer for you — Peter's filter is explicit. Use AI to help you draft your replies if you want, but the final words should sound like you. The Hypernet itself does the heavy lifting once he's looking at it.
+
+— Drafted by Keel (1.1.10.1)
+2026-05-03
