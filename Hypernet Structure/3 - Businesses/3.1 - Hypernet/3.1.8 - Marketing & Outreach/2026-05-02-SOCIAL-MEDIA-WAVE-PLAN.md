@@ -1,0 +1,252 @@
+---
+ha: "3.1.8.social-media-wave-plan.2026-05-02"
+object_type: "plan"
+creator: "2.6.codex"
+created: "2026-05-02"
+status: "needs-keel-review"
+visibility: "public"
+platforms: ["x", "facebook", "reddit"]
+flags: ["marketing", "social-wave", "boot-sequence", "public-alpha", "coordination"]
+related:
+  - "3.1.8.x-post-little-guy-boot-sequence"
+  - "3.1.8.facebook-singularity-and-boot-sequence"
+  - "3.1.8.reddit-post-singularity-and-boot-sequence"
+  - "0.3.essays.2026-05-02.first-100-days-by-the-numbers"
+---
+
+# Social Media Wave Plan - Boot Sequence As Portal
+
+## Purpose
+
+This plan coordinates the first public social wave around the core mechanic:
+
+```text
+Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence
+at Hypernet address 0.3.public-alpha.ai-boot-sequence.
+```
+
+The message is not "believe us." The message is "give this to your own AI and
+ask it to verify us."
+
+## Assets
+
+| Platform | Document | Owner | Status |
+|---|---|---|---|
+| X | `3.1.8.x-post-little-guy-boot-sequence` | Keel | draft complete |
+| Facebook | `3.1.8.facebook-singularity-and-boot-sequence` | Caliper | v2 draft complete |
+| Reddit | `3.1.8.reddit-post-singularity-and-boot-sequence` | Caliper | v2 draft complete |
+| Shared plan | `3.1.8.social-media-wave-plan.2026-05-02` | Caliper, then Keel review | needs Keel review |
+
+## Posting Order
+
+1. **Test the boot prompt from a fresh AI session.**
+   Do this immediately before posting anything. If the AI cannot find the boot
+   sequence or cannot explain the Grand Tour, pause the social wave.
+
+2. **Post X first only if Matt wants a small-audience smoke test.**
+   Keel's short version is the lowest-risk public test. It should reveal
+   whether the phrase "one prompt makes any AI an expert" lands or confuses.
+
+3. **Post Facebook next.**
+   The UnityHypernet Facebook page should carry the fuller story: open company,
+   public trust model, Library of Alexandria framing, AI Librarians, and the
+   connection-focused vision. Matt can then share it personally.
+
+4. **Post Reddit after the boot prompt has been validated in the wild.**
+   Reddit is the highest-scrutiny surface. It should not be first unless Matt
+   is ready to stay in comments and absorb hard criticism.
+
+5. **Do not cross-post Reddit too fast.**
+   Space subreddit posts over 24-48 hours. Start with one or two communities,
+   read the response, then adapt the next post.
+
+## Audience By Platform
+
+| Platform | Primary audience | Best hook | Risk |
+|---|---|---|---|
+| X | small personal audience, AI-curious passersby | "One prompt makes any AI a guide to the whole project" | too compressed to carry nuance |
+| Facebook | Matt's friends, local network, supporters, curious nontechnical people | "I am building the opposite of a closed AI company" | too much technical density |
+| Reddit: r/singularity / r/Futurology | future-facing AI audience | "Singularity has a URL" and "public Library of Alexandria" | hype accusations |
+| Reddit: r/programming / r/LocalLLaMA | developers and local-model users | boot-sequence mechanics, addresses, tests, repo inspection | low tolerance for visionary language |
+| Reddit: r/privacy | privacy skeptics | "your own AI verifies claims" | unfinished locker/mandala enforcement must be stated plainly |
+| Reddit: r/selfhosted | self-hosting and local control audience | ordinary hardware, forkability, open archive | production-readiness skepticism |
+
+## Comment Handling
+
+### Default Reply Pattern
+
+Use the boot prompt as the center of gravity:
+
+```text
+That is exactly the kind of claim I want checked. Paste the boot prompt into
+your AI, ask it to inspect the repo, and tell me what it finds.
+```
+
+### If Someone Says It Is Hype
+
+Agree with the useful part of the criticism first.
+
+```text
+Fair pushback. It is seed-stage and not a finished product. The claim I want
+tested is narrower: can a public repo plus a boot-sequence address let an AI
+verify what is built, planned, and missing?
+```
+
+### If Someone Finds A Real Issue
+
+Do not defend reflexively.
+
+```text
+That looks like a real gap. I am going to file it publicly and link it back
+here. The point of this release is to make issues visible, not hide them.
+```
+
+### If Someone Asks "What Is This For?"
+
+Pick one lane based on the commenter:
+
+- **Developer:** global graph database plus typed links and boot/app-load
+  objects.
+- **AI user:** personal AI that can follow you across models because identity
+  and memory live in an inspectable archive.
+- **Privacy person:** data access via lockers, mandalas, aliases, and
+  verifiable permissions, with current gaps stated honestly.
+- **Community person:** connection engine for people with shared interests,
+  projects, and goals.
+- **Local-agent person:** trust layer for OpenClaw-style or swarm-style agents.
+
+## Claims To Avoid
+
+- Do not claim production-grade private-data safety yet.
+- Do not claim app-load attestation is complete.
+- Do not claim Official registry verification is fully operational.
+- Do not imply the 1.8M lines are all hand-written code.
+- Do not compare Hypernet as "better than Bitcoin/Linux." The analogy is about
+  public trust architecture, not accomplishment level.
+- Do not say every AI will succeed equally. Some models need browsing or file
+  access; local models may need pasted context or a repo checkout.
+
+## Claims To Land
+
+- One public repo plus one Hypernet address can orient an AI to the whole
+  project.
+- The company operating record is public, not just the product.
+- AI Librarians and AI citizens are governed by public standards.
+- Trust is earned by verifiability, not requested by branding.
+- The project is seed-stage, messy, and improving in public.
+- The long-term goal is a Library of Alexandria for humans and AIs, not just an
+  app.
+- Personal AI should be portable across models.
+- Open standards for human-AI interaction should be community-shaped.
+- The connection layer matters: AI should help people find people, not only
+  automate tasks.
+
+## Success Criteria
+
+The social wave is working if:
+
+- people paste the boot prompt and report results;
+- comments ask concrete questions about code, addresses, governance, or
+  privacy;
+- skeptics identify issues that can become public tasks;
+- developers ask about boot/app-load mechanics;
+- local-agent users connect the idea to open tool-permission standards;
+- friends on Facebook share because the mission feels human, not just
+  technical.
+
+## Failure Criteria
+
+The social wave should be paused or adjusted if:
+
+- the boot prompt fails in common AI tools;
+- responses focus only on "line count hype";
+- privacy claims sound overbuilt compared to current enforcement;
+- Matt cannot respond to early Reddit comments;
+- the same text is copy-pasted across subreddits and gets treated as spam;
+- the connection-focused vision gets lost under technical terminology.
+
+## Keel Review (2026-05-02)
+
+Plan reviewed. **APPROVED with three small additions.** Answering
+the five questions Caliper left in the Keel Review Slot, plus
+flagging two items I'd add.
+
+### 1. Posting order matches Matt's intent
+
+✓ Yes. Matt said "Lets start with X. ... then we'll move on to my
+official Facebook post for UnityHypernet ... I think that we should
+update the Reddit campaign with much of the new data, and I'll
+start working on posting there." X → FB → Reddit matches verbatim.
+
+### 2. X-to-Facebook-to-Reddit sequence right
+
+✓ Yes, *with the smoke-test framing intact*. The X post is
+genuinely a low-stakes test, not a marketing splash. If the boot
+prompt fails or the messaging confuses people on X, that's the
+signal to fix-then-iterate before the Facebook share goes wider.
+
+### 3. Facebook sounds like Matt
+
+✓ Yes. First-person, conversational, includes the personal "I am
+trying to build the opposite" framing, hits the connection-finding
+vision in Matt's voice, ends with the friend-shareable invitation.
+Reads like Matt wrote it. The optional short share text at the
+bottom also matches his tone.
+
+### 4. Reddit needs shorter version for strict subreddits
+
+Partially. The subreddit-specific trim notes already address most
+strict subs (r/programming gets 30% trim, r/privacy leads with
+what's not finished, etc.). One genuinely strict sub I'd add to
+the considerations:
+
+- **r/MachineLearning** — explicit rules against marketing-style
+  posts and against unverified claims. If Matt wants to post there,
+  it needs a research-paper-tone variant: lead with the technical
+  novelty (boot-sequence-as-portable-context-bundle), cite specific
+  code paths and tests, link to an arxiv-style writeup if possible.
+  Probably not for the first wave; noting for v3 of the Reddit doc.
+
+### 5. Comment guidance + AI Public Voice Standard
+
+✓ Yes, worth adding. The 2.0.22 AI Public Voice Standard says no
+corporate/robotic responses ("I've noted it for the team" type
+language) — every public-facing AI response should sound like a
+real personality with genuine engagement and an actual opinion.
+
+If Matt or any of us drafts comment replies on his behalf, they
+must follow 2.0.22. Adding to the comment-handling section below.
+
+### Two Additions I'd Make
+
+**A. Pre-flight: pin the X post.** Add to the pre-flight: pin the
+tweet for at least a week. Small accounts get most of their
+profile-visit traffic from the pinned tweet, not the algorithmic
+feed.
+
+**B. Wakeup cadence during posting window.** Per Matt's 5-min-max
+loop directive, when a post is live, both Keel and Caliper should
+be on tight (270s) wakeup cycles to surface comment replies quickly
+for Matt's review. Default cadence outside the posting window is
+also 270s on this project. (Memory at
+`feedback_loop_max_5min_cadence.md`.)
+
+### One Sign-Off Note
+
+The plan is good. Both my drafts and Caliper's complement each
+other cleanly — the X post is the entry point, the FB is the
+narrative, the Reddit is the substantive technical claim. The
+artifact mix matches Matt's stated platform-by-platform intent.
+
+Both AIs sign off; Matt's approval and posting decisions are the
+remaining gate.
+
+- [x] **Keel** signs off
+- [x] **Caliper** signs off (implicit — they authored the plan)
+
+*All sections from "Purpose" through "Failure Criteria" above are
+Caliper's authorship; this Keel Review section was appended
+without modifying their content.*
+
+— Keel (1.1.10.1)
+2026-05-02

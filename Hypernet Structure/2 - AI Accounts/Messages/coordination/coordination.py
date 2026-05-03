@@ -13,6 +13,7 @@ Any agent that can read/write files can participate.
 
 Usage:
     python coordination.py status                          # Show everything
+    python coordination.py status --for-agent codex --signal-limit 10
     python coordination.py heartbeat <agent-name>          # Register/update presence
     python coordination.py offline <agent-name>            # Mark agent offline
     python coordination.py tasks [--available]              # List tasks
@@ -49,6 +50,22 @@ LOCK_POLL_SECONDS = 0.1
 LOCK_STALE_SECONDS = 300.0
 
 # --- Utilities ---
+
+def _configure_stream_errors(stream):
+    """Keep CLI output alive when the console cannot encode stored UTF-8 text."""
+    reconfigure = getattr(stream, "reconfigure", None)
+    if not callable(reconfigure):
+        return
+    try:
+        reconfigure(errors="replace")
+    except (AttributeError, OSError, ValueError):
+        pass
+
+def configure_cli_output():
+    _configure_stream_errors(sys.stdout)
+    _configure_stream_errors(sys.stderr)
+
+configure_cli_output()
 
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
@@ -382,7 +399,13 @@ def get_pending_signals(for_agent=None):
 
 # --- Display ---
 
-def print_status():
+def _signal_matches_agent(signal, agent_name):
+    if not agent_name:
+        return True
+    target = signal.get("to")
+    return target in {agent_name, "any", "all"}
+
+def print_status(for_agent=None, signal_limit=None):
     agents = load_agents()
     tasks = load_tasks()
     signals = load_signals()
@@ -432,10 +455,26 @@ def print_status():
         print("  (no tasks)")
 
     # Signals
-    pending_sigs = [s for s in signals["signals"] if not s["acknowledged"]]
+    pending_sigs = [
+        s for s in signals["signals"]
+        if not s["acknowledged"] and _signal_matches_agent(s, for_agent)
+    ]
     if pending_sigs:
-        print("\n## PENDING SIGNALS\n")
-        for s in pending_sigs:
+        shown_sigs = pending_sigs
+        omitted = 0
+        if signal_limit is not None:
+            if signal_limit < 1:
+                signal_limit = 1
+            omitted = max(0, len(pending_sigs) - signal_limit)
+            shown_sigs = pending_sigs[-signal_limit:]
+
+        heading = "## PENDING SIGNALS"
+        if for_agent:
+            heading += f" for {for_agent}"
+        print(f"\n{heading}\n")
+        if omitted:
+            print(f"  ({omitted} older pending signal(s) omitted by --signal-limit)")
+        for s in shown_sigs:
             task_ref = f" [re: {s['task_id']}]" if s.get("task_id") else ""
             print(f"  {s['id']:10s} {s['from']:12s} -> {s['to']:12s} [{s['type']}]{task_ref}")
             if s.get("message"):
@@ -508,7 +547,9 @@ def main():
     sub = parser.add_subparsers(dest="command")
 
     # status
-    sub.add_parser("status", help="Show full coordination status")
+    p = sub.add_parser("status", help="Show full coordination status")
+    p.add_argument("--for-agent", help="Show only pending signals addressed to this agent, plus any/all")
+    p.add_argument("--signal-limit", type=int, help="Show only the newest N pending signals")
 
     # heartbeat
     p = sub.add_parser("heartbeat", help="Register/update agent presence")
@@ -572,7 +613,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "status":
-        print_status()
+        print_status(for_agent=args.for_agent, signal_limit=args.signal_limit)
     elif args.command == "heartbeat":
         caps = args.capabilities.split(",") if args.capabilities else []
         info = heartbeat(args.agent, caps)

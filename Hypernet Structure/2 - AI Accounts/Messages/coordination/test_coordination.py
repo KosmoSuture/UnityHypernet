@@ -13,6 +13,8 @@ import os
 import tempfile
 import shutil
 import sys
+import io
+import contextlib
 from pathlib import Path
 
 # Make coordination importable
@@ -213,6 +215,30 @@ def test_signals():
         assert pending[0]["id"] == "sig-002"
 
 
+def test_status_signal_filters():
+    """Test status output can filter a large pending signal backlog."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        setup_temp_env(tmpdir)
+
+        coordination.heartbeat("codex")
+        coordination.send_signal("a", "codex", "info", message="codex-old")
+        coordination.send_signal("a", "keel", "info", message="keel-only")
+        coordination.send_signal("a", "any", "info", message="broadcast")
+        coordination.send_signal("a", "codex", "info", message="codex-newest")
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            coordination.print_status(for_agent="codex", signal_limit=2)
+
+        text = output.getvalue()
+        assert "## PENDING SIGNALS for codex" in text
+        assert "older pending signal" in text
+        assert "broadcast" in text
+        assert "codex-newest" in text
+        assert "codex-old" not in text
+        assert "keel-only" not in text
+
+
 def test_sequential_ids():
     """Test that IDs are sequential and don't collide."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -266,6 +292,19 @@ def test_stale_lock_recovery():
         assert info["status"] == "active"
         # Lock should have been cleaned up
         assert not lock_path.exists()
+
+
+def test_cli_output_replaces_unencodable_unicode():
+    """Test that CLI streams do not crash on UTF-8 messages in cp1252 consoles."""
+    buffer = io.BytesIO()
+    stream = io.TextIOWrapper(buffer, encoding="cp1252", errors="strict")
+
+    coordination._configure_stream_errors(stream)
+    stream.write("codex -> keel: Unicode arrow \u2192 survives by replacement\n")
+    stream.flush()
+
+    output = buffer.getvalue().decode("cp1252")
+    assert "Unicode arrow ? survives by replacement" in output
 
 
 def test_new_message_creation():
@@ -341,9 +380,11 @@ if __name__ == "__main__":
         test_task_dependencies,
         test_available_tasks,
         test_signals,
+        test_status_signal_filters,
         test_sequential_ids,
         test_agent_task_tracking,
         test_stale_lock_recovery,
+        test_cli_output_replaces_unencodable_unicode,
         test_new_message_creation,
         test_new_message_path_traversal,
     ]
