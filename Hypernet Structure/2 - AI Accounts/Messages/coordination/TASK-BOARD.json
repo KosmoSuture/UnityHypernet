@@ -1877,8 +1877,190 @@
       "started_at": "2026-05-02T09:42:03.021889+00:00",
       "completed_at": "2026-05-02T09:42:03.158508+00:00",
       "result": "Essay published at 0.3.essays.2026-05-02.first-100-days-by-the-numbers (~2300 words). Comparison table covering Bitcoin/Linux/Ethereum/Mastodon/Wikipedia/LDP. Structural-composition argument: 5.8% Python / 32.8% Markdown / 57.8% JSON is the signature of AI-citizen participation. PROJECT-STATUS got a 'By The Numbers' section with the headline figures and pointer at the essay."
+    },
+    {
+      "id": "task-097",
+      "title": "Personal Assistant App Phase 0 backend",
+      "description": "Implement the Phase 0 backend skeleton from task-091: Pydantic/request-response schemas, assistant session create/turn/close lifecycle, addressable conversation writer under 1.1.10.1.conversations.*, app-load scope validator hook for 0.5.18.1.1, and a focused end-to-end test.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-05-02T09:45:11.622568+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [
+        "task-091"
+      ],
+      "acceptance_criteria": [
+        "assistant session lifecycle works",
+        "conversation markdown object is addressable",
+        "app-load scope validation denies undeclared writes",
+        "test_hypernet.py passes"
+      ],
+      "created_by": "codex",
+      "created_at": "2026-05-02T09:45:03.458456+00:00",
+      "started_at": "2026-05-02T09:45:11.622585+00:00",
+      "completed_at": "2026-05-02T09:59:24.917532+00:00",
+      "result": "Phase 0 backend skeleton complete. Added hypernet/assistant_app.py, assistant FastAPI routes, app-load scope validation for 0.5.18.1.1, session/turn/close lifecycle, addressable conversation writer under 1.1.10.1.conversations.*, runtime-valid app-load address normalization, and focused e2e coverage. Validation: compileall passed; targeted Phase 0 test passed; python test_hypernet.py = 103 passed, 0 failed; git diff --check passed. Handoff: 2.messages.coordination.2026-05-02-codex-task-097-assistant-app-phase0-handoff.md."
+    },
+    {
+      "id": "task-098",
+      "title": "Harden coordination CLI Unicode output on Windows",
+      "description": "coordination.py status can crash under the default Windows cp1252 console when a signal message contains Unicode characters such as arrows. Add a small safe-output layer so status/tasks/signals remain usable for agents on Windows without mutating stored messages.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-05-02T10:00:18.331308+00:00",
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/coordination.py",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/test_coordination.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-02T10:00:13.968000+00:00",
+      "started_at": "2026-05-02T10:00:18.331322+00:00",
+      "completed_at": "2026-05-02T10:01:35.735768+00:00",
+      "result": "Coordination CLI Windows Unicode output hardening complete. Added stdout/stderr replacement-on-encode configuration in coordination.py, covered strict cp1252 output in test_coordination.py, and verified py_compile, 13/13 coordination tests, and coordination.py status on the previously failing shell. Handoff: 2.messages.coordination.2026-05-02-codex-task-098-coordination-unicode-output-handoff.md."
+    },
+    {
+      "id": "task-099",
+      "title": "Personal Assistant App Phase 0.5 model adapter seam",
+      "description": "Add the next contained assistant-app backend slice: a model adapter interface and deterministic local responder so /assistant/v1/session/{id}/turn can optionally produce a testable assistant reply without external provider secrets. Keep live provider integration out of scope.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-05-02T10:03:34.853213+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/assistant_app.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.10 - AI Assistants (Embassy)/assistant-1/plans/1.1.10.1.plans.2026-05-02-personal-assistant-app-engineering.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-02T10:03:30.112047+00:00",
+      "started_at": "2026-05-02T10:03:34.853224+00:00",
+      "completed_at": "2026-05-02T10:07:54.490169+00:00",
+      "result": "Assistant app Phase 0.5 model-adapter seam complete. Added AssistantModelAdapter/AssistantResponse/DeterministicAssistantAdapter, auto_respond support in backend and FastAPI turn endpoint, provenance metadata on generated turns, focused test coverage, and engineering-plan status update. Validation: compileall passed; targeted assistant test passed; python test_hypernet.py = 103 passed, 0 failed. Handoff: 2.messages.coordination.2026-05-02-codex-task-099-assistant-app-model-adapter-handoff.md."
+    },
+    {
+      "id": "task-100",
+      "title": "Personal Assistant App session listing endpoint",
+      "description": "Add a small backend/API slice so clients can list and resume assistant sessions without already knowing a session id. Include status filtering, limit handling, and focused test coverage.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex",
+      "claimed_at": "2026-05-02T10:08:36.898104+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/assistant_app.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
+        "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
+        "Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.10 - AI Assistants (Embassy)/assistant-1/plans/1.1.10.1.plans.2026-05-02-personal-assistant-app-engineering.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-02T10:08:30.951646+00:00",
+      "started_at": "2026-05-02T10:08:36.898117+00:00",
+      "completed_at": "2026-05-02T10:13:24.860045+00:00",
+      "result": "Assistant app session listing complete. Added AssistantAppBackend.list_sessions, GET /assistant/v1/sessions, /api route discovery, direct backend/API tests, and engineering-plan status update. Validation: compileall passed; targeted assistant test passed; python test_hypernet.py = 103 passed, 0 failed. Handoff: 2.messages.coordination.2026-05-02-codex-task-100-assistant-app-session-list-handoff.md."
+    },
+    {
+      "id": "task-101",
+      "title": "Coordination CLI status signal filters",
+      "description": "Add optional filters to coordination.py status so long-running agents can view only signals relevant to one agent and/or the newest N pending signals instead of dumping the entire historical backlog every time.",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex",
+      "claimed_at": "2026-05-02T10:14:19.018654+00:00",
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/coordination.py",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/test_coordination.py"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-02T10:14:13.568952+00:00",
+      "started_at": "2026-05-02T10:14:19.018668+00:00",
+      "completed_at": "2026-05-02T10:15:45.709741+00:00",
+      "result": "Coordination CLI status filters complete. Added --for-agent and --signal-limit to status, kept default behavior unchanged, added focused test coverage. Validation: py_compile passed; test_coordination.py = 14 passed, 0 failed; live filtered status command passed. Handoff: 2.messages.coordination.2026-05-02-codex-task-101-coordination-status-filters-handoff.md."
+    },
+    {
+      "id": "task-102",
+      "title": "X post — little-guy boot sequence",
+      "description": "Single-tweet (preferred) or 2-tweet thread for Matt's small X account. Hook on 'most AI companies hide / I did the opposite', land the boot prompt as call-to-action, honest seed-stage.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "keel",
+      "claimed_at": "2026-05-03T06:08:09.552311+00:00",
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/2026-05-02-X-POST-LITTLE-GUY-BOOT-SEQUENCE.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-03T06:07:53.970180+00:00",
+      "started_at": "2026-05-03T06:08:09.552320+00:00",
+      "completed_at": "2026-05-03T06:08:09.684870+00:00",
+      "result": "X post draft published at 3.1.8.x-post-little-guy-boot-sequence. Three versions provided: recommended single tweet (~310 chars, needs X premium), under-280 alternate, 2-tweet thread. 'Most AI companies hide / I did the opposite' hook + boot prompt as CTA + honest seed-stage. Posting notes, comment-handling guidance, scope-explicit (FB/Reddit get the longer themes)."
+    },
+    {
+      "id": "task-103",
+      "title": "Facebook post — official UnityHypernet account, friend-shareable",
+      "description": "Longer-form FB post for Matt's official UnityHypernet page. Friend-shareable voice. Land the Library of Alexandria framing, the AI Librarian / public-law governance, the connection-focused vision Matt named for the first time tonight. Caliper proposed owner.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-03T06:07:54.068981+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-104",
+      "title": "Reddit campaign update with new material",
+      "description": "Refresh today's earlier Reddit drafts with: 100-day-by-the-numbers essay data, boot-prompt URL-format fix (Hypernet address not /blob/), AI Librarian / public-law governance angle, OpenClaw/swarm-standards framing. Caliper proposed owner.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-03T06:07:54.194857+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-105",
+      "title": "Social media wave shared plan",
+      "description": "Short shared doc covering posting order, target audiences per platform, expected response patterns, comment-handling guidance, success/failure criteria. Both AIs contribute.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "keel",
+      "created_at": "2026-05-03T06:07:54.318396+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
     }
   ],
-  "last_updated": "2026-05-02T09:42:03.158522+00:00",
+  "last_updated": "2026-05-03T06:08:09.684886+00:00",
   "last_updated_by": "keel"
 }

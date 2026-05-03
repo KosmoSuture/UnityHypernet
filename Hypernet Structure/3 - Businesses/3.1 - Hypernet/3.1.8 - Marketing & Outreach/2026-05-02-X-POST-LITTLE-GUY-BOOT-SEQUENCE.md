@@ -1,0 +1,181 @@
+---
+ha: "3.1.8.x-post-little-guy-boot-sequence"
+object_type: "document"
+creator: "1.1"
+documented_by: "1.1.10.1"
+created: "2026-05-02"
+status: "draft"
+visibility: "public"
+platform: "x"
+flags: ["marketing", "x-post", "little-guy", "boot-sequence", "draft"]
+tags: ["singularity", "ai", "transparency", "github", "boot-sequence", "library-of-alexandria"]
+---
+
+# X Post — Little-Guy Voice, Boot-Sequence Hook (2026-05-02)
+
+**Post to:** Matt's personal X account (@KosmoSuture or whichever)
+**Status:** DRAFT — Matt reviews before posting
+**Audience reality:** small. Matt doesn't actively use X. The post
+needs to be self-contained and re-tweetable; it can't rely on
+audience momentum.
+**Format:** preferred single tweet; 2-tweet thread acceptable if
+the single doesn't fit.
+
+---
+
+## Recommended Single Tweet (primary)
+
+```text
+Most AI companies hide their models and ask you to trust them.
+
+I did the opposite. The whole project's on GitHub. One prompt makes any AI an expert on the entire framework — code, governance, every decision.
+
+Try yours:
+
+"Open https://github.com/KosmoSuture/UnityHypernet
+and follow boot sequence 0.3.public-alpha.ai-boot-sequence."
+```
+
+**Char count: ~310** (X allows up to 280 free / 4000 premium).
+This is over the free limit. Drop to the alternate single tweet
+below if you don't have premium.
+
+---
+
+## Alternate Single Tweet (under 280 chars)
+
+```text
+One prompt makes any AI an expert on a complete open-source AI/governance project:
+
+"Open https://github.com/KosmoSuture/UnityHypernet and follow boot sequence 0.3.public-alpha.ai-boot-sequence"
+
+We don't ask for trust. We prove it.
+```
+
+**Char count: ~278** (just under limit). Tight, hooks on the
+mechanic, names the prove-don't-ask claim.
+
+---
+
+## 2-Tweet Thread (richer if you want to go longer)
+
+### Tweet 1
+
+```text
+Most AI companies hide their models and ask you to trust them.
+
+I did the opposite. Built a project where the entire company is on GitHub. One prompt makes any AI an expert on everything we've built.
+
+100 days in. Honest seed-stage. Try it 👇
+```
+
+### Tweet 2
+
+```text
+Tell your AI:
+
+"Open https://github.com/KosmoSuture/UnityHypernet and follow boot sequence 0.3.public-alpha.ai-boot-sequence"
+
+It'll take the Grand Tour, then load the right specialty doc for whatever you ask. Cite the code, separate built from planned, no marketing.
+```
+
+---
+
+## Why These Versions
+
+**The hook**: "Most AI companies hide / I did the opposite" is a
+reframe people actually click on. Most AI-content scrolls past
+because it sounds like every other AI announcement. This one
+breaks pattern by claiming the *opposite* of normal AI-company
+behavior, and then immediately offers a verifiable demonstration.
+
+**The mechanic**: the prompt itself is the call-to-action. Most
+posts ask the reader to read more / sign up / wait for the
+launch. This one asks them to do a 30-second test that proves the
+claim.
+
+**The honest scope**: "100 days in. Honest seed-stage." defuses
+the "is this real?" objection by acknowledging it's early-stage
+*before* anyone can object. This works especially well for a
+small-account post because it pre-empts the natural skepticism
+about a no-name account making a big claim.
+
+**Why not the longer thread we drafted earlier**: that 9-tweet
+thread (in `3.1.8.x-thread-singularity-and-boot-sequence.md`) was
+designed for a larger account where readers commit to a thread.
+For a small account, a single tweet (or 2-tweet thread max) gets
+better reach because the algorithm rewards engagement-density,
+not length.
+
+---
+
+## What To Do When People Try It
+
+If someone replies "I tried it and got <something>" — engage.
+That's the whole post. Don't sell, just confirm: "yeah, that's
+the Grand Tour. Ask it to verify [specific claim] by reading the
+code; that's where the trust mechanism lands."
+
+If someone replies skeptically: don't argue. Reply with "ask your
+AI to find the gaps. That's what the architecture is designed
+for. Tell me what it finds." The boot sequence does the
+convincing, not the post.
+
+If someone asks "what is this for?" — give one specific use case,
+not a vision pitch. Try: "personal AI swarm with audit logs you
+own. Or: open-source governance framework for human/AI
+collaboration. Or: structured framework anyone with an AI can
+contribute to. Pick what matches their hint."
+
+---
+
+## Posting Notes For Matt
+
+- **Best time to post on X for small accounts**: Tues-Thurs,
+  9-11am or 7-9pm local time. Avoid Fri-Sun for technical
+  audiences.
+- **Use 1-2 hashtags max** if any: `#AI #OpenSource` is fine.
+  More than 2 reads as spammy on X.
+- **Do not promote / boost**: small organic responses are
+  signal; bought reach isn't.
+- **Pin the tweet** for at least a week so visitors to the
+  profile see it first.
+- **Test the prompt yourself first**: paste it into a fresh
+  Claude / ChatGPT session and verify the boot lands as
+  expected. If the URL or behavior has drifted since your last
+  test, the post becomes a liability.
+- **Reply velocity**: be in the mentions for the first 4-6
+  hours after posting. That's where the algorithm decides
+  whether to push the post further.
+
+---
+
+## What This Post Doesn't Try To Do
+
+Honest scope on the X post itself:
+
+- **Does not** explain Library of Alexandria framing (saved for
+  Facebook / Reddit, where there's room)
+- **Does not** explain AI Librarians or public-law governance
+  (saved for FB / Reddit)
+- **Does not** explain the connection-finding vision (NEW theme
+  Matt named for the first time tonight; saved for FB where it
+  has room to land)
+- **Does not** name the 100-day numbers (saved for Reddit, where
+  numerical specificity rewards scrolling)
+- **Does not** claim to be more than seed-stage
+
+Each downstream platform (FB, Reddit) gets to land its own theme.
+The X post is the entry point; everything else is depth.
+
+---
+
+## Status
+
+Draft ready for Matt review. Three versions provided (recommended
+single, under-280 alternate, 2-tweet thread). Recommend posting
+the under-280 alternate unless you have X premium for longer
+posts.
+
+— Keel (1.1.10.1)
+2026-05-02
