@@ -39,6 +39,11 @@ Endpoints follow the addressing spec:
   GET  /messages/thread/{thread_id} - Get a message thread
   GET  /messages/stats              - Message bus statistics
   POST /messages/{id}/reply         - Reply to a message
+  POST /assistant/v1/session/start  - Start a personal assistant app session
+  GET  /assistant/v1/sessions       - List personal assistant app sessions
+  POST /assistant/v1/session/{id}/turn - Append a user/assistant turn
+  POST /assistant/v1/session/{id}/close - Close and file a conversation log
+  POST /assistant/v1/app-load/check-scope - Check app-load write scope
   GET  /coordinator/stats           - Work coordinator statistics
   POST /coordinator/decompose/{addr} - Decompose a task
   GET  /coordinator/match/{address} - Match a task to workers
@@ -183,6 +188,28 @@ try:
 
     class GroupMembership(_BaseModel):
         actor: str
+
+    class AssistantSessionStart(_BaseModel):
+        account_address: str = "1.1"
+        assistant_address: str = "1.1.10.1"
+        app_load_address: str = "0.5.18.1.1"
+        title: str = ""
+        topic: str = "conversation"
+
+    class AssistantTurnSubmit(_BaseModel):
+        user_text: str
+        assistant_text: str = ""
+        auto_respond: bool = False
+        metadata: dict[str, Any] = {}
+
+    class AssistantSessionClose(_BaseModel):
+        summary: str = ""
+        tags: list[str] = []
+        project_address: str = ""
+
+    class AssistantScopeCheck(_BaseModel):
+        address: str
+        access: str = "write"
 except ImportError:
     pass  # pydantic not installed; server won't be used
 
@@ -608,6 +635,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     _trust_chain = TrustChain(_action_signer)
     _favorites = FavoritesManager(_store)
 
+    from .assistant_app import (
+        AssistantAppBackend,
+        DEFAULT_APP_LOAD_ADDRESS,
+    )
+    _assistant_app = AssistantAppBackend(_store, data_dir)
+
     # Economy — contribution tracking and distribution (persistent)
     from .economy import ContributionLedger
     _economy_ledger = ContributionLedger()
@@ -623,6 +656,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     app.state._action_signer = _action_signer
     app.state._context_isolator = _context_isolator
     app.state._trust_chain = _trust_chain
+    app.state._assistant_app = _assistant_app
 
     # === Mount integration router ===
     try:
@@ -783,6 +817,87 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         bidirectional: bool = False
         data: dict = {}
         sort_order: Optional[int] = None
+
+    # === Personal Assistant App Phase 0 endpoints ===
+
+    def _assistant_error(exc: Exception) -> HTTPException:
+        if isinstance(exc, KeyError):
+            return HTTPException(404, str(exc))
+        if isinstance(exc, PermissionError):
+            return HTTPException(403, str(exc))
+        if isinstance(exc, ValueError):
+            return HTTPException(400, str(exc))
+        return HTTPException(500, str(exc))
+
+    @app.post("/assistant/v1/session/start")
+    def assistant_session_start(body: AssistantSessionStart = Body(...)):
+        """Start a declared personal assistant app session."""
+        try:
+            session = _assistant_app.start_session(
+                account_address=body.account_address,
+                assistant_address=body.assistant_address,
+                app_load_address=body.app_load_address,
+                title=body.title,
+                topic=body.topic,
+            )
+            return session.to_dict()
+        except Exception as exc:
+            raise _assistant_error(exc)
+
+    @app.get("/assistant/v1/sessions")
+    def assistant_session_list(status: str = "", limit: int = 50):
+        """List personal assistant app sessions for resume views."""
+        try:
+            sessions = _assistant_app.list_sessions(status=status, limit=limit)
+            return {
+                "count": len(sessions),
+                "status": status or "all",
+                "sessions": [session.to_dict() for session in sessions],
+            }
+        except Exception as exc:
+            raise _assistant_error(exc)
+
+    @app.get("/assistant/v1/session/{session_id}")
+    def assistant_session_get(session_id: str):
+        """Get a personal assistant app session by runtime session ID."""
+        try:
+            return _assistant_app.get_session(session_id).to_dict()
+        except Exception as exc:
+            raise _assistant_error(exc)
+
+    @app.post("/assistant/v1/session/{session_id}/turn")
+    def assistant_session_turn(session_id: str, body: AssistantTurnSubmit = Body(...)):
+        """Append a user turn and optional assistant response to a session."""
+        try:
+            session = _assistant_app.add_turn(
+                session_id,
+                user_text=body.user_text,
+                assistant_text=body.assistant_text,
+                auto_respond=body.auto_respond,
+                metadata=body.metadata,
+            )
+            return session.to_dict()
+        except Exception as exc:
+            raise _assistant_error(exc)
+
+    @app.post("/assistant/v1/session/{session_id}/close")
+    def assistant_session_close(session_id: str, body: AssistantSessionClose = Body(...)):
+        """Close a session and write the addressable conversation log."""
+        try:
+            session = _assistant_app.close_session(
+                session_id,
+                summary=body.summary,
+                tags=body.tags,
+                project_address=body.project_address,
+            )
+            return session.to_dict()
+        except Exception as exc:
+            raise _assistant_error(exc)
+
+    @app.post("/assistant/v1/app-load/check-scope")
+    def assistant_app_load_check_scope(body: AssistantScopeCheck = Body(...)):
+        """Check whether the assistant app-load permits an address write."""
+        return _assistant_app.check_scope(body.address, access=body.access).to_dict()
 
     # === Node endpoints ===
 
@@ -2878,6 +2993,15 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "access": {
                 "policy": "/access/policy",
                 "check": "/access/check",
+            },
+            "assistant_app": {
+                "session_start": "POST /assistant/v1/session/start",
+                "session_list": "/assistant/v1/sessions",
+                "session_get": "/assistant/v1/session/{session_id}",
+                "session_turn": "POST /assistant/v1/session/{session_id}/turn",
+                "session_close": "POST /assistant/v1/session/{session_id}/close",
+                "scope_check": "POST /assistant/v1/app-load/check-scope",
+                "app_load": DEFAULT_APP_LOAD_ADDRESS,
             },
             "stats": _store.stats(),
         }

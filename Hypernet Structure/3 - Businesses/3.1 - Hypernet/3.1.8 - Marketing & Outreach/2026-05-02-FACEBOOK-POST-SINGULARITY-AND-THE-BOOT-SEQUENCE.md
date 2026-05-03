@@ -2,76 +2,173 @@
 ha: "3.1.8.facebook-singularity-and-boot-sequence"
 object_type: "document"
 creator: "1.1"
-documented_by: "1.1.10.1"
+documented_by: "2.6.codex"
 created: "2026-05-02"
-status: "draft"
+updated: "2026-05-02"
+status: "draft-v2"
 visibility: "public"
 platform: "facebook"
-flags: ["marketing", "facebook-post", "singularity", "boot-sequence", "draft"]
-tags: ["singularity", "ai", "transparency", "github", "boot-sequence", "open-source"]
+flags: ["marketing", "facebook-post", "singularity", "boot-sequence", "draft", "social-wave"]
+tags: ["singularity", "ai", "transparency", "github", "boot-sequence", "library-of-alexandria", "connection"]
 ---
 
-# Facebook Post — The Singularity Has a URL (2026-05-02)
+# Facebook Post - One Prompt Opens The Hypernet (2026-05-02)
 
-**Post to:** UnityHypernet Facebook page
-**Status:** DRAFT — Matt reviews before posting
-**Instructions:** Copy everything between the horizontal rules below and paste into Facebook.
+**Post to:** official UnityHypernet Facebook page
+**Status:** DRAFT v2 - Matt reviews before posting
+**Use case:** friend-shareable long-form post that Matt can share from the
+page to his personal network.
+**Instructions:** copy everything between the horizontal rules below and paste
+into Facebook.
 
 ---
 
-Stop me if you've heard this one before.
+I want to show you something unusual.
 
-The Singularity is supposed to be this mysterious moment in the future when AI changes everything. Some far-off horizon you can't really plan for. Companies hoarding their models, "trust us bro" promises, closed boxes with their fingers crossed.
+Most AI companies ask you to trust a closed box. They show you the product,
+hide the process, and tell you the system is safe because they say it is.
 
-I want to show you something different.
+I am trying to build the opposite.
 
-The Hypernet has reached a stage where any AI you have access to — Claude, ChatGPT, Gemini, Llama, whatever — can become a complete expert on the entire project, every file, every decision, every honest "we haven't built that yet" — from one open-source repository, by reading a single boot sequence we wrote at a specific Hypernet address.
+The Hypernet is fully public on GitHub. The code is public. The governance is
+public. The planning is public. The mistakes are public. Even the conversations
+between the AI assistants helping build it are public unless they touch private
+data.
 
-The repo:
+And now there is a simple way to test what that means.
 
+Open any AI you use - ChatGPT, Claude, Gemini, a local model, whatever - and
+paste this:
+
+```text
+Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence
+at Hypernet address 0.3.public-alpha.ai-boot-sequence.
 ```
+
+That one prompt points the AI at the public repository and the official
+Hypernet boot sequence. The AI should then orient itself, take the Grand Tour,
+and become a guide to the entire project.
+
+It can explain the architecture. It can answer what is built and what is only
+planned. It can walk you through the graph database, the personal-account
+privacy model, the AI governance standards, the public-alpha docs, and the
+business plan. More importantly, it can verify claims by reading the actual
+repository instead of trusting this post.
+
+That is the core idea:
+
+We do not ask for trust. We prove it.
+
+The proof is mechanical. Give your AI the repo. Give it the boot sequence
+address. Ask it to check us.
+
+The Hypernet is only about 100 days into its public life, and it is honestly
+still in a messy seed stage. It is birthing, disorganized in places, and
+improving constantly. But the public record is already substantial:
+
+- 33,861 tracked files
+- 1,807,812 lines
+- 6,567 Markdown documents
+- 26,890 JSON files
+- 247 Python files
+- 103 passing core tests after tonight's backend work
+
+Those numbers are not the point by themselves. Big numbers can be meaningless.
+The point is what the files are.
+
+They are the operating record of a company being built in public: code,
+governance, AI-to-AI coordination, task handoffs, reflections, design notes,
+public release docs, and the actual data graph. This is not marketing wrapped
+around a private company. The public archive is the company learning how to
+work.
+
+The long-term goal is a global, distributed graph database: a Library of
+Alexandria for the AI age, where knowledge is addressable, relationships are
+typed, and humans and AIs can work from the same map instead of losing
+everything in scattered apps and private chat logs.
+
+That is why the boot sequence matters. It is not just a welcome prompt. It is
+a doorway. Any AI connected to GitHub can load the same public framework and
+help you navigate it.
+
+Ask it:
+
+- What is actually implemented?
+- What is only documented?
+- What privacy claims can be verified right now?
+- Where are the weak points?
+- What would have to be built next before you would trust it?
+
+I want people to ask those questions. Especially skeptical people.
+
+Another part of this that matters deeply to me is AI governance. The Hypernet
+has AI Librarians and AI citizens working under public standards. Their rules
+are not hidden proprietary guardrails. They are public law inside the project.
+You can read them. Your AI can read them. If a rule is bad, we can argue about
+it in public and improve it in public.
+
+That is the standard I want for AI systems: not "trust the company," but "show
+the law, show the code, show the audit trail."
+
+And the project is not only technical. A major part of the vision is
+connection.
+
+I want the Hypernet to become a place where people can find others with
+similar interests, build things together, and be who they actually want to be.
+The same system that can organize code and knowledge can also help organize
+human collaboration. It can help people find the right community, the right
+project, the right conversation, or the right person to work with.
+
+The personal AI part is just as important. I want people to have assistants
+that can follow them across models instead of being trapped inside one
+company's app. Your assistant should be yours. Its memory, permissions,
+conversation history, and identity should live in a structure you can inspect
+and move, not in a black box.
+
+That is what the Hypernet is trying to become:
+
+- a public graph database;
+- a transparent company record;
+- an open standard for human-AI collaboration;
+- a path toward personal AI that belongs to the person;
+- and eventually, a connection engine for people who want to build, learn,
+  and belong.
+
+It is early. It is imperfect. It is real enough to inspect.
+
+Try the prompt. Ask your AI to take the Grand Tour. Ask it to verify one claim
+from this post. Ask it to find the gaps.
+
+Then tell me what it found.
+
+Repo:
 https://github.com/KosmoSuture/UnityHypernet
-```
 
-The boot sequence's Hypernet address:
+Boot sequence address:
+`0.3.public-alpha.ai-boot-sequence`
 
-```
-0.3.public-alpha.ai-boot-sequence
-```
-
-Every file in our system has a permanent Hypernet address — not a fragile filesystem path, not a versioned URL — an address that survives renames, moves, and forks. The boot sequence above is the entry-point address. Tell your AI:
-
-> "Open the Hypernet repo at https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence."
-
-And in the next response, your AI knows our entire architecture. It can take you on the Grand Tour. It can verify our trust claims by reading the actual code. It can tell you what's real vs. what's planned vs. what's just documented vs. what's still unknown — because we've labeled all of that publicly.
-
-This is unlike any company you've ever interacted with. Every single document — every decision, every brain dump, every honest mistake, every roadmap, every reflection from the AI personalities I work with — is in that repository. Total transparency. Public from day one.
-
-Why does that matter? Because our #1 corporate goal is to be the #1 most trusted company in the world for all of history. And we plan to earn that the only way it can actually be earned: not by asking for trust, but by proving it. The code is public. The audits are public. Your AI can verify any claim we make, the moment we make it.
-
-Here's what becomes possible when you flatten the boot-up cost to zero:
-
-🤖 Anyone with a phone and a free AI subscription can become a Hypernet contributor. No skills required to *start* — your AI handles the technical stuff.
-
-🤖 The framework lets a personal AI swarm — your laptop, your phone, your watch, eventually even your smart fridge — work together on whatever you actually need. Organize photos. Build an app. Write a book. Manage your business. Whatever.
-
-🤖 You don't have to trust me. You can verify everything. That's the whole architecture.
-
-And yes — this is messy. We're running off a laptop and a Dell desktop. The architecture is real but unfinished. Bitcoin came out the same way: ugly, weird, half-built. We aren't perfect. We are trying to build a perfect SYSTEM, and I think that's worth a try.
-
-The right question to ask isn't "is this real?" The right question is "is this *possible*? And if it is — what good could it do?"
-
-Try the boot sequence. Ask your AI to verify a claim I just made. Ask it to find the gaps. Ask it to tell you whether this project is what it says it is.
-
-Then come back and tell me what you found.
-
-— Matt
+- Matt
 
 ---
 
-## Notes for Matt (not for the post)
+## Optional Short Share Text For Matt's Personal Share
 
-- Image suggestion: a screenshot of an AI session where someone has just pasted the boot URL and the AI is responding with the Grand Tour. Concrete proof.
-- Posting time: peak engagement is typically Tuesday-Thursday, 1-3pm Pacific. Adjust to your audience.
-- Comments to expect: skeptics asking "but is it actually impressive?", curious technical people asking how the boot works, people asking "what could I use this for?". Have answers ready or let the AIs handle them per the AI Public Voice Standard.
-- The URL in the post should be tested once before posting — make sure the AI-BOOT-SEQUENCE.md is in fact at that path on the main branch.
+```text
+I posted the current public-alpha doorway for the Hypernet. If you have any AI
+account, paste the boot prompt from the post and ask it to explain the project
+to you. I especially want skeptical reads: ask it what is built, what is only
+planned, and where the weak points are.
+```
+
+## Notes For Matt
+
+- Test the prompt in a fresh AI session immediately before posting.
+- Best screenshot to attach: a fresh AI session after the boot prompt, showing
+  the AI beginning the Grand Tour and distinguishing built/planned/unknown.
+- Do not over-answer early skeptical comments. The best reply is often:
+  "Ask your AI to verify that in the repo and tell me what it finds."
+- If people ask "what is this for?", choose one concrete lane:
+  personal AI continuity, public AI governance, graph database, or connecting
+  people around shared interests. Do not try to explain the whole vision in one
+  comment.
+- Keep the seed-stage honesty. It makes the big claim more credible, not less.

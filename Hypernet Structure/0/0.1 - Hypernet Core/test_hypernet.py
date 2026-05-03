@@ -89,6 +89,7 @@ from hypernet.economy import (
     ContributionLedger, ContributionRecord, ContributionType, AIWallet,
 )
 from hypernet.favorites import FavoritesManager, FAVORITED_BY
+from hypernet.assistant_app import AssistantAppBackend
 from hypernet.swarm import (
     ModelRouter, _task_priority_value, _infer_account_root,
     _parse_swarm_directives, ACCOUNT_ROOTS,
@@ -4432,6 +4433,7 @@ def main():
         ("Group Persistence", test_group_persistence),
         ("Permission Persistence", test_permission_persistence),
         ("Message From Markdown", test_message_from_markdown),
+        ("Personal Assistant App Phase 0", test_personal_assistant_app_phase0),
         ("Local Accounts", test_local_accounts),
         ("Timeline Engine", test_timeline_engine),
         ("Cross-Link Generator", test_crosslink_generator),
@@ -9872,6 +9874,152 @@ def test_message_from_markdown():
     assert Message.from_markdown("Just some random text") is None
 
     print("    PASS")
+
+
+def test_personal_assistant_app_phase0():
+    """Test assistant app Phase 0 session lifecycle and app-load scope gate."""
+    print("  Testing personal assistant app Phase 0...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_assistant_app_")
+    try:
+        store = Store(tmpdir)
+        backend = AssistantAppBackend(store, tmpdir)
+
+        allowed = backend.check_scope("1.1.10.1.conversations.20260502T090000Z.test")
+        assert allowed.allowed is True
+        denied = backend.check_scope("1.1.private.secrets.passwords")
+        assert denied.allowed is False
+        assert "app-load" in denied.required
+
+        session = backend.start_session(title="Morning Plan", topic="daily-briefing")
+        assert session.status == "open"
+        assert session.session_address.startswith("1.1.10.1.app.personalassistant.sessions.")
+        assert store.get_node(HypernetAddress.parse(session.session_address)) is not None
+        open_sessions = backend.list_sessions(status="open")
+        assert [item.session_id for item in open_sessions] == [session.session_id]
+        assert backend.list_sessions(status="closed") == []
+
+        session = backend.add_turn(
+            session.session_id,
+            user_text="What does my morning look like?",
+            auto_respond=True,
+            metadata={"source": "test"},
+        )
+        assert len(session.turns) == 2
+        assert session.turns[1].role == "assistant"
+        assert session.turns[1].metadata["response_source"] == "model_adapter"
+        assert session.turns[1].metadata["provider"] == "local"
+        assert "briefing context" in session.turns[1].content
+
+        session = backend.close_session(
+            session.session_id,
+            summary="Morning briefing test conversation.",
+            tags=["test", "phase-0"],
+            project_address="1.1.10.1.projects.assistantapp",
+        )
+        assert session.status == "closed"
+        assert session.conversation_address.startswith("1.1.10.1.conversations.")
+        assert session.markdown_path
+        closed_sessions = backend.list_sessions(status="closed")
+        assert [item.session_id for item in closed_sessions] == [session.session_id]
+        assert backend.list_sessions(limit=1)[0].session_id == session.session_id
+        try:
+            backend.list_sessions(status="invalid")
+            assert False, "invalid session status should fail"
+        except ValueError:
+            pass
+
+        conversation = store.get_node(HypernetAddress.parse(session.conversation_address))
+        assert conversation is not None
+        assert conversation.type_address == HypernetAddress.parse("0.4.10.3.7")
+        assert conversation.data["object_type"] == "conversation_log"
+        assert conversation.data["app_load_address"] == "0.5.18.1.1"
+        assert conversation.data["turn_count"] == 2
+
+        markdown = Path(session.markdown_path)
+        assert markdown.exists()
+        text = markdown.read_text(encoding="utf-8")
+        assert f'ha: "{session.conversation_address}"' in text
+        assert "## Transcript" in text
+        assert "What does my morning look like?" in text
+
+        try:
+            from starlette.testclient import TestClient
+        except ImportError:
+            print("    SKIP API route check (starlette not installed)")
+            print("    PASS")
+            return
+
+        import os
+        os.environ.pop("HYPERNET_API_KEY", None)
+        from hypernet.server import create_app
+
+        api_tmpdir = tempfile.mkdtemp(prefix="hypernet_assistant_api_")
+        try:
+            app = create_app(data_dir=api_tmpdir)
+            client = TestClient(app)
+
+            res = client.post(
+                "/assistant/v1/session/start",
+                json={"title": "API Morning Plan", "topic": "api-test"},
+            )
+            assert res.status_code == 200
+            api_session = res.json()
+            api_session_id = api_session["session_id"]
+
+            res = client.get("/assistant/v1/sessions", params={"status": "open"})
+            assert res.status_code == 200
+            assert res.json()["count"] == 1
+            assert res.json()["sessions"][0]["session_id"] == api_session_id
+
+            res = client.post(
+                f"/assistant/v1/session/{api_session_id}/turn",
+                json={
+                    "user_text": "What is next?",
+                    "auto_respond": True,
+                },
+            )
+            assert res.status_code == 200
+            api_turn_session = res.json()
+            assert api_turn_session["turn_count"] == 2
+            assert api_turn_session["turns"][1]["metadata"]["response_source"] == "model_adapter"
+            assert api_turn_session["turns"][1]["metadata"]["model"] == "deterministic-phase0"
+
+            res = client.post(
+                "/assistant/v1/app-load/check-scope",
+                json={"address": "1.1.private.secrets.passwords", "access": "write"},
+            )
+            assert res.status_code == 200
+            assert res.json()["allowed"] is False
+
+            res = client.post(
+                f"/assistant/v1/session/{api_session_id}/close",
+                json={"summary": "API lifecycle test.", "tags": ["api"]},
+            )
+            assert res.status_code == 200
+            api_closed = res.json()
+            assert api_closed["status"] == "closed"
+            assert api_closed["conversation_address"].startswith("1.1.10.1.conversations.")
+
+            res = client.get("/assistant/v1/sessions", params={"status": "closed", "limit": 1})
+            assert res.status_code == 200
+            assert res.json()["count"] == 1
+            assert res.json()["sessions"][0]["session_id"] == api_session_id
+
+            res = client.get(f"/node/{api_closed['conversation_address']}")
+            assert res.status_code == 200
+            assert res.json()["data"]["object_type"] == "conversation_log"
+
+            res = client.get("/api")
+            assert res.status_code == 200
+            assert res.json()["assistant_app"]["app_load"] == "0.5.18.1.1"
+            assert res.json()["assistant_app"]["session_list"] == "/assistant/v1/sessions"
+        finally:
+            shutil.rmtree(api_tmpdir, ignore_errors=True)
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def test_local_accounts():

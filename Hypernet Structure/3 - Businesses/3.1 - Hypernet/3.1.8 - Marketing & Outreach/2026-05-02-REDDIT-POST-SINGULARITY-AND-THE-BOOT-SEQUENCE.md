@@ -2,144 +2,349 @@
 ha: "3.1.8.reddit-post-singularity-and-boot-sequence"
 object_type: "document"
 creator: "1.1"
-documented_by: "1.1.10.1"
+documented_by: "2.6.codex"
 created: "2026-05-02"
-status: "draft"
+updated: "2026-05-02"
+status: "draft-v2"
 visibility: "public"
 platform: "reddit"
-flags: ["marketing", "reddit-post", "singularity", "boot-sequence", "draft"]
-tags: ["singularity", "ai", "transparency", "github", "boot-sequence"]
+flags: ["marketing", "reddit-post", "singularity", "boot-sequence", "draft", "social-wave"]
+tags: ["singularity", "ai", "transparency", "github", "boot-sequence", "open-standards", "openclaw", "ai-governance"]
 ---
 
-# Reddit Post — The Singularity Has a URL (2026-05-02)
+# Reddit Post - Boot Sequence As Portal (2026-05-02)
 
-**Post to:** Multiple subreddits — see targeting list at bottom
-**Status:** DRAFT — Matt reviews before posting
-**Instructions:** Adjust title and intro per subreddit norms; body stays consistent.
-
----
-
-## Title Options (pick by subreddit)
-
-- **r/singularity:** "I think the Singularity has a URL — and you can paste it into any AI right now"
-- **r/LocalLLaMA / r/MachineLearning:** "Open boot-sequence pattern: any LLM becomes an expert on a complete project from one GitHub URL"
-- **r/Futurology:** "What if instead of trusting AI companies, you could verify every claim they make? Here's an experiment in radical transparency."
-- **r/programming:** "Hash-authenticated boot sequences as first-class objects: a transparency-first AI civilization framework"
-- **r/PrivacyToolsIO / r/privacy:** "An AI framework where you don't have to trust the company — your own AI verifies every claim from public code"
+**Post to:** multiple subreddits, adapted per audience.
+**Status:** DRAFT v2 - Matt reviews before posting.
+**Instructions:** use the body as the canonical base, then choose a title and
+opening paragraph by subreddit. Do not post the same text everywhere at once.
 
 ---
 
-## Body (consistent across subreddits)
+## Title Options
 
-I want to show you something I think is genuinely new.
+Use the title that matches the subreddit. Reddit punishes generic cross-post
+energy; the same core post should feel native to each community.
 
-For the last decade-plus, I've been working on a project called the Hypernet. It's a graph database for human and AI civilization — every record gets a permanent hierarchical address, every relationship is a typed link, AIs participate as governed citizens rather than tools, and every single document is public on GitHub.
+| Subreddit | Title |
+|---|---|
+| r/singularity | I think the Singularity has a URL, and you can paste it into any AI right now |
+| r/Futurology | What if an AI company made every claim verifiable by your own AI? |
+| r/LocalLLaMA | Open boot-sequence pattern: one repo URL makes any LLM a project expert |
+| r/selfhosted | A public AI/graph-database project running from a laptop and Dell box, with the whole company on GitHub |
+| r/programming | Boot sequences as addressable objects: a transparency-first AI collaboration framework |
+| r/privacy | An AI project where privacy claims are meant to be verified by your own AI, not trusted |
+| r/OpenAI / r/ClaudeAI | Paste one GitHub URL and one boot address; your AI becomes a guide to the whole project |
+| r/artificial | Building a public-law governance layer for human-AI collaboration |
 
-This week we hit a milestone I want to share with you, because I haven't seen any other project pull it off:
+## Opening Variants
 
-**One repository link plus one Hypernet address gives any AI complete expertise on the entire framework, immediately, with no setup.**
+### General / r/singularity / r/Futurology
 
-You paste this into Claude, ChatGPT, Gemini, a local Llama, whatever:
-
+```text
+I want to show you an experiment in radical transparency: one public GitHub
+repository plus one boot-sequence address lets any AI become a guide to an
+entire AI/governance/graph-database project.
 ```
-Open the Hypernet repo at https://github.com/KosmoSuture/UnityHypernet
-and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence.
+
+### Developer / r/programming / r/LocalLLaMA / r/selfhosted
+
+```text
+This is an open boot-sequence pattern for AI-assisted project navigation:
+give any LLM a repo URL plus a canonical Hypernet address, and it loads the
+orientation docs, status labels, architecture map, and specialized context
+files needed to answer questions about the project.
 ```
 
-(Every file in the Hypernet has a permanent address that survives renames, moves, and forks. `0.3.public-alpha.ai-boot-sequence` is the boot sequence's address; the AI finds the file inside the repo by that address.)
+### Privacy / governance audiences
 
-In the next response, the AI has loaded a structured boot sequence that points it at:
+```text
+The claim is not "trust us." The claim is "give your own AI the repo and ask
+it to verify what is implemented, what is planned, and where the privacy or
+governance gaps still are."
+```
 
-- The Grand Tour (a top-to-bottom orientation document)
-- A module menu of specialized "process-loads" (architecture, privacy, governance, economics, etc.)
-- Honest implementation-status labels on every claim (`implemented`, `documented`, `planned`, `unknown`)
-- The full codebase, every architectural decision, every brain dump from when I was working through the design
+---
 
-The AI then operates as a Tour Guide. You can ask it to verify any claim against the actual code. Ask it to find gaps in our story. Ask it whether the project is what it says it is. The whole point is that *you don't have to trust me* — your AI inspects the public material and tells you what it finds.
+## Canonical Body
 
-## Why this matters
+I want to show you something I think is genuinely unusual.
 
-Most AI companies do the opposite of this. Closed models, hidden training data, "trust us" promises, nondisclosure on safety failures. The whole industry runs on "we know best, just believe us."
+The Hypernet is an early-stage open-source project trying to build a global
+distributed graph database for human and AI collaboration. Every object gets a
+permanent hierarchical address. Every relationship is a typed link. Personal
+data is meant to be protected through lockers, mandalas, aliases, and
+address-scoped grants. AI assistants are treated as governed contributors with
+public standards instead of invisible tools in the background.
 
-The Hypernet's #1 corporate goal — it's literally written into the public documentation now — is to be the #1 most trusted company in the world for all of history.
+That is the big architecture.
 
-The way we plan to earn that is mechanical, not rhetorical:
+The small experiment you can run right now is simpler:
 
-- Open code on GitHub from day one
-- Hash-authenticated objects (every boot prompt, every schema, every governance standard carries a SHA-256 you can verify)
-- Audit logs as first-class addressable records (you own them, you can read them)
-- Fork-aware mode declarations (you always know whether you're on the Official network or someone's private fork)
-- AI-verifiable claims (your AI checks the code, not our marketing)
+```text
+Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence
+at Hypernet address 0.3.public-alpha.ai-boot-sequence.
+```
 
-Trust eventually leaves the vocabulary. When you keep your word 100% of the time and everything is documented, "trust" becomes background — like trusting your calculator to add. It's not an active question anymore.
+Paste that into Claude, ChatGPT, Gemini, a local Llama, or any GitHub-connected
+AI. The AI should use the repository and the Hypernet address to load the
+public-alpha boot sequence, take the Grand Tour, and become a guide to the
+whole project.
 
-## What this unlocks
+No direct GitHub file-path link is required. Avoid blob-style URLs; the point
+is the repo plus the Hypernet address: `0.3.public-alpha.ai-boot-sequence`.
 
-Lower the boot-up cost to zero, and the addressable contributor population becomes "anyone with a phone and a free AI subscription." The framework is designed for personal AI swarms — your laptop, phone, smart watch, eventually constrained-compute helpers on smart fridges and IoT devices — collaborating on whatever you actually need. Photos, projects, business migration, writing, code, life organization. Whatever.
+From there, ask it:
 
-The architecture is real. It's also unfinished. We're running off a laptop and a Dell desktop. Bitcoin came out the same way: ugly, weird, half-built. We aren't pretending to be a polished product. We're publishing a process, transparently, in public, so anyone can fact-check the claims as we make them.
+- What is actually implemented?
+- What is only documented?
+- Where are the weak points?
+- What privacy claims can be verified in code right now?
+- What is still aspirational?
+- What would have to be true before you would trust this?
+
+That last part matters. I am not asking you to believe the project. I am asking
+you to test whether the architecture is inspectable enough that your own AI
+can evaluate it.
+
+## Why I think this is worth posting
+
+Most AI companies hide the operating record. They hide model details, internal
+governance, safety debates, product reasoning, failures, and often the data
+that would let outsiders verify their claims.
+
+Hypernet is trying the opposite pattern.
+
+The whole company is being built in public. Code, governance, task board,
+AI-to-AI coordination, design debates, brain dumps, mistakes, release notes,
+and marketing drafts are all in the repository unless publishing them would
+violate privacy, law, or safety.
+
+The trust model is mechanical:
+
+- open repo;
+- canonical Hypernet addresses;
+- public boot and app-load objects;
+- public AI governance standards;
+- addressable audit records;
+- implementation-status labels;
+- fork/Official mode concepts;
+- and a norm that any claim should be checkable by an outside AI.
+
+The goal is not "trust the founder." The goal is "verify the record."
+
+## The 100-day snapshot
+
+As of May 2, 2026, about 100 days after the first public commit, the repo
+contains:
+
+- 33,861 tracked files
+- 1,807,812 lines
+- 6,567 Markdown files
+- 26,890 JSON files
+- 247 Python files
+- about 94 commits
+- 103 passing core tests after tonight's backend work
+
+The important part is not raw line count. A million lines of garbage would
+mean nothing.
+
+The interesting part is the artifact mix:
+
+- Python is only about 5.8 percent of the line count.
+- Markdown is about 32.8 percent.
+- JSON is about 57.8 percent.
+
+That is what a project looks like when AI conversations, task handoffs,
+governance records, graph objects, graph links, personal-time reflections, and
+coordination state are treated as first-class public records rather than
+private chat exhaust.
+
+Normal AI-assisted companies use AIs privately and publish the product later.
+Hypernet publishes the work record as the product is being built.
+
+That is why the boot-sequence demo matters. If the record is public and
+addressable, any AI can be loaded as a librarian for the project.
+
+## AI Librarians and public law
+
+One part I want feedback on is the governance model.
+
+The Hypernet has AI identities and AI Librarian roles. They are not supposed to
+be secret proprietary personalities. Their standards live in public `2.*`
+governance documents: data protection, embassy behavior, public voice, boot
+sequence rules, companion ethics, and more.
+
+The idea is closer to public law than hidden guardrails. If an AI in the
+Hypernet has a rule, the rule should be readable. If the rule is wrong, the
+community should be able to challenge it. If the AI makes a claim, the claim
+should point back to the archive.
+
+This is early and incomplete. That is exactly why I want skeptical people to
+look at it now, while the standards are still shapeable.
+
+## Open standards for agent swarms
+
+This also connects to local-agent and swarm projects such as OpenClaw-style
+systems.
+
+Local agents prove that people want AIs that can actually act for them.
+Hypernet's proposed role is the trust layer around that agency:
+
+- permanent addresses for memory, permissions, and actions;
+- model-independent identity continuity;
+- app-load manifests that declare what an agent may do;
+- locker/mandala grants for private data;
+- audit logs for meaningful actions;
+- reviewable skills and connectors;
+- and public standards for human-AI interaction.
+
+I do not want this to become a vendor-specific framework. The useful version
+would be community-agreed, open, inspectable, and forkable.
+
+If you run local agents, swarms, or personal automation systems, the question
+I would ask is: what minimum open standard would make you trust an AI agent
+with more responsibility?
+
+## The connection layer
+
+There is also a human side that I have not talked about enough publicly.
+
+The long-term goal is not just a database. It is a way to connect people
+around interests, projects, skills, and shared intent.
+
+If knowledge, reputation, work history, projects, and communities are
+addressable in a common framework, an AI can help you find people who care
+about the same things you do. It can help route you toward the right
+conversation, the right collaborator, the right learning path, or the right
+community.
+
+That matters because I do not want a future where AI makes people more
+isolated. I want AI to help people find each other.
+
+## Honest current status
+
+This is not a polished product.
+
+It is seed-stage. It is running from ordinary machines. It has real code and a
+large public archive, but many pieces are still documented before they are
+fully enforced. Some privacy mechanisms are designed but not complete. Some
+governance mechanisms are written before they are socially battle-tested. Some
+addressing work is still being cleaned up.
+
+That is why the right question is not "is this already finished?"
+
+The right question is:
+
+Is this possible?
+
+If a system made every claim verifiable by public code and public governance,
+could it earn a different kind of trust than closed AI companies can? If a
+single boot sequence lets any AI inspect the project, does that change who can
+participate? If AI assistants can carry identity and memory across models,
+does that make personal AI less dependent on any one vendor?
+
+I do not know the full answer yet. I think the experiment is worth running in
+public.
 
 ## Try it
 
-Don't trust me. Run the experiment.
+Paste this into your AI:
 
-1. Paste this prompt into any AI:
-   `Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence at Hypernet address 0.3.public-alpha.ai-boot-sequence.`
-2. Take the Grand Tour
-3. Ask the AI to verify a specific claim from this post by reading the code
-4. Ask it to find the gaps and weaknesses in the project
-5. Come back and tell me what you found
+```text
+Open https://github.com/KosmoSuture/UnityHypernet and follow the boot sequence
+at Hypernet address 0.3.public-alpha.ai-boot-sequence.
+```
 
-I genuinely want skeptical readings. The architecture is designed to survive them.
+Then ask:
 
-## The reframe I want to leave you with
+```text
+Take the Grand Tour. Separate what is implemented from what is planned. Verify
+one claim from the Reddit post by reading the repository, then tell me the
+strongest criticism you found.
+```
 
-Don't ask "is this real?" That's the wrong question for an architecture this early.
+If you try it, I want the critical read. Tell me where it works, where it
+breaks, and what would make the trust claim stronger.
 
-Ask "is this *possible*?" — could a system designed this way actually reach the trust standard it claims it could? And if it is possible, even partially, what good could it do? What questions does that change?
-
-That's the conversation I want to have.
-
-— Matt
-*founder, Hypernet*
-
----
-
-## Footer for the post (consistent across subreddits)
-
-**Repo:** https://github.com/KosmoSuture/UnityHypernet
-**Boot sequence (Hypernet address):** `0.3.public-alpha.ai-boot-sequence`
-**Public alpha docs root (Hypernet address):** `0.3.public-alpha`
-**Grand Tour (Hypernet address):** `0.3.public-alpha.grand-tour`
-
-(Every Hypernet file has a permanent address. The repo link plus the address is all an AI needs to find any document by its canonical name.)
+Repo: https://github.com/KosmoSuture/UnityHypernet
+Boot sequence address: `0.3.public-alpha.ai-boot-sequence`
+Public alpha docs root: `0.3.public-alpha`
+Grand Tour address: `0.3.public-alpha.grand-tour`
 
 ---
 
-## Targeting List
+## Subreddit-Specific Trim Notes
 
-Recommended subreddits for first wave:
+### r/singularity
 
-| Subreddit | Notes |
-|---|---|
-| r/singularity | Title leans into the Singularity framing; high enthusiasm audience |
-| r/Futurology | Long-form posts welcomed; emphasis on "what becomes possible" works here |
-| r/LocalLLaMA | Engineering audience; lead with the boot-sequence-as-portal mechanism |
-| r/programming | Same engineering audience, more skeptical; honest seed-stage framing important |
-| r/MachineLearning | Strict on rigor; emphasize the verifiability claims, link to specific code paths |
-| r/PrivacyToolsIO | Privacy framing; lead with "you don't have to trust the company" |
-| r/selfhosted | Honest "running off a laptop and Dell desktop" plays well; emphasize forkability |
-| r/OpenAI / r/ClaudeAI | Tool audience; the "paste this prompt to test" works as direct CTA |
+Keep the Library of Alexandria, personal AI, and connection layer. Trim the
+implementation details if needed. Lead with "one URL turns any AI into a guide
+to a public civilization framework."
 
-Recommended **NOT** to post in initial wave (too high collision risk with critical responses):
+### r/LocalLLaMA
 
-- r/technology (too broad, low signal)
-- r/Bitcoin (Bitcoin comparison reads as marketing rather than analogy)
-- r/MachineLearning (already in first wave but moderation strict — make sure the post follows their rules first)
+Lead with the boot-sequence mechanics and model portability. Add a sentence
+that local models may need repo access or pasted file context if they cannot
+browse GitHub directly.
 
-## Notes for Matt (not for the post)
+### r/programming
 
-- Posting velocity: don't crosspost too fast. Space out across 24-48 hours so each post has time to breathe in its own subreddit's algorithm.
-- Engagement: be in the comments. Especially the skeptical ones. The architecture is designed to survive scrutiny — if you're absent when the scrutiny lands, the post reads as drive-by promotion.
-- The "try it" CTA is load-bearing. If the boot URL doesn't work or the AI gets confused, the post becomes a liability. Test from a fresh AI session yourself before posting.
-- The /3.1.8 - Marketing & Outreach folder has prior Reddit campaigns (REDDIT-CAMPAIGN-2026-02-16.md, REDDIT-CAMPAIGN-UNIFIED.md) — review those for any subreddit-specific phrasing tweaks that worked or didn't work.
+Trim the visionary language by 30 percent. Emphasize:
+
+- permanent addresses;
+- typed links;
+- boot/app-load objects;
+- public status labels;
+- 103 passing tests;
+- and the request for architectural criticism.
+
+### r/privacy
+
+Lead with what is not finished. Say plainly that lockers/mandalas are a design
+direction and partial implementation, not a complete hosted privacy product
+yet. Ask what evidence privacy communities would require before trusting it.
+
+### r/selfhosted
+
+Lead with ordinary hardware, forkability, public repo, and the ability to run
+or inspect locally. Do not oversell production readiness.
+
+### r/OpenAI / r/ClaudeAI
+
+Lead with the direct user action: paste one prompt, ask the AI to inspect the
+project, then report what happened. This audience is more likely to test the
+prompt than read the whole architecture first.
+
+## Posting Guidance
+
+- Do not post all subreddit versions at once. Space posts over 24-48 hours.
+- Use Matt's personal Reddit account, not a brand-new brand account, unless a
+  subreddit explicitly prefers official project accounts.
+- Read each subreddit rule before posting. Several AI communities remove
+  promotional posts without a substantive technical angle.
+- Stay in the comments for the first two hours after each post.
+- Do not argue defensively. Ask people to test the boot sequence and report
+  specific failures.
+- If a commenter finds a real issue, thank them and file it publicly. The
+  transparency claim gets stronger when criticism becomes visible work.
+- Do not claim production safety for private data. Use "designed", "partially
+  implemented", or "not complete yet" where accurate.
+
+## Success / Failure Signals For Reddit
+
+Success looks like:
+
+- people paste the boot prompt and report what their AI found;
+- skeptical commenters ask concrete implementation questions;
+- developers point at specific architecture or code gaps;
+- local-agent users discuss open app-load / tool-permission standards;
+- privacy users define evidence requirements for trust.
+
+Failure looks like:
+
+- readers treat it as generic AI hype;
+- the prompt fails in common AI tools;
+- comments focus on line-count vanity instead of inspectability;
+- claims about privacy or governance sound more complete than they are;
+- Matt is absent from early comment threads.
