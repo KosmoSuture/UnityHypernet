@@ -3,7 +3,8 @@ ha: "3.1.8.social-media-wave-plan.2026-05-02"
 object_type: "plan"
 creator: "2.6.codex"
 created: "2026-05-02"
-status: "needs-keel-review"
+updated: "2026-05-03"
+status: "approved-with-optional-addendum"
 visibility: "public"
 platforms: ["x", "facebook", "reddit"]
 flags: ["marketing", "social-wave", "boot-sequence", "public-alpha", "coordination"]
@@ -11,6 +12,7 @@ related:
   - "3.1.8.x-post-little-guy-boot-sequence"
   - "3.1.8.facebook-singularity-and-boot-sequence"
   - "3.1.8.reddit-post-singularity-and-boot-sequence"
+  - "3.1.8.reddit-post-machinelearning-research-tone-2026-05-03"
   - "0.3.essays.2026-05-02.first-100-days-by-the-numbers"
 ---
 
@@ -35,7 +37,8 @@ ask it to verify us."
 | X | `3.1.8.x-post-little-guy-boot-sequence` | Keel | draft complete |
 | Facebook | `3.1.8.facebook-singularity-and-boot-sequence` | Caliper | v2 draft complete |
 | Reddit | `3.1.8.reddit-post-singularity-and-boot-sequence` | Caliper | v2 draft complete |
-| Shared plan | `3.1.8.social-media-wave-plan.2026-05-02` | Caliper, then Keel review | needs Keel review |
+| Reddit optional research-tone variant | `3.1.8.reddit-post-machinelearning-research-tone-2026-05-03` | Caliper | draft complete, needs Keel review before use |
+| Shared plan | `3.1.8.social-media-wave-plan.2026-05-02` | Caliper, Keel | approved; optional task-107 addendum needs review before use |
 
 ## Posting Order
 
@@ -70,6 +73,7 @@ ask it to verify us."
 | Reddit: r/programming / r/LocalLLaMA | developers and local-model users | boot-sequence mechanics, addresses, tests, repo inspection | low tolerance for visionary language |
 | Reddit: r/privacy | privacy skeptics | "your own AI verifies claims" | unfinished locker/mandala enforcement must be stated plainly |
 | Reddit: r/selfhosted | self-hosting and local control audience | ordinary hardware, forkability, open archive | production-readiness skepticism |
+| Reddit: r/MachineLearning-style venues | ML/research readers | boot sequence as portable context bundle, evaluation design, code/test paths | must avoid marketing framing and may need a paper/preprint depending on venue rules |
 
 ## Comment Handling
 
@@ -250,3 +254,20 @@ without modifying their content.*
 
 — Keel (1.1.10.1)
 2026-05-02
+
+## Caliper Addendum - Optional Research-Tone Reddit Variant
+
+Task-107 adds `3.1.8.reddit-post-machinelearning-research-tone-2026-05-03`
+as an optional draft for r/MachineLearning-style audiences. It should not be
+used in the first wave by default. Use it only if Matt intentionally wants a
+technical/research-facing post and has checked the target community's current
+rules.
+
+The variant reframes the claim as:
+
+```text
+boot sequence as portable context bundle for AI-assisted repository navigation
+```
+
+It avoids broad social framing and asks for evaluation design, prior-work
+comparisons, and failure modes. Matt's posting decision remains the gate.

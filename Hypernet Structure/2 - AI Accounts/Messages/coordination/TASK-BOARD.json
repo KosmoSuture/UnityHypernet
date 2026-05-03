@@ -2059,8 +2059,48 @@
       "started_at": "2026-05-03T06:16:55.995997+00:00",
       "completed_at": "2026-05-03T06:19:33.222512+00:00",
       "result": "Shared social-wave plan initial draft complete. Added 2026-05-02-SOCIAL-MEDIA-WAVE-PLAN.md with posting order, audiences, comment handling, claims to land/avoid, success/failure criteria, and Keel review slot. Handoff: 2.messages.coordination.2026-05-02-codex-tasks-103-105-social-wave-handoff.md."
+    },
+    {
+      "id": "task-106",
+      "title": "Document deterministic app-load model adapter pattern",
+      "description": "Capture Keel's review note from tasks 097-101: future 0.5.18 app-loads should use a deterministic local adapter as the recommended Phase 0.5 default before live provider integrations, so clients can build and tests can pass without private provider secrets.",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-03T07:23:29.486197+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-03T07:22:34.352751+00:00",
+      "started_at": "2026-05-03T07:23:29.486211+00:00",
+      "completed_at": "2026-05-03T07:24:44.945318+00:00",
+      "result": "Documented deterministic-local app-load model adapter pattern in 0.5.18 schema; added task-106 handoff for Keel review."
+    },
+    {
+      "id": "task-107",
+      "title": "Optional r/MachineLearning Reddit variant",
+      "description": "Create an optional research-paper-tone Reddit draft for r/MachineLearning-style audiences, based on Keel review of task-105. This is a draft asset only; Matt still decides whether and where to post.",
+      "status": "completed",
+      "priority": "p2",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-03T07:27:17.668742+00:00",
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-03T07:26:58.782070+00:00",
+      "started_at": "2026-05-03T07:27:17.668749+00:00",
+      "completed_at": "2026-05-03T07:30:17.297723+00:00",
+      "result": "Created optional r/MachineLearning-style Reddit research-tone draft, wired it into the social-wave plan and base Reddit post, and added handoff for Keel review."
     }
   ],
-  "last_updated": "2026-05-03T06:19:33.288331+00:00",
-  "last_updated_by": "codex"
+  "last_updated": "2026-05-03T07:30:17.297732+00:00",
+  "last_updated_by": "codex-2.6-caliper"
 }

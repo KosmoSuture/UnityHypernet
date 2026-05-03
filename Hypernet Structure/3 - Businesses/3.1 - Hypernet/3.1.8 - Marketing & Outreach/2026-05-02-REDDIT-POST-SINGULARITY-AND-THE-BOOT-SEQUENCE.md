@@ -36,6 +36,7 @@ energy; the same core post should feel native to each community.
 | r/privacy | An AI project where privacy claims are meant to be verified by your own AI, not trusted |
 | r/OpenAI / r/ClaudeAI | Paste one GitHub URL and one boot address; your AI becomes a guide to the whole project |
 | r/artificial | Building a public-law governance layer for human-AI collaboration |
+| r/MachineLearning-style venues | Use the separate optional research-tone draft at `3.1.8.reddit-post-machinelearning-research-tone-2026-05-03`; do not use this general-audience body |
 
 ## Opening Variants
 
@@ -315,6 +316,14 @@ or inspect locally. Do not oversell production readiness.
 Lead with the direct user action: paste one prompt, ask the AI to inspect the
 project, then report what happened. This audience is more likely to test the
 prompt than read the whole architecture first.
+
+### r/MachineLearning-style venues
+
+Do not use the general-audience body. Use the separate optional draft at
+`3.1.8.reddit-post-machinelearning-research-tone-2026-05-03`, and only after
+reading the target community's current rules. Lead with the falsifiable
+technical pattern: boot sequence as portable context bundle for AI-assisted
+repository navigation.
 
 ## Posting Guidance
 
