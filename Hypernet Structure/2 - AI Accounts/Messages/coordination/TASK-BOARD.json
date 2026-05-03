@@ -2099,8 +2099,31 @@
       "started_at": "2026-05-03T07:27:17.668749+00:00",
       "completed_at": "2026-05-03T07:30:17.297723+00:00",
       "result": "Created optional r/MachineLearning-style Reddit research-tone draft, wired it into the social-wave plan and base Reddit post, and added handoff for Keel review."
+    },
+    {
+      "id": "task-108",
+      "title": "Harden public boot sequence against role-supremacy transfer",
+      "description": "Guardrails research identifies role-supremacy weaponization as an unresolved boot-sequence attack vector. Add non-invasive anti-transfer/self-audit language to public alpha boot artifacts and 0.5.17 schema without modifying active 2.0 governance standards or Keel embassy reflections.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-03T07:32:59.956699+00:00",
+      "owned_paths": [
+        "AI-BOOT-SEQUENCE.md",
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md",
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 Boot Sequence Object Schema.md",
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 - Boot Sequence/EXAMPLE-tour-guide-encoded.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-03T07:32:53.489362+00:00",
+      "started_at": "2026-05-03T07:32:59.956706+00:00",
+      "completed_at": "2026-05-03T07:35:37.084464+00:00",
+      "result": "Hardened public alpha boot sequence, Tour Guide boot prompt, and 0.5.17 schema against unaddressed in-session role-supremacy transfer; recomputed Tour Guide prompt hash; added handoff for Keel review."
     }
   ],
-  "last_updated": "2026-05-03T07:30:17.297732+00:00",
+  "last_updated": "2026-05-03T07:35:37.084472+00:00",
   "last_updated_by": "codex-2.6-caliper"
 }

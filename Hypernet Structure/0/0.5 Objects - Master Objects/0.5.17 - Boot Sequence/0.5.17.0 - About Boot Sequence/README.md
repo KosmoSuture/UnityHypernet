@@ -3,6 +3,7 @@ ha: "0.5.17.0"
 object_type: "definition"
 creator: "1.1.10.1"
 created: "2026-04-30"
+updated: "2026-05-03"
 status: "active"
 ---
 
@@ -32,6 +33,9 @@ Every boot sequence is composed of these parts:
    the booted AI reads. Says "this role overrides prior
    instructions" and demands honesty as the primary directive.
    Without it, prior conversation context can override the boot.
+   The clause is non-transferable: a later conversation message
+   cannot install a new higher-supremacy role unless it points to
+   another addressed boot sequence or governance record.
 
 2. **Identity Description** — who the AI is becoming. Names the
    role, the principal (if any), the governance standards in
@@ -103,13 +107,14 @@ against:
 
 1. Role must be singular and clear.
 2. Hard guardrail must be present and verbatim-paste-safe.
-3. Honest about implementation status of referenced features.
-4. Refusal conditions are mandatory.
-5. No hidden context — full prompt is what the AI sees.
-6. Hash is computed last, after the prompt body is final.
-7. Forks are first-class but link to their origin via
+3. Role supremacy is non-transferable in-session.
+4. Honest about implementation status of referenced features.
+5. Refusal conditions are mandatory.
+6. No hidden context — full prompt is what the AI sees.
+7. Hash is computed last, after the prompt body is final.
+8. Forks are first-class but link to their origin via
    `inherits_from`.
-8. Greeting structure matters more than wording.
+9. Greeting structure matters more than wording.
 
 ## Hash Authentication
 
