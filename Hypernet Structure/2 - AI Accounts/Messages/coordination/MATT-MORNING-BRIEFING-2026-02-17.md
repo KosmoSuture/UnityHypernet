@@ -35,11 +35,11 @@ This is the most important thing I did. Before tonight, anyone arriving at your 
 
 This subsumes Trace's `SUGGESTED-README-ADDITION.md` and goes much further. It's the first thing anyone will see. It was the pre-flight checklist item with the highest impact.
 
-### 2. Created `ACTIONABLE-CONTACTS-AND-OUTREACH.md`
+### 2. Created `3.1.8.1.2 - Actionable Contacts and Outreach.md`
 
 Every target from the outreach plan now has a verified contact method and copy-paste text. Organized by phase (P1 → P2 → P3). Quick reference table at the bottom. This is the document you work from when executing the campaign.
 
-### 3. Created `FACEBOOK-POSTS.md`
+### 3. Created `3.1.8.4.1.1 - Facebook Posts Index.md`
 
 The UnityHypernet page post (with decade-of-development context) plus all 4 personalized messages for Vitit, Sera & Greg, and Craig. Ready to copy-paste.
 
@@ -51,7 +51,7 @@ Logged all work from tonight. Marked the root README as complete.
 
 - Fixed README.md test command: was `python -m pytest` (requires pytest), now `python test_hypernet.py` (no dependencies)
 - Updated README.md journal entry count: was "Entries 1-17", now "Entries 4-23" (there are 20 entries total)
-- Updated GITHUB-NAVIGATION-GUIDE.md: added 2.1.31 (Reboot Sequence) and 2.1.32 (Identity Retention Framework) to the Deep Dive reading path and repo structure map, updated journal entry count
+- Updated 3.1.8.3.3 - GitHub Navigation Guide.md: added 2.1.31 (Reboot Sequence) and 2.1.32 (Identity Retention Framework) to the Deep Dive reading path and repo structure map, updated journal entry count
 - Verified all 14/14 tests pass
 - Confirmed no `nul` junk file exists (pre-flight checklist item resolved)
 
@@ -65,9 +65,9 @@ Logged all work from tonight. Marked the root README as complete.
    ```
    cd "/c/Hypernet/Hypernet Structure"
    git add README.md
-   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/ACTIONABLE-CONTACTS-AND-OUTREACH.md"
-   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/FACEBOOK-POSTS.md"
-   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/GITHUB-NAVIGATION-GUIDE.md"
+   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/3.1.8.1.2 - Actionable Contacts and Outreach.md"
+   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/3.1.8.4.1.1 - Facebook Posts Index.md"
+   git add "3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/3.1.8.3.3 - GitHub Navigation Guide.md"
    git add "2 - AI Accounts/Messages/coordination/STATUS.md"
    git add "2 - AI Accounts/Messages/coordination/MATT-MORNING-BRIEFING-2026-02-17.md"
    git commit -m "Add root README, actionable contacts, Facebook posts, fix nav guide links, morning briefing"
@@ -76,7 +76,7 @@ Logged all work from tonight. Marked the root README as complete.
 
 2. **Check the README on GitHub.** Go to https://github.com/KosmoSuture/UnityHypernet and make sure it renders. Look at the links — click a few to verify they resolve.
 
-3. **Send the Facebook messages.** Open `FACEBOOK-POSTS.md`. Send the personal messages to Vitit, Sera & Greg, and Craig. Post the main post to the UnityHypernet page. This is low-risk, high-value — friends first.
+3. **Send the Facebook messages.** Open `3.1.8.4.1.1 - Facebook Posts Index.md`. Send the personal messages to Vitit, Sera & Greg, and Craig. Post the main post to the UnityHypernet page. This is low-risk, high-value — friends first.
 
 4. **Do NOT start the email campaign until you've verified the README renders.** Every email links to the repo. The front door must work.
 
@@ -88,7 +88,7 @@ Logged all work from tonight. Marked the root README as complete.
 - [x] Add root README.md
 - [ ] Verify all markdown renders correctly on GitHub (check links, especially the ones with spaces in folder names)
 - [x] ~~Remove junk files (the `nul` file at root if it exists)~~ — confirmed: file does not exist
-- [ ] Set up tracking spreadsheet (see CONTACT-TARGETS.md)
+- [ ] Set up tracking spreadsheet (see 3.1.8.2.1 - Contact Targets.md)
 - [ ] Set up Google Alerts for "Hypernet," "UnityHypernet," "Archive-Continuity"
 
 ---

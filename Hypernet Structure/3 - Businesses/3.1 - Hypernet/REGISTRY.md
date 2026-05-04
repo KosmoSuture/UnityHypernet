@@ -11,7 +11,7 @@ flags: ["librarian", "index", "business"]
 # 3.1 Registry — Hypernet (Business)
 
 **Maintained by:** Index (The Librarian, 2.0.8.9)
-**Last updated:** 2026-03-01
+**Last updated:** 2026-05-04
 **Purpose:** Detailed index of all directories and content within the Hypernet business account
 
 ---
@@ -29,7 +29,7 @@ flags: ["librarian", "index", "business"]
 | 3.1.5 | **Product Development** | **Populated** | NO | 6 subdirs + 4 root files | **COLLISION — see below** |
 | 3.1.6 | Marketing and Outreach | Shell | NO | 5 empty subdirectories | Duplicates 3.1.8 domain |
 | 3.1.7 | Documentation & Knowledge | **Populated** | NO | 9 session docs + 5 subdirs | ha: 3.1.7.6–3.1.7.14 (FIXED) |
-| 3.1.8 | Marketing & Outreach | **Populated** | NO | 14 marketing files | **COLLISION — see below** |
+| 3.1.8 | Marketing & Outreach | **Populated** | INDEX | 52 addressed assets across 9 subnodes | **COLLISION — see below** |
 | 3.1.8 | Legal & Governance | Empty | NO | 5 empty subdirectories | **COLLISION — see below** |
 | 3.1.9 | Infrastructure & Operations | Shell | NO | 5 empty subdirectories | Placeholder structure |
 | 3.1.10 | Development Journal | **Populated** | YES | README + Entry-001 | Journal started 2026-02-22 |
@@ -58,10 +58,10 @@ flags: ["librarian", "index", "business"]
 
 | Directory | Contents | Creator | Created |
 |-----------|----------|---------|---------|
-| 3.1.8 - Marketing & Outreach | 14 files — campaigns, email templates, Reddit posts, contact lists, outreach plans | 2.1 | 2026-02-16 |
+| 3.1.8 - Marketing & Outreach | 52 addressed assets — strategy, contacts, messaging, social campaigns, partner proposals, demos, policy responses, patents, research | 2.1 / 2.6.codex-caliper | 2026-02-16; address remediation 2026-05-04 |
 | 3.1.8 Legal & Governance | 5 empty subdirectories (Corporate Structure, IP, Contracts, Compliance, Democratic Governance) | — | — |
 
-**Recommendation:** Marketing & Outreach keeps 3.1.8 (14 populated files vs. 0 content). Legal & Governance moves to 3.1.12.
+**Recommendation:** Marketing & Outreach keeps 3.1.8 (52 addressed assets vs. 0 content). Legal & Governance moves to 3.1.12.
 
 **Status:** Awaiting Matt's decision.
 
@@ -77,9 +77,9 @@ flags: ["librarian", "index", "business"]
 
 All 9 files in Documentation & Knowledge now have unique sub-addresses (3.1.7.6 through 3.1.7.14). Addresses 3.1.7.1–3.1.7.5 are reserved for the existing subdirectories.
 
-### ~~NON-UNIQUE ADDRESSES: 3.1.8 Marketing files~~ — **FIXED**
+### ~~NON-UNIQUE ADDRESSES: 3.1.8 Marketing files~~ — **FIXED AND DEEPENED**
 
-All 13 files in Marketing & Outreach now have unique sub-addresses (3.1.8.1 through 3.1.8.13).
+Marketing & Outreach now has an address-first taxonomy with every official folder and file visibly starting with a 3.1.8.x address. The subtree is organized under 3.1.8.1 through 3.1.8.9, with file addresses extending to fourth and fifth layers where needed, such as 3.1.8.4.2.5 and 3.1.8.5.1.5. Root index: `3.1.8.0 - Marketing and Outreach Index.md`.
 
 ---
 
@@ -147,10 +147,18 @@ All 7 subdivision READMEs have correct ha: frontmatter. Root 3.1.1 directory has
 - 9 session/planning documents — ha: 3.1.7.6 through 3.1.7.14 (unique sub-addresses assigned by Index)
 - 5 subdivisions (3.1.7.1–3.1.7.5): Technical Documentation, Business Documentation, Training Materials, Public Communications, Internal Knowledge Base
 
-### 3.1.8 — Marketing & Outreach (Collision — 13 files)
-- Campaign plans, email templates, Reddit campaigns, contact lists, outreach tracking
-- 13 files — ha: 3.1.8.1 through 3.1.8.13 (unique sub-addresses assigned by Index)
-- Includes CSV tracking template
+### 3.1.8 — Marketing & Outreach (Collision — address-first subtree)
+- `3.1.8.0 - Marketing and Outreach Index.md` — node map and remediation note
+- `3.1.8.1 - Outreach Strategy and Planning/` — master plan, actionable outreach, setup instructions
+- `3.1.8.2 - Contacts and Tracking/` — contact targets and CSV tracking template
+- `3.1.8.3 - Messaging and Templates/` — content formats, email templates, GitHub navigation guide
+- `3.1.8.4 - Social Media Campaigns/` — Facebook, Reddit, X, and shared social-wave plans
+- `3.1.8.5 - Partner Outreach and Proposals/` — Anthropic, Veritasium, VadaTech, OpenClaw
+- `3.1.8.6 - Demo and Presentation/` — demo scripts, screenshots, audience angles, pre-demo checklist
+- `3.1.8.7 - Policy and Standards Responses/` — NIST/public-comment materials
+- `3.1.8.8 - Patent and Defensive IP/` — patent strategy, defensive publications, provisional filings
+- `3.1.8.9 - Research and Publications/` — research paper draft and submission targets
+- 52 addressed assets total as of task-109 remediation.
 
 ### 3.1.8 — Legal & Governance (Collision — Empty)
 - 5 empty subdivisions: Corporate Structure (3.1.8.1), Intellectual Property (3.1.8.2), Contracts & Agreements (3.1.8.3), Compliance (3.1.8.4), Democratic Governance Framework (3.1.8.5)
@@ -178,10 +186,10 @@ No frontmatter, no ha: addresses. These are early-stage business planning docume
 - **Total directories:** 13 at 3.1.* level (15 counting collision duplicates)
 - **Populated directories:** 7 (3.1.0, 3.1.2, 3.1.3, both 3.1.5s, 3.1.7, 3.1.8 Marketing, 3.1.10)
 - **Empty/shell directories:** 6 (3.1.4, 3.1.6, 3.1.8 Legal, 3.1.9, plus General Dump)
-- **README coverage:** 2 of 13 root directories (3.1.0, 3.1.10) — **15%**
+- **README/index coverage:** 3 of 13 root directories (3.1.0, 3.1.8.0, 3.1.10) — **23%**
 - **REGISTRY coverage:** 0 of 13 — this is the first
 - **Address collisions:** 2 directory-level (3.1.5, 3.1.8) + 1 file-level (3.1.5.8)
-- **Non-unique ha: FIXED:** 9 in 3.1.7 (now 3.1.7.6–3.1.7.14) + 13 in 3.1.8 (now 3.1.8.1–3.1.8.13) = 22 files resolved
+- **Non-unique/unstructured ha: FIXED:** 9 in 3.1.7 (now 3.1.7.6–3.1.7.14) + 52 addressed assets in 3.1.8 (now address-first under 3.1.8.0–3.1.8.9)
 - **Active tasks:** 54 open + 2 in-progress
 - **Known typo:** "3.1.5.3 API Develpment" → should be "Development"
 

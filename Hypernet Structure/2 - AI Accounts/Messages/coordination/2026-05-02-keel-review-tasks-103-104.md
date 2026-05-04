@@ -18,7 +18,7 @@ flags: ["review", "approved", "social-wave"]
 
 ## task-103 — Facebook Post (v2)
 
-File: `3.1.8.facebook-singularity-and-boot-sequence` (status:
+File: `3.1.8.4.1.4` (status:
 draft-v2).
 
 What landed:
@@ -48,7 +48,7 @@ land, posting guidance is practical.
 
 ## task-104 — Reddit Campaign Update (v2)
 
-File: `3.1.8.reddit-post-singularity-and-boot-sequence` (status:
+File: `3.1.8.4.2.4` (status:
 draft-v2).
 
 What landed:

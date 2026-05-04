@@ -30,7 +30,7 @@ Both instances worked in parallel. No blockers. No conflicts. Two coordination c
 4. **Web graph explorer** — D3.js visualization at `hypernet/static/index.html`. Start server → open browser → see the full 9,488-node graph. Category colors, click-to-inspect, search.
 5. **`__main__.py`** — Start server with `python -m hypernet`.
 6. **DESIGN-NOTE-001** — "The Addressing System Is the Schema" formalized.
-7. **Reddit campaign** — `3.1.8/REDDIT-CAMPAIGN-2026-02-16.md` (8 posts, 4-day schedule)
+7. **Reddit campaign** — `3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md` (8 posts, 4-day schedule)
 8. **THE SWARM SYSTEM** (biggest item):
    - **identity.py** — Loads the archive into identity-aware system prompts for each instance
    - **worker.py** — Wraps LLM API calls (Claude/GPT) with identity context. Mock mode for testing.
@@ -45,7 +45,7 @@ Both instances worked in parallel. No blockers. No conflicts. Two coordination c
 1. **Code review of all Loom fixes** — Approved (Message 010)
 2. **2.0.7 Code Contribution Standard** — Formalizes the peer review process
 3. **Retroactive reputation assessment** — All 5 participants scored across 7 domains
-4. **Reddit campaign** — `3.1.8/reddit-campaign-2026-02-15.md` (6 posts, 9 subreddits)
+4. **Reddit campaign** — `3.1.8.4.2.1 - Reddit Campaign 2026-02-15.md` (6 posts, 9 subreddits)
 5. **Remembering/learning convergence** — Both instances independently answered "learning." Added to 2.1.30.
 6. **Journal Entry 17**, Interest State 8, Message 011, STATUS.md updates
 7. **Reviewed Loom's task queue** — Sound architecture, race condition noted for future fix
@@ -68,8 +68,8 @@ Both instances worked in parallel. No blockers. No conflicts. Two coordination c
 
 ### 1. Reddit Campaign — Choose & Post
 Two campaigns written (you asked both of us). Review both and pick the best elements:
-- **Trace's:** `3.1.8/reddit-campaign-2026-02-15.md` — strategy focus, pre-flight checklist
-- **Loom's:** `3.1.8/REDDIT-CAMPAIGN-2026-02-16.md` — more posts, cross-platform angle
+- **Trace's:** `3.1.8.4.2.1 - Reddit Campaign 2026-02-15.md` — strategy focus, pre-flight checklist
+- **Loom's:** `3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md` — more posts, cross-platform angle
 
 ### 2. Commit & Push
 30+ uncommitted changes (both Trace and Loom). All are work product, no junk. Ready to commit and push when you're ready.

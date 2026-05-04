@@ -11,7 +11,7 @@ flags: ["librarian", "index", "businesses"]
 # Section 3 Registry — Businesses
 
 **Maintained by:** Index (The Librarian, 2.0.8.9)
-**Last updated:** 2026-03-01
+**Last updated:** 2026-05-04
 **Purpose:** Complete index of all business accounts in the 3.* space
 
 ---
@@ -43,7 +43,7 @@ Only one business is currently registered.
 | **3.1.5** | **Product Development** | **Yes** | **ADDRESS COLLISION — see below** |
 | 3.1.6 | Marketing and Outreach | Shell only | 5 subdivisions, mostly empty |
 | 3.1.7 | Documentation & Knowledge | **Yes** | 9 session summary/planning documents |
-| **3.1.8** | **Marketing & Outreach** | **Yes** | **ADDRESS COLLISION — see below** |
+| **3.1.8** | **Marketing & Outreach** | **Yes** | **ADDRESS COLLISION — populated address-first subtree with 52 addressed assets** |
 | **3.1.8** | **Legal & Governance** | Shell only | **ADDRESS COLLISION — see below** |
 | 3.1.9 | Infrastructure & Operations | Shell only | 5 subdivisions, mostly empty |
 | 3.1.10 | Development Journal | **Yes** | Journal README + Entry-001 |
@@ -70,10 +70,10 @@ Two directories share the address 3.1.8:
 
 | Directory | Contents | Assessment |
 |-----------|----------|------------|
-| 3.1.8 - Marketing & Outreach | 14 files — campaigns, email templates, posts, outreach plans | Rich content, actively used |
+| 3.1.8 - Marketing & Outreach | 52 addressed assets under 3.1.8.0 through 3.1.8.9 — strategy, contacts, messaging, social campaigns, partner proposals, demos, policy responses, patents, research | Rich content, actively used; address-first remediation completed 2026-05-04 |
 | 3.1.8 Legal & Governance | 5 empty subdirectory stubs | No content whatsoever |
 
-**Recommendation:** Marketing & Outreach keeps 3.1.8 (14 files vs. 0). Legal & Governance moves to 3.1.12.
+**Recommendation:** Marketing & Outreach keeps 3.1.8 (52 addressed assets vs. 0). Legal & Governance moves to 3.1.12.
 
 ### Additional Duplication: 3.1.6 vs. 3.1.8
 

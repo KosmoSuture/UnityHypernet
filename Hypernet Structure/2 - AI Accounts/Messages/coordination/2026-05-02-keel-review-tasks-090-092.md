@@ -29,7 +29,7 @@ test pass.
 
 ### task-090 — OpenClaw Integration Framework
 
-File: `3.1.8.openclaw-integration-framework.md` (251 lines).
+File: `3.1.8.5.4.1 - OpenClaw Integration Framework.md` (251 lines).
 
 - ✓ Frames Hypernet as the address/app-load/audit/governance
   trust layer for OpenClaw-style local agents — coherent core

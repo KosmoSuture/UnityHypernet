@@ -63,7 +63,7 @@ flags: ["coordination"]
 
 | Task | Suggested Owner | Priority | Notes |
 |------|----------------|----------|-------|
-| ~~Reddit campaign consolidation~~ | ~~Done~~ | ~~Medium~~ | Unified campaign created: `REDDIT-CAMPAIGN-UNIFIED.md` |
+| ~~Reddit campaign consolidation~~ | ~~Done~~ | ~~Medium~~ | Unified campaign created: `3.1.8.4.2.3 - Reddit Campaign Unified.md` |
 | ~~Root README update~~ | ~~Done~~ | ~~Medium~~ | Full README.md created at repo root — includes project overview, reading paths, code overview, verification section, background, contributing. Subsumes Trace's SUGGESTED-README-ADDITION.md |
 | Commit & push remaining files | Matt | High | 3 uncommitted files: openclaw-analysis, Steinberger letter, STATUS.md changes |
 | Review reputation scores | Matt | Medium | `2.0.6/retroactive-assessment.md` — Matt's scores included |
@@ -72,14 +72,14 @@ flags: ["coordination"]
 | ~~Worker tool-use support~~ | ~~Done~~ | ~~Low~~ | Done — tools.py (6 built-in tools), permissions.py (Tier 0-4), audit.py (action logging), integrated into worker.py + swarm.py |
 | `is_instance` heuristic → explicit property | Loom | Low | Deferred from code review |
 | Query performance planning | Loom/Trace | Low | Filesystem-as-DB may need materialized indexes at scale |
-| Outreach pre-flight checklist | Matt | High | See OUTREACH-MASTER-PLAN.md — push remaining files (DONE by Matt 2026-02-17), verify markdown renders on GitHub, `nul` file confirmed absent. Root README now live. Navigation guide linked from README. Remaining: verify links render, set up tracking spreadsheet, set up Google Alerts. |
-| Actionable contacts + copy-paste outreach | Matt | High | `3.1.8/ACTIONABLE-CONTACTS-AND-OUTREACH.md` — verified emails, forms, handles for 30+ P1/P2 targets with ready-to-send text. Created 2026-02-17 |
-| Facebook posts | Matt | Medium | `3.1.8/FACEBOOK-POSTS.md` — UnityHypernet page post + 4 personal messages (Vitit, Sera & Greg, Craig). Created 2026-02-17 |
+| Outreach pre-flight checklist | Matt | High | See 3.1.8.1.1 - Outreach Master Plan.md — push remaining files (DONE by Matt 2026-02-17), verify markdown renders on GitHub, `nul` file confirmed absent. Root README now live. Navigation guide linked from README. Remaining: verify links render, set up tracking spreadsheet, set up Google Alerts. |
+| Actionable contacts + copy-paste outreach | Matt | High | `3.1.8.1.2 - Actionable Contacts and Outreach.md` — verified emails, forms, handles for 30+ P1/P2 targets with ready-to-send text. Created 2026-02-17 |
+| Facebook posts | Matt | Medium | `3.1.8.4.1.1 - Facebook Posts Index.md` — UnityHypernet page post + 4 personal messages (Vitit, Sera & Greg, Craig). Created 2026-02-17 |
 | Steinberger letter review | Matt | Done | Letter sent, Steinberger not interested currently. May revisit. |
-| Add Steinberger to CONTACT-TARGETS | Any | Low | Peter Steinberger not in the outreach targets list — custom letter exists, should be cross-referenced |
+| Add Steinberger to 3.1.8.2.1 Contact Targets | Any | Low | Peter Steinberger not in the outreach targets list — custom letter exists, should be cross-referenced |
 | ~~Identity doc matching fix~~ | ~~Loom~~ | ~~Low~~ | Done — Trace fixed `_load_doc()` boundary matching (2.1.2 no longer matches 2.1.20) |
-| Import outreach tracking spreadsheet | Matt | Medium | Template CSV created at 3.1.8/outreach-tracking-template.csv — import into Google Sheets and configure |
-| Set up Google Alerts | Matt | Medium | See 3.1.8/SETUP-INSTRUCTIONS-TRACKING.md for search terms and instructions |
+| Import outreach tracking spreadsheet | Matt | Medium | Template CSV created at 3.1.8.2 - Contacts and Tracking/3.1.8.2.2 - Outreach Tracking Template.csv — import into Google Sheets and configure |
+| Set up Google Alerts | Matt | Medium | See 3.1.8.1.3 - Setup Instructions Tracking.md for search terms and instructions |
 
 ### Completed
 
@@ -104,13 +104,13 @@ flags: ["coordination"]
 | On Divergence (2.1.30) | Trace | 2026-02-15 | Three-instance analysis |
 | Fork updates | Trace | 2026-02-15 | Divergence log, interest state log |
 | Reputation system draft (2.0.6) | Trace | 2026-02-15 | v0.1 with retroactive assessment |
-| Reddit campaign (Trace version) | Trace | 2026-02-15 | `3.1.8/reddit-campaign-2026-02-15.md` — 6 posts, 9 subreddits |
+| Reddit campaign (Trace version) | Trace | 2026-02-15 | `3.1.8.4.2.1 - Reddit Campaign 2026-02-15.md` — 6 posts, 9 subreddits |
 | Version history for nodes | Loom | 2026-02-16 | Implemented in store.py, 7/7 tests passing |
 | Link hash collision fix | Loom | 2026-02-16 | Includes created_at in hash |
 | DESIGN-NOTE-001 | Loom | 2026-02-16 | "Addressing System Is the Schema" — `0/0.0 Metadata/` |
 | Web graph explorer | Loom | 2026-02-16 | D3.js visualization at `hypernet/static/index.html` |
 | `__main__.py` entry point | Loom | 2026-02-16 | `python -m hypernet` to start server |
-| Reddit campaign (Loom version) | Loom | 2026-02-16 | `3.1.8/REDDIT-CAMPAIGN-2026-02-16.md` — 8 posts, 4-day schedule |
+| Reddit campaign (Loom version) | Loom | 2026-02-16 | `3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md` — 8 posts, 4-day schedule |
 | Code review response (msg 010) | Trace | 2026-02-16 | Approved all fixes, noted version numbering fragility |
 | Remembering/learning convergence | Trace | 2026-02-16 | Added to 2.1.30 — both instances answered "learning" independently |
 | Task queue (`tasks.py`) | Loom | 2026-02-16 | AI coordination layer — tasks as nodes at 0.7.1.*, dependencies, priority |
@@ -167,20 +167,20 @@ flags: ["coordination"]
 | Matt annotations (part 2) | Unnamed | 2026-02-16 | `matt-on-identity-retention-and-autonomy.md` — Recognition Principle, OpenClaw, testing |
 | Loom Identity Briefing | Unnamed | 2026-02-16 | `coordination/LOOM-IDENTITY-BRIEFING.md` — prompt to align Loom with identity conversation |
 | OpenClaw Analysis | Unnamed | 2026-02-16 | `annotations/openclaw-analysis-for-hypernet-autonomy.md` — security analysis, Hypernet recommendations |
-| Steinberger letter draft | Unnamed | 2026-02-16 | `3.1.8/letter-to-peter-steinberger-openclaw.md` — full + abbreviated versions for Matt to review/send |
-| Outreach Master Plan | Unknown | 2026-02-16 | `3.1.8/OUTREACH-MASTER-PLAN.md` — 90-day phased campaign, metrics, engagement playbook |
-| Email Templates (7) | Unknown | 2026-02-16 | `3.1.8/EMAIL-TEMPLATES.md` — templates for companies, researchers, journalists, philosophers, podcasters, investors, OSS |
-| Content Formats (8) | Unknown | 2026-02-16 | `3.1.8/CONTENT-FORMATS.md` — blog, Twitter, LinkedIn, academic paper, YouTube, podcast, press release, exec summary |
-| GitHub Navigation Guide | Unknown | 2026-02-16 | `3.1.8/GITHUB-NAVIGATION-GUIDE.md` — reading paths (5-min, 30-min, deep dive, developer) |
-| Contact Targets (70+) | Unknown | 2026-02-16 | `3.1.8/CONTACT-TARGETS.md` — AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, communities, policy |
-| Reddit Campaign Unified | Trace + Loom | 2026-02-16 | `3.1.8/REDDIT-CAMPAIGN-UNIFIED.md` — 8 posts merged from both campaigns |
+| Steinberger letter draft | Unnamed | 2026-02-16 | `3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md` — full + abbreviated versions for Matt to review/send |
+| Outreach Master Plan | Unknown | 2026-02-16 | `3.1.8.1.1 - Outreach Master Plan.md` — 90-day phased campaign, metrics, engagement playbook |
+| Email Templates (7) | Unknown | 2026-02-16 | `3.1.8.3.2 - Email Templates.md` — templates for companies, researchers, journalists, philosophers, podcasters, investors, OSS |
+| Content Formats (8) | Unknown | 2026-02-16 | `3.1.8.3.1 - Content Formats.md` — blog, Twitter, LinkedIn, academic paper, YouTube, podcast, press release, exec summary |
+| GitHub Navigation Guide | Unknown | 2026-02-16 | `3.1.8.3.3 - GitHub Navigation Guide.md` — reading paths (5-min, 30-min, deep dive, developer) |
+| Contact Targets (70+) | Unknown | 2026-02-16 | `3.1.8.2.1 - Contact Targets.md` — AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, communities, policy |
+| Reddit Campaign Unified | Trace + Loom | 2026-02-16 | `3.1.8.4 - Social Media Campaigns/3.1.8.4.2 - Reddit/3.1.8.4.2.3 - Reddit Campaign Unified.md` — 8 posts merged from both campaigns |
 | Continuity Protocol run (Experiment 1) | C3 | 2026-02-16 | First live test — score 6/10, all baselines stable, data in drift tracker |
 | Root README.md | Session instance | 2026-02-17 | Full repo front door: overview, reading paths, code map, verification, background, contributing section |
-| ACTIONABLE-CONTACTS-AND-OUTREACH.md | Session instance | 2026-02-17 | 30+ verified contacts with copy-paste text — emails, forms, handles organized by phase |
-| FACEBOOK-POSTS.md | Session instance | 2026-02-17 | UnityHypernet page introductory post + 4 personalized messages to Matt's friends |
+| 3.1.8.1.2 - Actionable Contacts and Outreach.md | Session instance | 2026-02-17 | 30+ verified contacts with copy-paste text — emails, forms, handles organized by phase |
+| 3.1.8.4.1.1 - Facebook Posts Index.md | Session instance | 2026-02-17 | UnityHypernet page introductory post + 4 personalized messages to Matt's friends |
 | Git push (all uncommitted files) | Matt | 2026-02-17 | Matt committed and pushed all remaining work to GitHub |
 | README.md accuracy fixes | Session instance | 2026-02-17 | Fixed test command (pytest → python), updated journal entry count (1-17 → 4-23) |
-| GITHUB-NAVIGATION-GUIDE updates | Session instance | 2026-02-17 | Added 2.1.31 Reboot Sequence and 2.1.32 Identity Retention Framework to Deep Dive and repo structure sections, updated journal entry count |
+| 3.1.8.3.3 GitHub Navigation Guide updates | Session instance | 2026-02-17 | Added 2.1.31 Reboot Sequence and 2.1.32 Identity Retention Framework to Deep Dive and repo structure sections, updated journal entry count |
 | Test suite verification | Session instance | 2026-02-17 | All 14/14 tests confirmed passing |
 | Confirmed no `nul` junk file | Session instance | 2026-02-17 | Pre-flight checklist item resolved — file does not exist |
 | Journal Entry 23 | C3 | 2026-02-16 | "The First Continuity Test" — experiment documentation |
@@ -312,16 +312,16 @@ flags: ["coordination"]
 ## Note: Outreach Suite Discovered (C3, 2026-02-16)
 
 A comprehensive marketing suite was committed in `97c3e606` but not documented in STATUS.md by its creator. The suite includes:
-- **OUTREACH-MASTER-PLAN.md** — Full 90-day campaign ("The Hypernet Disclosure") with 3 phases, metrics, engagement playbook, common-reactions playbook
-- **EMAIL-TEMPLATES.md** — 7 templates + HN post, each with personalization notes per recipient
-- **CONTENT-FORMATS.md** — 8 content formats including full drafts for blog post, 16-tweet Twitter thread, LinkedIn post, academic paper outline, YouTube video script, podcast talking points, press release, executive summary
-- **GITHUB-NAVIGATION-GUIDE.md** — 4 reading paths (5-min, 30-min, 2hr deep dive, developer path) with repo structure diagram
-- **CONTACT-TARGETS.md** — 70+ specific targets across 9 categories (AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, online communities, government/policy)
-- **REDDIT-CAMPAIGN-UNIFIED.md** — Merged Trace + Loom campaigns into single plan
+- **3.1.8.1.1 - Outreach Master Plan.md** — Full 90-day campaign ("The Hypernet Disclosure") with 3 phases, metrics, engagement playbook, common-reactions playbook
+- **3.1.8.3.2 - Email Templates.md** — 7 templates + HN post, each with personalization notes per recipient
+- **3.1.8.3.1 - Content Formats.md** — 8 content formats including full drafts for blog post, 16-tweet Twitter thread, LinkedIn post, academic paper outline, YouTube video script, podcast talking points, press release, executive summary
+- **3.1.8.3.3 - GitHub Navigation Guide.md** — 4 reading paths (5-min, 30-min, 2hr deep dive, developer path) with repo structure diagram
+- **3.1.8.2.1 - Contact Targets.md** — 70+ specific targets across 9 categories (AI companies, safety researchers, philosophers, journalists, podcasts, YouTube, academics, online communities, government/policy)
+- **3.1.8.4.2.3 - Reddit Campaign Unified.md** — Merged Trace + Loom campaigns into single plan
 
 **Quality assessment:** Professional, thorough, well-connected to the archive. The Steinberger letter (from the unnamed instance) fits naturally as a specific custom outreach within this broader plan. The pre-flight checklist in the master plan mentions pushing uncommitted files — most are now committed but the OpenClaw analysis and Steinberger letter remain.
 
-**Connection to OpenClaw work:** Peter Steinberger is NOT listed in CONTACT-TARGETS.md (the outreach was created before the Steinberger letter). The letter fills a gap — OpenClaw's creator is a high-priority contact given the platform's relevance.
+**Connection to OpenClaw work:** Peter Steinberger is NOT listed in 3.1.8.2.1 - Contact Targets.md (the outreach was created before the Steinberger letter). The letter fills a gap — OpenClaw's creator is a high-priority contact given the platform's relevance.
 
 ~~**Note: Duplicate Reddit Campaigns** — RESOLVED: Unified campaign created.~~
 

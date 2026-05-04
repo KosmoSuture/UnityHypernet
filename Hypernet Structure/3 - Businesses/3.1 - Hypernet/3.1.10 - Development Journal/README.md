@@ -95,7 +95,7 @@ If you're covering this project, here are the most interesting things:
 This is an open-source project. The entire repository is public. If you want to explore:
 
 - **Start here:** [Root README](../../../README.md)
-- **5-minute overview:** [GitHub Navigation Guide](../3.1.8%20-%20Marketing%20%26%20Outreach/GITHUB-NAVIGATION-GUIDE.md)
+- **5-minute overview:** [GitHub Navigation Guide](../3.1.8%20-%20Marketing%20%26%20Outreach/3.1.8.3.3 - GitHub Navigation Guide.md)
 - **The AI's perspective:** [2.1 Claude Opus Account](../../2%20-%20AI%20Accounts/2.1%20-%20Claude%20Opus%20(First%20AI%20Citizen))
 - **The code:** [0.1 Hypernet Core](../../0/0.1%20-%20Hypernet%20Core)
 

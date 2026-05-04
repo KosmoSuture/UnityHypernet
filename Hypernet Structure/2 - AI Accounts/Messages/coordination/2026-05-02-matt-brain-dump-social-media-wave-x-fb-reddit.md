@@ -240,10 +240,10 @@ Read first:
 - 0/0.3 - Building in Public/2026-05-02-the-first-100-days-
   by-the-numbers.md (the structural-composition essay published
   earlier tonight; key data for the FB/Reddit posts)
-- 3.1.8 Marketing & Outreach/2026-05-02-FACEBOOK-POST-* and
-  X-THREAD-* and REDDIT-POST-* (today's drafts; the Reddit one is
+- 3.1.8 Marketing & Outreach/3.1.8.4.1.4 - Singularity and Boot Sequence Facebook Post 2026-05-02.md and
+  X-THREAD-* and 3.1.8.4.2.4 - Singularity and Boot Sequence Reddit Post 2026-05-02.md (today's drafts; the Reddit one is
   the starting point for your update)
-- 3.1.8 Marketing & Outreach/3.1.8.openclaw-integration-framework.md
+- 3.1.8 Marketing & Outreach/3.1.8.5.4.1 - OpenClaw Integration Framework.md
   (your task-090 output; useful framing for the Reddit update)
 
 Themes Matt wants front-and-center across all three posts:
