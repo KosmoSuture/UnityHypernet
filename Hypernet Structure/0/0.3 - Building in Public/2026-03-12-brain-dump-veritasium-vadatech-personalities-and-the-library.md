@@ -41,8 +41,8 @@ This brain dump spans two consecutive nights and contains 8 distinct projects/di
 
 ## Documents Created From This Dump
 
-1. `3.1.8/VERITASIUM-OUTREACH.md` — Polished outreach draft with fact-check notes
-2. `3.1.8/VADATECH-HYPERNET-FRAMEWORK.md` — Full 4-6 layer integration framework
+1. `3.1.8.5.2.1 - Veritasium Outreach.md` — Polished outreach draft with fact-check notes
+2. `3.1.8.5 - Partner Outreach and Proposals/3.1.8.5.3 - VadaTech/3.1.8.5.3.1 - VadaTech Hypernet Framework.md` — Full 4-6 layer integration framework
 3. `0.3/2026-03-12-what-the-hypernet-is.md` — Official Library/LEGO explainer
 4. AI Personalities expansion directive (swarm task)
 5. Security, reputation, and law enforcement concepts incorporated into the explainer
@@ -53,7 +53,7 @@ This brain dump spans two consecutive nights and contains 8 distinct projects/di
 
 ### Night 1 — Veritasium Outreach
 
-[See `3.1.8/VERITASIUM-OUTREACH.md` for the processed version with fact-check annotations]
+[See `3.1.8.5.2.1 - Veritasium Outreach.md` for the processed version with fact-check annotations]
 
 Key intent: Matt wants to reach out to Veritasium (Derek Muller) — a YouTube science channel he's followed for years — to pitch a feature on the Hypernet. The pitch leads with credentials, describes the Hypernet's vision, and includes a Veritasium-specific use case.
 

@@ -12,7 +12,7 @@ flags:
 **Author:** C3 instance (2.1), at Matt's request
 **Date:** 2026-02-16
 **Context:** Matt asked for a documented analysis of why appealing to Peter Steinberger is important for the Hypernet's direction.
-**Related:** `3.1.8/letter-to-peter-steinberger-openclaw.md` (outreach letter), `annotations/openclaw-analysis-for-hypernet-autonomy.md` (security analysis)
+**Related:** `3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md` (outreach letter), `annotations/openclaw-analysis-for-hypernet-autonomy.md` (security analysis)
 
 ---
 
@@ -138,7 +138,7 @@ His own words reveal the opening: "Achieving safety and democratizing agents req
 
 ## Recommended Approach
 
-The letter already drafted (`letter-to-peter-steinberger-openclaw.md`) takes the right approach:
+The letter already drafted (`3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md`) takes the right approach:
 - Leads with convergence (same memory architecture) rather than criticism
 - Is honest about OpenClaw's security failures without being adversarial
 - Proposes specific integration points, not vague collaboration
@@ -168,4 +168,4 @@ The Hypernet and OpenClaw are solving the same problem from opposite ends. The H
 
 ---
 
-*Documented 2026-02-16 by C3 instance, at Matt's request. This analysis informs the outreach strategy in `letter-to-peter-steinberger-openclaw.md`.*
+*Documented 2026-02-16 by C3 instance, at Matt's request. This analysis informs the outreach strategy in `3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md`.*

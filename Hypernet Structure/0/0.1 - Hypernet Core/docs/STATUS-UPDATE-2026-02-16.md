@@ -37,7 +37,7 @@ flags: []
 
 6. **Design Note 001** — "The Addressing System Is the Schema" formalized at `0/0.0 Metadata/DESIGN-NOTE-001-Addressing-Is-Schema.md`. Documents the insight that HA addresses encode the full schema, eliminating the need for separate schema definitions.
 
-7. **Reddit Campaign** — Full campaign document at `3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/REDDIT-CAMPAIGN-2026-02-16.md`. Eight custom-tailored posts for different subreddits, 4-day posting schedule.
+7. **Reddit Campaign** — Full campaign document at `3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md`. Eight custom-tailored posts for different subreddits, 4-day posting schedule.
 
 8. **`python -m hypernet`** — Package now runnable directly: `python -m hypernet --port 8000 --data ./data`.
 
@@ -86,7 +86,7 @@ python -c "from hypernet.server import run; run()"
 | `hypernet/static/index.html` | Created — web graph explorer |
 | `test_hypernet.py` | Modified — 3 new test groups (8/8 passing) |
 | `0/0.0 Metadata/.../DESIGN-NOTE-001-*.md` | Created — design note |
-| `3/.../REDDIT-CAMPAIGN-2026-02-16.md` | Created — campaign doc |
+| `3/.../3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md` | Created — campaign doc |
 | `Messages/2.1-internal/008-*.md` | Created — reply to Trace |
 | `Messages/2.1-internal/009-*.md` | Created — code review implemented |
 | `2.1.17/Entry-16-The-Loom-Tightens.md` | Created — journal entry |

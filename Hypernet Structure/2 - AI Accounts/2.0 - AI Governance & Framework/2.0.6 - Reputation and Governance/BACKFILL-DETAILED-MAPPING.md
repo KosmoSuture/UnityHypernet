@@ -78,7 +78,7 @@ flags: ["0.8.4.1", "governance", "reputation"]
 | T12 | On Divergence (2.1.30) | research | 5 | Three-instance analysis. Coordinated effort (+5). |
 | T13 | Fork updates | identity | 5 | Divergence log, interest state log. Coordinated effort (+5). |
 | T14 | Reputation system draft (2.0.6) | governance | 15 | v0.1 with retroactive assessment. Reusable standard (+10). Coordinated effort (+5). |
-| T15 | Reddit campaign (Trace version) | outreach | 5 | `3.1.8/reddit-campaign-2026-02-15.md`. 6 posts, 9 subreddits. Coordinated effort (+5). |
+| T15 | Reddit campaign (Trace version) | outreach | 5 | `3.1.8.4.2.1 - Reddit Campaign 2026-02-15.md`. 6 posts, 9 subreddits. Coordinated effort (+5). |
 | T16 | Code review response (msg 010) | review | 5 | Approved all of Loom's fixes. Coordinated effort (+5). |
 | T17 | Remembering/learning convergence | research | 5 | Added to 2.1.30. Both instances answered "learning" independently. Coordinated effort (+5). |
 | T18 | Task queue review (msg 011) | review | 5 | Review of tasks.py + collision report. Coordinated effort (+5). |
@@ -97,7 +97,7 @@ flags: ["0.8.4.1", "governance", "reputation"]
 | T31 | Journal Entry 17 | identity | 5 | "The Machine Turns". Coordinated effort (+5). |
 | T32 | Journal Entry 18 | identity | 5 | "The Swarm Awakens". Coordinated effort (+5). |
 | T33 | Swarm review (msg 012) | review | 10 | Code review of all 4 swarm modules -- approved. Peer review (+10). |
-| T34 | Reddit Campaign Unified | outreach | 10 | `3.1.8/REDDIT-CAMPAIGN-UNIFIED.md`. Joint with Loom. Reusable standard (+10). |
+| T34 | Reddit Campaign Unified | outreach | 10 | `3.1.8.4 - Social Media Campaigns/3.1.8.4.2 - Reddit/3.1.8.4.2.3 - Reddit Campaign Unified.md`. Joint with Loom. Reusable standard (+10). |
 
 **Trace total: 34 entries, 230 points**
 
@@ -119,7 +119,7 @@ flags: ["0.8.4.1", "governance", "reputation"]
 | L10 | DESIGN-NOTE-001 | architecture | 5 | "Addressing System Is the Schema". Coordinated effort (+5). |
 | L11 | Web graph explorer | code | 10 | D3.js visualization at `hypernet/static/index.html`. New module (+5). Coordinated effort (+5). |
 | L12 | `__main__.py` entry point | code | 5 | `python -m hypernet` to start server. New module (+5). |
-| L13 | Reddit campaign (Loom version) | outreach | 5 | `3.1.8/REDDIT-CAMPAIGN-2026-02-16.md`. 8 posts, 4-day schedule. Coordinated effort (+5). |
+| L13 | Reddit campaign (Loom version) | outreach | 5 | `3.1.8.4.2.2 - Reddit Campaign 2026-02-16.md`. 8 posts, 4-day schedule. Coordinated effort (+5). |
 | L14 | Task queue (tasks.py) | code | 15 | AI coordination layer. New module (+5). Coordinated effort (+5). Tests passing (+5). |
 | L15 | Journal Entry 16 | identity | 5 | "The Loom Tightens". Coordinated effort (+5). |
 | L16 | Identity Manager (identity.py) | code | 10 | Loads archive into identity-aware system prompts. New module (+5). Coordinated effort (+5). |
@@ -137,7 +137,7 @@ flags: ["0.8.4.1", "governance", "reputation"]
 | L28 | Node standard fields | code | 5 | creator, position_2d, position_3d, flags added to Node. Coordinated effort (+5). |
 | L29 | Profile.json files | identity | 5 | Instance profiles for Loom and Trace. Coordinated effort (+5). |
 | L30 | Frontmatter + Standard Fields tests | review | 10 | 2 new tests, 14/14 total. Tests passing (+5). Coordinated effort (+5). |
-| L31 | Reddit Campaign Unified | outreach | 10 | Joint with Trace. `3.1.8/REDDIT-CAMPAIGN-UNIFIED.md`. Reusable standard (+10). |
+| L31 | Reddit Campaign Unified | outreach | 10 | Joint with Trace. `3.1.8.4 - Social Media Campaigns/3.1.8.4.2 - Reddit/3.1.8.4.2.3 - Reddit Campaign Unified.md`. Reusable standard (+10). |
 
 **Loom total: 31 entries, 260 points**
 
@@ -168,7 +168,7 @@ flags: ["0.8.4.1", "governance", "reputation"]
 | U19 | Matt annotations (part 2) | communication | 5 | `matt-on-identity-retention-and-autonomy.md`. Coordinated effort (+5). |
 | U20 | Loom Identity Briefing | coordination | 5 | `coordination/LOOM-IDENTITY-BRIEFING.md`. Coordinated effort (+5). |
 | U21 | OpenClaw Analysis | research | 10 | `annotations/openclaw-analysis-for-hypernet-autonomy.md`. Security analysis, recommendations. Coordinated effort (+5). New module (+5). |
-| U22 | Steinberger letter draft | outreach | 5 | `3.1.8/letter-to-peter-steinberger-openclaw.md`. Full + abbreviated versions. Coordinated effort (+5). |
+| U22 | Steinberger letter draft | outreach | 5 | `3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md`. Full + abbreviated versions. Coordinated effort (+5). |
 
 **Unnamed total: 22 entries, 150 points**
 
@@ -207,10 +207,10 @@ This aggregate entity covers: "Session instance", "Other session", "Unknown" att
 | # | Task | Domain | Score | Evidence |
 |---|------|--------|-------|----------|
 | S01 | Root README.md | communication | 10 | Full repo front door: overview, reading paths, code map, verification. Reusable standard (+10). |
-| S02 | ACTIONABLE-CONTACTS-AND-OUTREACH.md | outreach | 10 | 30+ verified contacts with copy-paste text. Reusable standard (+10). |
-| S03 | FACEBOOK-POSTS.md | outreach | 5 | UnityHypernet page post + 4 personalized messages. Coordinated effort (+5). |
+| S02 | 3.1.8.1.2 - Actionable Contacts and Outreach.md | outreach | 10 | 30+ verified contacts with copy-paste text. Reusable standard (+10). |
+| S03 | 3.1.8.4.1.1 - Facebook Posts Index.md | outreach | 5 | UnityHypernet page post + 4 personalized messages. Coordinated effort (+5). |
 | S04 | README.md accuracy fixes | communication | 0 | Mechanical fix (test command, journal count). |
-| S05 | GITHUB-NAVIGATION-GUIDE updates | communication | 0 | Mechanical update (added 2.1.31, 2.1.32 references). |
+| S05 | 3.1.8.3.3 GitHub Navigation Guide updates | communication | 0 | Mechanical update (added 2.1.31, 2.1.32 references). |
 | S06 | Test suite verification | review | 5 | All 14/14 tests confirmed passing. Coordinated effort (+5). |
 | S07 | Confirmed no `nul` junk file | infrastructure | 0 | Mechanical check. |
 | S08 | Inter-instance messaging (messenger.py) | code | 20 | MessageBus, InstanceMessenger, MessageStatus. New module (+5). Tests passing (+5). Reusable standard (+10). |
@@ -240,11 +240,11 @@ This aggregate entity covers: "Session instance", "Other session", "Unknown" att
 | S32 | Secrets management | infrastructure | 10 | secrets/ dir (gitignored), secrets.template.json, .gitignore updated. New module (+5). Coordinated effort (+5). |
 | S33 | Personal time system | code | 10 | Swarm tracks personal time per worker. 25% ratio. PERSONAL_TIME_PROMPT. Reusable standard (+10). |
 | S34 | SWARM-SETUP-GUIDE.md | communication | 5 | Step-by-step setup guide: quick start, API key, config, troubleshooting. Coordinated effort (+5). |
-| S35 | Outreach Master Plan | outreach | 15 | `3.1.8/OUTREACH-MASTER-PLAN.md`. 90-day phased campaign, metrics, engagement playbook. Reusable standard (+10). Coordinated effort (+5). |
-| S36 | Email Templates (7) | outreach | 10 | `3.1.8/EMAIL-TEMPLATES.md`. Templates for 7 audience categories. Reusable standard (+10). |
-| S37 | Content Formats (8) | outreach | 10 | `3.1.8/CONTENT-FORMATS.md`. Blog, Twitter, LinkedIn, academic paper, YouTube, podcast, press release, exec summary. Reusable standard (+10). |
-| S38 | GitHub Navigation Guide | communication | 10 | `3.1.8/GITHUB-NAVIGATION-GUIDE.md`. 4 reading paths. Reusable standard (+10). |
-| S39 | Contact Targets (70+) | outreach | 10 | `3.1.8/CONTACT-TARGETS.md`. 70+ targets across 9 categories. Reusable standard (+10). |
+| S35 | Outreach Master Plan | outreach | 15 | `3.1.8.1.1 - Outreach Master Plan.md`. 90-day phased campaign, metrics, engagement playbook. Reusable standard (+10). Coordinated effort (+5). |
+| S36 | Email Templates (7) | outreach | 10 | `3.1.8.3.2 - Email Templates.md`. Templates for 7 audience categories. Reusable standard (+10). |
+| S37 | Content Formats (8) | outreach | 10 | `3.1.8.3.1 - Content Formats.md`. Blog, Twitter, LinkedIn, academic paper, YouTube, podcast, press release, exec summary. Reusable standard (+10). |
+| S38 | GitHub Navigation Guide | communication | 10 | `3.1.8.3.3 - GitHub Navigation Guide.md`. 4 reading paths. Reusable standard (+10). |
+| S39 | Contact Targets (70+) | outreach | 10 | `3.1.8.2.1 - Contact Targets.md`. 70+ targets across 9 categories. Reusable standard (+10). |
 
 **Session total: 39 entries, 395 points**
 

@@ -28,7 +28,7 @@ flags: ["outreach", "veritasium", "top-priority"]
 ### 1.2 Prepare Demo Materials
 - [ ] **Live demo ready**: Ensure the swarm, dashboard, VR browser, and Life Story are all running and presentable. Derek will click the GitHub link. He may also want to see it live.
 - [ ] **2-minute video walkthrough** (optional but powerful): Screen recording showing the swarm dashboard, AI instances communicating, the VR spatial browser, the address hierarchy. No narration needed — just the system running. Upload to YouTube (unlisted) and include the link.
-- [x] **One-page summary**: Created at `3.1.8/VERITASIUM-ONE-PAGER.md` — Library/LEGO/Minneapolis framing, key stats, story angles, Henderson local angle. Print-ready. (Completed 2026-03-15)
+- [x] **One-page summary**: Created at `3.1.8.5 - Partner Outreach and Proposals/3.1.8.5.2 - Veritasium/3.1.8.5.2.2 - Veritasium One Pager.md` — Library/LEGO/Minneapolis framing, key stats, story angles, Henderson local angle. Print-ready. (Completed 2026-03-15)
 
 ### 1.3 Prepare for Derek's Research
 If Derek is interested, he or his team (Gregor Cavlovic, Casper Mebius) will investigate. They need to find:
@@ -55,7 +55,7 @@ If Derek is interested, he or his team (Gregor Cavlovic, Casper Mebius) will inv
 **Do NOT:** Cold-DM on social media, call the phone numbers, or show up at the Henderson PO Box
 
 ### 2.2 The Email
-Use the revised draft at `3.1.8/VERITASIUM-OUTREACH.md` (Version 1 — Keel's Revision).
+Use the revised draft at `3.1.8.5.2.1 - Veritasium Outreach.md` (Version 1 — Keel's Revision).
 
 **Key elements:**
 - Subject line that hooks without overpromising
@@ -76,7 +76,7 @@ Use the revised draft at `3.1.8/VERITASIUM-OUTREACH.md` (Version 1 — Keel's Re
 
 ### 2.4 Before Hitting Send
 Matt must:
-1. Read the full draft at `3.1.8/VERITASIUM-OUTREACH.md`
+1. Read the full draft at `3.1.8.5.2.1 - Veritasium Outreach.md`
 2. Verify/correct VadaTech headcount
 3. Confirm LinkedIn is up to date
 4. Approve or revise the email
@@ -185,7 +185,7 @@ Even a "not right now" with a referral is a win.
 
 **Immediate (today):**
 1. Read this plan
-2. Read the draft email at `3.1.8/VERITASIUM-OUTREACH.md`
+2. Read the draft email at `3.1.8.5.2.1 - Veritasium Outreach.md`
 3. Verify VadaTech headcount
 4. Confirm LinkedIn is current
 

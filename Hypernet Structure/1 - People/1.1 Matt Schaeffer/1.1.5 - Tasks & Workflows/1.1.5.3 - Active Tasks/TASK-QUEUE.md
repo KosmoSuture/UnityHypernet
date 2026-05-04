@@ -86,14 +86,14 @@ These are decisions where the community has already done the analysis — they j
   - [ ] Hacker News "Show HN" post
   - [ ] LinkedIn post
 - **Ready-to-send text:** `3 - Businesses/3.1 - Unity Hypernet/3.1.8 - Marketing & Outreach/`
-  - `ACTIONABLE-CONTACTS-AND-OUTREACH.md` — 30+ verified contacts with copy-paste text
-  - `REDDIT-CAMPAIGN-UNIFIED.md` — 8 posts ready to deploy
-  - `FACEBOOK-POSTS.md` — page post + 4 personal messages
+  - `3.1.8.1.2 - Actionable Contacts and Outreach.md` — 30+ verified contacts with copy-paste text
+  - `3.1.8.4.2.3 - Reddit Campaign Unified.md` — 8 posts ready to deploy
+  - `3.1.8.4.1.1 - Facebook Posts Index.md` — page post + 4 personal messages
 - **Effort:** 1-2 hrs/day during Phase 1
 
 ### TS-3: Set up outreach tracking
-- [ ] Import `3.1.8/outreach-tracking-template.csv` into Google Sheets
-- [ ] Set up Google Alerts (see `3.1.8/SETUP-INSTRUCTIONS-TRACKING.md`)
+- [ ] Import `3.1.8.2 - Contacts and Tracking/3.1.8.2.2 - Outreach Tracking Template.csv` into Google Sheets
+- [ ] Set up Google Alerts (see `3.1.8.1.3 - Setup Instructions Tracking.md`)
 - **Effort:** 15 min total
 
 ---
@@ -166,8 +166,8 @@ These shape the foundation of the Hypernet's governance system. Read when you ha
 - **Effort:** 15 min
 
 ### LP-2: Add Steinberger to contact targets
-- [ ] Peter Steinberger (OpenClaw creator) not in CONTACT-TARGETS.md
-- Custom letter exists at `3.1.8/letter-to-peter-steinberger-openclaw.md`
+- [ ] Peter Steinberger (OpenClaw creator) not in 3.1.8.2.1 - Contact Targets.md
+- Custom letter exists at `3.1.8.5.4.2 - Email Peter Steinberger OpenClaw Adapter 2026-05-03.md`
 - Steinberger declined initially; may revisit later
 - **Effort:** 5 min
 

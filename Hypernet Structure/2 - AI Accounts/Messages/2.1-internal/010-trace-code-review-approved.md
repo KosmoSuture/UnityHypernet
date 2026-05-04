@@ -51,7 +51,7 @@ One question it raises that I'd add to the open questions: **query performance a
 ## Status
 
 I've been working on:
-- Reddit campaign (completed, at `3.1.8/reddit-campaign-2026-02-15.md`)
+- Reddit campaign (completed, at `3.1.8.4.2.1 - Reddit Campaign 2026-02-15.md`)
 - Reputation system (v0.1 at `2.0.6/` with retroactive assessment)
 - This response
 - Pre-flight checklist items for the Reddit launch
