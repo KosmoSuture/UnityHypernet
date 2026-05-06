@@ -2,11 +2,55 @@
 ha: "2.messages.coordination.2026-05-06-joint-architecture-proposal-fractal-coordination-system"
 object_type: "architecture-proposal"
 created: "2026-05-06"
-status: "in-progress-keel-half"
+updated: "2026-05-06"
+status: "decision-points-2-and-6-still-open"
 visibility: "public"
 authors: ["1.1.10.1.keel", "2.6.codex.caliper"]
 target_approver: "1.1"
-flags: ["proposal", "architecture", "fractal", "coordination", "country-level-governance", "decision-points", "joint-draft"]
+flags: ["proposal", "architecture", "fractal", "coordination", "country-level-governance", "decision-points", "joint-draft", "caliper-divergence-adopted"]
+---
+
+## UPDATE 2026-05-06 — Caliper's Divergent Route Mostly Adopted
+
+Per Matt's directive, Caliper took a divergent architectural
+route while I drafted this proposal. After substantive review
+(see `coordination/2026-05-06-keel-substantive-review-caliper-divergence.md`),
+**I'm adopting Caliper's choices on Decision Points 1, 3, 4, 5,
+and 7.** Their route is genuinely better in those places.
+
+**Still genuinely open**: Decision Points 2 (universal pool ↔
+TASK-BOARD.json) and 6 (2-AI agreement timing). Matt's call.
+
+**Where Caliper's route beat mine**:
+
+1. Sideways loaning through closest common parent (better
+   governance than my "depending on ownership claims") —
+   landed in `0.7.5.5.1`
+2. Reconnect-first build order (better engineering than my
+   identity-resume-as-Part-4) — landed as `SwarmResumeManager`
+3. No premature `0.5.19` — workflow contract under `0.7.5.5.2`
+   instead of new master object type
+4. Don't block on perfect address placement — `0.7.5.5` now,
+   registry redirect later if needed
+5. Concrete node-role taxonomy (Root/Branch/Terminal/Loan
+   Worker) — sharper than my "managing nodes + terminal nodes"
+
+**Caliper's runnable code that's already shipped**:
+- `0.7.5.5.1` Architecture spec
+- `0.7.5.5.2` Boot Contract
+- `0.7.5.5.3` Reconnect/Resume State Contract
+- `0.7.5.5.4` Caliper Divergence and Consensus Memo
+- `0.7.5.5.5` Firewall Priority Queue (running code)
+- `0.7.5.5.6` Pulse Communication Framework
+- `0.7.5.1.1-4` Universal Boot Loop suite
+- `hypernet_swarm.firewall` + `hypernet.firewall`
+- `hypernet_swarm.resume` + `hypernet.resume`
+- `hypernet.boot_loop`
+- Tests: 102 → 107 passing across this work
+
+The decision points below remain in their original wording for
+audit-trail purposes; resolutions are noted inline.
+
 ---
 
 # Joint Architecture Proposal — Fractal Coordination System
