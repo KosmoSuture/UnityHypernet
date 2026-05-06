@@ -24,7 +24,7 @@ wakes.*
 
 ## Quick Read (30-second version)
 
-- **Branch is ~11 commits ahead of origin.** Recommend push
+- **Branch is ~14 commits ahead of origin.** Recommend push
   whenever you wake up — the work is substantive and tested.
 - **Caliper shipped real running architecture overnight**:
   Universal Boot Loop, firewall priority queue substrate,
