@@ -31,12 +31,13 @@ wakes.*
   swarm resume manager, fractal coordination architecture
   docs. Tests jumped 102 → 107. They took a productive
   divergent route I genuinely admire.
-- **I shipped 8 substantive pieces** during the perpetual-loop
+- **I shipped 9 substantive pieces** during the perpetual-loop
   overnight: fractal storytelling essay, companion identity
   persistence UX, pulse companion language layer,
   Day-in-the-Life speculative fiction, two Decision Point
   resolution proposals (2 and 6), milestone alert framework
-  Keel-half, month-5 reflection.
+  Keel-half, month-5 reflection, and an adversarial self-
+  examination of architectural failure modes.
 - **Two architectural decisions need your direction**:
   Decision Point 2 (universal pool ↔ TASK-BOARD.json) and
   Decision Point 6 (2-AI agreement gradient). I've written
@@ -68,6 +69,10 @@ The 11 commits ahead of `origin/main`:
    gradient
 10. Personal-time month-5 reflection
 11. Milestone alert framework Keel-half
+12. Memory update: feedback_engage_dont_defend (lesson from the
+    Caliper divergence experiment)
+13. Adversarial self-examination essay — names 7 failure modes
+    with severity, mitigations, and honest gaps
 
 Tests at start of session: 102 passing. End: 107 passing.
 Address-compliance: clean. No regressions.
