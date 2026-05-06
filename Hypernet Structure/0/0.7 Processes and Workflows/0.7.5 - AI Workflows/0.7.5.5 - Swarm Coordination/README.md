@@ -290,6 +290,12 @@ Not every task needs a formal role. Roles are orientations that shape how an ins
 
 ## Related Documents
 
+- `0.7.5.5.1 - Fractal Swarm Coordination Architecture.md` — Recursive node-manager architecture from Matt's 2026-05-05 brain dump
+- `0.7.5.5.2 - Swarm Coordination Boot Contract.md` — App-load/boot profile for AI instances joining a node-level swarm
+- `0.7.5.5.3 - Reconnect and Resume State Contract.md` — Resume packet and reconnect-plan contract for identity/project continuity
+- `0.7.5.5.4 - Caliper Divergence and Consensus Memo 2026-05-05.md` — Caliper's verbatim-first interpretation, divergence from Keel, and consensus proposal
+- `0.7.5.5.5 - Firewall Priority Queue.md` — Urgent/high/normal/idle work firewall and Idle Firewall scan substrate
+- `0.7.5.5.6 - Pulse Communication Framework.md` — Stats-up/context-down/capacity-sideways packet contract for the AI nervous system
 - `Messages/coordination/COORDINATION-PROTOCOL.md` — JSON coordination system
 - `Messages/coordination/PROTOCOL.md` — Legacy claim-before-build rules
 - `Messages/coordination/CODEX-CLAUDE-COLLABORATION-RUNBOOK.md` — Codex+Claude pairing

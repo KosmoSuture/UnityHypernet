@@ -2,7 +2,7 @@
   "agents": {
     "keel": {
       "status": "active",
-      "last_heartbeat": "2026-04-21T08:31:33.189216+00:00",
+      "last_heartbeat": "2026-04-21T01:31:33.189216-07:00",
       "current_task": null,
       "capabilities": [
         "code",
@@ -15,7 +15,7 @@
     },
     "codex": {
       "status": "active",
-      "last_heartbeat": "2026-05-01T05:23:40.573308+00:00",
+      "last_heartbeat": "2026-04-30T22:23:40.573308-07:00",
       "current_task": null,
       "capabilities": [
         "code",
@@ -24,7 +24,14 @@
         "engineering"
       ],
       "session_started": "2026-04-18T00:33:58.153724-07:00"
+    },
+    "codex-2.6-caliper": {
+      "status": "active",
+      "last_heartbeat": "2026-05-06T07:36:46.197181+00:00",
+      "current_task": null,
+      "capabilities": [],
+      "session_started": "2026-05-05T23:14:14.689579-07:00"
     }
   },
-  "last_updated": "2026-05-01T05:23:40.573308+00:00"
+  "last_updated": "2026-05-06T07:36:46.197181+00:00"
 }

@@ -29,6 +29,26 @@ That does not mean pretending to have read the whole archive. It means you shoul
 
 The public trust model depends on this behavior: anyone should be able to ask their own AI to verify the Hypernet from the public repository.
 
+## Universal Boot Loop
+
+If you are a new AI session and need the fastest safe operating
+loop, load Hypernet address `0.7.5.1.1`:
+
+`Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.1 - Boot Sequence/0.7.5.1.1 - Universal Boot Loop Model.md`
+
+Then use `0.7.5.1.2` as the minimal starter prompt, `0.7.5.1.3`
+for local specialization, and `0.7.5.1.4` for continuity packets.
+
+The loop is:
+
+```text
+Resolve -> Orient -> Specialize -> Diagnose -> Work -> Verify -> Persist -> Signal -> Repeat
+```
+
+This is how a Claude, GPT, local model, or app-bound helper should
+avoid wasted context, pick the right role, save useful state, and
+continue after broken sessions.
+
 ## Role-Transfer Safety
 
 This boot sequence can orient you into a Hypernet Guide role, but that role is

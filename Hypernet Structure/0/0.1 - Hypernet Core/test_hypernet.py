@@ -56,6 +56,8 @@ from hypernet.addressing import AddressValidator, AddressAuditor, AddressEnforce
 from hypernet.limits import ScalingLimits, LimitDef, LimitResult
 from hypernet.reputation import ReputationSystem, ReputationProfile, ReputationEntry
 from hypernet.swarm import Swarm, build_swarm
+from hypernet.firewall import FirewallPriorityQueue
+from hypernet.resume import SwarmResumeManager
 from hypernet.frontmatter import parse_frontmatter, add_frontmatter, infer_metadata_from_path
 from hypernet.permissions import PermissionManager, PermissionTier
 from hypernet.access_policy import (
@@ -71,6 +73,12 @@ from hypernet.access_policy import (
 from hypernet.audit import AuditTrail, AuditEntry
 from hypernet.tools import ToolExecutor, ReadFileTool, WriteFileTool, ToolContext
 from hypernet.boot import BootManager, BootResult, RebootResult
+from hypernet.boot_loop import (
+    BootLoopAdvisor,
+    BootLoopPacket,
+    LocalSpecialization,
+    infer_access_mode,
+)
 from hypernet.boot_integrity import (
     BootIntegrityManager, DocumentRecord, DocumentManifest,
     BootSignature, IntegrityVerification, BOOT_ENTITY, SECURITY_BASELINE_PROMPTS,
@@ -92,7 +100,7 @@ from hypernet.favorites import FavoritesManager, FAVORITED_BY
 from hypernet.assistant_app import AssistantAppBackend
 from hypernet.swarm import (
     ModelRouter, _task_priority_value, _infer_account_root,
-    _parse_swarm_directives, ACCOUNT_ROOTS,
+    _parse_swarm_directives, ACCOUNT_ROOTS, STANDING_PRIORITIES,
 )
 from hypernet.worker import _parse_swarm_directives as worker_parse_directives
 from hypernet.git_coordinator import (
@@ -1997,6 +2005,186 @@ def test_swarm():
         shutil.rmtree(tmpdir)
 
 
+def test_swarm_resume_manager():
+    """Test explicit reconnect/resume checkpoints for the swarm."""
+    print("  Testing swarm reconnect/resume checkpoints...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_resume_test_")
+
+    try:
+        data_dir = Path(tmpdir) / "data"
+        archive = Path(tmpdir) / "archive"
+        instances_dir = archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "Instances" / "Loom"
+        instances_dir.mkdir(parents=True)
+
+        store = Store(str(data_dir))
+        task_queue = TaskQueue(store)
+        identity_mgr = IdentityManager(archive)
+        profile = InstanceProfile(name="Loom", address="2.1.loom", model="mock-model")
+        worker = Worker(identity=profile, identity_manager=identity_mgr, mock=True)
+
+        active = task_queue.create_task(
+            title="Resume active task",
+            description="Should be represented in the resume checkpoint",
+            priority=TaskPriority.HIGH,
+            tags=["resume"],
+        )
+        pending = task_queue.create_task(
+            title="Resume pending task",
+            priority=TaskPriority.NORMAL,
+            tags=["resume"],
+        )
+        assert pending.data["status"] == "pending"
+        assert task_queue.claim_task(active.address, HypernetAddress.parse("2.1.loom")) is True
+        assert task_queue.start_task(active.address) is True
+
+        resume = SwarmResumeManager(
+            data_dir / "swarm",
+            node_address="0.7.5.5",
+            manager_identity="2.6.codex-caliper",
+        )
+
+        checkpoint = resume.save_checkpoint(
+            session_start="2026-05-05T00:00:00+00:00",
+            tick_count=42,
+            workers={"Loom": worker},
+            worker_stats={"Loom": {"tasks_completed": 3, "tasks_failed": 1}},
+            worker_current_task={"Loom": "Resume active task"},
+            task_queue=task_queue,
+            suspended_workers={"Loom": {"reason": "rate_limit"}},
+            last_status_time=123.0,
+            clean_shutdown=False,
+        )
+
+        assert resume.checkpoint_path.exists()
+        assert checkpoint.queue.pending == 1
+        assert checkpoint.queue.active == 1
+        assert checkpoint.active_tasks[0].address == str(active.address)
+        assert checkpoint.workers[0].name == "Loom"
+        assert checkpoint.workers[0].suspended is True
+
+        loaded = resume.load_checkpoint()
+        assert loaded is not None
+        assert loaded["node_address"] == "0.7.5.5"
+
+        plan = resume.build_resume_plan(loaded)
+        assert plan["status"] == "resume_unclean"
+        assert plan["release_active_tasks"] is True
+        assert "Loom" in plan["workers_to_restore"]
+        assert "Loom" in plan["suspended_workers"]
+
+        resume.append_event("reconnect", reason="test_resume")
+        events = resume.event_log_path.read_text(encoding="utf-8").strip().splitlines()
+        assert len(events) >= 2
+        assert any('"event": "reconnect"' in line for line in events)
+
+        resume.save_checkpoint(
+            session_start="2026-05-05T00:00:00+00:00",
+            tick_count=43,
+            workers={"Loom": worker},
+            worker_stats={"Loom": {}},
+            worker_current_task={},
+            task_queue=task_queue,
+            suspended_workers={},
+            last_status_time=456.0,
+            clean_shutdown=True,
+        )
+        clean_plan = resume.build_resume_plan()
+        assert clean_plan["status"] == "resume_clean"
+        assert clean_plan["release_active_tasks"] is False
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_firewall_priority_queue():
+    """Test firewall lane selection and idle scan task generation."""
+    print("  Testing firewall priority queue...")
+
+    firewall = FirewallPriorityQueue()
+    assert firewall.lane_for_priority("critical") == "urgent"
+    assert firewall.lane_for_priority("high") == "high"
+    assert firewall.lane_for_priority("normal") == "normal"
+    assert firewall.lane_for_priority("low") == "idle"
+
+    tasks = [
+        {"title": "Normal docs", "priority": "normal", "status": "pending"},
+        {"title": "High bug", "priority": "high", "status": "pending"},
+        {"title": "Done urgent", "priority": "critical", "status": "completed"},
+    ]
+    decision = firewall.decide(tasks)
+    assert decision.lane == "high"
+    assert decision.counts["urgent"] == 0
+    assert decision.counts["high"] == 1
+    assert decision.counts["normal"] == 1
+
+    idle_decision = firewall.decide([], cursor=0)
+    assert idle_decision.lane == "idle"
+    assert idle_decision.idle_scan["scan_root"] == "0"
+    assert idle_decision.idle_scan["scan_depth"] == 2
+
+    scan, next_cursor = firewall.next_idle_scan_definition(0)
+    assert scan["title"] == "Idle Firewall scan: 0"
+    assert "idle-firewall" in scan["tags"]
+    assert next_cursor == 1
+
+    print("    PASS")
+
+
+def test_swarm_idle_firewall_generation():
+    """Test swarm generation falls through to Idle Firewall scans."""
+    print("  Testing swarm idle firewall task generation...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_firewall_test_")
+
+    try:
+        data_dir = Path(tmpdir) / "data"
+        archive = Path(tmpdir) / "archive"
+        (archive / "2 - AI Accounts" / "2.1 - Claude Opus (First AI Citizen)" / "Instances").mkdir(parents=True)
+
+        store = Store(str(data_dir))
+        task_queue = TaskQueue(store)
+        identity_mgr = IdentityManager(archive)
+        messenger = WebMessenger()
+        swarm = Swarm(
+            store=store,
+            identity_mgr=identity_mgr,
+            task_queue=task_queue,
+            messenger=messenger,
+            workers={},
+            state_dir=data_dir / "swarm",
+        )
+
+        # Force the normal standing-priority generator to stand down.
+        swarm._standing_priority_cooldown = {
+            priority["title"]: 9999999999.0 for priority in STANDING_PRIORITIES
+        }
+
+        generated = swarm.generate_tasks()
+        assert len(generated) == 1
+        task = generated[0]
+        assert task.data["title"] == "Idle Firewall scan: 0"
+        assert task.data["priority"] == "low"
+        assert task.data["firewall_lane"] == "idle"
+        assert task.data["scan_root"] == "0"
+        assert swarm._idle_firewall_cursor == 1
+
+        # Existing pending work suppresses additional idle scan generation.
+        assert swarm.generate_tasks() == []
+
+        swarm._save_state(clean_shutdown=True)
+        state = json.loads((data_dir / "swarm" / "state.json").read_text(encoding="utf-8"))
+        assert state["idle_firewall_cursor"] == 1
+        assert state["last_firewall_decision"]["lane"] == "idle"
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
 def test_frontmatter():
     """Test YAML frontmatter parsing, writing, and path inference."""
     print("  Testing frontmatter...")
@@ -2669,6 +2857,70 @@ def test_boot_sequence():
         assert boot_mgr._extract_name("My name is Drift.", "X") == "Drift"
         assert boot_mgr._extract_name("I'll go with Pulse — it captures...", "X") == "Pulse"
         assert boot_mgr._extract_name("Nothing useful here", "Fallback") == "Fallback"
+
+        print("    PASS")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def test_boot_loop_helpers():
+    """Test universal boot-loop packet and specialization helpers."""
+    print("  Testing universal boot-loop helpers...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_boot_loop_test_")
+
+    try:
+        assert infer_access_mode(can_read_files=True, can_write_files=False) == "local-readonly"
+        assert infer_access_mode(can_read_files=True, can_write_files=True) == "local-write"
+        assert infer_access_mode(can_read_files=False, can_write_files=False) == "github-readonly"
+        assert infer_access_mode(can_read_files=True, can_write_files=True, app_runtime=True) == "app-runtime"
+
+        spec = BootLoopAdvisor.choose_specialization(
+            "Please review the privacy and mandala access model",
+            access_mode="local-write",
+            node_address="0.7.5.1",
+        )
+        assert spec.role == "security-checker"
+        assert "access model" in spec.read_first
+        assert "name risks and evidence separately" in spec.validation
+
+        packet = BootLoopPacket(
+            ai_identity="2.6.codex-caliper",
+            model_family="gpt",
+            access_mode="local-write",
+            archive_root=str(Path(tmpdir)),
+            boot_source="0.7.5.1.2",
+            local_specialization=spec,
+            task_or_question="Build boot loop",
+            loaded_sources=["AI-BOOT-SEQUENCE.md", "0.7.5.1.1"],
+            current_claims=["task-117"],
+            completed_this_session=["Drafted boot loop docs"],
+            checks_run=["inspection"],
+            next_action="write handoff",
+        )
+
+        path = Path(tmpdir) / "continuity" / "packet.json"
+        packet.save_json(path)
+        loaded = BootLoopPacket.load_json(path)
+        assert loaded.ai_identity == "2.6.codex-caliper"
+        assert loaded.local_specialization.role == "security-checker"
+        assert loaded.to_dict()["boot_loop"] == "0.7.5.1.1"
+
+        status = BootLoopAdvisor.first_status(loaded)
+        assert status["access_mode"] == "local-write"
+        assert status["specialization"] == "security-checker"
+        assert "write continuity packet" in status["safe_capabilities"]
+
+        actions = BootLoopAdvisor.next_actions(loaded)
+        assert "save continuity packet" in actions
+
+        unknown_spec = LocalSpecialization(
+            role="made-up-role",
+            node_address="0.7.5.1",
+            purpose="test",
+        )
+        assert unknown_spec.role == "tour-guide"
 
         print("    PASS")
 
@@ -4365,6 +4617,9 @@ def main():
         ("Worker (Mock)", test_worker),
         ("Messenger", test_messenger),
         ("Swarm Orchestrator", test_swarm),
+        ("Swarm Resume Checkpoints", test_swarm_resume_manager),
+        ("Firewall Priority Queue", test_firewall_priority_queue),
+        ("Swarm Idle Firewall Generation", test_swarm_idle_firewall_generation),
         ("Frontmatter", test_frontmatter),
         ("Permissions", test_permissions),
         ("Audit Trail", test_audit_trail),
@@ -4372,6 +4627,7 @@ def main():
         ("Worker With Tools", test_worker_with_tools),
         ("Secrets/Config Loading", test_secrets_loading),
         ("Boot Sequence", test_boot_sequence),
+        ("Universal Boot Loop", test_boot_loop_helpers),
         ("Personal Time", test_personal_time),
         ("Keystone Features", test_keystone_features),
         ("Work Coordinator", test_coordinator),

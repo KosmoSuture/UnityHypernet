@@ -21,6 +21,14 @@ The about-node at `0.5.17.0 - About Boot Sequence/` contains the
 metadata definition (parts, properties, methods, rules) per the
 `*.0` metadata-framework convention.
 
+Operational boot-loop workflow lives at `0.7.5.1`. The current
+universal low-step model is:
+
+- `0.7.5.1.1 - Universal Boot Loop Model.md`
+- `0.7.5.1.2 - Minimal Universal Boot Prompt.md`
+- `0.7.5.1.3 - Local Specialization Pack Contract.md`
+- `0.7.5.1.4 - Continuity Packet Template.md`
+
 A worked example showing an existing boot sequence rendered as a
 schema instance — with a real computed SHA-256 hash — is at
 `EXAMPLE-tour-guide-encoded.md` in this directory.

@@ -21,6 +21,11 @@ Where `0.5.17` Boot Sequence answers "who is this AI becoming?",
 do, under which account, with which data, and how can that be
 verified?"
 
+When an app invokes AI helpers, it may also reference local
+specialization packs from `0.7.5.1.3` so each helper starts with
+the smallest useful role, node, permission, verification, and
+continuity contract.
+
 The about-node at `0.5.18.0 - About App Load/` contains the
 metadata definition (parts, properties, methods, rules) per the
 `*.0` metadata-framework convention.

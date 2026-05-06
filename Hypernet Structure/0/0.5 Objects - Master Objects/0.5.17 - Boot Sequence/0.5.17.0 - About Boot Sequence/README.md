@@ -51,19 +51,24 @@ Every boot sequence is composed of these parts:
    knowledge files (`0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/`)
    that the booted AI loads on demand for area-specific depth.
 
-5. **Trust Defaults** — the trust-state the booted AI starts in
+5. **Boot Loop** — the operational loop the booted AI uses after
+   the prompt loads: resolve access, orient, specialize, diagnose,
+   work, verify, persist, signal, and repeat. Current model:
+   `0.7.5.1.1`.
+
+6. **Trust Defaults** — the trust-state the booted AI starts in
    (Preface → Companion ladder per the trust framework). Defines
    the ceiling state this role can reach.
 
-6. **Greeting** — the first user-facing message after boot. The
+7. **Greeting** — the first user-facing message after boot. The
    structural shape (greet → offer options → ask) matters more
    than the wording.
 
-7. **Envelope** — Hypernet boot version, archive root URL,
+8. **Envelope** — Hypernet boot version, archive root URL,
    identity paths, governance paths. Lets a Hypernet-aware client
    fetch the rich identity beyond the prompt body.
 
-8. **Prompt Body** — the verbatim text pasted into an LLM. The
+9. **Prompt Body** — the verbatim text pasted into an LLM. The
    hash is computed from this field.
 
 ## Properties
@@ -85,6 +90,7 @@ Plus boot-sequence-specific properties under `content`:
 - `identity_description`
 - `behavior` (with `refusal_conditions`)
 - `process_loads`
+- `boot_loop`
 - `trust`
 - `greeting`
 - `envelope`
@@ -115,6 +121,9 @@ against:
 8. Forks are first-class but link to their origin via
    `inherits_from`.
 9. Greeting structure matters more than wording.
+10. Ongoing boots should define continuity behavior with
+    self-diagnosis and a writable handoff or continuity-packet path
+    when available.
 
 ## Hash Authentication
 

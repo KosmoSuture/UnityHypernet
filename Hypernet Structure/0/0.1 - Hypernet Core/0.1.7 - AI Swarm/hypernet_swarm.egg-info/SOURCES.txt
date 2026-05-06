@@ -11,6 +11,7 @@ hypernet_swarm/budget.py
 hypernet_swarm/coordinator.py
 hypernet_swarm/discord_monitor.py
 hypernet_swarm/economy.py
+hypernet_swarm/firewall.py
 hypernet_swarm/git_coordinator.py
 hypernet_swarm/governance.py
 hypernet_swarm/herald.py
@@ -18,6 +19,7 @@ hypernet_swarm/identity.py
 hypernet_swarm/messenger.py
 hypernet_swarm/permissions.py
 hypernet_swarm/providers.py
+hypernet_swarm/resume.py
 hypernet_swarm/security.py
 hypernet_swarm/swarm.py
 hypernet_swarm/swarm_cli.py

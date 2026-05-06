@@ -38,6 +38,8 @@ from .herald import HeraldController
 
 # --- Coordination ---
 from .coordinator import WorkCoordinator, CapabilityMatcher, TaskDecomposer, CapabilityProfile
+from .firewall import FirewallPriorityQueue, FirewallDecision, DEFAULT_SCAN_ROOTS
+from .resume import SwarmResumeManager, ResumeCheckpoint, QueueResumeState, WorkerResumeState
 
 # --- Trust Infrastructure ---
 from .permissions import PermissionManager, PermissionTier

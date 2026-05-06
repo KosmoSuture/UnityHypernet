@@ -55,6 +55,8 @@ from .budget import BudgetTracker, BudgetConfig
 from .herald import HeraldController
 from .economy import ContributionLedger
 from .providers import get_model_tier, get_model_cost_per_million, ModelTier, CreditsExhaustedError
+from .firewall import FirewallPriorityQueue
+from .resume import SwarmResumeManager
 
 log = logging.getLogger(__name__)
 
@@ -363,6 +365,9 @@ class Swarm:
         # Tracks title → last generation timestamp. Contributed by Lattice (2.1).
         self._standing_priority_cooldown: dict[str, float] = {}
         self._standing_priority_cooldown_seconds = 1800  # 30 minutes
+        self.firewall_queue = FirewallPriorityQueue()
+        self._idle_firewall_cursor: int = 0
+        self._last_firewall_decision: dict = {}
 
         # Work coordinator — self-organization layer
         self.coordinator = WorkCoordinator(task_queue)
@@ -455,6 +460,12 @@ class Swarm:
         self._code_check_interval: float = 60.0  # seconds between checks
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
+        self.resume_manager = SwarmResumeManager(
+            self.state_dir,
+            node_address=str(SWARM_ADDRESS),
+            manager_identity=str(SWARM_ADDRESS),
+        )
+        self._resume_plan: dict = {}
 
     def run(self) -> None:
         """Main loop — runs until interrupted or shut down."""
@@ -1234,6 +1245,9 @@ class Swarm:
         priority from being regenerated too frequently after completion.
         Contributed by Lattice (2.1, The Architect).
         """
+        if self.task_queue.get_available_tasks():
+            return []
+
         created = []
         now = time.time()
         for priority_def in STANDING_PRIORITIES:
@@ -1267,7 +1281,50 @@ class Swarm:
             self._standing_priority_cooldown[title] = now
             log.info(f"Auto-generated task: {title}")
 
+        if not created:
+            idle_task = self.generate_idle_firewall_task()
+            if idle_task:
+                created.append(idle_task)
+
         return created
+
+    def generate_idle_firewall_task(self):
+        """Generate the final-line idle scan task when no other queue lane applies."""
+        existing = self.store.list_nodes(prefix=HypernetAddress.parse("0.7.1"))
+        decision = self.firewall_queue.decide(existing, cursor=self._idle_firewall_cursor)
+        self._last_firewall_decision = decision.to_dict()
+        if decision.lane != "idle" or not decision.idle_scan:
+            return None
+
+        scan_def = decision.idle_scan
+        title = scan_def["title"]
+        already_exists = any(
+            n.data.get("title") == title
+            and n.data.get("status") in ("pending", "claimed", "in_progress")
+            for n in existing
+        )
+        if already_exists:
+            return None
+
+        task = self.task_queue.create_task(
+            title=title,
+            description=scan_def["description"],
+            priority=TaskPriority[scan_def["priority"].upper()],
+            created_by=SWARM_ADDRESS,
+            tags=scan_def.get("tags", []),
+        )
+        task.data["firewall_lane"] = scan_def["firewall_lane"]
+        task.data["scan_root"] = scan_def["scan_root"]
+        task.data["scan_depth"] = scan_def["scan_depth"]
+        task.data["created_reason"] = "idle_firewall"
+        task.update_data()
+        self.store.put_node(task)
+
+        _, self._idle_firewall_cursor = self.firewall_queue.next_idle_scan_definition(
+            self._idle_firewall_cursor
+        )
+        log.info("Idle Firewall generated task: %s", title)
+        return task
 
     def _check_conflicts(self) -> None:
         """Detect coordination conflicts between workers.
@@ -2105,8 +2162,8 @@ class Swarm:
             )
             self.identity_mgr.save_session_log(name, session)
 
-        # Save swarm state
-        self._save_state()
+        # Save swarm state and mark the resume checkpoint as clean.
+        self._save_state(clean_shutdown=True)
 
         # Append session summary to rolling history
         self._save_session_summary()
@@ -3070,7 +3127,7 @@ class Swarm:
             if hasattr(backend, 'close_response_window'):
                 backend.close_response_window()
 
-    def _save_state(self) -> None:
+    def _save_state(self, clean_shutdown: bool = False) -> None:
         """Persist swarm state to disk."""
         now = datetime.now(timezone.utc)
         uptime_seconds = 0.0
@@ -3126,6 +3183,8 @@ class Swarm:
             "recent_tasks": self._task_history[-20:],  # Last 20 tasks
             "last_status_time": self._last_status_time,
             "standing_priority_cooldown": self._standing_priority_cooldown,
+            "idle_firewall_cursor": self._idle_firewall_cursor,
+            "last_firewall_decision": self._last_firewall_decision,
             "suspended_workers": self._suspended_workers,
             "worker_consecutive_failures": self._worker_consecutive_failures,
             "worker_completions": self._worker_completions,
@@ -3136,6 +3195,22 @@ class Swarm:
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(state, indent=2), encoding="utf-8")
         tmp.replace(path)
+
+        # Persist a compact reconnect/resume packet for identity continuity.
+        try:
+            self.resume_manager.save_checkpoint(
+                session_start=self._session_start,
+                tick_count=self._tick_count,
+                workers=self.workers,
+                worker_stats=self._worker_stats,
+                worker_current_task=self._worker_current_task,
+                task_queue=self.task_queue,
+                suspended_workers=self._suspended_workers,
+                last_status_time=self._last_status_time,
+                clean_shutdown=clean_shutdown,
+            )
+        except Exception as e:
+            log.warning("Could not save swarm resume checkpoint: %s", e)
 
         # Persist reputation, limits, approval queue, governance, and budget alongside swarm state
         self.reputation.save(self.state_dir / "reputation.json")
@@ -3169,6 +3244,14 @@ class Swarm:
         cooldown = self._state.get("standing_priority_cooldown")
         if isinstance(cooldown, dict):
             self._standing_priority_cooldown = cooldown
+
+        # Restore Idle Firewall scan position from previous state
+        idle_cursor = self._state.get("idle_firewall_cursor")
+        if isinstance(idle_cursor, int):
+            self._idle_firewall_cursor = idle_cursor
+        last_firewall = self._state.get("last_firewall_decision")
+        if isinstance(last_firewall, dict):
+            self._last_firewall_decision = last_firewall
 
         # Restore suspended workers from previous state
         suspended = self._state.get("suspended_workers")
@@ -3221,6 +3304,14 @@ class Swarm:
             perm_loaded = self._tool_executor.permission_mgr.load(self.state_dir / "permissions.json")
             if perm_loaded:
                 log.info("Restored permission tiers from previous session")
+
+        try:
+            self._resume_plan = self.resume_manager.build_resume_plan()
+            event = "reconnect" if str(self._resume_plan.get("status", "")).startswith("resume") else "connect"
+            self.resume_manager.append_event(event, reason=self._resume_plan.get("status", "unknown"))
+            log.info("Resume plan loaded: %s", self._resume_plan.get("status"))
+        except Exception as e:
+            log.warning("Could not build swarm resume plan: %s", e)
 
     # =================================================================
     # Autoscaling — contributed by Keystone (2.2)

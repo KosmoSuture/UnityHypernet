@@ -9,11 +9,13 @@ hypernet/approval_queue.py
 hypernet/audit.py
 hypernet/boot.py
 hypernet/boot_integrity.py
+hypernet/boot_loop.py
 hypernet/budget.py
 hypernet/coordinator.py
 hypernet/discord_monitor.py
 hypernet/economy.py
 hypernet/favorites.py
+hypernet/firewall.py
 hypernet/frontmatter.py
 hypernet/git_coordinator.py
 hypernet/governance.py
@@ -27,6 +29,7 @@ hypernet/node.py
 hypernet/permissions.py
 hypernet/providers.py
 hypernet/reputation.py
+hypernet/resume.py
 hypernet/security.py
 hypernet/server.py
 hypernet/store.py

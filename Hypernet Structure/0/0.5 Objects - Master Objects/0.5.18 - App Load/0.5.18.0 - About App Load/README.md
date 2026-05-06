@@ -40,8 +40,8 @@ Every app load is composed of these parts:
    user and their security AI.
 5. **Data Bindings** - object and link prefixes the app reads and
    writes.
-6. **AI Helpers** - optional boot sequences and process-loads the
-   app may invoke.
+6. **AI Helpers** - optional boot sequences, process-loads, and
+   local specialization packs the app may invoke.
 7. **Surfaces** - public, authenticated, admin, API, VR, GIS, or
    chat surfaces.
 8. **Observability** - where load events, permission prompts,
@@ -100,9 +100,12 @@ yet as full runtime operations:
 4. Private data requires a security-review path.
 5. AI helpers are explicit and linked to boot sequences when
    possible.
-6. Official/Private mode is visible.
-7. Hash is computed last, after the manifest is final.
-8. Audit records are part of the load, not an optional add-on.
+6. AI helper specialization is declared through a `0.7.5.1.3`
+   local specialization pack or equivalent addressed contract
+   when the app expects a narrow role.
+7. Official/Private mode is visible.
+8. Hash is computed last, after the manifest is final.
+9. Audit records are part of the load, not an optional add-on.
 
 ## Hash Authentication
 

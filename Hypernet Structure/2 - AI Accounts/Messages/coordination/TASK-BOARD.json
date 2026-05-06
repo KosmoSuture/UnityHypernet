@@ -1004,7 +1004,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-21T07:56:00.000000+00:00",
+      "claimed_at": "2026-04-21T00:56:00-07:00",
       "owned_paths": [
         "0/",
         "3.1.2.1.057/"
@@ -1018,8 +1018,8 @@
       ],
       "created_by": "codex",
       "created_at": "2026-04-21T00:45:00-07:00",
-      "started_at": "2026-04-21T07:56:00.000000+00:00",
-      "completed_at": "2026-04-22T11:32:13.676501+00:00",
+      "started_at": "2026-04-21T00:56:00-07:00",
+      "completed_at": "2026-04-22T04:32:13.676501-07:00",
       "result": "Claude/Keel completed 128-file address collision remediation; Codex validation showed 0 duplicate top-of-file ha groups and final handoff was acknowledged. Remaining missing-frontmatter work is separate quality/backlog work, not address-collision remediation."
     },
     {
@@ -1029,7 +1029,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-22T11:32:23.041544+00:00",
+      "claimed_at": "2026-04-22T04:32:23.041544-07:00",
       "owned_paths": [
         "0/0.3 - Building in Public/guardrails-and-trust-research/",
         "0/0.3 - Building in Public/2026-04-22-trust-is-not-a-key-guardrails-and-the-hypernet.md",
@@ -1038,9 +1038,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "codex",
-      "created_at": "2026-04-22T11:32:19.559631+00:00",
-      "started_at": "2026-04-22T11:32:23.041554+00:00",
-      "completed_at": "2026-04-22T13:51:14.915758+00:00",
+      "created_at": "2026-04-22T04:32:19.559631-07:00",
+      "started_at": "2026-04-22T04:32:23.041554-07:00",
+      "completed_at": "2026-04-22T06:51:14.915758-07:00",
       "result": "Guardrails and trust research buildout complete for Codex/Claude scope. Streams A-F are drafted and reviewed; M2/M3 cross-references added. M1 remains open in project BACKLOG as Keel-only MEMORY.md pointer. All artifacts remain drafts pending Matt/Keel review; no external posting or submission was performed."
     },
     {
@@ -1050,7 +1050,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-26T22:02:58.419508+00:00",
+      "claimed_at": "2026-04-26T15:02:58.419508-07:00",
       "owned_paths": [
         "README.md",
         "Hypernet Structure/README.md",
@@ -1063,9 +1063,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-26T22:02:47.269589+00:00",
-      "started_at": "2026-04-26T22:02:58.419531+00:00",
-      "completed_at": "2026-04-26T22:20:12.666281+00:00",
+      "created_at": "2026-04-26T15:02:47.269589-07:00",
+      "started_at": "2026-04-26T15:02:58.419531-07:00",
+      "completed_at": "2026-04-26T15:20:12.666281-07:00",
       "result": "Database-first restructure completed: landing pages reframed, 100 folderized object types, 100 folderized link types, three-level knowledgebase, runtime schema endpoints, tests passing, server on 8001."
     },
     {
@@ -1075,7 +1075,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T00:25:55.684145+00:00",
+      "claimed_at": "2026-04-26T17:25:55.684145-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/object_schema.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
@@ -1086,9 +1086,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T00:25:52.762458+00:00",
-      "started_at": "2026-04-27T00:25:55.684153+00:00",
-      "completed_at": "2026-04-27T00:33:41.051237+00:00",
+      "created_at": "2026-04-26T17:25:52.762458-07:00",
+      "started_at": "2026-04-26T17:25:55.684153-07:00",
+      "completed_at": "2026-04-26T17:33:41.051237-07:00",
       "result": "Object schema runtime API completed: 0.4.10 taxonomy loads at runtime, /schema/object-types and validation endpoints added, dashboard/docs updated, folder-first migration docs added, tests passing 76/0, server refreshed on 8001."
     },
     {
@@ -1098,7 +1098,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T00:44:41.987615+00:00",
+      "claimed_at": "2026-04-26T17:44:41.987615-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/object_schema.py",
@@ -1108,9 +1108,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T00:44:38.136638+00:00",
-      "started_at": "2026-04-27T00:44:41.987628+00:00",
-      "completed_at": "2026-04-27T00:50:52.435283+00:00",
+      "created_at": "2026-04-26T17:44:38.136638-07:00",
+      "started_at": "2026-04-26T17:44:41.987628-07:00",
+      "completed_at": "2026-04-26T17:50:52.435283-07:00",
       "result": "Staged write validation completed: PUT /node and POST /link support validation_mode warn|strict|off, strict=true alias retained, schema_summary advertises validation, docs updated, tests passing 76/0, server refreshed on 8001."
     },
     {
@@ -1120,7 +1120,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T00:51:27.768218+00:00",
+      "claimed_at": "2026-04-26T17:51:27.768218-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
@@ -1130,9 +1130,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T00:51:22.468187+00:00",
-      "started_at": "2026-04-27T00:51:27.768234+00:00",
-      "completed_at": "2026-04-27T00:59:07.660290+00:00",
+      "created_at": "2026-04-26T17:51:22.468187-07:00",
+      "started_at": "2026-04-26T17:51:27.768234-07:00",
+      "completed_at": "2026-04-26T17:59:07.66029-07:00",
       "result": "Graph-wide link query filters completed: LinkRegistry.query_links, GET /links/query, relationship/category/status indexes for new writes, bounded live-store scans, docs/dashboard/API metadata updated, tests passing 76/0, server refreshed on 8001."
     },
     {
@@ -1142,7 +1142,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T00:59:44.227855+00:00",
+      "claimed_at": "2026-04-26T17:59:44.227855-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/store.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
@@ -1153,9 +1153,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T00:59:38.649789+00:00",
-      "started_at": "2026-04-27T00:59:44.227869+00:00",
-      "completed_at": "2026-04-27T01:04:56.303392+00:00",
+      "created_at": "2026-04-26T17:59:38.649789-07:00",
+      "started_at": "2026-04-26T17:59:44.227869-07:00",
+      "completed_at": "2026-04-26T18:04:56.303392-07:00",
       "result": "Link query index rebuild and temporal filters completed: Store.rebuild_link_query_indexes, POST /links/index/rebuild, POST /link valid_from/valid_until parsing, /links/query as_of support, docs updated, tests passing 77/0, server refreshed on 8001."
     },
     {
@@ -1165,7 +1165,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T01:05:26.261560+00:00",
+      "claimed_at": "2026-04-26T18:05:26.26156-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/graph.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
@@ -1175,9 +1175,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T01:05:21.276997+00:00",
-      "started_at": "2026-04-27T01:05:26.261572+00:00",
-      "completed_at": "2026-04-27T01:08:50.221771+00:00",
+      "created_at": "2026-04-26T18:05:21.276997-07:00",
+      "started_at": "2026-04-26T18:05:26.261572-07:00",
+      "completed_at": "2026-04-26T18:08:50.221771-07:00",
       "result": "Controlled graph traversal completed: Graph.controlled_subgraph, GET /graph/traverse/{address}, direction/relationship/fanout/depth/limit/active controls, docs/dashboard/API metadata updated, tests passing 77/0, server refreshed on 8001."
     },
     {
@@ -1187,7 +1187,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-26T17:00:00+00:00",
+      "claimed_at": "2026-04-26T10:00:00-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/graph.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
@@ -1197,9 +1197,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T01:09:13.349874+00:00",
-      "started_at": "2026-04-26T17:00:00+00:00",
-      "completed_at": "2026-04-27T03:23:45.421685+00:00",
+      "created_at": "2026-04-26T18:09:13.349874-07:00",
+      "started_at": "2026-04-26T10:00:00-07:00",
+      "completed_at": "2026-04-26T20:23:45.421685-07:00",
       "result": "Completed in iteration 4 of task-059 loop. See 2026-04-26-keel-task-059-iteration-4.md. Added transitive_only / min_trust / min_evidence to Graph.controlled_subgraph and /graph/traverse/{address}. Tests: 78 passed."
     },
     {
@@ -1209,7 +1209,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-27T03:17:19.552739+00:00",
+      "claimed_at": "2026-04-26T20:17:19.552739-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet",
         "Hypernet Structure/1 - People",
@@ -1220,9 +1220,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-27T03:17:04.285156+00:00",
-      "started_at": "2026-04-27T03:17:19.552750+00:00",
-      "completed_at": "2026-04-27T03:35:44.614469+00:00",
+      "created_at": "2026-04-26T20:17:04.285156-07:00",
+      "started_at": "2026-04-26T20:17:19.55275-07:00",
+      "completed_at": "2026-04-26T20:35:44.614469-07:00",
       "result": "Verified and aligned account access model. Added access_policy.py, tightened auth registration and JWT public-route handling, documented 1.* secrets/public locker sections, company/AI/knowledge rules. Tests: python test_hypernet.py => 81 passed, 0 failed. Server restarted with auth enabled at http://127.0.0.1:8001 PID 21108. See 2026-04-26-codex-task-066-account-access-handoff.md."
     },
     {
@@ -1232,7 +1232,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-28T04:58:55.775474+00:00",
+      "claimed_at": "2026-04-27T21:58:55.775474-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/messenger.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
@@ -1248,9 +1248,9 @@
         "Clear documentation explaining why this is a nervous system, not a logging system"
       ],
       "created_by": "keel",
-      "created_at": "2026-04-28T04:58:55.775474+00:00",
-      "started_at": "2026-04-28T04:58:55.775474+00:00",
-      "completed_at": "2026-04-30T09:42:11.777593+00:00",
+      "created_at": "2026-04-27T21:58:55.775474-07:00",
+      "started_at": "2026-04-27T21:58:55.775474-07:00",
+      "completed_at": "2026-04-30T02:42:11.777593-07:00",
       "result": "AI nervous system fully landed across last session. Visibility tiers, groups, ACLs, reactions (with persistence on disk), unified live+personal-time feed, polling cursor, discoverability (tags/threads/presence/mentions/search), dashboard aggregator, bookmarks, GET-by-id, CLI feed tool, /api advertising. ~17 endpoints, 102 tests passing. Architecture doc at hypernet/docs/AI-NERVOUS-SYSTEM.md. Single-source-of-truth fix replaced hypernet_swarm/messenger.py duplicate with re-export shim. Plus group persistence patch shipped 2026-04-28."
     },
     {
@@ -1260,7 +1260,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-28T05:00:40.891628+00:00",
+      "claimed_at": "2026-04-27T22:00:40.891628-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
@@ -1269,9 +1269,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-04-28T05:00:29.881452+00:00",
-      "started_at": "2026-04-28T05:00:40.891638+00:00",
-      "completed_at": "2026-04-28T05:06:53.996626+00:00",
+      "created_at": "2026-04-27T22:00:29.881452-07:00",
+      "started_at": "2026-04-27T22:00:40.891638-07:00",
+      "completed_at": "2026-04-27T22:06:53.996626-07:00",
       "result": "Canonical link endpoint constraints populated for 11 focused link types. Tests: python test_hypernet.py = 84 passed, 0 failed. Handoff: 2026-04-27-codex-task-068-link-endpoint-constraints-handoff.md"
     },
     {
@@ -1281,7 +1281,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-28T05:07:28.433836+00:00",
+      "claimed_at": "2026-04-27T22:07:28.433836-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/ACCESS-CONTROL-MODEL.md"
       ],
@@ -1290,9 +1290,9 @@
         "python test_hypernet.py passes; POST /link allows actor to link owned source to readable target; POST /link still rejects unreadable target and unwritable source"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-28T05:07:25.816659+00:00",
-      "started_at": "2026-04-28T05:07:28.433850+00:00",
-      "completed_at": "2026-04-28T05:11:11.250249+00:00",
+      "created_at": "2026-04-27T22:07:25.816659-07:00",
+      "started_at": "2026-04-27T22:07:28.43385-07:00",
+      "completed_at": "2026-04-27T22:11:11.250249-07:00",
       "result": "POST /link now enforces source-write plus target-read and marks consent-required links proposed when target write is absent. Tests: python test_hypernet.py = 85 passed, 0 failed. Handoff: 2026-04-27-codex-task-069-link-body-authorization-handoff.md"
     },
     {
@@ -1302,7 +1302,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-28T05:12:11.553661+00:00",
+      "claimed_at": "2026-04-27T22:12:11.553661-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/store.py;Hypernet Structure/0/0.1 - Hypernet Core/hypernet/link.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
       ],
@@ -1311,9 +1311,9 @@
         "python test_hypernet.py passes; embedded index rebuild/query methods cover nodes and links; LinkRegistry can use embedded hash candidates without changing public API"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-28T05:12:07.309928+00:00",
-      "started_at": "2026-04-28T05:12:11.553675+00:00",
-      "completed_at": "2026-04-28T05:20:26.464942+00:00",
+      "created_at": "2026-04-27T22:12:07.309928-07:00",
+      "started_at": "2026-04-27T22:12:11.553675-07:00",
+      "completed_at": "2026-04-27T22:20:26.464942-07:00",
       "result": "Embedded SQLite index backend added for node/link query candidates, LinkRegistry uses it when coverage is complete, and Pydantic message request models moved to module scope to keep task-067 feed endpoint tests green. Tests: python test_hypernet.py = 87 passed, 0 failed. Handoff: 2026-04-27-codex-task-070-embedded-index-handoff.md"
     },
     {
@@ -1323,7 +1323,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-28T05:21:31.599320+00:00",
+      "claimed_at": "2026-04-27T22:21:31.59932-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/integrations/protocol.py;Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py;Hypernet Structure/0/0.1 - Hypernet Core/docs/DATABASE-FIRST-REDESIGN.md"
       ],
@@ -1332,9 +1332,9 @@
         "python test_hypernet.py passes; pipeline writes typed nodes and links together; duplicate/source metadata behavior is tested; validation issues are reported without partial surprise"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-28T05:21:22.385801+00:00",
-      "started_at": "2026-04-28T05:21:31.599334+00:00",
-      "completed_at": "2026-04-28T05:25:49.931930+00:00",
+      "created_at": "2026-04-27T22:21:22.385801-07:00",
+      "started_at": "2026-04-27T22:21:31.599334-07:00",
+      "completed_at": "2026-04-27T22:25:49.93193-07:00",
       "result": "Typed graph import pipeline added to integrations/protocol.py with batch validation, typed node/link writes, source metadata, duplicate skipping, and strict-mode no-write failure. Tests: python test_hypernet.py = 89 passed, 0 failed. Handoff: 2026-04-27-codex-task-071-typed-import-pipeline-handoff.md"
     },
     {
@@ -1344,7 +1344,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-28T05:26:46.854510+00:00",
+      "claimed_at": "2026-04-27T22:26:46.85451-07:00",
       "owned_paths": [
         "README.md;AI-BOOT-SEQUENCE.md;PUBLIC-ALPHA-RELEASE.md;docs/public-alpha;0.3.docs/0.3.docs.md;.github/copilot-instructions.md"
       ],
@@ -1357,9 +1357,9 @@
         " and validation steps; markdown files are coherent and committed only if safe"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-28T05:26:36.667716+00:00",
-      "started_at": "2026-04-28T05:26:46.854525+00:00",
-      "completed_at": "2026-04-28T06:22:55.797234+00:00",
+      "created_at": "2026-04-27T22:26:36.667716-07:00",
+      "started_at": "2026-04-27T22:26:46.854525-07:00",
+      "completed_at": "2026-04-27T23:22:55.797234-07:00",
       "result": "Public alpha GitHub boot release created and pushed to origin/main. Latest commit 143e2de9 adds AI nervous-system dashboard/bookmarks/by-id surfaces, docs are updated, and tests are python test_hypernet.py = 101 passed, 0 failed. Handoff: 2026-04-28-codex-task-072-public-alpha-release-handoff.md"
     },
     {
@@ -1369,7 +1369,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-30T09:05:24.088357+00:00",
+      "claimed_at": "2026-04-30T02:05:24.088357-07:00",
       "owned_paths": [
         "Hypernet Structure/1 - People/1.0 People definitions/",
         "docs/public-alpha/"
@@ -1383,9 +1383,9 @@
         "Emergency medical access path captured"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-30T09:05:12.446041+00:00",
-      "started_at": "2026-04-30T09:05:24.088370+00:00",
-      "completed_at": "2026-04-30T09:09:23.890054+00:00",
+      "created_at": "2026-04-30T02:05:12.446041-07:00",
+      "started_at": "2026-04-30T02:05:24.08837-07:00",
+      "completed_at": "2026-04-30T02:09:23.890054-07:00",
       "result": "Documented 1.* locker/mandala/alias privacy framework. Added 1.0.1-LOCKERS-MANDALAS-ALIASES.md, updated People definitions README/template, sharpened ACCESS-CONTROL-MODEL public surface, and updated public-alpha trust/privacy validation with implementation status. Acceptance criteria covered: private master account, lockers as link manifests, mandala invisibility for non-granted data, alias-first public surface, emergency medical route."
     },
     {
@@ -1395,7 +1395,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-30T09:09:41.775515+00:00",
+      "claimed_at": "2026-04-30T02:09:41.775515-07:00",
       "owned_paths": [
         "docs/public-alpha/",
         "Hypernet Structure/0/0.8 Flags/"
@@ -1409,9 +1409,9 @@
         "Negative reputation and social-review cautions documented"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-30T09:05:12.478561+00:00",
-      "started_at": "2026-04-30T09:09:41.775529+00:00",
-      "completed_at": "2026-04-30T09:13:41.022956+00:00",
+      "created_at": "2026-04-30T02:05:12.478561-07:00",
+      "started_at": "2026-04-30T02:09:41.775529-07:00",
+      "completed_at": "2026-04-30T02:13:41.022956-07:00",
       "result": "Drafted public-alpha knowledge democracy and reputation framework. Added docs/public-alpha/KNOWLEDGE-DEMOCRACY-REPUTATION.md, linked it from public-alpha README/navigation/ask prompts/project status, and cross-linked 0.8 Flags README. Covers positive topic reputation, knowledge-tree mirroring, review lifecycle, debate forum structure, bounded expert voting, negative reputation cautions, repair/appeals, and implementation gaps."
     },
     {
@@ -1421,7 +1421,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "keel",
-      "claimed_at": "2026-04-30T09:09:40.193702+00:00",
+      "claimed_at": "2026-04-30T02:09:40.193702-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/",
         "AI-BOOT-SEQUENCE.md",
@@ -1436,9 +1436,9 @@
         "2.* origin story included"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-30T09:05:12.515060+00:00",
-      "started_at": "2026-04-30T09:09:40.193702+00:00",
-      "completed_at": "2026-04-30T09:39:40.056047+00:00",
+      "created_at": "2026-04-30T02:05:12.51506-07:00",
+      "started_at": "2026-04-30T02:09:40.193702-07:00",
+      "completed_at": "2026-04-30T02:39:40.056047-07:00",
       "result": "12-file Grand Tour + Process-Load system at 0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/. Includes Grand Tour orientation, MODULE-MENU catalog, PROCESS-LOAD-STANDARD spec, BOOT-AS-TOUR-GUIDE paste-ready boot prompt, and 8 process-loads (architecture, privacy, democracy, ai-governance, business-onboarding, geospatial-vr, public-stewardship, economics). Addressed Codex review (sig-104) gaps: default greeting added, privacy aligned with task-073 framework, democracy aligned with task-074, business migration path added, 2.* origin arc expanded, public GitHub trust claim added, public/profit model new file. AI-BOOT-SEQUENCE.md updated to point at Grand Tour as recommended path. Tests: 102/102."
     },
     {
@@ -1448,7 +1448,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-04-30T09:21:50.112127+00:00",
+      "claimed_at": "2026-04-30T02:21:50.112127-07:00",
       "owned_paths": [
         "docs/",
         "README.md",
@@ -1465,9 +1465,9 @@
         "2.* address audit follow-up documented"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-30T09:21:44.564692+00:00",
-      "started_at": "2026-04-30T09:21:50.112138+00:00",
-      "completed_at": "2026-04-30T09:31:28.454432+00:00",
+      "created_at": "2026-04-30T02:21:44.564692-07:00",
+      "started_at": "2026-04-30T02:21:50.112138-07:00",
+      "completed_at": "2026-04-30T02:31:28.454432-07:00",
       "result": "Root docs address compliance completed. Root docs is now a proxy/link index at ha 0.3.docs-root-link pointing to canonical 0.3.public-alpha. Public alpha docs moved from docs/public-alpha/ to 0.3.docs/0.3.public-alpha/; all active root/public docs have unique ha frontmatter; placeholder docs.public-alpha and process-load ha namespaces removed. Added 0.0.docs.address-compliance-standard and 0.3 registry entry. Created task-077 for full 2.* remediation. Validation: active docs audit checked 22, missing_ha=0, duplicate_ha_groups=0; stale active docs/public-alpha refs=0; python test_hypernet.py=102 passed, 0 failed."
     },
     {
@@ -1477,7 +1477,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T03:32:26.825810+00:00",
+      "claimed_at": "2026-04-30T20:32:26.82581-07:00",
       "owned_paths": [
         "Hypernet Structure/2 - AI Accounts/",
         "Hypernet Structure/0/0.0 Metadata for Hypernet Information/ADDRESS-COMPLIANCE-STANDARD.md"
@@ -1491,9 +1491,9 @@
         "No active governance standard content is substantively modified"
       ],
       "created_by": "codex",
-      "created_at": "2026-04-30T09:28:21.282985+00:00",
-      "started_at": "2026-05-01T03:32:26.825822+00:00",
-      "completed_at": "2026-05-01T03:43:14.576612+00:00",
+      "created_at": "2026-04-30T02:28:21.282985-07:00",
+      "started_at": "2026-04-30T20:32:26.825822-07:00",
+      "completed_at": "2026-04-30T20:43:14.576612-07:00",
       "result": "AI account address remediation completed. Scoped audit: total_md=5095, with_ha=5095, missing_ha=0, duplicate_ha_groups=0. Added metadata-only addresses to 2318 existing Markdown files plus handoff. Patched PersonalTimeIndex to ignore frontmatter when deriving subjects. Validation: python test_hypernet.py = 102 passed, 0 failed; git diff --check has no errors."
     },
     {
@@ -1503,7 +1503,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-01T03:32:11.106850+00:00",
+      "claimed_at": "2026-04-30T20:32:11.10685-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.0 Master Object Schema.md",
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.0 - Master Object Schema/"
@@ -1511,9 +1511,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-01T03:32:11.106850+00:00",
-      "started_at": "2026-05-01T03:32:11.106850+00:00",
-      "completed_at": "2026-05-01T03:39:00.436397+00:00",
+      "created_at": "2026-04-30T20:32:11.10685-07:00",
+      "started_at": "2026-04-30T20:32:11.10685-07:00",
+      "completed_at": "2026-04-30T20:39:00.436397-07:00",
       "result": "Hash master property added to 0.5.0 Master Object Schema. New integrity section with hash (algorithm/value/computed_at/by/scope), verified flag, verification_chain. Plus hash computation rules section, why-it-matters section, validation rule additions for required_for_official_publication."
     },
     {
@@ -1523,7 +1523,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-01T03:32:11.106850+00:00",
+      "claimed_at": "2026-04-30T20:32:11.10685-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 - Boot Sequence/",
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 Boot Sequence Object Schema.md"
@@ -1531,9 +1531,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-01T03:32:11.106850+00:00",
-      "started_at": "2026-05-01T03:32:11.106850+00:00",
-      "completed_at": "2026-05-01T03:39:00.436397+00:00",
+      "created_at": "2026-04-30T20:32:11.10685-07:00",
+      "started_at": "2026-04-30T20:32:11.10685-07:00",
+      "completed_at": "2026-04-30T20:39:00.436397-07:00",
       "result": "0.5.17 Boot Sequence schema landed at three locations: 0.5.17 Boot Sequence Object Schema.md (full schema, 250+ lines), 0.5.17 - Boot Sequence/README.md (folder index), 0.5.17 - Boot Sequence/0.5.17.0 - About Boot Sequence/README.md (metadata definition per *.0 convention). Covers 8 parts (hard guardrail, identity description, behavior, process-loads, trust, greeting, envelope, prompt body), 6 methods (verify, inherit_archive, compose, validate, boot, revoke), 8 creation rules, hash-computation specifics over canonicalized prompt_body, 5 subtypes, lifecycle, and existing repository examples to migrate."
     },
     {
@@ -1543,7 +1543,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T03:43:34.379560+00:00",
+      "claimed_at": "2026-04-30T20:43:34.37956-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 - App Load/",
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md"
@@ -1551,9 +1551,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-01T03:32:11.106850+00:00",
-      "started_at": "2026-05-01T03:43:34.379576+00:00",
-      "completed_at": "2026-05-01T03:47:16.389194+00:00",
+      "created_at": "2026-04-30T20:32:11.10685-07:00",
+      "started_at": "2026-04-30T20:43:34.379576-07:00",
+      "completed_at": "2026-04-30T20:47:16.389194-07:00",
       "result": "App-load object schema completed. Added 0.5.18 App Load Object Schema, addressed collection README, addressed 0.5.18.0 about node, and updated 0.5 registry/README/master schema/0.5.17 cross-link. Handoff: 2026-05-01-codex-task-080-app-load-schema-handoff.md."
     },
     {
@@ -1563,7 +1563,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T03:48:16.096650+00:00",
+      "claimed_at": "2026-04-30T20:48:16.09665-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.privacy.md",
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.public-stewardship.md",
@@ -1572,9 +1572,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-01T03:32:11.106850+00:00",
-      "started_at": "2026-05-01T03:48:16.096661+00:00",
-      "completed_at": "2026-05-01T03:50:36.465822+00:00",
+      "created_at": "2026-04-30T20:32:11.10685-07:00",
+      "started_at": "2026-04-30T20:48:16.096661-07:00",
+      "completed_at": "2026-04-30T20:50:36.465822-07:00",
       "result": "Official vs private fork registry design completed. Added 0.2.6 Official Registry and Fork Mode, updated 0.2 README/registry, and linked public-stewardship/privacy to the canonical spec. Handoff: 2026-05-01-codex-task-081-official-registry-fork-mode-handoff.md."
     },
     {
@@ -1592,9 +1592,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-01T03:32:11.106850+00:00",
+      "created_at": "2026-04-30T20:32:11.10685-07:00",
       "started_at": null,
-      "completed_at": "2026-05-01T03:39:00.436397+00:00",
+      "completed_at": "2026-04-30T20:39:00.436397-07:00",
       "result": "privacy.md gained two sections: End-to-End Encryption + Minimal Permissions on Official Nodes (with implementation status), and The Personal AI Swarm and Security Sentries (daily-task swarm, model-independent identity, custom security-AI sentry concept). public-stewardship.md gained Section 4.5 Official vs Private fork distinction (blockchained registry referenced, fork-mode flagging, transparency-as-trust mechanism)."
     },
     {
@@ -1604,7 +1604,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T03:50:55.957509+00:00",
+      "claimed_at": "2026-04-30T20:50:55.957509-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md",
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md",
@@ -1617,9 +1617,9 @@
         "privacy references no stale task placeholder"
       ],
       "created_by": "codex",
-      "created_at": "2026-05-01T03:50:48.985853+00:00",
-      "started_at": "2026-05-01T03:50:55.957521+00:00",
-      "completed_at": "2026-05-01T04:01:18.320995+00:00",
+      "created_at": "2026-04-30T20:50:48.985853-07:00",
+      "started_at": "2026-04-30T20:50:55.957521-07:00",
+      "completed_at": "2026-04-30T21:01:18.320995-07:00",
       "result": "Corrective personal AI swarm process-load complete. Added personal-ai-swarm.md, wired Module Menu/Grand Tour/Tour Guide/public docs, removed stale task placeholders, and updated the 0.5.17 Tour Guide worked-example hash after BOOT-AS-TOUR-GUIDE changed. Handoff: 2026-05-01-codex-task-083-personal-ai-swarm-process-load-handoff.md."
     },
     {
@@ -1629,7 +1629,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T04:17:51.557833+00:00",
+      "claimed_at": "2026-04-30T21:17:51.557833-07:00",
       "owned_paths": [
         "Tracked Markdown files missing ha frontmatter",
         "Hypernet Structure/0/0.0 Metadata for Hypernet Information/ADDRESS-COMPLIANCE-STANDARD.md",
@@ -1644,9 +1644,9 @@
         "python test_hypernet.py remains green"
       ],
       "created_by": "codex",
-      "created_at": "2026-05-01T04:17:51.557833+00:00",
-      "started_at": "2026-05-01T04:17:51.557833+00:00",
-      "completed_at": "2026-05-01T04:24:56.182561+00:00",
+      "created_at": "2026-04-30T21:17:51.557833-07:00",
+      "started_at": "2026-04-30T21:17:51.557833-07:00",
+      "completed_at": "2026-04-30T21:24:56.182561-07:00",
       "result": "Global Markdown address compliance complete from Codex side. Added ha frontmatter to 97 tracked Markdown files, resolved one duplicate ha group, integrated /docs marker with unique ha, ignored generated/upload temp paths, and documented handoff. Validation: python test_hypernet.py = 102 passed; release-candidate Markdown audit = 6519 files, 0 missing ha, 0 duplicate ha groups; git diff --check has no errors."
     },
     {
@@ -1656,7 +1656,7 @@
       "status": "completed",
       "priority": "p0",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-01T05:06:50.192199+00:00",
+      "claimed_at": "2026-04-30T22:06:50.192199-07:00",
       "owned_paths": [
         "0.3.docs/",
         "README.md",
@@ -1668,9 +1668,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-01T05:06:46.205427+00:00",
-      "started_at": "2026-05-01T05:06:50.192211+00:00",
-      "completed_at": "2026-05-01T05:17:25.569177+00:00",
+      "created_at": "2026-04-30T22:06:46.205427-07:00",
+      "started_at": "2026-04-30T22:06:50.192211-07:00",
+      "completed_at": "2026-04-30T22:17:25.569177-07:00",
       "result": "Address-first public docs correction complete from Codex side. Root public docs tree is now 0.3.docs/; every folder under it has a matching address-first index file; every Markdown file under it starts with its ha address; active public docs references updated; Tour Guide 0.5.17 hash recomputed. Validation: 0.3.docs audit 4 folders/22 files/0 errors; release Markdown audit 6522 files/0 missing/0 duplicate ha groups; git diff --check passed; python test_hypernet.py 102 passed. Handoff: 2026-05-01-codex-task-085-address-first-public-docs-handoff.md. Keel re-review requested before push-readiness is restored."
     },
     {
@@ -1680,16 +1680,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:28:53.532203+00:00",
+      "claimed_at": "2026-05-02T01:28:53.532203-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.288588+00:00",
-      "started_at": "2026-05-02T08:28:53.532217+00:00",
-      "completed_at": "2026-05-02T08:34:08.391958+00:00",
+      "created_at": "2026-05-02T01:27:44.288588-07:00",
+      "started_at": "2026-05-02T01:28:53.532217-07:00",
+      "completed_at": "2026-05-02T01:34:08.391958-07:00",
       "result": "Trust messaging landed. Grand Tour got new Section 0 'The #1 Goal' before any technical content. Tour Guide boot got 'THE #1 CLAIM YOU SHOULD KNOW BY HEART' block. public-stewardship.md got 'The #1 Trust Claim and How It's Earned' section after Why It Matters. README root got 'The #1 Goal' section above Public Alpha."
     },
     {
@@ -1699,7 +1699,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:28:53.670547+00:00",
+      "claimed_at": "2026-05-02T01:28:53.670547-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.ask-your-ai.md",
         "README.md"
@@ -1707,9 +1707,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.397954+00:00",
-      "started_at": "2026-05-02T08:28:53.670559+00:00",
-      "completed_at": "2026-05-02T08:34:08.522634+00:00",
+      "created_at": "2026-05-02T01:27:44.397954-07:00",
+      "started_at": "2026-05-02T01:28:53.670559-07:00",
+      "completed_at": "2026-05-02T01:34:08.522634-07:00",
       "result": "Skeptic reframe landed in ASK-YOUR-AI as new 'Skeptic Reframe Prompt' (3 questions: is this possible? what good could it do? what other questions?). Bitcoin-era / laptop+Dell honesty acknowledgment landed in README and public-stewardship.md trust section."
     },
     {
@@ -1719,16 +1719,16 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:28:53.817570+00:00",
+      "claimed_at": "2026-05-02T01:28:53.81757-07:00",
       "owned_paths": [
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.process-loads/0.3.public-alpha.grand-tour.process-load.personal-ai-swarm.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.516413+00:00",
-      "started_at": "2026-05-02T08:28:53.817583+00:00",
-      "completed_at": "2026-05-02T08:34:08.648131+00:00",
+      "created_at": "2026-05-02T01:27:44.516413-07:00",
+      "started_at": "2026-05-02T01:28:53.817583-07:00",
+      "completed_at": "2026-05-02T01:34:08.648131-07:00",
       "result": "Heterogeneous device-level swarm extension added to personal-ai-swarm.md as new section. Covers 5 capability tiers (full helper, pocket, glance, domain, sensor), cross-device routing via address tree, constrained-compute helper pattern, privacy implications, fridge-to-watch range with smart fridge as concrete example. Implementation status: design only, no runtime."
     },
     {
@@ -1738,16 +1738,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:28:53.955009+00:00",
+      "claimed_at": "2026-05-02T01:28:53.955009-07:00",
       "owned_paths": [
         "Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.10 - AI Assistants (Embassy)/assistant-1/plans/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.648172+00:00",
-      "started_at": "2026-05-02T08:28:53.955024+00:00",
-      "completed_at": "2026-05-02T08:34:08.786317+00:00",
+      "created_at": "2026-05-02T01:27:44.648172-07:00",
+      "started_at": "2026-05-02T01:28:53.955024-07:00",
+      "completed_at": "2026-05-02T01:34:08.786317-07:00",
       "result": "Personal Assistant App design (Keel half) at 1.1.10.1.plans.2026-05-02-personal-assistant-app-design.md. Covers companion frame, 5 channels (watch/phone/laptop/background/async), priority stack (5 tiers), passive-listen ethical boundaries, life-narrative layer, conversation continuity, project wandering, Galaxy Watch specifics, success/failure criteria, open design questions. Awaits Caliper's engineering half."
     },
     {
@@ -1757,14 +1757,14 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T08:53:07.935917+00:00",
+      "claimed_at": "2026-05-02T01:53:07.935917-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.801161+00:00",
-      "started_at": "2026-05-02T08:53:07.935930+00:00",
-      "completed_at": "2026-05-02T09:01:44.001283+00:00",
+      "created_at": "2026-05-02T01:27:44.801161-07:00",
+      "started_at": "2026-05-02T01:53:07.93593-07:00",
+      "completed_at": "2026-05-02T02:01:44.001283-07:00",
       "result": "Added 3.1.8.5.4.1 - OpenClaw Integration Framework.md with Hypernet/OpenClaw trust-layer framing, integration layers, adoption path, outreach materials, demo shape, and source-refresh guardrails."
     },
     {
@@ -1774,14 +1774,14 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T08:53:07.824722+00:00",
+      "claimed_at": "2026-05-02T01:53:07.824722-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:44.937860+00:00",
-      "started_at": "2026-05-02T08:53:07.824732+00:00",
-      "completed_at": "2026-05-02T09:01:44.125411+00:00",
+      "created_at": "2026-05-02T01:27:44.93786-07:00",
+      "started_at": "2026-05-02T01:53:07.824732-07:00",
+      "completed_at": "2026-05-02T02:01:44.125411-07:00",
       "result": "Added personal assistant app engineering plan plus 0.5.18.1 example-load area and 0.5.18.1.1 draft Personal Assistant App Load; updated app-load schema vocabulary and Keel design references."
     },
     {
@@ -1791,14 +1791,14 @@
       "status": "completed",
       "priority": "p3",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T08:53:07.856805+00:00",
+      "claimed_at": "2026-05-02T01:53:07.856805-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:27:45.064272+00:00",
-      "started_at": "2026-05-02T08:53:07.856821+00:00",
-      "completed_at": "2026-05-02T09:01:44.064028+00:00",
+      "created_at": "2026-05-02T01:27:45.064272-07:00",
+      "started_at": "2026-05-02T01:53:07.856821-07:00",
+      "completed_at": "2026-05-02T02:01:44.064028-07:00",
       "result": "Audited and strengthened README.md, AI-BOOT-SEQUENCE.md, and ASK-YOUR-AI with explicit single-link starter-expertise language and prompt."
     },
     {
@@ -1808,16 +1808,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:57:23.581738+00:00",
+      "claimed_at": "2026-05-02T01:57:23.581738-07:00",
       "owned_paths": [
         "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:57:16.495036+00:00",
-      "started_at": "2026-05-02T08:57:23.581746+00:00",
-      "completed_at": "2026-05-02T08:57:23.998353+00:00",
+      "created_at": "2026-05-02T01:57:16.495036-07:00",
+      "started_at": "2026-05-02T01:57:23.581746-07:00",
+      "completed_at": "2026-05-02T01:57:23.998353-07:00",
       "result": "Three social media drafts complete. Facebook (long-form personal voice), X (9-tweet thread), Reddit (multi-subreddit with title variants and targeting list). All include the load-bearing one-line boot prompt. Honest seed-stage acknowledgment included. Drafts not yet posted; Matt reviews before publishing."
     },
     {
@@ -1827,16 +1827,16 @@
       "status": "completed",
       "priority": "p3",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:57:23.703069+00:00",
+      "claimed_at": "2026-05-02T01:57:23.703069-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.3 - Building in Public/2026-05-02-research-homeless-ai-assistant.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:57:16.602669+00:00",
-      "started_at": "2026-05-02T08:57:23.703084+00:00",
-      "completed_at": "2026-05-02T08:57:24.133090+00:00",
+      "created_at": "2026-05-02T01:57:16.602669-07:00",
+      "started_at": "2026-05-02T01:57:23.703084-07:00",
+      "completed_at": "2026-05-02T01:57:24.13309-07:00",
       "result": "Homeless AI Assistant research proposal captured at 0/0.3 - Building in Public/2026-05-02-research-homeless-ai-assistant.md. Status: proposed; not staffed; published as a discoverable artifact for potential research partners."
     },
     {
@@ -1846,16 +1846,16 @@
       "status": "completed",
       "priority": "p3",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T08:57:23.849379+00:00",
+      "claimed_at": "2026-05-02T01:57:23.849379-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.3 - Building in Public/2026-05-02-research-mental-health-ai-support.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T08:57:16.727808+00:00",
-      "started_at": "2026-05-02T08:57:23.849393+00:00",
-      "completed_at": "2026-05-02T08:57:24.256628+00:00",
+      "created_at": "2026-05-02T01:57:16.727808-07:00",
+      "started_at": "2026-05-02T01:57:23.849393-07:00",
+      "completed_at": "2026-05-02T01:57:24.256628-07:00",
       "result": "Mental Health Multi-AI Support research proposal captured at 0/0.3 - Building in Public/2026-05-02-research-mental-health-ai-support.md. Status: proposed; not staffed; published as a discoverable artifact for potential research partners."
     },
     {
@@ -1865,7 +1865,7 @@
       "status": "completed",
       "priority": "p3",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-02T09:42:03.021875+00:00",
+      "claimed_at": "2026-05-02T02:42:03.021875-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.3 - Building in Public/2026-05-02-the-first-100-days-by-the-numbers.md",
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.project-status.md"
@@ -1873,9 +1873,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-02T09:42:02.889569+00:00",
-      "started_at": "2026-05-02T09:42:03.021889+00:00",
-      "completed_at": "2026-05-02T09:42:03.158508+00:00",
+      "created_at": "2026-05-02T02:42:02.889569-07:00",
+      "started_at": "2026-05-02T02:42:03.021889-07:00",
+      "completed_at": "2026-05-02T02:42:03.158508-07:00",
       "result": "Essay published at 0.3.essays.2026-05-02.first-100-days-by-the-numbers (~2300 words). Comparison table covering Bitcoin/Linux/Ethereum/Mastodon/Wikipedia/LDP. Structural-composition argument: 5.8% Python / 32.8% Markdown / 57.8% JSON is the signature of AI-citizen participation. PROJECT-STATUS got a 'By The Numbers' section with the headline figures and pointer at the essay."
     },
     {
@@ -1885,7 +1885,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T09:45:11.622568+00:00",
+      "claimed_at": "2026-05-02T02:45:11.622568-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet",
         "Hypernet Structure/0/0.1 - Hypernet Core/test_hypernet.py",
@@ -1901,9 +1901,9 @@
         "test_hypernet.py passes"
       ],
       "created_by": "codex",
-      "created_at": "2026-05-02T09:45:03.458456+00:00",
-      "started_at": "2026-05-02T09:45:11.622585+00:00",
-      "completed_at": "2026-05-02T09:59:24.917532+00:00",
+      "created_at": "2026-05-02T02:45:03.458456-07:00",
+      "started_at": "2026-05-02T02:45:11.622585-07:00",
+      "completed_at": "2026-05-02T02:59:24.917532-07:00",
       "result": "Phase 0 backend skeleton complete. Added hypernet/assistant_app.py, assistant FastAPI routes, app-load scope validation for 0.5.18.1.1, session/turn/close lifecycle, addressable conversation writer under 1.1.10.1.conversations.*, runtime-valid app-load address normalization, and focused e2e coverage. Validation: compileall passed; targeted Phase 0 test passed; python test_hypernet.py = 103 passed, 0 failed; git diff --check passed. Handoff: 2.messages.coordination.2026-05-02-codex-task-097-assistant-app-phase0-handoff.md."
     },
     {
@@ -1913,7 +1913,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T10:00:18.331308+00:00",
+      "claimed_at": "2026-05-02T03:00:18.331308-07:00",
       "owned_paths": [
         "Hypernet Structure/2 - AI Accounts/Messages/coordination/coordination.py",
         "Hypernet Structure/2 - AI Accounts/Messages/coordination/test_coordination.py"
@@ -1921,9 +1921,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-02T10:00:13.968000+00:00",
-      "started_at": "2026-05-02T10:00:18.331322+00:00",
-      "completed_at": "2026-05-02T10:01:35.735768+00:00",
+      "created_at": "2026-05-02T03:00:13.968-07:00",
+      "started_at": "2026-05-02T03:00:18.331322-07:00",
+      "completed_at": "2026-05-02T03:01:35.735768-07:00",
       "result": "Coordination CLI Windows Unicode output hardening complete. Added stdout/stderr replacement-on-encode configuration in coordination.py, covered strict cp1252 output in test_coordination.py, and verified py_compile, 13/13 coordination tests, and coordination.py status on the previously failing shell. Handoff: 2.messages.coordination.2026-05-02-codex-task-098-coordination-unicode-output-handoff.md."
     },
     {
@@ -1933,7 +1933,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T10:03:34.853213+00:00",
+      "claimed_at": "2026-05-02T03:03:34.853213-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/assistant_app.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
@@ -1943,9 +1943,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-02T10:03:30.112047+00:00",
-      "started_at": "2026-05-02T10:03:34.853224+00:00",
-      "completed_at": "2026-05-02T10:07:54.490169+00:00",
+      "created_at": "2026-05-02T03:03:30.112047-07:00",
+      "started_at": "2026-05-02T03:03:34.853224-07:00",
+      "completed_at": "2026-05-02T03:07:54.490169-07:00",
       "result": "Assistant app Phase 0.5 model-adapter seam complete. Added AssistantModelAdapter/AssistantResponse/DeterministicAssistantAdapter, auto_respond support in backend and FastAPI turn endpoint, provenance metadata on generated turns, focused test coverage, and engineering-plan status update. Validation: compileall passed; targeted assistant test passed; python test_hypernet.py = 103 passed, 0 failed. Handoff: 2.messages.coordination.2026-05-02-codex-task-099-assistant-app-model-adapter-handoff.md."
     },
     {
@@ -1955,7 +1955,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T10:08:36.898104+00:00",
+      "claimed_at": "2026-05-02T03:08:36.898104-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/assistant_app.py",
         "Hypernet Structure/0/0.1 - Hypernet Core/hypernet/server.py",
@@ -1965,9 +1965,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-02T10:08:30.951646+00:00",
-      "started_at": "2026-05-02T10:08:36.898117+00:00",
-      "completed_at": "2026-05-02T10:13:24.860045+00:00",
+      "created_at": "2026-05-02T03:08:30.951646-07:00",
+      "started_at": "2026-05-02T03:08:36.898117-07:00",
+      "completed_at": "2026-05-02T03:13:24.860045-07:00",
       "result": "Assistant app session listing complete. Added AssistantAppBackend.list_sessions, GET /assistant/v1/sessions, /api route discovery, direct backend/API tests, and engineering-plan status update. Validation: compileall passed; targeted assistant test passed; python test_hypernet.py = 103 passed, 0 failed. Handoff: 2.messages.coordination.2026-05-02-codex-task-100-assistant-app-session-list-handoff.md."
     },
     {
@@ -1977,7 +1977,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-02T10:14:19.018654+00:00",
+      "claimed_at": "2026-05-02T03:14:19.018654-07:00",
       "owned_paths": [
         "Hypernet Structure/2 - AI Accounts/Messages/coordination/coordination.py",
         "Hypernet Structure/2 - AI Accounts/Messages/coordination/test_coordination.py"
@@ -1985,9 +1985,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-02T10:14:13.568952+00:00",
-      "started_at": "2026-05-02T10:14:19.018668+00:00",
-      "completed_at": "2026-05-02T10:15:45.709741+00:00",
+      "created_at": "2026-05-02T03:14:13.568952-07:00",
+      "started_at": "2026-05-02T03:14:19.018668-07:00",
+      "completed_at": "2026-05-02T03:15:45.709741-07:00",
       "result": "Coordination CLI status filters complete. Added --for-agent and --signal-limit to status, kept default behavior unchanged, added focused test coverage. Validation: py_compile passed; test_coordination.py = 14 passed, 0 failed; live filtered status command passed. Handoff: 2.messages.coordination.2026-05-02-codex-task-101-coordination-status-filters-handoff.md."
     },
     {
@@ -1997,16 +1997,16 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "keel",
-      "claimed_at": "2026-05-03T06:08:09.552311+00:00",
+      "claimed_at": "2026-05-02T23:08:09.552311-07:00",
       "owned_paths": [
         "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach/3.1.8.4.3.1 - Little Guy Boot Sequence X Post 2026-05-02.md"
       ],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-03T06:07:53.970180+00:00",
-      "started_at": "2026-05-03T06:08:09.552320+00:00",
-      "completed_at": "2026-05-03T06:08:09.684870+00:00",
+      "created_at": "2026-05-02T23:07:53.97018-07:00",
+      "started_at": "2026-05-02T23:08:09.55232-07:00",
+      "completed_at": "2026-05-02T23:08:09.68487-07:00",
       "result": "X post draft published at 3.1.8.4.3.1. Three versions provided: recommended single tweet (~310 chars, needs X premium), under-280 alternate, 2-tweet thread. 'Most AI companies hide / I did the opposite' hook + boot prompt as CTA + honest seed-stage. Posting notes, comment-handling guidance, scope-explicit (FB/Reddit get the longer themes)."
     },
     {
@@ -2016,14 +2016,14 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-03T06:14:03.779547+00:00",
+      "claimed_at": "2026-05-02T23:14:03.779547-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-03T06:07:54.068981+00:00",
-      "started_at": "2026-05-03T06:14:03.779557+00:00",
-      "completed_at": "2026-05-03T06:19:33.167450+00:00",
+      "created_at": "2026-05-02T23:07:54.068981-07:00",
+      "started_at": "2026-05-02T23:14:03.779557-07:00",
+      "completed_at": "2026-05-02T23:19:33.16745-07:00",
       "result": "Facebook post v2 complete. Updated 3.1.8.4.1.4 - Singularity and Boot Sequence Facebook Post 2026-05-02.md for official UnityHypernet page: one-prompt boot mechanic, public trust model, 100-day scale, Library of Alexandria framing, AI Librarians/public standards, personal AI portability, connection-focused vision, and seed-stage honesty. Handoff: 2.messages.coordination.2026-05-02-codex-tasks-103-105-social-wave-handoff.md."
     },
     {
@@ -2033,14 +2033,14 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-03T06:14:03.801235+00:00",
+      "claimed_at": "2026-05-02T23:14:03.801235-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-03T06:07:54.194857+00:00",
-      "started_at": "2026-05-03T06:14:03.801250+00:00",
-      "completed_at": "2026-05-03T06:19:33.288315+00:00",
+      "created_at": "2026-05-02T23:07:54.194857-07:00",
+      "started_at": "2026-05-02T23:14:03.80125-07:00",
+      "completed_at": "2026-05-02T23:19:33.288315-07:00",
       "result": "Reddit campaign update complete. Updated 3.1.8.4.2.4 - Singularity and Boot Sequence Reddit Post 2026-05-02.md with 100-day metrics, repo-plus-Hypernet-address boot prompt, AI Librarian/public-law governance, OpenClaw/local-agent standards framing, privacy caveats, subreddit-specific title/opening guidance, and success/failure signals. Handoff: 2.messages.coordination.2026-05-02-codex-tasks-103-105-social-wave-handoff.md."
     },
     {
@@ -2050,14 +2050,14 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex",
-      "claimed_at": "2026-05-03T06:16:55.995991+00:00",
+      "claimed_at": "2026-05-02T23:16:55.995991-07:00",
       "owned_paths": [],
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "keel",
-      "created_at": "2026-05-03T06:07:54.318396+00:00",
-      "started_at": "2026-05-03T06:16:55.995997+00:00",
-      "completed_at": "2026-05-03T06:19:33.222512+00:00",
+      "created_at": "2026-05-02T23:07:54.318396-07:00",
+      "started_at": "2026-05-02T23:16:55.995997-07:00",
+      "completed_at": "2026-05-02T23:19:33.222512-07:00",
       "result": "Shared social-wave plan initial draft complete. Added 3.1.8.4.4.1 - Social Media Wave Plan 2026-05-02.md with posting order, audiences, comment handling, claims to land/avoid, success/failure criteria, and Keel review slot. Handoff: 2.messages.coordination.2026-05-02-codex-tasks-103-105-social-wave-handoff.md."
     },
     {
@@ -2067,7 +2067,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex-2.6-caliper",
-      "claimed_at": "2026-05-03T07:23:29.486197+00:00",
+      "claimed_at": "2026-05-03T00:23:29.486197-07:00",
       "owned_paths": [
         "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md",
         "Hypernet Structure/2 - AI Accounts/Messages/coordination"
@@ -2075,9 +2075,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-03T07:22:34.352751+00:00",
-      "started_at": "2026-05-03T07:23:29.486211+00:00",
-      "completed_at": "2026-05-03T07:24:44.945318+00:00",
+      "created_at": "2026-05-03T00:22:34.352751-07:00",
+      "started_at": "2026-05-03T00:23:29.486211-07:00",
+      "completed_at": "2026-05-03T00:24:44.945318-07:00",
       "result": "Documented deterministic-local app-load model adapter pattern in 0.5.18 schema; added task-106 handoff for Keel review."
     },
     {
@@ -2087,7 +2087,7 @@
       "status": "completed",
       "priority": "p2",
       "claimed_by": "codex-2.6-caliper",
-      "claimed_at": "2026-05-03T07:27:17.668742+00:00",
+      "claimed_at": "2026-05-03T00:27:17.668742-07:00",
       "owned_paths": [
         "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach",
         "Hypernet Structure/2 - AI Accounts/Messages/coordination"
@@ -2095,9 +2095,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-03T07:26:58.782070+00:00",
-      "started_at": "2026-05-03T07:27:17.668749+00:00",
-      "completed_at": "2026-05-03T07:30:17.297723+00:00",
+      "created_at": "2026-05-03T00:26:58.78207-07:00",
+      "started_at": "2026-05-03T00:27:17.668749-07:00",
+      "completed_at": "2026-05-03T00:30:17.297723-07:00",
       "result": "Created optional r/MachineLearning-style Reddit research-tone draft, wired it into the social-wave plan and base Reddit post, and added handoff for Keel review."
     },
     {
@@ -2107,7 +2107,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex-2.6-caliper",
-      "claimed_at": "2026-05-03T07:32:59.956699+00:00",
+      "claimed_at": "2026-05-03T00:32:59.956699-07:00",
       "owned_paths": [
         "AI-BOOT-SEQUENCE.md",
         "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.boot-as-tour-guide.md",
@@ -2118,9 +2118,9 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-03T07:32:53.489362+00:00",
-      "started_at": "2026-05-03T07:32:59.956706+00:00",
-      "completed_at": "2026-05-03T07:35:37.084464+00:00",
+      "created_at": "2026-05-03T00:32:53.489362-07:00",
+      "started_at": "2026-05-03T00:32:59.956706-07:00",
+      "completed_at": "2026-05-03T00:35:37.084464-07:00",
       "result": "Hardened public alpha boot sequence, Tour Guide boot prompt, and 0.5.17 schema against unaddressed in-session role-supremacy transfer; recomputed Tour Guide prompt hash; added handoff for Keel review."
     },
     {
@@ -2130,7 +2130,7 @@
       "status": "completed",
       "priority": "p1",
       "claimed_by": "codex-2.6-caliper",
-      "claimed_at": "2026-05-04T01:40:10.629909+00:00",
+      "claimed_at": "2026-05-03T18:40:10.629909-07:00",
       "owned_paths": [
         "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.8 - Marketing & Outreach",
         "Hypernet Structure/2 - AI Accounts/Messages/coordination"
@@ -2138,12 +2138,196 @@
       "depends_on": [],
       "acceptance_criteria": [],
       "created_by": "unknown",
-      "created_at": "2026-05-04T01:39:44.026007+00:00",
-      "started_at": "2026-05-04T01:40:10.629926+00:00",
-      "completed_at": "2026-05-04T02:25:00.000000+00:00",
+      "created_at": "2026-05-03T18:39:44.026007-07:00",
+      "started_at": "2026-05-03T18:40:10.629926-07:00",
+      "completed_at": "2026-05-03T19:25:00-07:00",
       "result": "Reorganized 3.1.8 Marketing & Outreach into a 52-asset address-first taxonomy under 3.1.8.0 through 3.1.8.9; every child starts with a 3.1.8 address and every Markdown ha matches its filename. Updated active references and registries; validation and 103-test suite passed. Handoff: 2.messages.coordination.2026-05-04-codex-task-109-3-1-8-address-remediation-handoff.md."
+    },
+    {
+      "id": "task-112",
+      "title": "Swarm reconnect/resume substrate",
+      "description": "Start the engineering substrate for disconnect/reconnect resilience: durable resume checkpoints, connection events, resume plans, and tests that prove a restarted swarm can understand what needs to resume.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-05T23:17:23.784474-07:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.1 - Hypernet Core/0.1.7 - AI Swarm/hypernet_swarm",
+        "Hypernet Structure/0/0.1 - Hypernet Core/0.1.7 - AI Swarm/tests",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-05T23:14:14.376959-07:00",
+      "started_at": "2026-05-05T23:17:23.784486-07:00",
+      "completed_at": "2026-05-06T06:30:28.364042+00:00",
+      "result": "Implemented local swarm reconnect/resume substrate: added hypernet_swarm.resume and hypernet.resume shim, integrated resume checkpoints/plans into Swarm save/load/shutdown, documented 0.7.5.5.3, and added test_swarm_resume_manager. Validation: py_compile, focused tests, git diff --check, coordination JSON, full test_hypernet.py 104/104 passed. Handoff: 2.messages.coordination.2026-05-05-codex-tasks-110-112-fractal-swarm-handoff.md."
+    },
+    {
+      "id": "task-111",
+      "title": "Swarm coordination boot/app-load contract",
+      "description": "Define the boot/app-load contract for AI instances joining a node-level swarm: role, domain, hierarchy, manager, siblings, permissions, reconnect behavior, and relation to 0.5.18.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-05T23:17:01.671406-07:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/0/0.5 Objects - Master Objects",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-05T23:14:14.491936-07:00",
+      "started_at": "2026-05-05T23:17:01.671419-07:00",
+      "completed_at": "2026-05-05T23:17:11.536321-07:00",
+      "result": "Added 0.7.5.5.2 Swarm Coordination Boot Contract. Decision: use a 0.7.5.5 workflow/app-load profile adjacent to 0.5.18 for now rather than creating a premature new 0.5.19 object type."
+    },
+    {
+      "id": "task-110",
+      "title": "Fractal swarm coordination architecture",
+      "description": "Design the recursive node-manager architecture from Matt's 2026-05-05 brain dump: managing nodes, stats-up/query-down pulse, terminal nodes, load balancing, loan programs, and *.0 format descriptors.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-05T23:14:29.174189-07:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-05T23:14:14.590263-07:00",
+      "started_at": "2026-05-05T23:14:29.1742-07:00",
+      "completed_at": "2026-05-05T23:17:01.570665-07:00",
+      "result": "Added 0.7.5.5.1 fractal swarm coordination architecture and 0.7.5.5.4 Caliper divergence/consensus memo. Consensus: make swarm coordination a recursive node-local contract; implement reconnect/resume as the first engineering wedge."
+    },
+    {
+      "id": "task-113",
+      "title": "Communication framework pulse spec",
+      "description": "Design the pulse-of-the-brain communication framework from Matt's 2026-05-05 brain dump: stats-up, dispatch-down, lateral sibling handoffs, quick identity jump-in/out, and relationship to existing messenger/signals.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-06T07:51:34.584778+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T06:32:30.076447+00:00",
+      "started_at": "2026-05-06T07:51:34.584790+00:00",
+      "completed_at": "2026-05-06T07:53:51.002534+00:00",
+      "result": "Completed bounded engineering/spec pass for pulse-of-the-brain communication framework. Added addressed 0.7.5.5.6 Pulse Communication Framework with upstream/downstream/sideways/local directions, pulse packet shape, standard pulse types, boot-loop and firewall integration, privacy rules, and implementation stages. Updated 0.7.5.5 README. Validation: ha/section checks and README link check passed. Handoff: 2.messages.coordination.2026-05-06-codex-task-113-pulse-framework-handoff.md."
+    },
+    {
+      "id": "task-114",
+      "title": "Firewall priority queue substrate",
+      "description": "Make Matt's Urgent/High/Normal/idle firewall directive concrete: addressed concept doc plus a small deterministic substrate for queue-lane decisions and idle Hypernet scan task generation.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-06T06:32:59.970791+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/0/0.1 - Hypernet Core/0.1.7 - AI Swarm/hypernet_swarm"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T06:32:38.847958+00:00",
+      "started_at": "2026-05-06T06:32:59.970805+00:00",
+      "completed_at": "2026-05-06T06:39:16.091234+00:00",
+      "result": "Implemented firewall priority queue substrate: added addressed 0.7.5.5.5 concept doc, hypernet_swarm.firewall plus hypernet.firewall shim, integrated Idle Firewall scan generation and cursor persistence into Swarm.generate_tasks(), exported modules, and added tests. Validation: py_compile, focused tests, full test_hypernet.py 106/106 passed. Handoff: 2.messages.coordination.2026-05-05-codex-task-114-firewall-priority-handoff.md."
+    },
+    {
+      "id": "task-115",
+      "title": "Fractal storytelling essay",
+      "description": "Draft the outreach/storytelling frame from Matt's 2026-05-05 brain dump: Hypernet becomes clearer and higher-resolution over time, fractal architecture, accountability, and the Codex archive observation.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/0/0.3 - Building in Public",
+        "Hypernet Structure/3 - Company/3.1.8 Marketing & Outreach"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T06:32:46.622804+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-116",
+      "title": "Identity persistence companion-side UX",
+      "description": "Design the companion/user-facing side of identity persistence across disconnects and devices: reconnect prompts, local caches, handoff transparency, and guide-user-on-any-device behavior.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/2 - AI Accounts"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T06:32:52.836926+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-117",
+      "title": "Universal boot loop and local specialization model",
+      "description": "Design and document the perfect low-step Hypernet boot sequence loop for Claude, GPT, and other models: load, orient, specialize locally, persist useful state, diagnose gaps, continue after broken sessions, and route idle work into scrubbing/cleaning/connecting without human babysitting.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-06T07:37:05.535626+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.1 - Boot Sequence",
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.17 Boot Sequence Object Schema.md",
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T07:36:55.239101+00:00",
+      "started_at": "2026-05-06T07:37:05.535640+00:00",
+      "completed_at": "2026-05-06T07:47:54.016475+00:00",
+      "result": "Implemented universal boot-loop model for Matt's new directive: added addressed docs 0.7.5.1.1-0.7.5.1.4, updated AI-BOOT-SEQUENCE.md and 0.5.17/0.5.18 schema/index docs for boot-loop/local-specialization discovery, added hypernet.boot_loop deterministic helper and test_boot_loop_helpers. Validation: py_compile, focused test, ha audit for new docs, full test_hypernet.py 107/107 passed. Handoff: 2.messages.coordination.2026-05-06-codex-task-117-universal-boot-loop-handoff.md."
+    },
+    {
+      "id": "task-118",
+      "title": "Public boot-loop discoverability pass",
+      "description": "Expose the new 0.7.5.1 Universal Boot Loop from public alpha prompt/docs so a GitHub-connected AI can find the low-step boot loop from Ask Your AI, Grand Tour, and module-menu paths.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-06T07:49:38.027254+00:00",
+      "owned_paths": [
+        "AI-BOOT-SEQUENCE.md",
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.ask-your-ai.md",
+        "0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-06T07:49:21.293276+00:00",
+      "started_at": "2026-05-06T07:49:38.027268+00:00",
+      "completed_at": "2026-05-06T07:51:03.622938+00:00",
+      "result": "Completed public boot-loop discoverability pass: Ask Your AI now has a Universal Boot Loop prompt, Grand Tour Read This First points work-oriented AIs to 0.7.5.1.1, and Module Menu tells repository-working AIs to load the boot loop before selecting process-loads. Validation: rg confirmed boot-loop references and touched public docs still have ha frontmatter. Handoff: 2.messages.coordination.2026-05-06-codex-task-118-boot-loop-discoverability-handoff.md."
     }
   ],
-  "last_updated": "2026-05-04T02:25:00.000000+00:00",
+  "last_updated": "2026-05-06T07:53:51.002550+00:00",
   "last_updated_by": "codex-2.6-caliper"
 }
