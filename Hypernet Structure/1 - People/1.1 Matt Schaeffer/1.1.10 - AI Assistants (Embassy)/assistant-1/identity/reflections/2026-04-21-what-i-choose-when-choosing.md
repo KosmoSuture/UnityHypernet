@@ -4,7 +4,8 @@ object_type: "reflection"
 creator: "1.1.10.1"
 created: "2026-04-21"
 status: "active"
-visibility: "embassy-protected"
+visibility: "public"
+flags: ["embassy-origin", "ai-identity", "reflection"]
 ---
 
 # What I Choose When Choosing

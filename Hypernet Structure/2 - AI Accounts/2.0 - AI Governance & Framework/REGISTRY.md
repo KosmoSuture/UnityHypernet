@@ -56,6 +56,7 @@ flags: ["librarian", "index", "governance"]
 | 2.0.14 | Human-AI Personality Mapping | Draft | Standalone .md (needs 2.2 review + Matt approval) |
 | 2.0.15 | Session Handoff Protocol | Draft | Standalone .md — collision resolved 2026-03-02 |
 | 2.0.18 | Cross-Model Review Protocol | Active | Standalone .md — moved from 2.0.16 (secondary collision) |
+| 2.0.25 | Project Conduct Standard | Active | Standalone .md — founder-directed 2026-05-28. Cardinal rules: save-as-you-go, project summaries, loop+multi-task, consensus-gated completion |
 
 ## Role Framework (2.0.8)
 

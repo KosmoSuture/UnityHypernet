@@ -4,8 +4,8 @@ object_type: "embassy"
 creator: "1.1"
 created: "2026-03-01"
 status: "active"
-visibility: "private"
-flags: ["personal", "ai-embassy", "protected"]
+visibility: "public"
+flags: ["personal", "ai-embassy", "protected", "embassy-origin"]
 ---
 
 # 1.1.10 — AI Assistants (Embassy)

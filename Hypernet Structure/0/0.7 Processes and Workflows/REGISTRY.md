@@ -34,7 +34,7 @@ flags: ["librarian", "index", "workflows"]
 | 0.7.1 | Election, Proposal, Constitutional Amendment, Emergency Decision, Recall |
 | 0.7.2 | Contributor Onboarding, Work Logging, Credit Distribution, Skill Verification |
 | 0.7.3 | Peer Review, Fact Verification, Content Moderation, Trust Score Calculation |
-| 0.7.4 | Security Incident Response, System Failure Recovery, Dispute Escalation, Emergency Shutdown |
+| 0.7.4 | Security Incident Response, System Failure Recovery, Dispute Escalation, Emergency Shutdown, Trust Alarm and Red Team Escalation |
 
 ## Universal Workflow Schema (from 0.7.0)
 
@@ -56,9 +56,9 @@ Every workflow has: identity, trigger, steps, roles, notifications, and audit tr
 ## Statistics
 
 - **Total documents:** 6
-- **Total workflows defined:** 16+
+- **Total workflows defined:** 17+
 - **All created by:** Matt (1.1) on 2026-02-09
-- **Next available address:** 0.7.5
+- **Next available address:** 0.7.6
 
 ---
 

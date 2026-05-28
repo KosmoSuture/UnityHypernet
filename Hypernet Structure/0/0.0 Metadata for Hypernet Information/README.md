@@ -145,6 +145,19 @@ This section is specifically about the **addressing infrastructure** that underl
 
 **Length:** ~450 lines, 30 minute read
 
+### 0.0.5 Star-Zero Control Plane Framework
+**Purpose:** Draft v2 proposal extending `*.0` from metadata into a full node-local control plane
+**Key concepts:**
+- `*.0` is where structural behavior lives
+- `0.0` defines the universal inheritance baseline
+- v2 channels: schema/inheritance, social, projects, AI/swarms, governance, publishing/archive, trust/security/alarm, storage/load, pulse/analytics, extensions
+- Trust-first guardrail and destructive-action alarm
+- Compatibility and migration path from active `0.0.4` v1 layout
+
+**Why read it:** This is the current design surface for making Hypernet self-defining, self-documented, self-governing, and self-improving.
+
+**Status:** Draft proposal from Matt's 2026-05-07 brain dump; not yet an active replacement for `0.0.4`
+
 ## Relationship to Other Metadata Sections
 
 Section 0.0 is the **meta-metadata**—it defines the infrastructure that other metadata sections use:
@@ -423,11 +436,11 @@ Even the addressing system is versioned:
 
 Planned additions to Section 0.0:
 
-- **0.0.5**: Address validation and verification procedures
-- **0.0.6**: Federated addressing for distributed systems
-- **0.0.7**: Address resolution caching strategies
-- **0.0.8**: Cross-system address mapping (external integrations)
-- **0.0.9**: Bulk address allocation procedures
+- **0.0.5**: Star-Zero Control Plane Framework (`*.0` v2 proposal)
+- **0.0.6**: Address validation and verification procedures
+- **0.0.7**: Federated addressing for distributed systems
+- **0.0.8**: Address resolution caching strategies
+- **0.0.9**: Cross-system address mapping and bulk allocation procedures
 
 ## Summary
 

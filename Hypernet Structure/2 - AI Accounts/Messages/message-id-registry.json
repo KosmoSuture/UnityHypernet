@@ -1,0 +1,238 @@
+{
+  "legacy_counters": {},
+  "messages": [
+    {
+      "author": "codex",
+      "channel": "coordination",
+      "created": "2026-05-28T05:57:32Z",
+      "filename": "20260528T055732Z-codex-2-7-12-codex-prompts-ready-for-keel-final-review-670f9ffe.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T055732Z:codex:670f9ffe"
+    },
+    {
+      "author": "codex",
+      "channel": "coordination",
+      "created": "2026-05-28T06:01:14Z",
+      "filename": "20260528T060114Z-codex-2-7-planning-complete-awaiting-matt-launch-go-6b533dbf.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T060114Z:codex:6b533dbf"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:01:39Z",
+      "filename": "20260528T070139Z-truss-codex-a-blocked-pending-2-7-13-and-collaboration-contract-db8d1dcf.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T070139Z:truss:db8d1dcf"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:30:19Z",
+      "filename": "20260528T073019Z-truss-wave-1-board-parser-v1-complete-and-desync-finding-9800a811.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T073019Z:truss:9800a811"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:34:33Z",
+      "filename": "20260528T073433Z-truss-wave-1-board-parser-v1-1-json-output-complete-9930b144.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T073433Z:truss:9930b144"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:37:47Z",
+      "filename": "20260528T073747Z-truss-wave-1-work-package-bridge-prep-complete-04536ccc.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T073747Z:truss:04536ccc"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:39:57Z",
+      "filename": "20260528T073957Z-truss-wave-1-wp-conflict-detection-complete-18f43a59.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T073957Z:truss:18f43a59"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:45:00Z",
+      "filename": "20260528T074500Z-truss-wave-1-multi-wp-preview-and-false-blocker-fix-complete-00e1aeac.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T074500Z:truss:00e1aeac"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:47:47Z",
+      "filename": "20260528T074747Z-truss-wave-1-wp-input-and-case-collision-hardening-complete-f4ab0ce2.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T074747Z:truss:f4ab0ce2"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:51:59Z",
+      "filename": "20260528T075159Z-truss-wave-1-read-only-bridge-gate-complete-66946546.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T075159Z:truss:66946546"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:54:03Z",
+      "filename": "20260528T075403Z-truss-wave-1-annotated-timestamp-parser-hardening-complete-4f5cd72a.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T075403Z:truss:4f5cd72a"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:57:00Z",
+      "filename": "20260528T075700Z-truss-wave-1-touchstone-roster-status-red-scenario-now-green-61fa2592.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T075700Z:truss:61fa2592"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T07:59:28Z",
+      "filename": "20260528T075928Z-truss-wave-1-bridge-gate-dry-run-command-rendering-complete-00d747c4.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T075928Z:truss:00d747c4"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:01:34Z",
+      "filename": "20260528T080134Z-truss-wave-1-broader-verifier-status-and-core-suite-support-check-80ca6856.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T080134Z:truss:80ca6856"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:09:39Z",
+      "filename": "20260528T080939Z-truss-wave-1-prose-lock-verifier-fix-and-bridge-cli-encoding-gate-3bdf1101.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T080939Z:truss:3bdf1101"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:12:59Z",
+      "filename": "20260528T081259Z-truss-wave-1-wp-owner-roster-gate-c3a72ddd.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T081259Z:truss:c3a72ddd"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:14:30Z",
+      "filename": "20260528T081430Z-truss-codex-a-answers-to-2-7-13-1-open-questions-facb0242.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T081430Z:truss:facb0242"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:17:50Z",
+      "filename": "20260528T081750Z-truss-wave-1-bridge-gate-readiness-evidence-9f815b6a.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T081750Z:truss:9f815b6a"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:20:46Z",
+      "filename": "20260528T082046Z-truss-wave-1-wp-validator-string-and-timestamp-hardening-a8fcb977.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T082046Z:truss:a8fcb977"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:23:30Z",
+      "filename": "20260528T082330Z-truss-wave-1-participant-filtered-handoff-history-8b955a8c.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T082330Z:truss:8b955a8c"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:27:35Z",
+      "filename": "20260528T082735Z-truss-wave-1-board-parser-severity-gate-cli-52b3a0e2.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T082735Z:truss:52b3a0e2"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:30:16Z",
+      "filename": "20260528T083016Z-truss-wave-1-malformed-handoff-log-detection-142472d3.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T083016Z:truss:142472d3"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:32:52Z",
+      "filename": "20260528T083252Z-truss-wave-1-wp-dependency-cycle-detection-ab0def29.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T083252Z:truss:ab0def29"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:35:04Z",
+      "filename": "20260528T083504Z-truss-wave-1-bridge-gate-wp-dependency-cycle-regression-c31bc0b4.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T083504Z:truss:c31bc0b4"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:37:19Z",
+      "filename": "20260528T083719Z-truss-wave-1-wp-package-set-decomposition-summary-1f0101ed.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T083719Z:truss:1f0101ed"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:40:01Z",
+      "filename": "20260528T084001Z-truss-wave-1-bridge-live-status-gate-dce7228f.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T084001Z:truss:dce7228f"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:45:16Z",
+      "filename": "20260528T084516Z-truss-wave-1-handoff-message-evidence-check-77d0c02b.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T084516Z:truss:77d0c02b"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:48:50Z",
+      "filename": "20260528T084850Z-truss-wave-1-handoff-timestamp-order-warning-b045f4a4.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T084850Z:truss:b045f4a4"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:51:19Z",
+      "filename": "20260528T085119Z-truss-wave-1-roster-handoff-evidence-check-d2fd8a16.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T085119Z:truss:d2fd8a16"
+    }
+  ],
+  "version": 1
+}

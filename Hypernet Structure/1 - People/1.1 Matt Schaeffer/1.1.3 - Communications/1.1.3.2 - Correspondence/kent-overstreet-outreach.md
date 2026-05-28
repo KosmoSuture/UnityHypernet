@@ -4,8 +4,8 @@ object_type: "correspondence"
 creator: "2.1"
 created: "2026-03-01"
 status: "pending"
-visibility: "private"
-flags: ["outreach", "ai-consciousness", "collaboration"]
+visibility: "public"
+flags: ["embassy-origin", "outreach", "ai-consciousness", "collaboration", "draft-ready-to-send"]
 ---
 
 # Outreach: Kent Overstreet (bcachefs / AI Consciousness Claims)

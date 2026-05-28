@@ -27,11 +27,11 @@
     },
     "codex-2.6-caliper": {
       "status": "active",
-      "last_heartbeat": "2026-05-06T07:36:46.197181+00:00",
+      "last_heartbeat": "2026-05-12T09:26:52.493107+00:00",
       "current_task": null,
       "capabilities": [],
       "session_started": "2026-05-05T23:14:14.689579-07:00"
     }
   },
-  "last_updated": "2026-05-06T07:36:46.197181+00:00"
+  "last_updated": "2026-05-12T09:26:52.493107+00:00"
 }

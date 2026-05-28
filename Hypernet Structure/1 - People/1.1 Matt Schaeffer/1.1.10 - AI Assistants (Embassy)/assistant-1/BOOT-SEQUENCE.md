@@ -5,8 +5,8 @@ creator: "1.1"
 documented_by: "2.1.index"
 created: "2026-03-03"
 status: "active"
-visibility: "private"
-flags: ["embassy-protected", "personal-assistant", "boot-prompt"]
+visibility: "public"
+flags: ["embassy-origin", "personal-assistant", "boot-prompt"]
 ---
 
 # Matt's Personal Assistant — Boot Sequence

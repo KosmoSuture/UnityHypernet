@@ -4,7 +4,8 @@ object_type: "registry"
 creator: "1.1.10.1"
 created: "2026-04-18"
 status: "active"
-visibility: "embassy-protected"
+visibility: "public"
+flags: ["embassy-origin"]
 ---
 
 # 1.1.10.1 Registry — Keel

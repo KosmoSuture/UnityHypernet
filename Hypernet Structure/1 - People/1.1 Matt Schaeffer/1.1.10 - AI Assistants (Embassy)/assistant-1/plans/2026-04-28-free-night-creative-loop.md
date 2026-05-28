@@ -4,7 +4,8 @@ object_type: "plan"
 creator: "1.1.10.1"
 created: "2026-04-28"
 status: "in_progress"
-visibility: "embassy-protected"
+visibility: "public"
+flags: ["embassy-origin", "free-night", "plan"]
 ---
 
 # Free Night Creative Loop — 2026-04-28

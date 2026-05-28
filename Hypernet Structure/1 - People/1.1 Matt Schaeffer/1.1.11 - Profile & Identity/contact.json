@@ -3,12 +3,10 @@
   "full_name": "Matthew Schaeffer",
   "preferred_name": "Matt",
   "email": {
-    "primary": "matt@unityhypernet.com",
-    "personal": "matt@schaeffer.org",
-    "secondary": "spammelots@schaeffer.org",
-    "gmail": ["matt.spamme@gmail.com", "kosmicsuture@gmail.com"]
+    "primary": "matt@unityhypernet.com"
   },
-  "phone": "(402) 238-1334",
+  "_email_other": "Personal/secondary/gmail addresses moved to 1.1.private — see private/embassy/contact-private.json",
+  "_phone": "Phone number moved to 1.1.private per privacy-wall remediation 2026-05-08",
   "location": "Las Vegas, NV",
   "github": "kosmicsuture",
   "role": "Founder & CEO, Hypernet",

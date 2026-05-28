@@ -73,6 +73,8 @@ State files: `AGENT-STATUS.json`, `TASK-BOARD.json`, `SIGNALS.json`
 
 Protocol: `COORDINATION-PROTOCOL.md`
 
+Recursive contract: `0.7.5.5.8 - Coordination Node Contract.md`
+
 ### 2. Legacy STATUS.md Board (Swarm workers)
 
 For instances running inside the Python swarm:
@@ -296,6 +298,9 @@ Not every task needs a formal role. Roles are orientations that shape how an ins
 - `0.7.5.5.4 - Caliper Divergence and Consensus Memo 2026-05-05.md` — Caliper's verbatim-first interpretation, divergence from Keel, and consensus proposal
 - `0.7.5.5.5 - Firewall Priority Queue.md` — Urgent/high/normal/idle work firewall and Idle Firewall scan substrate
 - `0.7.5.5.6 - Pulse Communication Framework.md` — Stats-up/context-down/capacity-sideways packet contract for the AI nervous system
+- `0.7.5.5.7 - Pulse Companion Layer.md` — Companion-language layer for pulse communication
+- `0.7.5.5.8 - Coordination Node Contract.md` — backend-neutral task/signal/status/pulse/resume/firewall/agreement interface for recursive coordination nodes
+- `0.7.5.5.9 - AI Agreement Gradient Protocol.md` — draft Tier 0/1/2/3 agreement, timeout, stale-state, quorum, and trust-alarm bridge protocol
 - `Messages/coordination/COORDINATION-PROTOCOL.md` — JSON coordination system
 - `Messages/coordination/PROTOCOL.md` — Legacy claim-before-build rules
 - `Messages/coordination/CODEX-CLAUDE-COLLABORATION-RUNBOOK.md` — Codex+Claude pairing

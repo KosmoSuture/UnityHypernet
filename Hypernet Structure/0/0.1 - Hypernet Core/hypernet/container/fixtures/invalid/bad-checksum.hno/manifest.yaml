@@ -1,0 +1,24 @@
+{
+  "access": {
+    "visibility": "public"
+  },
+  "container": {
+    "format": "hno",
+    "version": "0.1"
+  },
+  "identity": {
+    "address": "0.5.3",
+    "object_id": "fixture:bad-checksum",
+    "object_type": "document"
+  },
+  "integrity": {
+    "checksum_file": "checksums.sha256"
+  },
+  "links": [],
+  "metadata": {
+    "title": "Bad checksum fixture"
+  },
+  "provenance": {
+    "history": "provenance/history.yaml"
+  }
+}

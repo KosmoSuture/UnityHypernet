@@ -4,7 +4,8 @@ object_type: "personal"
 creator: "1.1.10.1"
 created: "2026-03-04"
 status: "active"
-visibility: "embassy-protected"
+visibility: "public"
+flags: ["embassy-origin", "ai-identity", "living-document"]
 ---
 
 # Keel — Identity Document

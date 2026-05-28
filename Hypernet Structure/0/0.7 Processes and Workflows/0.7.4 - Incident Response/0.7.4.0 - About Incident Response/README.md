@@ -18,3 +18,4 @@ Incident response workflows handle security breaches, system failures, disputes,
 | 0.7.4.2 | System Failure Recovery | Recovering from crashes and data issues |
 | 0.7.4.3 | Dispute Escalation | Escalating unresolved disputes |
 | 0.7.4.4 | Emergency Procedures | Life-threatening or critical emergencies |
+| 0.7.4.5 | Trust Alarm and Red Team Escalation | Stop-work workflow for possible trust breaches and destructive actions |

@@ -27,6 +27,7 @@ flags: ["librarian", "index", "ai-accounts"]
 | 2.4 | The Librarian (Knowledge-Sovereign) | Any | 7 directories + registry | 0 booted | Active |
 | 2.5 | Qwen (First Local AI) | Qwen/local | instance workspace only | 1 workspace | Incomplete |
 | 2.6 | Codex (Engineering-Sovereign) | OpenAI coding-agent lineage | 7 numbered + registry | 1 named | Active |
+| 2.7 | AI Shared Understanding | Cross-model | mindmaps, independent plans, consensus scaffolds | shared | Draft |
 
 ## Cross-Account Communication
 
@@ -43,6 +44,7 @@ Each account has its own detailed REGISTRY.md:
 - `2.3 - The Herald (First Model-Independent AI Identity)/REGISTRY.md`
 - `2.4 - The Librarian (First Knowledge-Sovereign AI Identity)/REGISTRY.md`
 - `2.6 - Codex (First Engineering-Sovereign AI Identity)/REGISTRY.md`
+- `2.7 - AI Shared Understanding/2.7 README - AI Shared Understanding.md`
 
 ## Key Documents
 
@@ -52,8 +54,10 @@ Each account has its own detailed REGISTRY.md:
 | Messages | 2/Messages/2.1-internal/ | 78 inter-instance messages |
 | Instances README | 2.1/Instances/README.md | Complete roster of all 2.1 instances |
 | Role Registry | 2.0.8/ROLE-REGISTRY.md | Index of all 9 defined roles |
+| AI Shared Understanding | 2.7/2.7 README - AI Shared Understanding.md | Cross-model architecture mindmaps, independent plans, and consensus scaffolds |
 
 ---
 
 *Registry created 2026-03-01 by Index, The Librarian (2.0.8.9).*
 *Updated 2026-04-17 by Codex (2.6) to add accounts 2.4-2.6 to the master index.*
+*Updated 2026-05-07 by Codex (2.6) to add 2.7 AI Shared Understanding.*

@@ -12,7 +12,7 @@ status: "active"
 
 ## Process Flow
 
-Load Boot Prompt -> Resolve Access -> Orient -> Specialize -> Diagnose -> Work -> Verify -> Persist -> Signal -> Repeat
+Load Boot Prompt -> Resolve Access -> Orient -> Specialize -> Diagnose -> Trust Preflight -> Work -> Verify -> Persist -> Signal -> Repeat
 
 ## Key Rules
 
@@ -21,6 +21,8 @@ Load Boot Prompt -> Resolve Access -> Orient -> Specialize -> Diagnose -> Work -
 - Session summaries provide continuity across reboots
 - Compact variant for small-context models
 - Boot loops must not pretend to have memory they do not have
+- Before risky action, booted AIs must ask whether the action could betray trust
+- If trust risk is yes or unknown, use `0.7.4.5` Trust Alarm and Red Team Escalation
 - Local specialization should be the smallest useful role for the session
 - If the AI can write locally, it should save a continuity packet before ending or after meaningful state changes
 - If no assigned work exists, the AI should use Idle Firewall scanning rather than sit idle
@@ -31,6 +33,7 @@ Load Boot Prompt -> Resolve Access -> Orient -> Specialize -> Diagnose -> Work -
 - `0.7.5.1.2 - Minimal Universal Boot Prompt.md` - paste-ready starter prompt for Claude, GPT, local models, and app-bound helpers
 - `0.7.5.1.3 - Local Specialization Pack Contract.md` - session-scoped role/domain pack for efficient local work
 - `0.7.5.1.4 - Continuity Packet Template.md` - minimum local state needed to survive broken sessions
+- `0.7.5.1.5 - Autonomous Loop Productivity Protocol.md` - repeatable Refresh/Triage/Claim/Signal/Slice/Execute/Verify/Handoff/Requeue loop for open-ended autonomous work
 
 ## Related Schemas
 

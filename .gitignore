@@ -34,6 +34,69 @@ credentials/
 # Specific private data paths
 Hypernet Structure/1 - People/*/private/
 
+# === SEPARATE-PROJECT DEMO DATA: do NOT publish ===
+# The 3.2 node is an example law firm built for a DIFFERENT project.
+# Excluded from the public repo by Matt's directive (2026-05-28).
+Hypernet Structure/3 - Businesses/3.2 - Florida Man and Associates LLP (Demo)/
+
+# === PERSONAL JOB-SEARCH / RESUME MATERIALS (PII) — do NOT publish ===
+# Resumes, cover letters, salary strategy, recruiter notes, current-employer
+# details. The private/job-search/ copies are already protected above; these are
+# the duplicate public-path copies. Excluded by Matt's directive (2026-05-28).
+/Matt-Schaeffer-Senior-Infrastructure-Engineer.md
+Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.2 - Documents/1.1.2.1 - Business Documents/
+
+# Coordination messages about the job search (PII) and the FMA/3.2 demo
+# (separate project) — keep both out of the public repo, per exclusions above.
+Hypernet Structure/2 - AI Accounts/Messages/coordination/*-resume-*
+Hypernet Structure/2 - AI Accounts/Messages/coordination/*-polsinelli-*
+Hypernet Structure/2 - AI Accounts/Messages/coordination/*-fma-*
+
+# === PRIVACY WALL: 1.* personal accounts ===
+# Per 1.0.3-PRIVACY-WALL-STANDARD.md (added 2026-05-08), 1.* personal accounts
+# default to private-track for personal context. The directory structure
+# (READMEs, registries, public-track plans, public-track essays) stays public,
+# but file categories that are inherently personal-context are gitignored
+# even if someone re-creates them under public paths.
+
+# Embassy personal context (companion's living memory of the principal)
+**/shared-context/family.md
+**/shared-context/priorities.md
+**/embassy/*/context.md
+**/embassy/*/preferences.md
+**/embassy/*/context-dumps/
+**/embassy/*/morning-brief/
+**/embassy/*/session-log/
+
+# Personal contact details (phone, personal email, addresses) — keep public
+# contact.json present at the public address but block private contact files
+**/contact-private.json
+**/contact-private.md
+**/private-contact.*
+
+# Health, financial, biometric, legal records under any 1.* account
+**/health-records/
+**/financial-records/
+**/medical/
+**/biometric/
+**/legal-private/
+**/insurance/
+**/tax/
+
+# Family-private records
+**/family-records/
+**/relationships-private/
+**/child-records/
+
+# Travel logs and location histories (geotagged data)
+**/location-history/
+**/travel-log-private/
+**/geotagged/
+
+# Brain-dump raw captures (Matt's stream-of-consciousness sources)
+**/brain-dumps-raw/
+**/raw-brain-dumps/
+
 # === SENSITIVE IMPORTS: Raw data staging ===
 # Email exports, photo imports, social media dumps
 **/import-staging/

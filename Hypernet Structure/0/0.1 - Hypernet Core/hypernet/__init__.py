@@ -29,7 +29,7 @@ for _candidate in [
 del _pkg_dir, _candidate, _Path
 
 # ---- Core data model ----
-from .address import HypernetAddress
+from .address import HypernetAddress, HypernetReference
 from .node import Node
 from .link import Link, LinkRegistry, LinkStatus, seed_initial_links
 from .store import Store

@@ -1,0 +1,6 @@
+{
+  "required_fields": [
+    "title"
+  ],
+  "schema_ref": "0.5.3"
+}

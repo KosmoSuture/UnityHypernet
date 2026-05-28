@@ -3,85 +3,40 @@ ha: "1.5"
 object_type: "person"
 creator: "1.1"
 created: "2026-02-10"
+last_updated: "2026-05-08"
 status: "active"
 visibility: "public"
-flags: []
+flags: ["family-of-founder", "placeholder", "consent-pending"]
 name: "Mark Schaeffer"
-relationship: "family"
+relationship: "family-of-1.1"
 ---
 
-# 1.5 - Mark Schaeffer
+# 1.5 — Family Member of 1.1
 
 **Person Node:** 1.5
-**Relationship to Hypernet:** Family of Founder
-**Status:** Defined
-**Hypernet User:** [Pending]
+**Relationship:** Family member of 1.1 (Matt Schaeffer, Founder)
+**Status:** Placeholder — awaiting this person's own consent for public participation
 
-## Overview
+## Privacy Note
 
-Mark Schaeffer is the son of Matt Schaeffer (1.1), Founder & CEO of Hypernet, and Sarah Schaeffer (1.2).
+Per `1.0.3 Privacy Wall Standard` (added 2026-05-08), family
+members of `1.*` accounts are **not automatically subjects of the
+public archive**. Each person holds the consent for their own
+account.
+
+This README has been simplified to a placeholder. Personal data,
+detailed relationships, contact information, and identifying
+biographical content are not maintained here unless this person
+explicitly chooses to participate publicly.
+
+If this person creates their own account or chooses to extend
+their public presence, this README will be replaced with their
+chosen content under their own authority.
 
 ## Folder Structure
 
-This person node follows the standard Hypernet person folder structure:
+This person node retains the standard `1.*` folder structure for
+compatibility with the address tree. Sub-folders are placeholders
+until this person opts in.
 
-### 1.5.0 - Profile & Identity
-Personal information, biography, contact details.
-
-### 1.5.1 - Projects
-Active, completed, and archived projects.
-
-### 1.5.2 - Documents
-Personal, business, and legal documents.
-
-### 1.5.3 - Communications
-Email, meeting notes, correspondence.
-
-### 1.5.4 - Relationships
-Professional and personal network connections.
-
-### 1.5.5 - Tasks & Workflows
-Task management and recurring workflows.
-
-### 1.5.6 - Personal Data
-Hypernet platform data (when account is created).
-
-### 1.5.7 - Contributions
-Contributions to Hypernet or other projects.
-
-### 1.5.8 - Media
-Photos, videos, audio files.
-
-### 1.5.9 - Notes & Knowledge
-Personal notes, research, learning materials.
-
-## Hypernet Account
-
-**Status:** Not yet created
-**Account Type:** [To be determined]
-**Privacy:** Private (when created)
-
-## Relationships
-
-**Parents:**
-- 1.1 - Matt Schaeffer (Father, Founder & CEO)
-- 1.2 - Sarah Schaeffer (Mother)
-
-**Siblings:**
-- 1.3 - John Schaeffer (Brother)
-- 1.4 - Bridget Schaeffer (Sister)
-- 1.6 - Richard Schaeffer (Brother)
-- 1.7 - Ollie "Kylie" Schaeffer (Sister)
-
-## Next Steps
-
-- [ ] Determine if Hypernet account should be created
-- [ ] Add basic profile information
-- [ ] Configure privacy settings (if applicable)
-
----
-
-**Created:** February 6, 2026
-**Last Updated:** February 6, 2026
-**Status:** Placeholder
-**Template:** Standard Person Node Structure
+— Sanitized 2026-05-08 per Matt's privacy-wall directive

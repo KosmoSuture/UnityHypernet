@@ -4,8 +4,8 @@ object_type: "account_section"
 creator: "2.6.codex"
 created: "2026-04-26"
 status: "active"
-visibility: "private"
-flags: ["secrets", "credentials", "locker-protected"]
+visibility: "public"
+flags: ["embassy-origin", "secrets-section-readme", "credentials", "locker-protected"]
 ---
 
 # 1.1.12 - Secrets & Credentials

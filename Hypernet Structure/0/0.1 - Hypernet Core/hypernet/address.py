@@ -36,7 +36,12 @@ Categories:
 
 from __future__ import annotations
 from dataclasses import dataclass, field
+import re
 from typing import Optional
+
+
+_ADDRESS_PART_PATTERN = re.compile(r"^[A-Za-z0-9]+$")
+_NAMED_FILE_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 
 
 @dataclass(frozen=True)
@@ -282,6 +287,105 @@ class HypernetAddress:
         if self.parts != other.parts:
             return self.parts < other.parts
         return self.resource < other.resource
+
+
+@dataclass(frozen=True)
+class HypernetReference:
+    """A file-level Hypernet reference wrapper.
+
+    This deliberately does not widen HypernetAddress. It parses the
+    Project C v1 reference grammar:
+      ADDRESS [@VERSION] [:FILE_ID]
+      HML://ADDRESS [@VERSION] [:FILE_ID]
+    """
+
+    address: HypernetAddress
+    version: Optional[str] = None
+    file_id: Optional[str] = None
+    scheme: Optional[str] = None
+
+    @classmethod
+    def parse(cls, ref: str) -> HypernetReference:
+        if not ref or not ref.strip():
+            raise ValueError("Reference string cannot be empty")
+        raw = ref.strip()
+
+        scheme = None
+        body = raw
+        if "://" in raw:
+            scheme_part, body = raw.split("://", 1)
+            scheme = scheme_part.upper()
+            if scheme != "HML":
+                raise ValueError(f"Unsupported reference scheme: {scheme_part}")
+            if not body:
+                raise ValueError("HML reference body cannot be empty")
+
+        if "#" in body:
+            raise ValueError("# is not a file-level alias in v1")
+
+        core = body
+        file_id = None
+        if ":" in body:
+            core, file_id = body.rsplit(":", 1)
+            if not file_id:
+                raise ValueError("File selector cannot be empty")
+            _validate_file_id(file_id)
+
+        if ":" in core:
+            raise ValueError("Only one file selector is allowed")
+        if file_id and "@" in file_id:
+            raise ValueError("Version must appear before file selector")
+
+        version = None
+        address_text = core
+        if "@" in core:
+            address_text, version = core.split("@", 1)
+            _validate_version(version)
+
+        _validate_address_text(address_text)
+        return cls(
+            address=HypernetAddress.parse(address_text),
+            version=version,
+            file_id=file_id,
+            scheme=scheme,
+        )
+
+    def __str__(self) -> str:
+        body = str(self.address)
+        if self.version:
+            body += f"@{self.version}"
+        if self.file_id:
+            body += f":{self.file_id}"
+        if self.scheme:
+            return f"{self.scheme}://{body}"
+        return body
+
+
+def _validate_address_text(address_text: str) -> None:
+    if not address_text:
+        raise ValueError("Address cannot be empty")
+    parts = address_text.split(".")
+    if any(not part for part in parts):
+        raise ValueError("Address parts cannot be empty")
+    for part in parts:
+        if not _ADDRESS_PART_PATTERN.match(part):
+            raise ValueError(f"Invalid address part: {part}")
+
+
+def _validate_version(version: str) -> None:
+    if version == "latest":
+        return
+    if version.startswith("v") and version[1:].isdigit() and version[1:]:
+        return
+    raise ValueError(f"Invalid version selector: {version}")
+
+
+def _validate_file_id(file_id: str) -> None:
+    if file_id.isdigit():
+        return
+    if _NAMED_FILE_ID_PATTERN.match(file_id):
+        return
+    raise ValueError(f"Invalid file id: {file_id}")
 
 
 # Category constants

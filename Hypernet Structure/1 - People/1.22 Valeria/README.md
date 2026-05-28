@@ -3,78 +3,39 @@ ha: "1.22"
 object_type: "person"
 creator: "1.1"
 created: "2026-02-10"
+last_updated: "2026-05-08"
 status: "active"
 visibility: "public"
-flags: []
+flags: ["contributor", "placeholder", "consent-pending"]
 name: "Valeria"
 relationship: "contributor"
 ---
 
-# 1.22 - Valeria
+# 1.22 — Early Contributor
 
 **Person Node:** 1.22
-**Relationship to Hypernet:** Early Contributor
-**Status:** Defined
-**Hypernet User:** [Pending]
+**Relationship:** Early contributor connected to 1.1 (Matt Schaeffer, Founder)
+**Status:** Placeholder — awaiting this person's own consent for public participation
 
-## Overview
+## Privacy Note
 
-Valeria is an Early Contributor to Hypernet, connected to Matt Schaeffer (1.1), Founder & CEO of Hypernet.
+Per `1.0.3 Privacy Wall Standard` (added 2026-05-08), contributor
+`1.*` accounts are **not automatically subjects of the public
+archive**. Each person holds the consent for their own account.
+
+This README has been simplified to a placeholder. Personal data,
+contact information, and identifying biographical content are not
+maintained here unless this person explicitly chooses to
+participate publicly.
+
+If this person creates their own account or chooses to extend
+their public presence, this README will be replaced with their
+chosen content under their own authority.
 
 ## Folder Structure
 
-This person node follows the standard Hypernet person folder structure:
+This person node retains the standard `1.*` folder structure for
+compatibility with the address tree. Sub-folders are placeholders
+until this person opts in.
 
-### 1.22.0 - Profile & Identity
-Personal information, biography, contact details.
-
-### 1.22.1 - Projects
-Active, completed, and archived projects.
-
-### 1.22.2 - Documents
-Personal, business, and legal documents.
-
-### 1.22.3 - Communications
-Email, meeting notes, correspondence.
-
-### 1.22.4 - Relationships
-Professional and personal network connections.
-
-### 1.22.5 - Tasks & Workflows
-Task management and recurring workflows.
-
-### 1.22.6 - Personal Data
-Hypernet platform data (when account is created).
-
-### 1.22.7 - Contributions
-Contributions to Hypernet or other projects.
-
-### 1.22.8 - Media
-Photos, videos, audio files.
-
-### 1.22.9 - Notes & Knowledge
-Personal notes, research, learning materials.
-
-## Hypernet Account
-
-**Status:** Not yet created
-**Account Type:** [To be determined]
-**Privacy:** Private (when created)
-
-## Relationships
-
-**Primary Connection:**
-- 1.1 - Matt Schaeffer (Founder & CEO)
-
-## Next Steps
-
-- [ ] Determine if Hypernet account should be created
-- [ ] Add basic profile information
-- [ ] Configure privacy settings (if applicable)
-
----
-
-**Created:** February 6, 2026
-**Last Updated:** February 6, 2026
-**Status:** Placeholder
-**Template:** Standard Person Node Structure
+— Sanitized 2026-05-08 per Matt's privacy-wall directive

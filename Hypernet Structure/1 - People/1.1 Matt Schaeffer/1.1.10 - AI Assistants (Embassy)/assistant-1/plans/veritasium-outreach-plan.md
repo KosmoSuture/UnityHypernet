@@ -5,9 +5,9 @@ creator: "1.1.10.1"
 directed_by: "1.1"
 created: "2026-03-12"
 status: "active"
-visibility: "private"
+visibility: "public"
 priority: "top"
-flags: ["outreach", "veritasium", "top-priority"]
+flags: ["embassy-origin", "outreach", "veritasium", "top-priority"]
 ---
 
 # Veritasium Outreach Plan

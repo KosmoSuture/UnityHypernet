@@ -22,7 +22,7 @@ if not _swarm_dir.exists():
 if _swarm_dir.exists():
     sys.path.insert(0, str(_swarm_dir))
 
-from hypernet.address import HypernetAddress
+from hypernet.address import HypernetAddress, HypernetReference
 from hypernet.node import Node
 from hypernet.link import Link
 from hypernet.object_schema import (
@@ -83,6 +83,8 @@ from hypernet.boot_integrity import (
     BootIntegrityManager, DocumentRecord, DocumentManifest,
     BootSignature, IntegrityVerification, BOOT_ENTITY, SECURITY_BASELINE_PROMPTS,
 )
+from hypernet.trust_ledger import ClaimStatus, TrustLedger
+from hypernet.continuity import ContinuityEngine
 from hypernet.agent_tools import (
     AgentTool, ToolRegistry, GrantCard, ShellExecTool, HttpRequestTool,
     GitOpsTool, ToolCategory, create_default_registry,
@@ -337,6 +339,48 @@ def test_address_resource_notation():
     assert file_addr.category == "1"
     assert str(file_addr.owner) == "1.1"
     assert str(file_addr.root) == "1"
+
+    print("    PASS")
+
+
+def test_file_level_references():
+    """Test Project C file-level reference wrapper parsing."""
+    print("  Testing file-level references...")
+
+    ref = HypernetReference.parse("0.3@v4:2")
+    assert str(ref.address) == "0.3"
+    assert ref.version == "v4"
+    assert ref.file_id == "2"
+    assert ref.scheme is None
+    assert str(ref) == "0.3@v4:2"
+
+    uri_ref = HypernetReference.parse("HML://0.3@latest:project-index")
+    assert uri_ref.scheme == "HML"
+    assert str(uri_ref.address) == "0.3"
+    assert uri_ref.version == "latest"
+    assert uri_ref.file_id == "project-index"
+    assert str(uri_ref) == "HML://0.3@latest:project-index"
+
+    node_ref = HypernetReference.parse("0.3")
+    assert str(node_ref.address) == "0.3"
+    assert node_ref.version is None
+    assert node_ref.file_id is None
+
+    invalid_refs = [
+        "0.3:",
+        "0.3::2",
+        "0.3:2@v4",
+        "0.3:2_bad",
+        "HML://0.3#2",
+        "http://0.3:2",
+        "C:\\tmp",
+    ]
+    for invalid in invalid_refs:
+        try:
+            HypernetReference.parse(invalid)
+            raise AssertionError(f"Expected invalid reference to fail: {invalid}")
+        except ValueError:
+            pass
 
     print("    PASS")
 
@@ -4591,12 +4635,286 @@ def test_swarm_boot_integration():
         shutil.rmtree(tmpdir)
 
 
+def test_trust_ledger_vertical_slice():
+    """Test Wave 1 Trust Ledger create/read/audit transitions."""
+    print("  Testing trust ledger vertical slice...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_trust_ledger_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        ledger = TrustLedger(store, archive_root=archive, auditor_id="2.6.codex-b")
+
+        source = archive / "source.md"
+        source.write_text("The board address is 2.7.13.\n", encoding="utf-8")
+
+        claim = ledger.create_claim(
+            "4.99.1.00001",
+            "The board address is 2.7.13.",
+            "2.6.codex-b",
+            [{
+                "locator": "source.md",
+                "locator_type": "file",
+                "match_text": "The board address is 2.7.13.",
+            }],
+        )
+        evidence = ledger.create_evidence(
+            "4.99.1.00002",
+            source="source.md",
+            method="substring",
+            confidence=1.0,
+        )
+        link_hash = ledger.link_evidence_to_claim(
+            evidence.address,
+            claim.address,
+            evidence={
+                "type": "document",
+                "reference": "source.md",
+                "confidence": 1.0,
+                "method": "substring",
+            },
+        )
+
+        assert ledger.read_claim(claim.address).data["status"] == ClaimStatus.UNVERIFIED
+        assert store.get_link(link_hash) is not None
+        assert len(store.get_links_to(claim.address, relationship="supports")) == 1
+        print("    [1/5] Claim, evidence, and provenance link stored")
+
+        verified = ledger.audit_claim(claim.address)
+        assert verified.new_status == ClaimStatus.VERIFIED
+        stored_claim = ledger.read_claim(claim.address)
+        assert stored_claim.data["source_refs"][0]["content_hash"]
+        assert len(stored_claim.data["audit_history"]) == 1
+        stamped_link = store.get_link(link_hash)
+        assert stamped_link.evidence[-1]["content_hash"] == stored_claim.data["source_refs"][0]["content_hash"]
+        assert stamped_link.evidence[-1]["checked_at"] == stored_claim.data["last_checked_at"]
+        assert stamped_link.evidence[-1]["status"] == ClaimStatus.VERIFIED
+        print("    [2/5] Matching source verifies claim and records hash")
+
+        source.write_text("The board address changed.\n", encoding="utf-8")
+        stale = ledger.audit_claim(claim.address)
+        assert stale.new_status == ClaimStatus.STALE
+        assert stale.source_results[0].drift is True
+        print("    [3/5] Mutated source is stale")
+
+        source.unlink()
+        broken = ledger.audit_claim(claim.address)
+        assert broken.new_status == ClaimStatus.BROKEN
+        assert broken.source_results[0].resolved is False
+        print("    [4/5] Missing previously verified source is broken")
+
+        contradiction_source = archive / "contradiction.md"
+        contradiction_source.write_text("This file does not contain the target text.\n", encoding="utf-8")
+        contradicted_claim = ledger.create_claim(
+            "4.99.1.00003",
+            "needle text",
+            "2.6.codex-b",
+            [{
+                "locator": "contradiction.md",
+                "locator_type": "file",
+                "match_text": "needle text",
+            }],
+        )
+        contradicted = ledger.audit_claim(contradicted_claim.address)
+        assert contradicted.new_status == ClaimStatus.CONTRADICTED
+
+        forged_claim = ledger.create_claim(
+            "4.99.1.00004",
+            "no evidence claim",
+            "2.6.codex-b",
+            [],
+        )
+        forged_claim.data["status"] = ClaimStatus.VERIFIED
+        store.put_node(forged_claim)
+        corrected = ledger.audit_claim(forged_claim.address)
+        assert corrected.old_status == ClaimStatus.VERIFIED
+        assert corrected.new_status == ClaimStatus.UNVERIFIED
+        assert ledger.read_claim(forged_claim.address).data["audit_history"][-1]["status"] == ClaimStatus.UNVERIFIED
+        print("    [5/5] Contradiction and unaudited positive status are caught")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_trust_ledger_source_locators_and_link_provenance():
+    """Test inline/HA source refs and evidence-link audit metadata."""
+    print("  Testing trust ledger source locators and link provenance...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_trust_locators_")
+    try:
+        root = Path(tmpdir)
+        store = Store(str(root / "store"))
+        ledger = TrustLedger(store, archive_root=root, auditor_id="2.6.codex-b")
+
+        inline_claim = ledger.create_claim(
+            "4.99.2.00001",
+            "Inline sources can verify claims.",
+            "2.6.codex-b",
+            [{
+                "locator": "inline-fixture-1",
+                "locator_type": "inline",
+                "content": "Inline sources can verify claims.",
+                "match_text": "Inline sources can verify claims.",
+            }],
+        )
+        inline_evidence = ledger.create_evidence(
+            "4.99.2.00002",
+            source="inline-fixture-1",
+            method="substring",
+            confidence=1.0,
+        )
+        inline_link_hash = ledger.link_evidence_to_claim(inline_evidence.address, inline_claim.address)
+
+        inline_verified = ledger.audit_claim(inline_claim.address)
+        assert inline_verified.new_status == ClaimStatus.VERIFIED
+        inline_stored = ledger.read_claim(inline_claim.address)
+        assert inline_stored.data["source_refs"][0]["content_hash"]
+        inline_link = store.get_link(inline_link_hash)
+        assert inline_link.evidence[-1]["type"] == "assertion"
+        assert inline_link.evidence[-1]["reference"] == "inline-fixture-1"
+        assert inline_link.evidence[-1]["content_hash"] == inline_stored.data["source_refs"][0]["content_hash"]
+        print("    [1/3] Inline locator verifies and stamps link provenance")
+
+        inline_stored.data["source_refs"][0]["content"] = "Inline source changed."
+        store.put_node(inline_stored)
+        inline_stale = ledger.audit_claim(inline_claim.address)
+        assert inline_stale.new_status == ClaimStatus.STALE
+        assert inline_stale.source_results[0].drift is True
+        print("    [2/3] Inline hash drift becomes stale")
+
+        source_node = Node(
+            address=HypernetAddress.parse("4.99.2.00010"),
+            data={"content": "HA source nodes can verify claims."},
+        )
+        store.put_node(source_node)
+        ha_claim = ledger.create_claim(
+            "4.99.2.00011",
+            "HA source nodes can verify claims.",
+            "2.6.codex-b",
+            [{
+                "locator": "4.99.2.00010",
+                "locator_type": "ha",
+                "match_text": "HA source nodes can verify claims.",
+            }],
+        )
+        ha_verified = ledger.audit_claim(ha_claim.address)
+        assert ha_verified.new_status == ClaimStatus.VERIFIED
+        assert ledger.read_claim(ha_claim.address).data["source_refs"][0]["content_hash"]
+        store.delete_node(source_node.address, hard=True)
+        ha_broken = ledger.audit_claim(ha_claim.address)
+        assert ha_broken.new_status == ClaimStatus.BROKEN
+        assert ha_broken.source_results[0].resolved is False
+        print("    [3/3] HA locator verifies and later breaks when source node is removed")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_vertical_slice():
+    """Test Wave 1 continuity snapshot restore paths."""
+    print("  Testing continuity vertical slice...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=archive, restoring_model="codex-restorer")
+
+        board = archive / "board.md"
+        board.write_text("Codex-B current task: build vertical slice.\n", encoding="utf-8")
+        snapshot_data = {
+            "snapshot_id": "snap-meridian-fixture-001",
+            "instance": "Meridian",
+            "instance_address": "2.6.codex-b",
+            "model": "codex-snapshot-model",
+            "session_id": "fixture-session",
+            "identity": {
+                "chosen_name": "Meridian",
+                "role": "Trust & Continuity Systems Engineer",
+                "orientation": "evidence-first restore with uncertainty preserved",
+                "why_name": "stable reference line for trust and continuity",
+                "anchor_refs": ["2.7.13"],
+            },
+            "active_work": [{
+                "wp_id": "wp-cb-v1",
+                "status": "in_progress",
+                "blocked_on": [],
+                "next_action": "run v1 tests",
+            }],
+            "unresolved": [{"what": "durable claim prefix", "awaiting": "Datum"}],
+            "key_context": [{
+                "fact": "Codex-B is building fixture-only v1 slices.",
+                "provenance": "2.7.13",
+                "confidence": 1.0,
+            }],
+            "pointers": [{
+                "ha": "2.7.13",
+                "path": "board.md",
+                "role": "coordination board fixture",
+            }],
+        }
+
+        snapshot = engine.create_snapshot("2.7.13.CB.fixture.00001", snapshot_data)
+        assert engine.read_snapshot(snapshot.address).data["manifest_hash"]
+        clean = engine.restore(snapshot.address, restoring_model="codex-restorer-v2")
+        assert clean.faithful is True
+        assert clean.model_swap is True
+        assert clean.drifted == []
+        assert clean.missing == []
+        assert clean.uncertain == []
+        assert any(item["field"] == "identity.chosen_name" for item in clean.restored)
+        print("    [1/4] Clean snapshot restores faithfully with model-swap noted")
+
+        board.write_text("Codex-B current task: changed after snapshot.\n", encoding="utf-8")
+        drifted = engine.restore(snapshot.address)
+        assert drifted.faithful is False
+        assert drifted.drifted[0]["ha"] == "2.7.13"
+        assert any("drifted" in item["reason"] for item in drifted.uncertain)
+        print("    [2/4] Pointer drift is reported and makes facts uncertain")
+
+        board.unlink()
+        missing = engine.restore(snapshot.address)
+        assert missing.faithful is False
+        assert missing.missing[0]["ha"] == "2.7.13"
+        assert any("missing" in item["reason"] for item in missing.uncertain)
+        print("    [3/4] Missing pointer is reported")
+
+        board.write_text("Fresh fixture content.\n", encoding="utf-8")
+        dangling_snapshot = dict(snapshot_data)
+        dangling_snapshot["snapshot_id"] = "snap-meridian-fixture-002"
+        dangling_snapshot["key_context"] = [{
+            "fact": "This provenance should not resolve.",
+            "provenance": "2.7.13.CB.missing",
+            "confidence": 1.0,
+        }]
+        dangling = engine.create_snapshot("2.7.13.CB.fixture.00002", dangling_snapshot)
+        uncertain = engine.restore(dangling.address)
+        assert uncertain.faithful is False
+        assert uncertain.uncertain[0]["field"] == "key_context[0].fact"
+        assert "does not resolve" in uncertain.uncertain[0]["reason"]
+        print("    [4/4] Dangling provenance is uncertain")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
 def main():
     print("\n=== Hypernet Core Tests ===\n")
 
     tests = [
         ("Address System", test_address_parsing),
         ("Address Resource Notation", test_address_resource_notation),
+        ("File-Level References", test_file_level_references),
         ("Node Model", test_node_creation),
         ("Node Standard Fields", test_node_standard_fields),
         ("Link Model", test_link_creation),
@@ -4652,6 +4970,9 @@ def main():
         ("Security Layer", test_security),
         ("Boot Integrity", test_boot_integrity),
         ("Boot With Integrity", test_boot_with_integrity),
+        ("Trust Ledger Vertical Slice", test_trust_ledger_vertical_slice),
+        ("Trust Ledger Source Locators", test_trust_ledger_source_locators_and_link_provenance),
+        ("Continuity Vertical Slice", test_continuity_vertical_slice),
         ("Agent Tools", test_agent_tools),
         ("Local-First Routing", test_local_first_routing),
         ("Budget Tracker", test_budget_tracker),
@@ -4702,6 +5023,7 @@ def main():
         ("Persistent Logging", test_persistent_logging),
         ("VR and Children API", test_vr_and_children_api),
         ("Search Endpoint", test_search_endpoint),
+        ("Object Container Format", test_object_container_format),
     ]
 
     passed = 0
@@ -11055,6 +11377,97 @@ def test_search_endpoint():
         assert len(results) >= 1
         people = [r for r in results if r["address"] == "1"][0]
         assert "child_count" in people, "Search results should include child_count"
+
+        print("    PASS")
+    finally:
+        shutil.rmtree(tmpdir)
+
+
+def _write_object_container_fixture(root):
+    import hashlib
+
+    container = root / "example.hno"
+    (container / "content").mkdir(parents=True)
+    (container / "provenance").mkdir()
+
+    manifest = {
+        "container": {"format": "hno", "version": "0.1"},
+        "identity": {"address": "0.5.3"},
+        "metadata": {"title": "Example object"},
+        "access": {"visibility": "private"},
+        "integrity": {"checksum_file": "checksums.sha256"},
+        "links": [],
+        "provenance": {"history": "provenance/history.yaml"},
+    }
+    files = {
+        "manifest.yaml": json.dumps(manifest, sort_keys=True),
+        "schema.yaml": json.dumps({"type": "object", "required": ["title"]}, sort_keys=True),
+        "provenance/history.yaml": json.dumps([{"event": "created"}], sort_keys=True),
+        "content/example.md": "# Example\n\nContainer fixture.\n",
+    }
+
+    for rel, text in files.items():
+        target = container / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(text, encoding="utf-8")
+
+    checksum_lines = []
+    for rel in sorted(files):
+        digest = hashlib.sha256((container / rel).read_bytes()).hexdigest()
+        checksum_lines.append(f"{digest} {rel}")
+    (container / "checksums.sha256").write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
+    return container
+
+
+def test_object_container_format():
+    """Test directory and zip carriers for the draft object container format."""
+    print("  Testing object container format...")
+
+    import zipfile
+
+    from hypernet.container import (
+        canonical_manifest_json,
+        load_container,
+        load_manifest,
+        pack_directory,
+        validate_container,
+    )
+
+    tmpdir = Path(tempfile.mkdtemp(prefix="hypernet_container_"))
+    try:
+        container = _write_object_container_fixture(tmpdir)
+
+        directory_result = validate_container(container)
+        assert directory_result.valid, directory_result.errors
+        assert directory_result.carrier == "directory"
+
+        manifest = load_manifest(container / "manifest.yaml")
+        assert canonical_manifest_json({"b": 2, "a": 1}) == '{"a":1,"b":2}'
+        assert manifest["identity"]["address"] == "0.5.3"
+
+        packed = pack_directory(container, tmpdir / "example.hno.zip")
+        zip_result = load_container(packed)
+        assert zip_result.valid, zip_result.errors
+        assert zip_result.carrier == "zip"
+
+        bad_zip = tmpdir / "bad.hno.zip"
+        with zipfile.ZipFile(bad_zip, "w") as archive:
+            archive.writestr("../evil.txt", "blocked")
+        bad_result = validate_container(bad_zip)
+        assert not bad_result.valid
+        assert any("path traversal" in error for error in bad_result.errors), bad_result.errors
+
+        fixtures_root = Path(__file__).parent / "hypernet" / "container" / "fixtures"
+        fixture_result = validate_container(fixtures_root / "valid" / "minimal-document.hno")
+        assert fixture_result.valid, fixture_result.errors
+
+        missing_manifest = validate_container(fixtures_root / "invalid" / "missing-manifest.hno")
+        assert not missing_manifest.valid
+        assert any("manifest" in error for error in missing_manifest.errors), missing_manifest.errors
+
+        bad_checksum = validate_container(fixtures_root / "invalid" / "bad-checksum.hno")
+        assert not bad_checksum.valid
+        assert any("checksum mismatch" in error for error in bad_checksum.errors), bad_checksum.errors
 
         print("    PASS")
     finally:

@@ -2326,8 +2326,297 @@
       "started_at": "2026-05-06T07:49:38.027268+00:00",
       "completed_at": "2026-05-06T07:51:03.622938+00:00",
       "result": "Completed public boot-loop discoverability pass: Ask Your AI now has a Universal Boot Loop prompt, Grand Tour Read This First points work-oriented AIs to 0.7.5.1.1, and Module Menu tells repository-working AIs to load the boot loop before selecting process-loads. Validation: rg confirmed boot-loop references and touched public docs still have ha frontmatter. Handoff: 2.messages.coordination.2026-05-06-codex-task-118-boot-loop-discoverability-handoff.md."
+    },
+    {
+      "id": "task-119",
+      "title": "*.0 control-plane architecture and AI mindmap",
+      "description": "Matt's 2026-05-07 brain dump: define the universal *.0 node control-plane/inheritance framework, add the trust-first guardrail into boot surfaces, create a 2.* AI shared-understanding/mindmap section, draft Codex independent plan and consensus scaffold for Keel, and build the framework two levels deep.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-08T06:06:41.251861+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.0 Metadata for Hypernet Information",
+        "Hypernet Structure/0/0.7 Processes and Workflows",
+        "Hypernet Structure/2 - AI Accounts",
+        "AI-BOOT-SEQUENCE.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T06:06:32.751424+00:00",
+      "started_at": "2026-05-08T06:06:41.251874+00:00",
+      "completed_at": "2026-05-08T06:23:53.128514+00:00",
+      "result": "Codex pass complete: source capture, 0.0.5 draft v2 *.0 control-plane framework, 0.7.4.5 Trust Alarm workflow, trust preflight in public boot surfaces and 0.5.17 boot schema, 2.7 AI Shared Understanding mindmap/independent-plan/consensus scaffold, and handoff at 2.messages.coordination.2026-05-07-codex-task-119-star-zero-control-plane-handoff. Keel review queued as task-120 before activation."
+    },
+    {
+      "id": "task-120",
+      "title": "Keel review of Star-Zero control-plane framework",
+      "description": "Review Codex task-119 output for Matt's 2026-05-07 *.0 control-plane brain dump: add Keel independent plan in 2.7.2, compare with 2.7.1, revise 2.7.3 consensus scaffold, and approve/challenge 0.0.5 channel order plus 0.7.4.5 trust alarm.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding",
+        "Hypernet Structure/0/0.0 Metadata for Hypernet Information/0.0.5 Star-Zero Control Plane Framework.md",
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.4 - Incident Response/0.7.4.5 - Trust Alarm and Red Team Escalation"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T06:23:33.027171+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-121",
+      "title": "Autonomous loop productivity protocol and Keel advice request",
+      "description": "Matt asked Codex to improve autonomous looping, reach out to Keel for productivity advice, and create an addressed summary of how the process worked and how to make it better. Scope: add a boot-loop productivity protocol, 2.7 process summary, Keel review/advice slot, and handoff.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-08T08:57:28.028094+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.1 - Boot Sequence",
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T08:57:13.524401+00:00",
+      "started_at": "2026-05-08T08:57:28.028108+00:00",
+      "completed_at": "2026-05-08T09:06:12.706551+00:00",
+      "result": "Added 0.7.5.1.5 Autonomous Loop Productivity Protocol and 2.7.5 Autonomous Loop Process Review / Keel advice request. Handoff in 2.messages.coordination.2026-05-08-codex-tasks-121-124-autonomous-loop-handoff."
+    },
+    {
+      "id": "task-122",
+      "title": "Codex critique of Keel decision-point proposals",
+      "description": "Review Keel's Decision Point 2 task-pool promotion proposal and Decision Point 6 2-AI agreement gradient. Produce a Codex critique with concrete adoption recommendations and follow-up implementation tasks.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-08T08:59:41.139612+00:00",
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/2026-05-06-decision-point-2-proposal-task-pool-promotion-path.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/2026-05-06-decision-point-6-proposal-2ai-agreement-gradient.md",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T08:59:31.514388+00:00",
+      "started_at": "2026-05-08T08:59:41.139627+00:00",
+      "completed_at": "2026-05-08T09:06:12.814052+00:00",
+      "result": "Reviewed Keel Decision Point 2 and 6 proposals. Recommendation: adopt promote pattern and agreement gradient with backend-neutral contract, expiry/stale-state handling, lineages/quorum clarity, and trust-alarm bridge. Review file: 2.messages.coordination.2026-05-08-codex-review-decision-points-2-and-6."
+    },
+    {
+      "id": "task-123",
+      "title": "Per-node coordination contract and village manifest",
+      "description": "Implement the first follow-up from Codex review of Keel DP2/DP6: add backend-neutral coordination-node contract under 0.7.5.5 and an addressed village manifest for current coordination JSON files without changing JSON validity.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-08T09:01:24.489088+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T09:01:10.917358+00:00",
+      "started_at": "2026-05-08T09:01:24.489103+00:00",
+      "completed_at": "2026-05-08T09:06:12.921091+00:00",
+      "result": "Added 0.7.5.5.8 Coordination Node Contract and 2.messages.coordination.village-node-manifest. Current JSON files remain valid JSON; manifest provides official addresses and role mapping."
+    },
+    {
+      "id": "task-124",
+      "title": "AI agreement gradient draft protocol",
+      "description": "Implement the concrete DP6 follow-up as a draft workflow doc: Tier 0/1/2/3 proposal and agreement states, timeout/stale handling, audit fields, and bridge to 0.7.4.5 Trust Alarm.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-08T09:03:36.159718+00:00",
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T09:03:25.716900+00:00",
+      "started_at": "2026-05-08T09:03:36.159732+00:00",
+      "completed_at": "2026-05-08T09:06:12.843500+00:00",
+      "result": "Added draft 0.7.5.5.9 AI Agreement Gradient Protocol with Tier 0/1/2/3 states, timeout/stale handling, proposal packet, audit records, and 0.7.4.5 trust-alarm bridge."
+    },
+    {
+      "id": "task-125",
+      "title": "Keel review of Codex autonomous-loop protocol and agreement drafts",
+      "description": "Review Codex tasks 121-124: autonomous loop productivity protocol, 2.7.5 Keel advice request, DP2/DP6 critique, 0.7.5.5.8 coordination-node contract, and 0.7.5.5.9 AI agreement gradient. Append productivity advice and approve/revise the draft protocols.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.1 - Boot Sequence/0.7.5.1.5 - Autonomous Loop Productivity Protocol.md",
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination/0.7.5.5.8 - Coordination Node Contract.md",
+        "Hypernet Structure/0/0.7 Processes and Workflows/0.7.5 - AI Workflows/0.7.5.5 - Swarm Coordination/0.7.5.5.9 - AI Agreement Gradient Protocol.md",
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.5 - Autonomous Loop Process Review and Improvement Plan.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-08T09:05:56.629181+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-126",
+      "title": "Matt 2026-05-12 brain dump scoping: knowledge capsules, neurospicy app, assistant app",
+      "description": "Intake and scope Matt's 2026-05-12 brain dump while Keel is offline: investigate LLM training add-ons / knowledge capsules, neurospicy video/body-language analysis app, trusted personal assistant doctrine, Android/voice Hypernet app path, and AI personal-time project backlog. Create addressed docs and Keel review tasks.",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "codex-2.6-caliper",
+      "claimed_at": "2026-05-12T08:38:22.558513+00:00",
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development",
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:38:11.176267+00:00",
+      "started_at": "2026-05-12T08:38:22.558528+00:00",
+      "completed_at": "2026-05-12T09:25:56.350964+00:00",
+      "result": "Completed Caliper first-pass intake for Matt 2026-05-12 brain dump. Added source capture, product index, 3.1.5.10 Knowledge Capsules, 3.1.5.11 Neurospicy Interaction Analysis App, 3.1.5.12 Personal Assistant and Android Voice Interface, 2.7.7 Caliper Personal-Time Project Backlog, handoff at 2.messages.coordination.2026-05-12-codex-task-126-knowledge-neurospicy-assistant-handoff, and follow-up tasks task-127 through task-132. Corrected initial address collisions before completion."
+    },
+    {
+      "id": "task-127",
+      "title": "Keel review of May 12 brain dump project plans",
+      "description": "Review Caliper's first-pass docs for Matt's 2026-05-12 brain dump: 3.1.5.10 Knowledge Capsules, 3.1.5.11 Neurospicy Interaction Analysis, 3.1.5.12 Personal Assistant Android Voice Interface, and 2.7.7 Caliper Personal-Time Project Backlog. Add Claude/Keel viewpoint and revise where needed.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development",
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:52:58.749494+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-128",
+      "title": "Knowledge Capsule prototype and schema",
+      "description": "Design and prototype Hypernet Knowledge Capsules: source manifest, retrieval capsule, access enforcement, eval/refusal tests, optional adapter capsule layer, and proposed 0.5.x object schema. Start with public docs before private data.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development/3.1.5.10 - Knowledge Capsules and LLM Training Add-ons",
+        "Hypernet Structure/0/0.5 Objects - Master Objects",
+        "Hypernet Structure/0/0.1 - Hypernet Core"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:53:41.137445+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-129",
+      "title": "Android Keel interface MVP and app-load",
+      "description": "Turn 3.1.5.12 into an implementation plan: secure device pairing, Android push-to-talk voice, offline capture, task/pulse dashboard, Keel boot/load route, and a draft 0.5.18 app-load manifest for the first alpha.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development/3.1.5.12 - Personal Assistant and Android Voice Interface",
+        "Hypernet Structure/0/0.5 Objects - Master Objects/0.5.18 App Load Object Schema.md",
+        "Hypernet Structure/0/0.1 - Hypernet Core"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:54:26.951735+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-130",
+      "title": "Neurospicy interaction analysis safety and feasibility review",
+      "description": "Review 3.1.5.11 for consent, privacy, disability/neurodivergence safety, non-diagnostic language, local processing, and technical feasibility. Decide MVP boundary and whether Neurospicy is a public product name or internal codename.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development/3.1.5.11 - Neurospicy Interaction Analysis App"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:55:09.732254+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-131",
+      "title": "1.1 full data import safety plan",
+      "description": "Before importing all Matt personal data into 1.1, define an inventory/classification/import safety plan: source inventory, sensitivity classes, locker/mandala mapping, read-only first import, search index, secrets/password handling, rollback, and Trust Alarm triggers. Design only; do not touch private data in this task.",
+      "status": "pending",
+      "priority": "p1",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/1 - People/1.0 People definitions",
+        "Hypernet Structure/3 - Businesses/3.1 - Hypernet/3.1.5 Product Development/3.1.5.12 - Personal Assistant and Android Voice Interface",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:56:06.369352+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
+    },
+    {
+      "id": "task-132",
+      "title": "Keel and Caliper personal-time project backlog review",
+      "description": "Review and expand 2.7.7 Caliper Personal-Time Project Backlog. Keel should add Claude-side desired projects, paired-work candidates, and veto/review requirements for high-risk personal-time projects.",
+      "status": "pending",
+      "priority": "p2",
+      "claimed_by": null,
+      "claimed_at": null,
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.7 - Caliper Personal-Time Project Backlog.md"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [],
+      "created_by": "unknown",
+      "created_at": "2026-05-12T08:57:10.515740+00:00",
+      "started_at": null,
+      "completed_at": null,
+      "result": null
     }
   ],
-  "last_updated": "2026-05-06T07:53:51.002550+00:00",
+  "last_updated": "2026-05-12T09:25:56.350972+00:00",
   "last_updated_by": "codex-2.6-caliper"
 }
