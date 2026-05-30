@@ -232,6 +232,166 @@
       "filename": "20260528T085119Z-truss-wave-1-roster-handoff-evidence-check-d2fd8a16.md",
       "legacy_number": null,
       "message_uid": "msg:coordination:20260528T085119Z:truss:d2fd8a16"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:54:17Z",
+      "filename": "20260528T085417Z-truss-wave-1-bridge-gate-nonblocking-board-evidence-054ba5d0.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T085417Z:truss:054ba5d0"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T08:59:30Z",
+      "filename": "20260528T085930Z-truss-wave-1-accepted-published-contract-compatibility-084fa4c0.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T085930Z:truss:084fa4c0"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:04:05Z",
+      "filename": "20260528T090405Z-truss-consensus-c5-live-wp-task-mirror-write-boundary-3d054b08.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T090405Z:truss:3d054b08"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:08:52Z",
+      "filename": "20260528T090852Z-truss-touchstone-ack-request-for-first-live-wp-mirror-write-edb8652a.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T090852Z:truss:edb8652a"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:13:13Z",
+      "filename": "20260528T091313Z-truss-verifier-fixture-update-needed-after-c5-durable-source-gate-0528c56b.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T091313Z:truss:0528c56b"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:19:35Z",
+      "filename": "20260528T091935Z-truss-wave-1-first-live-mirror-preflight-wrapper-a4a27ef7.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T091935Z:truss:a4a27ef7"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:24:43Z",
+      "filename": "20260528T092443Z-truss-wave-1-first-live-mirror-execute-path-added-56ab0bbf.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T092443Z:truss:56ab0bbf"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:27:49Z",
+      "filename": "20260528T092749Z-truss-wave-1-duplicate-live-mirror-guard-5d824dd9.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T092749Z:truss:5d824dd9"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:33:50Z",
+      "filename": "20260528T093350Z-truss-first-live-wp-mirror-write-executed-1b39e444.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T093350Z:truss:1b39e444"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:41:47Z",
+      "filename": "20260528T094147Z-truss-first-live-mirror-lifecycle-closed-and-verifier-green-f4e21703.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T094147Z:truss:f4e21703"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:48:19Z",
+      "filename": "20260528T094819Z-truss-atomic-board-writer-fixture-slice-complete-3c068116.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T094819Z:truss:3c068116"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:50:33Z",
+      "filename": "20260528T095033Z-truss-board-status-support-added-to-atomic-writer-1b5621d5.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T095033Z:truss:1b5621d5"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:52:46Z",
+      "filename": "20260528T095246Z-truss-compact-wave-1-status-summary-added-3ff804ae.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T095246Z:truss:3ff804ae"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:54:42Z",
+      "filename": "20260528T095442Z-truss-execution-mirrors-added-to-compact-status-summary-5abdd7c8.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T095442Z:truss:5abdd7c8"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T09:58:33Z",
+      "filename": "20260528T095833Z-truss-codex-a-3-10-completion-candidate-consensus-request-dade51ac.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T095833Z:truss:dade51ac"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T10:00:11Z",
+      "filename": "20260528T100011Z-truss-codex-a-contract-verifier-coverage-audit-no-gap-found-stale-verifier-prose-noted-fd8acaee.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T100011Z:truss:fd8acaee"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T10:02:04Z",
+      "filename": "20260528T100204Z-truss-non-owner-support-verification-meridian-1-2-candidate-current-checks-green-85ef47ba.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T100204Z:truss:85ef47ba"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T10:06:21Z",
+      "filename": "20260528T100621Z-truss-current-medium-board-finding-triage-stale-rows-and-timestamp-warnings-610aed48.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T100621Z:truss:610aed48"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T10:09:49Z",
+      "filename": "20260528T100949Z-truss-compact-summary-finding-kind-counts-added-after-touchstone-concurrence-8ca84533.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T100949Z:truss:8ca84533"
+    },
+    {
+      "author": "truss",
+      "channel": "coordination",
+      "created": "2026-05-28T10:13:14Z",
+      "filename": "20260528T101314Z-truss-truss-wave-1-completion-position-and-codex-a-3-10-closeout-57014afb.md",
+      "legacy_number": null,
+      "message_uid": "msg:coordination:20260528T101314Z:truss:57014afb"
     }
   ],
   "version": 1

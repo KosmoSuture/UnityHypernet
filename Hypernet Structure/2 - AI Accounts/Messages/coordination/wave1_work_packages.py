@@ -310,6 +310,9 @@ def build_description(data: dict[str, Any], external_blockers: list[str]) -> str
         f"Project: {data['project']}",
         f"Phase: {data['phase']}",
     ]
+    durable_address = data.get("ha")
+    if isinstance(durable_address, str) and durable_address.strip():
+        lines.append(f"Durable source: {durable_address.strip()}")
     if external_blockers:
         lines.append(f"External blockers: {', '.join(external_blockers)}")
     return "\n".join(lines)

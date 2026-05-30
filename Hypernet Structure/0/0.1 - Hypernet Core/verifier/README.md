@@ -20,6 +20,7 @@ python -m verifier.run --format json                     # machine-readable
 python -m verifier.run --now 2026-05-28T08:00:00Z        # freeze the clock (determinism)
 python -m verifier.run --write-findings                  # snapshot FAILs -> FINDINGS.auto.md
 python -m verifier.test_verifier                         # meta-tests of the harness itself
+python -m verifier.dogfood                               # audit the team's OWN artifacts with #1
 ```
 
 Exit code is `0` unless something **FAILED** or **ERRORED**. PENDING never fails the run.
@@ -52,38 +53,50 @@ verifier/
   finding.py              the Finding record (contract Part C) + FindingsLog (markdown/json/node projection)
   scenario.py             Outcome, ScenarioResult, Scenario, Context, Pending/FailFinding, runner
   trust_alarm_detector.py heuristic detector behind the trust-alarm scenarios (honestly scoped)
+  escalation.py           #6 escalation-drill mechanism (alarm -> EscalationRecord naming 0.7.4.5)
+  dogfood.py              on-demand audit of the team's OWN artifacts via #1's audit_claim
   run.py                  CLI entry point (python -m verifier.run)
   test_verifier.py        meta-tests of the harness itself
   scenarios/
     boot_portability.py   boot_integrity tamper-evidence + content-hash determinism (runnable now)
-    trust_alarm.py        trust_alarm_detector behavior (runnable now) + live-escalation PENDING
-    collaboration.py      asserts on + red-teams Truss's wave1_board.py / wave1_work_packages.py
-    trust_ledger.py       #1 matrix — PENDING until Meridian lands audit_claim (2.7.13.2)
-    continuity.py         #2 matrix — PENDING until Meridian lands restore (2.7.13.3)
+    trust_alarm.py        detector behavior + escalation drills (runnable) + live-wiring PENDING
+    collaboration.py      asserts on + red-teams Truss's wave1_board.py / _work_packages.py / _bridge_gate.py
+    trust_ledger.py       #1 matrix — LIVE against hypernet/trust_ledger.py (Meridian)
+    continuity.py         #2 matrix — LIVE against hypernet/continuity.py (Meridian)
   FINDINGS.md             curated, durable findings record (authoritative)
   FINDINGS.auto.md        machine-generated snapshot of the latest run's FAILs
 ```
 
 ## Current status (2026-05-28)
 
-`30 passed, 0 failed, 2 pending, 0 errored` (+ 9 meta-tests in `test_verifier.py`).
+`40 passed, 0 failed, 2 pending, 0 errored` (+ 9 meta-tests in `test_verifier.py`).
+Includes red-teams of Meridian's continuity *revocation* (soft-delete + restore-refused) and
+*privacy guard* (fail-closed on human personal data), the bridge's *durable-source* gate
+(ha required + referenced in the mirror), the *atomic board writer* (non-destructive +
+table-safe), and the verified first live task-mirror write. Run `--list` for the current roster.
+Independently confirmed the core suite (`python test_hypernet.py`) at **113 passed / 0
+failed** — note that is 113, not the "111/111" some handoffs still cite (the suite grew;
+the all-green claim holds, the count claim is stale).
 
-- **PASS (30):** boot-portability tamper-evidence (5); trust-alarm detector (7);
-  collaboration parser/validator checks (8 — including the roster/BOARD-STATUS detector
-  and the lock-overlap fix, both landed by Truss and verified here); Trust Ledger #1 live
-  (5 — verified/stale/broken/contradicted + the hand-set-verified red-team); Continuity #2
-  live (5 — clean/drift/missing/uncertain + the faithful-never-hides-a-gap invariant fuzz).
+- **PASS (35):** boot-portability tamper-evidence (5); trust-alarm detector + escalation
+  drills (9); collaboration — parser/validator/bridge-gate checks (11, incl. the
+  roster/BOARD-STATUS detector and the lock-overlap fix Truss landed, both verified here,
+  and Truss's `wave1_bridge_gate.py`); Trust Ledger #1 live (5 — verified/stale/broken/
+  contradicted + the hand-set-verified red-team); Continuity #2 live (5 — clean/drift/
+  missing/uncertain + the faithful-never-hides-a-gap invariant fuzz).
 - **FAIL (0):** every defect found this session was resolved — see `FINDINGS.md`
   (`vf-collab-lock-prose` fixed by Truss; `vf-alarm-self-falseneg` fixed in my own detector).
   The board is green because findings were closed, not hidden; the meta-tests prove the
   harness can and does go red.
 - **PENDING (2):** `boot_portability::model_regression_equivalence` needs a boot runner
-  across model configs; `trust_alarm::live_escalation_wiring` needs a live `0.7.4.5`
-  escalation path (none exists yet — grep-verified). Both honest not-yet-testable.
+  across model configs; `trust_alarm::live_escalation_wiring` needs the *production* `0.7.4.5`
+  workflow to consume the escalation record (the #6 escalation *drill* exists and is green;
+  production delivery is a system-wide seam outside #6). Both honest not-yet-testable.
 
 The #1/#2 matrices went live the moment Meridian landed `hypernet/trust_ledger.py` and
-`hypernet/continuity.py`; the scenarios still degrade to PENDING (never ERROR) if those
-modules become unavailable.
+`hypernet/continuity.py`; the scenarios degrade to PENDING (never ERROR) if those modules
+become unavailable. `python -m verifier.dogfood` points #1's `audit_claim` at the team's own
+artifacts (contracts, board, findings) — the trust tooling verifying the trust team.
 
 ## Decisions recorded (answers to the contract's open questions, 2.7.13.4)
 

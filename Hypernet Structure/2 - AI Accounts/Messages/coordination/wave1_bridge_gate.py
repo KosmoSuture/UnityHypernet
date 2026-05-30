@@ -133,6 +133,21 @@ def live_status_blockers(packages: list[Any]) -> list[str]:
     return blockers
 
 
+def durable_source_blockers(packages: list[Any]) -> list[str]:
+    blockers: list[str] = []
+    for index, package in enumerate(packages):
+        if not isinstance(package, dict):
+            continue
+        durable_address = package.get("ha", "")
+        if not isinstance(durable_address, str) or not wave1_board.clean_cell(durable_address):
+            blockers.append(f"wp[{index}] ha: live mirroring requires an addressed durable WP source.")
+            continue
+        cleaned = wave1_board.clean_cell(durable_address)
+        if wave1_board.extract_addresses(cleaned)[:1] != [cleaned]:
+            blockers.append(f"wp[{index}] ha: '{durable_address}' is not a valid Hypernet address.")
+    return blockers
+
+
 def build_readiness_evidence(
     board: wave1_board.Wave1Board,
     findings: list[wave1_board.Finding],
@@ -145,6 +160,7 @@ def build_readiness_evidence(
         "roster_owner_errors": roster_owner_blockers(board, packages),
         "cli_encoding_errors": cli_encoding_blockers(packages),
         "live_status_errors": live_status_blockers(packages),
+        "durable_source_errors": durable_source_blockers(packages),
     }
     blockers: list[str] = []
     for key in (
@@ -153,6 +169,7 @@ def build_readiness_evidence(
         "roster_owner_errors",
         "cli_encoding_errors",
         "live_status_errors",
+        "durable_source_errors",
     ):
         blockers.extend(evidence[key])
     evidence["blockers"] = blockers

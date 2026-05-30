@@ -43,11 +43,13 @@ def valid_wp() -> dict:
 
 def test_valid_work_package_maps_to_coordination_create_args():
     wp = valid_wp()
+    wp["ha"] = "2.7.13.CA.4.wp.test"
     issues = wave1_work_packages.validate_work_package(wp)
     args = wave1_work_packages.to_coordination_create_args(wp)
 
     assert issues == []
     assert args["title"].startswith("wp-3-board-parser:")
+    assert "Durable source: 2.7.13.CA.4.wp.test" in args["description"]
     assert args["owned_paths"] == wp["files_owned"]
     assert args["depends_on"] == ["wp-3-contract-review"]
     assert args["external_blockers"] == ["2.7.13.1", "Datum"]

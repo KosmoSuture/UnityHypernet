@@ -136,6 +136,23 @@ def test_contract_registry_desync_and_blocked_chain_are_reported():
         assert any(f.kind == "blocked_chain" and "Codex-A" in f.message for f in findings)
 
 
+def test_accepted_registry_is_compatible_with_published_contract_file():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        board_path = root / "2.7.13.md"
+        board_path.write_text(fixture_board(registry_status="accepted"), encoding="utf-8")
+        write_contract(root, "published-v1.1")
+
+        board = wave1_board.parse_board(board_path)
+        findings = wave1_board.collect_findings(
+            board,
+            contracts_dir=root,
+            now=datetime(2026, 5, 28, 7, 30, tzinfo=timezone.utc),
+        )
+
+        assert not any(f.kind == "desync" and "2.7.13.1" in f.message for f in findings)
+
+
 def test_stale_and_overlapping_edit_locks_are_reported():
     locks = "\n".join(
         [
@@ -485,10 +502,101 @@ def test_roster_board_status_desync_is_reported_when_all_blocked_claim_contradic
         assert any(f.kind == "roster_board_status_desync" for f in findings)
 
 
+def test_summary_report_exposes_compact_resume_fields():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        board_path = root / "2.7.13.md"
+        board_path.write_text(fixture_board(registry_status="accepted"), encoding="utf-8")
+        write_contract(root, "published-v1.1")
+
+        board = wave1_board.parse_board(board_path)
+        findings = wave1_board.collect_findings(
+            board,
+            contracts_dir=root,
+            now=datetime(2026, 5, 28, 7, 30, tzinfo=timezone.utc),
+        )
+        summary = wave1_board.board_summary_dict(board, findings, contracts_dir=root)
+        text = wave1_board.format_summary_report(board, findings, contracts_dir=root)
+
+        assert summary["ha"] == "2.7.13"
+        assert summary["active_edit_locks"] == 0
+        assert summary["finding_counts"]["high"] == 0
+        assert summary["contracts"][0]["file_status"] == "published-v1.1"
+        assert summary["latest_handoff"]["sender"] == "Datum"
+        assert "Wave 1 Coordination Summary" in text
+        assert "Codex-A / Truss" in text
+
+
+def test_summary_report_exposes_finding_kind_counts():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        board_path = root / "2.7.13.md"
+        board_path.write_text(fixture_board(registry_status="accepted"), encoding="utf-8")
+        write_contract(root, "published-v1.1")
+        board = wave1_board.parse_board(board_path)
+        findings = [
+            wave1_board.Finding("stale_ownership", "medium", "stale row"),
+            wave1_board.Finding("handoff_order_warning", "medium", "skew"),
+            wave1_board.Finding("handoff_order_warning", "medium", "skew again"),
+        ]
+
+        summary = wave1_board.board_summary_dict(board, findings, contracts_dir=root)
+        text = wave1_board.format_summary_report(board, findings, contracts_dir=root)
+
+        assert summary["finding_counts"]["medium"] == 3
+        assert summary["finding_kind_counts"] == {
+            "handoff_order_warning": 2,
+            "stale_ownership": 1,
+        }
+        assert "Finding kinds: handoff_order_warning=2, stale_ownership=1" in text
+
+
+def test_summary_report_includes_execution_mirrors_when_task_board_is_supplied():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        board_path = root / "2.7.13.md"
+        task_board = root / "TASK-BOARD.json"
+        board_path.write_text(fixture_board(registry_status="accepted"), encoding="utf-8")
+        write_contract(root, "published-v1.1")
+        task_board.write_text(
+            json.dumps(
+                {
+                    "tasks": [
+                        {
+                            "id": "task-133",
+                            "title": "Mirror",
+                            "description": "Mirror task.\n\nDurable source: 2.7.13.CA.4.wp.1",
+                            "status": "completed",
+                            "claimed_by": "Truss",
+                            "created_at": "2026-05-28T09:30:00Z",
+                            "completed_at": "2026-05-28T09:40:00Z",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        board = wave1_board.parse_board(board_path)
+        findings = wave1_board.collect_findings(
+            board,
+            contracts_dir=root,
+            now=datetime(2026, 5, 28, 7, 30, tzinfo=timezone.utc),
+        )
+        summary = wave1_board.board_summary_dict(board, findings, contracts_dir=root, task_board_path=task_board)
+        text = wave1_board.format_summary_report(board, findings, contracts_dir=root, task_board_path=task_board)
+
+        assert summary["execution_mirrors"][0]["durable_source"] == "2.7.13.CA.4.wp.1"
+        assert summary["execution_mirrors"][0]["task_id"] == "task-133"
+        assert summary["execution_mirrors"][0]["status"] == "completed"
+        assert "2.7.13.CA.4.wp.1: task-133 status=completed" in text
+
+
 if __name__ == "__main__":
     tests = [
         test_parse_frontmatter_block_lists_and_tables,
         test_contract_registry_desync_and_blocked_chain_are_reported,
+        test_accepted_registry_is_compatible_with_published_contract_file,
         test_stale_and_overlapping_edit_locks_are_reported,
         test_case_only_edit_lock_overlap_is_reported_on_windows_workspace,
         test_prose_bearing_edit_lock_overlap_is_reported,
@@ -505,6 +613,9 @@ if __name__ == "__main__":
         test_not_blocked_rows_do_not_create_blocked_chain_findings,
         test_parenthetical_timestamp_note_uses_leading_iso_time,
         test_roster_board_status_desync_is_reported_when_all_blocked_claim_contradicts_active_row,
+        test_summary_report_exposes_compact_resume_fields,
+        test_summary_report_exposes_finding_kind_counts,
+        test_summary_report_includes_execution_mirrors_when_task_board_is_supplied,
     ]
 
     passed = 0

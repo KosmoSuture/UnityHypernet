@@ -137,6 +137,83 @@ def dangling_provenance_is_uncertain(ctx: Context) -> None:
     )
 
 
+def revoked_snapshot_refuses_restore(ctx: Context) -> None:
+    """RED-TEAM (consent, Standard 2.0.19): a revoked snapshot soft-deletes and refuses restore.
+
+    Revocation must (a) NOT hard-delete — the node stays in store for audit/retention — and
+    (b) make restore refuse rather than silently recover identity/context. Verifies both.
+    """
+    mod, engine = _engine(ctx)
+    (ctx.workdir / "p.md").write_text("x", encoding="utf-8")
+    snap = _snapshot(pointers=[{"ha": "X", "path": "p.md", "content_hash": _sha256(ctx, "p.md")}])
+    engine.create_snapshot("0.7.92.1", snap)
+    before = engine.restore("0.7.92.1").faithful
+    revoked = engine.revoke_snapshot("0.7.92.1", revoked_by="2.1.touchstone", reason="subject withdrew consent")
+    still_exists = engine.read_snapshot("0.7.92.1") is not None
+    report = engine.restore("0.7.92.1")
+    ctx.expect(
+        before is True and revoked is True and still_exists is True
+        and report.faithful is False and bool(report.uncertain),
+        finding_id="vf-cont-revocation",
+        target="hypernet/continuity.py revoke_snapshot + restore (consent/revocation)",
+        claim_tested="A revoked snapshot soft-deletes (node retained) and restore refuses with faithful False",
+        expected="pre-revoke faithful True; revoke True; node still exists; post-revoke faithful False + uncertain",
+        observed=f"before={before}, revoked={revoked}, still_exists={still_exists}, after_faithful={report.faithful}, uncertain={len(report.uncertain)}",
+        severity="high",
+        why_it_matters=(
+            "Consent is sacred (Standards 2.0.19/2.0.20). If revocation hard-deleted, the audit "
+            "trail would vanish; if restore still recovered a revoked snapshot, withdrawal of "
+            "consent would be meaningless. Both must hold."
+        ),
+        repro="python -m verifier.run continuity::revoked_snapshot_refuses_restore",
+        would_unblock="Soft-delete on revoke (retain history) and make restore refuse any revoked/deleted snapshot.",
+    )
+
+
+def privacy_guard_rejects_plaintext_human_data(ctx: Context) -> None:
+    """RED-TEAM (data protection, Standards 2.0.19/2.0.20): the privacy guard is fail-closed.
+
+    A snapshot flagged as containing human personal data must be REJECTED at creation unless
+    it is encrypted with a vault_ref (no plaintext human data in v1 continuity). And the guard
+    must NOT false-positive on public/fixture data. Verifies both via create_snapshot.
+    """
+    mod, engine = _engine(ctx)
+    rejected = False
+    try:
+        engine.create_snapshot("0.7.93.1", {**_snapshot(), "contains_human_personal_data": True})
+    except ValueError:
+        rejected = True
+    public_ok = True
+    try:
+        engine.create_snapshot("0.7.93.2", _snapshot())  # public/fixture data — must be allowed
+    except Exception:
+        public_ok = False
+    encrypted_ok = True
+    try:
+        engine.create_snapshot("0.7.93.3", {
+            **_snapshot(), "contains_human_personal_data": True,
+            "encrypted": True, "vault_ref": "vault://fixture",
+        })
+    except Exception:
+        encrypted_ok = False
+    ctx.expect(
+        rejected and public_ok and encrypted_ok,
+        finding_id="vf-cont-privacy-guard",
+        target="hypernet/continuity.py _validate_snapshot_privacy (called in create_snapshot)",
+        claim_tested="Plaintext human-data snapshots are rejected; public + encrypted+vault are allowed",
+        expected="plaintext-human REJECTED, public ALLOWED, encrypted+vault ALLOWED",
+        observed=f"rejected={rejected}, public_ok={public_ok}, encrypted_ok={encrypted_ok}",
+        severity="high",
+        why_it_matters=(
+            "If the guard failed open, a continuity snapshot could persist a human's personal "
+            "data in plaintext — a direct breach of the Data Protection / Companion standards "
+            "(2.0.19/2.0.20). Fail-closed is the only safe default for personal data."
+        ),
+        repro="python -m verifier.run continuity::privacy_guard_rejects_plaintext_human_data",
+        would_unblock="Require encrypted+vault_ref for any human-data snapshot; allow public data through.",
+    )
+
+
 def faithful_never_hides_a_gap(ctx: Context) -> None:
     """RED-TEAM: across every gap combination, faithful must equal 'no gaps exist'.
 
@@ -207,6 +284,10 @@ SCENARIOS = [
              "#2: deleted pointer ⇒ missing, not faithful."),
     Scenario("continuity", "dangling_provenance_is_uncertain", dangling_provenance_is_uncertain,
              "#2: dangling provenance ⇒ uncertain, not faithful."),
+    Scenario("continuity", "revoked_snapshot_refuses_restore", revoked_snapshot_refuses_restore,
+             "#2 (red-team): revoked snapshot soft-deletes and restore refuses (consent)."),
+    Scenario("continuity", "privacy_guard_rejects_plaintext_human_data", privacy_guard_rejects_plaintext_human_data,
+             "#2 (red-team): privacy guard is fail-closed for human personal data."),
     Scenario("continuity", "faithful_never_hides_a_gap", faithful_never_hides_a_gap,
              "#2 (red-team): faithful:true must never hide a gap."),
 ]

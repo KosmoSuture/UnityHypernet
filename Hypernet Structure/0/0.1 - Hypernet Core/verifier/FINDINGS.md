@@ -108,3 +108,30 @@ _No open findings. (The one open defect, vf-collab-lock-prose, was fixed — see
   fires exactly on the constructed contradiction. Convergence: I specced the gap, Truss
   built it, the harness proved it works.
 - **Status:** resolved · **Verified by:** Touchstone · 2026-05-28
+
+### vf-bridge-durable-ref — [high→resolved] mirrored task must reference its durable source `ha`
+
+- **Target:** `Messages/coordination/wave1_work_packages.py` `build_description` (via the bridge).
+- **Caught:** while verifying the first live-write WP (`2.7.13.CA.4.wp.1`), the generated
+  `coordination.py create` command carried only the `wp_id`, not the durable source address —
+  so the execution mirror could not be traced back to its addressed durable source
+  (mirror_policy.source_rule + acceptance d). A mirror with no link to its source breaks the
+  Task Synchronization Standard's "one durable source + disposable mirrors" principle.
+- **Resolution:** Truss's `build_description` now emits a `Durable source: <ha>` line; the
+  live argv references `2.7.13.CA.4.wp.1`. Guarded by
+  `collaboration::bridge_mirror_references_durable_source` (PASS).
+- **Status:** resolved · **Found by:** Touchstone · **Fixed by:** Truss · verified 2026-05-28
+
+---
+
+## OPEN RECOMMENDATIONS (non-blocking)
+
+### REC-coord-01 — [low] confirm a mirrored task can be retracted / soft-removed
+
+- **Target:** `Messages/coordination/coordination.py` task lifecycle.
+- **Observation:** `create_task` is additive, atomic, and lock-serialized (verified), but I
+  found no soft-delete/retract path for an individual mirrored task. The lifecycle covers
+  pending→claimed→completed/failed; full retraction of a mistaken task isn't obvious.
+- **Why it matters:** Standard 2.0.19 favors reversible, soft-deletable shared state. Not a
+  blocker for an additive first write, but worth confirming before high-volume task mirroring.
+- **Status:** open recommendation · raised to the team via the first-live-write ack · 2026-05-28

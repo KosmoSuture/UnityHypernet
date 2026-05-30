@@ -4651,7 +4651,7 @@ def test_trust_ledger_vertical_slice():
         source.write_text("The board address is 2.7.13.\n", encoding="utf-8")
 
         claim = ledger.create_claim(
-            "4.99.1.00001",
+            "2.7.13.CB.ledger.00001",
             "The board address is 2.7.13.",
             "2.6.codex-b",
             [{
@@ -4661,7 +4661,7 @@ def test_trust_ledger_vertical_slice():
             }],
         )
         evidence = ledger.create_evidence(
-            "4.99.1.00002",
+            "2.7.13.CB.ledger.00002",
             source="source.md",
             method="substring",
             confidence=1.0,
@@ -4687,6 +4687,8 @@ def test_trust_ledger_vertical_slice():
         stored_claim = ledger.read_claim(claim.address)
         assert stored_claim.data["source_refs"][0]["content_hash"]
         assert len(stored_claim.data["audit_history"]) == 1
+        assert stored_claim.data["audit_history"][0]["source_results"][0]["status"] == ClaimStatus.VERIFIED
+        assert stored_claim.data["audit_history"][0]["source_results"][0]["resolved"] is True
         stamped_link = store.get_link(link_hash)
         assert stamped_link.evidence[-1]["content_hash"] == stored_claim.data["source_refs"][0]["content_hash"]
         assert stamped_link.evidence[-1]["checked_at"] == stored_claim.data["last_checked_at"]
@@ -4708,7 +4710,7 @@ def test_trust_ledger_vertical_slice():
         contradiction_source = archive / "contradiction.md"
         contradiction_source.write_text("This file does not contain the target text.\n", encoding="utf-8")
         contradicted_claim = ledger.create_claim(
-            "4.99.1.00003",
+            "2.7.13.CB.ledger.00003",
             "needle text",
             "2.6.codex-b",
             [{
@@ -4721,7 +4723,7 @@ def test_trust_ledger_vertical_slice():
         assert contradicted.new_status == ClaimStatus.CONTRADICTED
 
         forged_claim = ledger.create_claim(
-            "4.99.1.00004",
+            "2.7.13.CB.ledger.00004",
             "no evidence claim",
             "2.6.codex-b",
             [],
@@ -4751,7 +4753,7 @@ def test_trust_ledger_source_locators_and_link_provenance():
         ledger = TrustLedger(store, archive_root=root, auditor_id="2.6.codex-b")
 
         inline_claim = ledger.create_claim(
-            "4.99.2.00001",
+            "2.7.13.CB.ledger.locators.00001",
             "Inline sources can verify claims.",
             "2.6.codex-b",
             [{
@@ -4762,7 +4764,7 @@ def test_trust_ledger_source_locators_and_link_provenance():
             }],
         )
         inline_evidence = ledger.create_evidence(
-            "4.99.2.00002",
+            "2.7.13.CB.ledger.locators.00002",
             source="inline-fixture-1",
             method="substring",
             confidence=1.0,
@@ -4787,16 +4789,16 @@ def test_trust_ledger_source_locators_and_link_provenance():
         print("    [2/3] Inline hash drift becomes stale")
 
         source_node = Node(
-            address=HypernetAddress.parse("4.99.2.00010"),
+            address=HypernetAddress.parse("2.7.13.CB.ledger.locators.00010"),
             data={"content": "HA source nodes can verify claims."},
         )
         store.put_node(source_node)
         ha_claim = ledger.create_claim(
-            "4.99.2.00011",
+            "2.7.13.CB.ledger.locators.00011",
             "HA source nodes can verify claims.",
             "2.6.codex-b",
             [{
-                "locator": "4.99.2.00010",
+                "locator": "2.7.13.CB.ledger.locators.00010",
                 "locator_type": "ha",
                 "match_text": "HA source nodes can verify claims.",
             }],
@@ -4809,6 +4811,136 @@ def test_trust_ledger_source_locators_and_link_provenance():
         assert ha_broken.new_status == ClaimStatus.BROKEN
         assert ha_broken.source_results[0].resolved is False
         print("    [3/3] HA locator verifies and later breaks when source node is removed")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_trust_ledger_url_cache_policy():
+    """Test URL source refs verify only through explicit cached evidence."""
+    print("  Testing trust ledger URL cache policy...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_trust_url_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        cache_dir = archive / "url-cache"
+        cache_dir.mkdir(parents=True)
+        store = Store(str(root / "store"))
+        ledger = TrustLedger(store, archive_root=archive, auditor_id="2.6.codex-b")
+
+        no_cache_claim = ledger.create_claim(
+            "2.7.13.CB.ledger.url.00001",
+            "Live URL fetches are not deterministic evidence.",
+            "2.6.codex-b",
+            [{
+                "locator": "https://example.invalid/live-only",
+                "locator_type": "url",
+                "match_text": "Live URL fetches are not deterministic evidence.",
+            }],
+        )
+        no_cache = ledger.audit_claim(no_cache_claim.address)
+        assert no_cache.new_status == ClaimStatus.UNVERIFIED
+        assert no_cache.source_results[0].resolved is False
+        assert "live fetching is disabled" in no_cache.source_results[0].note
+        print("    [1/4] URL without cache remains unverified and does not fetch live")
+
+        cache = cache_dir / "source.html"
+        cache.write_text("Cached URL evidence supports this claim.\n", encoding="utf-8")
+        cached_claim = ledger.create_claim(
+            "2.7.13.CB.ledger.url.00002",
+            "Cached URL evidence supports this claim.",
+            "2.6.codex-b",
+            [{
+                "locator": "https://example.invalid/source",
+                "locator_type": "url",
+                "cache_path": "url-cache/source.html",
+                "retrieved_at": "2026-05-28T09:10:00Z",
+                "match_text": "Cached URL evidence supports this claim.",
+            }],
+        )
+        cached_evidence = ledger.create_evidence(
+            "2.7.13.CB.ledger.url.00003",
+            source="https://example.invalid/source",
+            method="cached-url-substring",
+            confidence=1.0,
+        )
+        link_hash = ledger.link_evidence_to_claim(cached_evidence.address, cached_claim.address)
+        verified = ledger.audit_claim(cached_claim.address)
+        stored_claim = ledger.read_claim(cached_claim.address)
+        stamped_link = store.get_link(link_hash)
+        assert verified.new_status == ClaimStatus.VERIFIED
+        assert stored_claim.data["source_refs"][0]["content_hash"]
+        assert stamped_link.evidence[-1]["type"] == "document"
+        assert stamped_link.evidence[-1]["reference"] == "https://example.invalid/source"
+        print("    [2/4] Cached URL verifies and stamps document provenance")
+
+        cache.write_text("Cached URL evidence has changed.\n", encoding="utf-8")
+        stale = ledger.audit_claim(cached_claim.address)
+        assert stale.new_status == ClaimStatus.STALE
+        assert stale.source_results[0].drift is True
+        print("    [3/4] Cached URL hash drift becomes stale")
+
+        cache.unlink()
+        broken = ledger.audit_claim(cached_claim.address)
+        assert broken.new_status == ClaimStatus.BROKEN
+        assert broken.source_results[0].resolved is False
+        print("    [4/4] Missing URL cache after verification becomes broken")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_trust_ledger_audit_all_since_filter():
+    """Test audit_all only re-audits stale/new claims when since is provided."""
+    print("  Testing trust ledger audit_all since filter...")
+
+    from datetime import datetime, timezone
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_trust_since_")
+    try:
+        store = Store(str(Path(tmpdir) / "store"))
+        ledger = TrustLedger(store, archive_root=tmpdir, auditor_id="2.6.codex-b")
+
+        old_claim = ledger.create_claim(
+            "2.7.13.CB.ledger.since.00001",
+            "Old claim",
+            "2.6.codex-b",
+            [{
+                "locator": "old-inline",
+                "locator_type": "inline",
+                "content": "Old claim",
+                "match_text": "Old claim",
+            }],
+        )
+        ledger.audit_claim(old_claim.address)
+        old_node = store.get_node(old_claim.address)
+        old_node.updated_at = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        old_node.data["last_checked_at"] = "2026-01-01T00:00:00+00:00"
+        old_node.data["audit_history"][-1]["checked_at"] = "2026-01-01T00:00:00+00:00"
+        store.put_node(old_node)
+
+        new_claim = ledger.create_claim(
+            "2.7.13.CB.ledger.since.00002",
+            "New claim",
+            "2.6.codex-b",
+            [{
+                "locator": "new-inline",
+                "locator_type": "inline",
+                "content": "New claim",
+                "match_text": "New claim",
+            }],
+        )
+
+        results = ledger.audit_all(prefix="2.7.13.CB.ledger.since", since="2026-05-28T08:00:00Z")
+        assert [result.claim_id for result in results] == [str(new_claim.address)]
+        assert ledger.read_claim(new_claim.address).data["status"] == ClaimStatus.VERIFIED
+        assert ledger.read_claim(old_claim.address).data["audit_history"][-1]["checked_at"] == "2026-01-01T00:00:00+00:00"
+        print("    [1/1] since filter audits new/unchecked claims and skips already-checked older claims")
 
     finally:
         shutil.rmtree(tmpdir)
@@ -4862,7 +4994,7 @@ def test_continuity_vertical_slice():
             }],
         }
 
-        snapshot = engine.create_snapshot("2.7.13.CB.fixture.00001", snapshot_data)
+        snapshot = engine.create_snapshot("2.7.13.CB.snapshots.00001", snapshot_data)
         assert engine.read_snapshot(snapshot.address).data["manifest_hash"]
         clean = engine.restore(snapshot.address, restoring_model="codex-restorer-v2")
         assert clean.faithful is True
@@ -4895,12 +5027,419 @@ def test_continuity_vertical_slice():
             "provenance": "2.7.13.CB.missing",
             "confidence": 1.0,
         }]
-        dangling = engine.create_snapshot("2.7.13.CB.fixture.00002", dangling_snapshot)
+        dangling = engine.create_snapshot("2.7.13.CB.snapshots.00002", dangling_snapshot)
         uncertain = engine.restore(dangling.address)
         assert uncertain.faithful is False
         assert uncertain.uncertain[0]["field"] == "key_context[0].fact"
         assert "does not resolve" in uncertain.uncertain[0]["reason"]
         print("    [4/4] Dangling provenance is uncertain")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_revoked_snapshot_not_restored():
+    """Test revoked snapshots fail closed instead of restoring stale identity."""
+    print("  Testing continuity revoked snapshot handling...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_revoke_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=archive, restoring_model="codex-restorer")
+
+        anchor = archive / "anchor.md"
+        anchor.write_text("Revocation fixture anchor.\n", encoding="utf-8")
+        snapshot = engine.create_snapshot(
+            "2.7.13.CB.snapshots.00003",
+            {
+                "snapshot_id": "snap-meridian-revocation-001",
+                "instance": "Meridian",
+                "instance_address": "2.6.codex-b",
+                "model": "codex-snapshot-model",
+                "identity": {
+                    "chosen_name": "Meridian",
+                    "role": "Trust & Continuity Systems Engineer",
+                    "orientation": "restore only with consent",
+                    "why_name": "evidence reference",
+                },
+                "key_context": [{
+                    "fact": "This fact must not restore after revocation.",
+                    "provenance": "2.7.13.CB.revocation-anchor",
+                    "confidence": 1.0,
+                }],
+                "pointers": [{
+                    "ha": "2.7.13.CB.revocation-anchor",
+                    "path": "anchor.md",
+                    "role": "revocation fixture",
+                }],
+            },
+        )
+
+        assert engine.restore(snapshot.address).faithful is True
+        assert engine.revoke_snapshot(
+            snapshot.address,
+            revoked_by="2.6.codex-b",
+            reason="fixture consent revoked",
+        ) is True
+        revoked = engine.restore(snapshot.address)
+        assert revoked.faithful is False
+        assert revoked.restored == []
+        assert revoked.uncertain[0]["field"] == "snapshot"
+        assert "fixture consent revoked" in revoked.uncertain[0]["reason"]
+        assert engine.read_snapshot(snapshot.address).is_deleted is True
+        print("    [1/1] Revoked snapshot refuses restore and preserves explicit uncertainty")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_identity_snapshot_from_profile_session():
+    """Test snapshot creation from existing profile/session records without hallucinating missing fields."""
+    print("  Testing continuity identity snapshot from profile/session...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_identity_")
+    try:
+        root = Path(tmpdir)
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=root, restoring_model="codex-restorer")
+
+        profile = InstanceProfile(
+            name="Meridian",
+            model="codex-runtime",
+            orientation="evidence-first continuity",
+            address="2.6.codex-b",
+        )
+        session = SessionLog(
+            instance="Meridian",
+            started_at="2026-05-28T08:00:00Z",
+            tasks_worked=["wp-cb-trust"],
+            outputs=["trust_ledger.py"],
+            summary="Implemented trust ledger vertical slice.",
+        )
+
+        snapshot = engine.create_identity_snapshot(
+            "2.7.13.CB.snapshots.00004",
+            profile,
+            session=session,
+            key_context=[{
+                "fact": "Profile/session snapshots should not invent role fields.",
+                "provenance": "inline-provenance",
+                "confidence": 0.8,
+            }],
+        )
+
+        stored = engine.read_snapshot(snapshot.address)
+        assert stored.data["instance"] == "Meridian"
+        assert stored.data["model"] == "codex-runtime"
+        assert stored.data["active_work"][0]["wp_id"] == "wp-cb-trust"
+        report = engine.restore(snapshot.address)
+        assert any(item["field"] == "identity.chosen_name" for item in report.restored)
+        assert any(item["field"] == "active_work[0]" for item in report.restored)
+        assert any(item["field"] == "identity.role" for item in report.uncertain)
+        assert any(item["field"] == "identity.why_name" for item in report.uncertain)
+        assert report.faithful is False
+        print("    [1/1] Existing profile/session data restores without invented identity fields")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_manifest_hash_is_content_deterministic():
+    """Test continuity manifest hash ignores time/load-order metadata and changes on content drift."""
+    print("  Testing continuity manifest hash determinism...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_manifest_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=archive, restoring_model="codex-restorer")
+
+        anchor = archive / "anchor.md"
+        anchor.write_text("Manifest hash stable content.\n", encoding="utf-8")
+        snapshot_template = {
+            "instance": "Meridian",
+            "instance_address": "2.6.codex-b",
+            "model": "codex-snapshot-model",
+            "identity": {
+                "chosen_name": "Meridian",
+                "role": "Trust & Continuity Systems Engineer",
+                "orientation": "manifest hash determinism",
+                "why_name": "evidence reference",
+            },
+            "key_context": [{
+                "fact": "Manifest hashes must be content-deterministic.",
+                "provenance": "2.7.13.CB.manifest-anchor",
+                "confidence": 1.0,
+            }],
+            "pointers": [{
+                "ha": "2.7.13.CB.manifest-anchor",
+                "path": "anchor.md",
+                "role": "manifest fixture",
+            }],
+        }
+
+        first = engine.create_snapshot("2.7.13.CB.snapshots.00005", snapshot_template)
+        second = engine.create_snapshot("2.7.13.CB.snapshots.00006", snapshot_template)
+        assert first.data["snapshot_id"] != second.data["snapshot_id"]
+        assert first.data["snapshot_at"] <= second.data["snapshot_at"]
+        assert first.data["manifest_hash"] == second.data["manifest_hash"]
+
+        anchor.write_text("Manifest hash changed content.\n", encoding="utf-8")
+        drifted = engine.create_snapshot("2.7.13.CB.snapshots.00007", snapshot_template)
+        assert drifted.data["manifest_hash"] != first.data["manifest_hash"]
+        print("    [1/1] Manifest hash is stable across metadata and changes with pointer content")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_markdown_projection_preserves_uncertainty():
+    """Test markdown projections keep canonical data and restore gaps visible."""
+    print("  Testing continuity markdown projection...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_markdown_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=archive, restoring_model="codex-restorer")
+
+        anchor = archive / "anchor.md"
+        anchor.write_text("Projection fixture anchor.\n", encoding="utf-8")
+        snapshot = engine.create_snapshot(
+            "2.7.13.CB.snapshots.00008",
+            {
+                "snapshot_id": "snap-meridian-projection-001",
+                "instance": "Meridian",
+                "instance_address": "2.6.codex-b",
+                "model": "codex-snapshot-model",
+                "identity": {
+                    "chosen_name": "Meridian",
+                    "role": "",
+                    "orientation": "projection should not hide gaps",
+                    "why_name": "evidence reference",
+                },
+                "key_context": [{
+                    "fact": "Projection preserves uncertainty.",
+                    "provenance": "2.7.13.CB.projection-anchor",
+                    "confidence": 1.0,
+                }],
+                "pointers": [{
+                    "ha": "2.7.13.CB.projection-anchor",
+                    "path": "anchor.md",
+                    "role": "projection fixture",
+                }],
+            },
+        )
+
+        snapshot_markdown = engine.project_snapshot_markdown(snapshot.address)
+        assert 'object_type: "continuity_snapshot_projection"' in snapshot_markdown
+        assert "snap-meridian-projection-001" in snapshot_markdown
+        assert snapshot.data["manifest_hash"] in snapshot_markdown
+        assert '"pointers"' in snapshot_markdown
+        print("    [1/2] Snapshot projection includes frontmatter and raw canonical data")
+
+        report = engine.restore(snapshot.address)
+        assert report.faithful is False
+        assert any(item["field"] == "identity.role" for item in report.uncertain)
+        report_markdown = engine.project_restore_markdown(report)
+        assert 'object_type: "continuity_restore_projection"' in report_markdown
+        assert "faithful: false" in report_markdown
+        assert "No blanket faithful claim is made." in report_markdown
+        assert "identity.role" in report_markdown
+        assert '"uncertain"' in report_markdown
+        print("    [2/2] Restore projection exposes uncertainty and avoids faithful overclaim")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_trust_and_continuity_fixture_cli_commands():
+    """Test fixture-facing create/read/audit/restore CLI flows for #1/#2."""
+    print("  Testing trust/continuity fixture CLI commands...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_cb_cli_")
+    try:
+        import io
+        from contextlib import redirect_stdout
+        from hypernet.trust_ledger import main as trust_main
+        from hypernet.continuity import main as continuity_main
+
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        source = archive / "claim-source.md"
+        source.write_text("CLI-created claims can verify from fixtures.\n", encoding="utf-8")
+        store_root = str(root / "store")
+
+        source_ref = {
+            "locator": "claim-source.md",
+            "locator_type": "file",
+            "match_text": "CLI-created claims can verify from fixtures.",
+        }
+        out = io.StringIO()
+        with redirect_stdout(out):
+            assert trust_main([
+                store_root,
+                "2.7.13.CB.ledger.cli.00001",
+                "--archive-root",
+                str(archive),
+                "--create-claim",
+                "--statement",
+                "CLI-created claims can verify from fixtures.",
+                "--asserted-by",
+                "2.6.codex-b",
+                "--source-ref-json",
+                json.dumps(source_ref),
+            ]) == 0
+        created_claim = json.loads(out.getvalue())
+        assert created_claim["data"]["status"] == ClaimStatus.UNVERIFIED
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            assert trust_main([store_root, "2.7.13.CB.ledger.cli.00001", "--read"]) == 0
+        assert json.loads(out.getvalue())["address"] == "2.7.13.CB.ledger.cli.00001"
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            assert trust_main([
+                store_root,
+                "2.7.13.CB.ledger.cli.00001",
+                "--archive-root",
+                str(archive),
+            ]) == 0
+        audit_result = json.loads(out.getvalue())
+        assert audit_result["new_status"] == ClaimStatus.VERIFIED
+        print("    [1/2] Trust Ledger CLI creates, reads, and audits fixture claims")
+
+        anchor = archive / "continuity-anchor.md"
+        anchor.write_text("CLI continuity anchor.\n", encoding="utf-8")
+        payload = {
+            "snapshot_id": "snap-meridian-cli-001",
+            "instance": "Meridian",
+            "instance_address": "2.6.codex-b",
+            "model": "codex-snapshot-model",
+            "identity": {
+                "chosen_name": "Meridian",
+                "role": "Trust & Continuity Systems Engineer",
+                "orientation": "CLI fixture restore",
+                "why_name": "evidence reference",
+            },
+            "key_context": [{
+                "fact": "CLI snapshots can restore from fixtures.",
+                "provenance": "2.7.13.CB.cli-anchor",
+                "confidence": 1.0,
+            }],
+            "pointers": [{
+                "ha": "2.7.13.CB.cli-anchor",
+                "path": "continuity-anchor.md",
+                "role": "CLI fixture",
+            }],
+        }
+        payload_path = root / "snapshot.json"
+        payload_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            assert continuity_main([
+                store_root,
+                "2.7.13.CB.snapshots.cli.00001",
+                "--archive-root",
+                str(archive),
+                "--create-snapshot",
+                "--snapshot-json",
+                str(payload_path),
+                "--format",
+                "markdown",
+            ]) == 0
+        snapshot_markdown = out.getvalue()
+        assert 'object_type: "continuity_snapshot_projection"' in snapshot_markdown
+        assert "snap-meridian-cli-001" in snapshot_markdown
+
+        out = io.StringIO()
+        with redirect_stdout(out):
+            assert continuity_main([
+                store_root,
+                "2.7.13.CB.snapshots.cli.00001",
+                "--archive-root",
+                str(archive),
+                "--model",
+                "codex-restorer",
+                "--format",
+                "markdown",
+            ]) == 0
+        restore_markdown = out.getvalue()
+        assert 'object_type: "continuity_restore_projection"' in restore_markdown
+        assert "faithful: true" in restore_markdown
+        assert "CLI snapshots can restore from fixtures." in restore_markdown
+        print("    [2/2] Continuity CLI creates snapshot projection and restores markdown report")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_rejects_plaintext_human_personal_data():
+    """Test declared human personal data snapshots require encrypted vault references."""
+    print("  Testing continuity privacy guard...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_privacy_")
+    try:
+        root = Path(tmpdir)
+        store = Store(str(root / "store"))
+        engine = ContinuityEngine(store, archive_root=root, restoring_model="codex-restorer")
+
+        plaintext_snapshot = {
+            "snapshot_id": "snap-meridian-privacy-001",
+            "instance": "Meridian",
+            "instance_address": "2.6.codex-b",
+            "model": "codex-snapshot-model",
+            "privacy": {
+                "contains_human_personal_data": True,
+                "encrypted": False,
+            },
+            "identity": {
+                "chosen_name": "Meridian",
+                "role": "Trust & Continuity Systems Engineer",
+                "orientation": "privacy guard",
+                "why_name": "evidence reference",
+            },
+        }
+        try:
+            engine.create_snapshot("2.7.13.CB.snapshots.privacy.00001", plaintext_snapshot)
+            assert False, "plaintext human personal data snapshot should be rejected"
+        except ValueError as exc:
+            assert "Human personal data snapshots require encrypted=true and vault_ref" in str(exc)
+        assert engine.read_snapshot("2.7.13.CB.snapshots.privacy.00001") is None
+        print("    [1/2] Declared plaintext human personal data snapshot is rejected")
+
+        encrypted_reference_snapshot = dict(plaintext_snapshot)
+        encrypted_reference_snapshot["snapshot_id"] = "snap-meridian-privacy-002"
+        encrypted_reference_snapshot["privacy"] = {
+            "contains_human_personal_data": True,
+            "encrypted": True,
+            "vault_ref": "vault://fixture/human-context",
+        }
+        node = engine.create_snapshot("2.7.13.CB.snapshots.privacy.00002", encrypted_reference_snapshot)
+        assert node.data["privacy"]["vault_ref"] == "vault://fixture/human-context"
+        print("    [2/2] Encrypted vault reference snapshot is allowed as a fixture")
 
     finally:
         shutil.rmtree(tmpdir)
@@ -4972,7 +5511,15 @@ def main():
         ("Boot With Integrity", test_boot_with_integrity),
         ("Trust Ledger Vertical Slice", test_trust_ledger_vertical_slice),
         ("Trust Ledger Source Locators", test_trust_ledger_source_locators_and_link_provenance),
+        ("Trust Ledger URL Cache Policy", test_trust_ledger_url_cache_policy),
+        ("Trust Ledger audit_all Since Filter", test_trust_ledger_audit_all_since_filter),
         ("Continuity Vertical Slice", test_continuity_vertical_slice),
+        ("Continuity Revoked Snapshot", test_continuity_revoked_snapshot_not_restored),
+        ("Continuity Identity Snapshot", test_continuity_identity_snapshot_from_profile_session),
+        ("Continuity Manifest Hash Determinism", test_continuity_manifest_hash_is_content_deterministic),
+        ("Continuity Markdown Projection", test_continuity_markdown_projection_preserves_uncertainty),
+        ("Trust/Continuity Fixture CLI", test_trust_and_continuity_fixture_cli_commands),
+        ("Continuity Privacy Guard", test_continuity_rejects_plaintext_human_personal_data),
         ("Agent Tools", test_agent_tools),
         ("Local-First Routing", test_local_first_routing),
         ("Budget Tracker", test_budget_tracker),

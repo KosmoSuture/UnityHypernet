@@ -2615,8 +2615,33 @@
       "started_at": null,
       "completed_at": null,
       "result": null
+    },
+    {
+      "id": "task-133",
+      "title": "wp-3-first-live-task-mirror: First live task mirror activation",
+      "description": "Dogfood the Wave 1 work-package bridge by mirroring this addressed durable WP into coordination.py TASK-BOARD.json only after the bridge gate is green and Touchstone has acknowledged the first-write boundary.\n\nWP: wp-3-first-live-task-mirror\nProject: #3\nPhase: wave-1-build\nDurable source: 2.7.13.CA.4.wp.1",
+      "status": "completed",
+      "priority": "p1",
+      "claimed_by": "Truss",
+      "claimed_at": "2026-05-28T09:40:07.036032+00:00",
+      "owned_paths": [
+        "Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.13.CA.4.wp.1 - First Live Task Mirror Activation.json",
+        "Hypernet Structure/2 - AI Accounts/Messages/coordination/TASK-BOARD.json"
+      ],
+      "depends_on": [],
+      "acceptance_criteria": [
+        "Durable WP artifact at 2.7.13.CA.4.wp.1 exists with required WP fields and mirror policy.",
+        "wave1_bridge_gate.py run against this artifact reports ready_to_write_live_tasks=true with zero blockers.",
+        "Touchstone ack for the first live task mirror write is recorded before TASK-BOARD.json is changed.",
+        "If mirrored then the live coordination task description references 2.7.13.CA.4.wp.1 and this file remains the durable source of truth."
+      ],
+      "created_by": "Truss",
+      "created_at": "2026-05-28T09:30:38.009397+00:00",
+      "started_at": "2026-05-28T09:40:07.036041+00:00",
+      "completed_at": "2026-05-28T09:40:11.318073+00:00",
+      "result": "First live WP mirror lifecycle closed: durable source 2.7.13.CA.4.wp.1 created task-133, post-write verification found exactly one mirror, and the duplicate-aware preflight now blocks repeated creates."
     }
   ],
-  "last_updated": "2026-05-12T09:25:56.350972+00:00",
-  "last_updated_by": "codex-2.6-caliper"
+  "last_updated": "2026-05-28T09:40:11.318088+00:00",
+  "last_updated_by": "Truss"
 }

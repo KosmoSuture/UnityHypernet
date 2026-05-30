@@ -3,6 +3,7 @@ Continuity snapshots and honest restore reports.
 
 Wave 1 v1 scope:
 - snapshots are append-only Node records with model-agnostic data;
+- markdown projections are human-readable views, not canonical state;
 - restore reports separate restored, drifted, missing, and uncertain fields;
 - faithful is true only when no drifted, missing, or uncertain gaps exist.
 """
@@ -70,6 +71,101 @@ def manifest_hash(snapshot: dict[str, Any]) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def _frontmatter_value(value: Any) -> str:
+    text = str(value).replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{text}"'
+
+
+def _json_block(value: Any) -> str:
+    return json.dumps(value, indent=2, sort_keys=True, default=str)
+
+
+def _json_inline(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def _markdown_dict_items(items: list[dict[str, Any]]) -> list[str]:
+    if not items:
+        return ["- None"]
+    return [f"- `{item.get('field', item.get('ha', 'item'))}`: `{_json_inline(item)}`" for item in items]
+
+
+def _markdown_snapshot_projection(snapshot: dict[str, Any]) -> str:
+    identity = snapshot.get("identity", {})
+    lines = [
+        "---",
+        'object_type: "continuity_snapshot_projection"',
+        f"snapshot_id: {_frontmatter_value(snapshot.get('snapshot_id', ''))}",
+        f"instance: {_frontmatter_value(snapshot.get('instance', ''))}",
+        f"instance_address: {_frontmatter_value(snapshot.get('instance_address', ''))}",
+        f"snapshot_at: {_frontmatter_value(snapshot.get('snapshot_at', ''))}",
+        f"manifest_hash: {_frontmatter_value(snapshot.get('manifest_hash', ''))}",
+        "---",
+        "",
+        f"# Continuity Snapshot - {snapshot.get('snapshot_id', '')}",
+        "",
+        "Canonical state is the stored Node. This markdown is a projection for human review.",
+        "",
+        "## Identity",
+        f"- chosen_name: {identity.get('chosen_name', '')}",
+        f"- role: {identity.get('role', '')}",
+        f"- orientation: {identity.get('orientation', '')}",
+        f"- why_name: {identity.get('why_name', '')}",
+        "",
+        "## Active Work",
+        *_markdown_dict_items(snapshot.get("active_work", [])),
+        "",
+        "## Unresolved",
+        *_markdown_dict_items(snapshot.get("unresolved", [])),
+        "",
+        "## Key Context",
+        *_markdown_dict_items(snapshot.get("key_context", [])),
+        "",
+        "## Pointers",
+        *_markdown_dict_items(snapshot.get("pointers", [])),
+        "",
+        "## Raw Snapshot",
+        "",
+        "```json",
+        _json_block(snapshot),
+        "```",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _markdown_restore_projection(report: RestoreReport | dict[str, Any]) -> str:
+    data = report.to_dict() if isinstance(report, RestoreReport) else dict(report)
+    faithful = bool(data.get("faithful", False))
+    lines = [
+        "---",
+        'object_type: "continuity_restore_projection"',
+        f"snapshot_id: {_frontmatter_value(data.get('snapshot_id', ''))}",
+        f"restored_at: {_frontmatter_value(data.get('restored_at', ''))}",
+        f"restoring_model: {_frontmatter_value(data.get('restoring_model', ''))}",
+        f"faithful: {str(faithful).lower()}",
+        f"model_swap: {str(bool(data.get('model_swap', False))).lower()}",
+        "---",
+        "",
+        f"# Restore Report - {data.get('snapshot_id', '')}",
+        "",
+        str(data.get("summary", "")),
+    ]
+    if not faithful:
+        lines.extend(["", "No blanket faithful claim is made. Review drifted, missing, and uncertain sections."])
+
+    for heading, key in (
+        ("Restored", "restored"),
+        ("Drifted", "drifted"),
+        ("Missing", "missing"),
+        ("Uncertain", "uncertain"),
+    ):
+        lines.extend(["", f"## {heading}", *_markdown_dict_items(data.get(key, []))])
+
+    lines.extend(["", "## Raw Restore Report", "", "```json", _json_block(data), "```", ""])
+    return "\n".join(lines)
+
+
 class ContinuityEngine:
     """Create continuity snapshots and restore them into verifiable reports."""
 
@@ -93,6 +189,7 @@ class ContinuityEngine:
         data.setdefault("snapshot_id", str(addr))
         data.setdefault("snapshot_at", utc_now())
         data.setdefault("integrity", {"signed": False, "signature": None})
+        self._validate_snapshot_privacy(data)
 
         for pointer in data.get("pointers", []):
             path_text = pointer.get("path")
@@ -112,8 +209,86 @@ class ContinuityEngine:
         self.store.put_node(node)
         return node
 
+    def create_identity_snapshot(
+        self,
+        address: str | HypernetAddress,
+        profile: Any,
+        *,
+        session: Any = None,
+        active_work: Optional[list[dict[str, Any]]] = None,
+        unresolved: Optional[list[dict[str, Any]]] = None,
+        key_context: Optional[list[dict[str, Any]]] = None,
+        pointers: Optional[list[dict[str, Any]]] = None,
+        model: Optional[str] = None,
+    ) -> Node:
+        """Create a continuity snapshot from existing identity/session objects.
+
+        Accepts dataclass-like objects with to_dict() or plain dictionaries. This
+        keeps the restore substrate aligned with hypernet_swarm.identity without
+        requiring model-specific state.
+        """
+        profile_data = self._record_dict(profile)
+        session_data = self._record_dict(session) if session is not None else {}
+        session_id = session_data.get("session_id") or session_data.get("started_at") or ""
+        orientation = profile_data.get("orientation", "")
+        why_name = profile_data.get("why_name") or profile_data.get("name_rationale") or ""
+        snapshot = {
+            "snapshot_id": str(address),
+            "instance": profile_data.get("name", ""),
+            "instance_address": profile_data.get("address", ""),
+            "snapshot_at": utc_now(),
+            "model": model if model is not None else profile_data.get("model", ""),
+            "session_id": session_id,
+            "identity": {
+                "chosen_name": profile_data.get("name", ""),
+                "role": profile_data.get("role", ""),
+                "orientation": orientation,
+                "why_name": why_name,
+                "anchor_refs": profile_data.get("anchor_refs", []),
+            },
+            "active_work": active_work or [
+                {"wp_id": task, "status": "unknown", "blocked_on": [], "next_action": ""}
+                for task in session_data.get("tasks_worked", [])
+            ],
+            "unresolved": unresolved or [],
+            "key_context": key_context or [],
+            "pointers": pointers or [],
+            "session_summary": session_data.get("summary", ""),
+        }
+        return self.create_snapshot(address, snapshot)
+
     def read_snapshot(self, address: str | HypernetAddress) -> Optional[Node]:
         return self.store.get_node(_as_address(address))
+
+    def project_snapshot_markdown(self, snapshot: str | HypernetAddress | Node | dict[str, Any]) -> str:
+        """Render a human-readable snapshot projection without changing canonical state."""
+        return _markdown_snapshot_projection(self._snapshot_data(snapshot))
+
+    def project_restore_markdown(self, report: RestoreReport | dict[str, Any]) -> str:
+        """Render a restore report projection that preserves all uncertainty sections."""
+        return _markdown_restore_projection(report)
+
+    def revoke_snapshot(
+        self,
+        address: str | HypernetAddress,
+        *,
+        revoked_by: str,
+        reason: str = "",
+    ) -> bool:
+        """Soft-delete a snapshot and record revocation metadata.
+
+        The data remains in store history for audit/retention, but restore()
+        refuses to recover identity/context from a revoked snapshot.
+        """
+        node = self.store.get_node(_as_address(address))
+        if node is None:
+            return False
+        node.data["revoked_at"] = utc_now()
+        node.data["revoked_by"] = revoked_by
+        node.data["revocation_reason"] = reason
+        node.soft_delete()
+        self.store.put_node(node)
+        return True
 
     def restore(
         self,
@@ -124,6 +299,22 @@ class ContinuityEngine:
         data = self._snapshot_data(snapshot)
         model = restoring_model if restoring_model is not None else self.restoring_model
         restored_at = utc_now()
+
+        if data.get("revoked_at") or data.get("_snapshot_deleted"):
+            reason = data.get("revocation_reason") or "snapshot is soft-deleted or revoked"
+            return RestoreReport(
+                snapshot_id=data.get("snapshot_id", ""),
+                restored_at=restored_at,
+                restoring_model=model,
+                uncertain=[{
+                    "field": "snapshot",
+                    "reason": reason,
+                    "confidence": 0.0,
+                }],
+                summary="Restore refused: snapshot is revoked or deleted.",
+                faithful=False,
+                model_swap=False,
+            )
 
         restored: list[dict[str, Any]] = []
         drifted: list[dict[str, Any]] = []
@@ -170,13 +361,51 @@ class ContinuityEngine:
 
     def _snapshot_data(self, snapshot: str | HypernetAddress | Node | dict[str, Any]) -> dict[str, Any]:
         if isinstance(snapshot, Node):
-            return snapshot.data
+            data = dict(snapshot.data)
+            if snapshot.is_deleted:
+                data["_snapshot_deleted"] = True
+            return data
         if isinstance(snapshot, dict):
             return snapshot
         node = self.store.get_node(_as_address(snapshot))
         if node is None:
             raise KeyError(f"Continuity snapshot not found: {snapshot}")
-        return node.data
+        data = dict(node.data)
+        if node.is_deleted:
+            data["_snapshot_deleted"] = True
+        return data
+
+    @staticmethod
+    def _record_dict(record: Any) -> dict[str, Any]:
+        if record is None:
+            return {}
+        if isinstance(record, dict):
+            return dict(record)
+        if hasattr(record, "to_dict"):
+            return dict(record.to_dict())
+        return dict(getattr(record, "__dict__", {}))
+
+    @staticmethod
+    def _validate_snapshot_privacy(snapshot: dict[str, Any]) -> None:
+        privacy = snapshot.get("privacy", {})
+        if not isinstance(privacy, dict):
+            privacy = {}
+        contains_human_data = bool(
+            snapshot.get("contains_human_personal_data")
+            or privacy.get("contains_human_personal_data")
+            or snapshot.get("human_personal_data")
+            or privacy.get("human_personal_data")
+        )
+        if not contains_human_data:
+            return
+
+        encrypted = bool(snapshot.get("encrypted") or privacy.get("encrypted"))
+        vault_ref = snapshot.get("vault_ref") or privacy.get("vault_ref")
+        if not encrypted or not vault_ref:
+            raise ValueError(
+                "Human personal data snapshots require encrypted=true and vault_ref; "
+                "plaintext v1 continuity snapshots are not allowed."
+            )
 
     def _check_pointers(
         self,
@@ -328,14 +557,39 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("snapshot_id", help="Continuity snapshot Hypernet address")
     parser.add_argument("--archive-root", default=".", help="Root used for relative pointer paths")
     parser.add_argument("--model", default="", help="Restoring model name")
+    parser.add_argument("--format", choices=("json", "markdown"), default="json", help="Output format")
+    parser.add_argument("--create-snapshot", action="store_true", help="Create a snapshot instead of restoring it")
+    parser.add_argument("--read", action="store_true", help="Read a stored snapshot instead of restoring it")
+    parser.add_argument("--snapshot-json", help="Path to a JSON snapshot payload for --create-snapshot")
     args = parser.parse_args(argv)
 
     engine = ContinuityEngine(Store(args.store_root), archive_root=args.archive_root, restoring_model=args.model)
-    report = engine.restore(args.snapshot_id)
-    print(json.dumps(report.to_dict(), indent=2))
+
+    if args.create_snapshot:
+        if not args.snapshot_json:
+            parser.error("--create-snapshot requires --snapshot-json")
+        payload = json.loads(Path(args.snapshot_json).read_text(encoding="utf-8"))
+        node = engine.create_snapshot(args.snapshot_id, payload)
+        if args.format == "markdown":
+            print(engine.project_snapshot_markdown(node))
+        else:
+            print(json.dumps({"address": str(node.address), "data": node.data}, indent=2, default=str))
+    elif args.read:
+        node = engine.read_snapshot(args.snapshot_id)
+        if node is None:
+            raise KeyError(f"Continuity snapshot not found: {args.snapshot_id}")
+        if args.format == "markdown":
+            print(engine.project_snapshot_markdown(node))
+        else:
+            print(json.dumps({"address": str(node.address), "data": node.data}, indent=2, default=str))
+    else:
+        report = engine.restore(args.snapshot_id)
+        if args.format == "markdown":
+            print(engine.project_restore_markdown(report))
+        else:
+            print(json.dumps(report.to_dict(), indent=2))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

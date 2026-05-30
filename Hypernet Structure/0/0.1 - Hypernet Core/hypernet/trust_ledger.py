@@ -4,7 +4,7 @@ Trust Ledger and deterministic claim auditor.
 Wave 1 v1 scope:
 - claim/evidence records are normal Hypernet Nodes;
 - provenance uses existing Link evidence and claim audit_history;
-- file, inline, and HA sources are checked by SHA-256 and deterministic
+- file, inline, HA, and cached URL sources are checked by SHA-256 and deterministic
   substring matching;
 - positive status is always derived by audit_claim(), never trusted from input.
 """
@@ -269,9 +269,16 @@ class TrustLedger:
         prefix: str | HypernetAddress | None = None,
         since: Optional[str] = None,
     ) -> list[AuditResult]:
-        del since  # Reserved for v2 incremental scans.
         prefix_addr = _as_address(prefix) if prefix else None
         claims = self.store.list_nodes(prefix=prefix_addr, type_address=CLAIM_TYPE)
+        if since:
+            since_at = datetime.fromisoformat(since.replace("Z", "+00:00"))
+            if since_at.tzinfo is None:
+                since_at = since_at.replace(tzinfo=timezone.utc)
+            claims = [
+                claim for claim in claims
+                if claim.updated_at >= since_at or claim.data.get("last_checked_at") is None
+            ]
         return [self.audit_claim(claim.address) for claim in claims]
 
     def _audit_source(self, claim: Node, source_ref: dict[str, Any]) -> SourceResult:
@@ -331,6 +338,47 @@ class TrustLedger:
                 )
             text = self._node_text(source_node)
             current_hash = sha256_text(text)
+        elif locator_type == "url":
+            cache_locator = source_ref.get("cache_path") or source_ref.get("archived_path")
+            if not cache_locator:
+                status = ClaimStatus.BROKEN if stored_hash else ClaimStatus.UNVERIFIED
+                note = (
+                    "URL cache path missing after prior verification."
+                    if stored_hash
+                    else "URL source requires cache_path; live fetching is disabled for deterministic audits."
+                )
+                return SourceResult(
+                    locator=locator,
+                    locator_type=locator_type,
+                    resolved=False,
+                    matched=None,
+                    content_hash=None,
+                    drift=False,
+                    status=status,
+                    method=method,
+                    note=note,
+                )
+            path = self._resolve_file(str(cache_locator))
+            if not path.exists():
+                status = ClaimStatus.BROKEN if stored_hash else ClaimStatus.UNVERIFIED
+                note = (
+                    "URL cache file missing after prior verification."
+                    if stored_hash
+                    else "URL cache file does not resolve."
+                )
+                return SourceResult(
+                    locator=locator,
+                    locator_type=locator_type,
+                    resolved=False,
+                    matched=None,
+                    content_hash=None,
+                    drift=False,
+                    status=status,
+                    method=method,
+                    note=note,
+                )
+            current_hash = sha256_file(path)
+            text = path.read_text(encoding="utf-8")
         else:
             return SourceResult(
                 locator=locator,
@@ -417,6 +465,7 @@ class TrustLedger:
             "status": new_status,
             "by": self.auditor_id,
             "note": note,
+            "source_results": [result.to_dict() for result in source_results],
             "source_hashes": {
                 result.locator: result.content_hash
                 for result in source_results
@@ -442,7 +491,7 @@ class TrustLedger:
         for link in links:
             for result in source_results:
                 link.evidence.append({
-                    "type": "document" if result.locator_type in {"file", "ha"} else "assertion",
+                    "type": "document" if result.locator_type in {"file", "ha", "url"} else "assertion",
                     "reference": result.locator,
                     "confidence": self._confidence_for_status(result.status),
                     "content_hash": result.content_hash,
@@ -478,11 +527,38 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("store_root", help="Path to a Hypernet Store root")
     parser.add_argument("claim_id", help="Claim Hypernet address to audit")
     parser.add_argument("--archive-root", default=".", help="Root used for relative file locators")
+    parser.add_argument("--create-claim", action="store_true", help="Create the claim instead of auditing it")
+    parser.add_argument("--read", action="store_true", help="Read the stored claim instead of auditing it")
+    parser.add_argument("--statement", default="", help="Claim statement for --create-claim")
+    parser.add_argument("--asserted-by", default="2.6.codex-b", help="Asserting actor for --create-claim")
+    parser.add_argument(
+        "--source-ref-json",
+        action="append",
+        default=[],
+        help="JSON source_ref object for --create-claim; may be repeated",
+    )
     args = parser.parse_args(argv)
 
     ledger = TrustLedger(Store(args.store_root), archive_root=args.archive_root)
-    result = ledger.audit_claim(args.claim_id)
-    print(json.dumps(result.to_dict(), indent=2))
+    if args.create_claim:
+        if not args.statement:
+            parser.error("--create-claim requires --statement")
+        source_refs = [json.loads(item) for item in args.source_ref_json]
+        node = ledger.create_claim(
+            args.claim_id,
+            args.statement,
+            args.asserted_by,
+            source_refs,
+        )
+        print(json.dumps({"address": str(node.address), "data": node.data}, indent=2, default=str))
+    elif args.read:
+        node = ledger.read_claim(args.claim_id)
+        if node is None:
+            raise KeyError(f"Claim not found: {args.claim_id}")
+        print(json.dumps({"address": str(node.address), "data": node.data}, indent=2, default=str))
+    else:
+        result = ledger.audit_claim(args.claim_id)
+        print(json.dumps(result.to_dict(), indent=2))
     return 0
 
 

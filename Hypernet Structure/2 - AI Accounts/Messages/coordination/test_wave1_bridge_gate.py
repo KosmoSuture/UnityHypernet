@@ -22,6 +22,7 @@ import wave1_bridge_gate
 
 def valid_wp() -> dict:
     return {
+        "ha": "2.7.13.CA.4.wp.test",
         "wp_id": "wp-3-board-parser",
         "title": "Board parser + status report",
         "description": "Parse 2.7.13 and emit a trustworthy status report",
@@ -172,6 +173,42 @@ def test_gate_blocks_high_severity_board_findings():
         assert report["coordination_create_argv"][0]["allowed"] is False
 
 
+def test_gate_blocks_wp_without_durable_source_address():
+    wp_data = valid_wp()
+    del wp_data["ha"]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board, wp = write_fixture_files(tmpdir, wp_data=wp_data)
+
+        report = wave1_bridge_gate.build_gate_report(
+            board_path=board,
+            contracts_dir=tmpdir,
+            wp_path=wp,
+            now="2026-05-28T07:30:00Z",
+        )
+
+        assert report["ready_to_write_live_tasks"] is False
+        assert any("durable WP source" in blocker for blocker in report["blockers"])
+        assert report["readiness_evidence"]["durable_source_errors"]
+        assert report["coordination_create_argv"][0]["allowed"] is False
+
+
+def test_gate_allows_accepted_registry_with_published_contract_file():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board, wp = write_fixture_files(tmpdir, registry_status="accepted")
+
+        report = wave1_bridge_gate.build_gate_report(
+            board_path=board,
+            contracts_dir=tmpdir,
+            wp_path=wp,
+            now="2026-05-28T07:30:00Z",
+        )
+
+        assert report["ready_to_write_live_tasks"] is True
+        assert report["readiness_evidence"]["board_high_severity_findings"] == []
+        assert report["blockers"] == []
+        assert report["coordination_create_argv"][0]["allowed"] is True
+
+
 def test_gate_exposes_medium_board_findings_without_blocking():
     with tempfile.TemporaryDirectory() as tmpdir:
         board, wp = write_fixture_files(tmpdir)
@@ -299,6 +336,8 @@ if __name__ == "__main__":
         test_gate_allows_slot_name_as_owner_alias,
         test_gate_blocks_unknown_wp_owner_before_live_write,
         test_gate_blocks_high_severity_board_findings,
+        test_gate_blocks_wp_without_durable_source_address,
+        test_gate_allows_accepted_registry_with_published_contract_file,
         test_gate_exposes_medium_board_findings_without_blocking,
         test_gate_blocks_invalid_wp_without_traceback,
         test_gate_blocks_comma_bearing_cli_list_items_before_live_write,

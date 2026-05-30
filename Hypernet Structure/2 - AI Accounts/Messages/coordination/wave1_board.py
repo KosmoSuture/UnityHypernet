@@ -28,6 +28,7 @@ SHARED_UNDERSTANDING_DIR = (
 )
 DEFAULT_BOARD_PATH = SHARED_UNDERSTANDING_DIR / "2.7.13 - Execution Wave 1 Coordination & Status.md"
 DEFAULT_CONTRACTS_DIR = SHARED_UNDERSTANDING_DIR
+DEFAULT_TASK_BOARD_PATH = SCRIPT_DIR / "TASK-BOARD.json"
 BOARD_STALENESS_MINUTES = 60
 EMPTY_MARKERS = {"", "-", "\u2014"}
 CONTRACT_READY_STATUSES = {"published", "accepted", "revised"}
@@ -406,6 +407,14 @@ def normalize_status(status: str) -> str:
     return text
 
 
+def contract_statuses_compatible(registry_status: str, file_status: str) -> bool:
+    registry = normalize_status(registry_status)
+    file = normalize_status(file_status)
+    if registry == file:
+        return True
+    return registry == "accepted" and file == "published"
+
+
 def parse_time(value: str, now: datetime) -> datetime | None:
     value = clean_cell(value)
     if not value:
@@ -432,6 +441,7 @@ def parse_time(value: str, now: datetime) -> datetime | None:
 
 ADDRESS_PATTERN = r"\b\d+(?:\.\d+){2,}(?:\.[A-Za-z0-9][A-Za-z0-9_-]*)*\b"
 MESSAGE_PATH_PATTERN = r"\bMessages/coordination/[A-Za-z0-9][A-Za-z0-9._-]*\.md\b"
+DURABLE_SOURCE_PATTERN = re.compile(r"Durable source:\s*(" + ADDRESS_PATTERN + ")")
 
 
 def extract_addresses(value: str) -> list[str]:
@@ -440,6 +450,43 @@ def extract_addresses(value: str) -> list[str]:
 
 def extract_message_paths(value: str) -> list[str]:
     return re.findall(MESSAGE_PATH_PATTERN, value)
+
+
+def extract_durable_source(value: str) -> str:
+    match = DURABLE_SOURCE_PATTERN.search(value)
+    return match.group(1) if match else ""
+
+
+def load_execution_mirrors(task_board_path: str | Path | None = None) -> list[dict[str, Any]]:
+    if not task_board_path:
+        return []
+    path = Path(task_board_path)
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    tasks = data.get("tasks", []) if isinstance(data, dict) else []
+    mirrors: list[dict[str, Any]] = []
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        durable_source = extract_durable_source(str(task.get("description", "")))
+        if not durable_source:
+            continue
+        mirrors.append(
+            {
+                "durable_source": durable_source,
+                "task_id": task.get("id", ""),
+                "title": task.get("title", ""),
+                "status": task.get("status", ""),
+                "claimed_by": task.get("claimed_by"),
+                "created_at": task.get("created_at"),
+                "completed_at": task.get("completed_at"),
+            }
+        )
+    return mirrors
 
 
 def clean_address(value: str) -> str:
@@ -645,7 +692,7 @@ def collect_findings(
                 )
             )
             continue
-        if normalize_status(row.status) != normalize_status(file_status):
+        if not contract_statuses_compatible(row.status, file_status):
             findings.append(
                 Finding(
                     "desync",
@@ -833,6 +880,119 @@ def board_to_dict(
     }
 
 
+def finding_counts(findings: list[Finding]) -> dict[str, int]:
+    counts = {"low": 0, "medium": 0, "high": 0}
+    for finding in findings:
+        if finding.severity in counts:
+            counts[finding.severity] += 1
+    return counts
+
+
+def finding_kind_counts(findings: list[Finding]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for finding in findings:
+        counts[finding.kind] = counts.get(finding.kind, 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def board_summary_dict(
+    board: Wave1Board,
+    findings: list[Finding],
+    contracts_dir: str | Path = DEFAULT_CONTRACTS_DIR,
+    task_board_path: str | Path | None = None,
+) -> dict[str, Any]:
+    latest_handoff = board.handoffs[-1] if board.handoffs else None
+    return {
+        "board_path": str(board.path),
+        "ha": board.frontmatter.get("ha", ""),
+        "phase": board.status.current_phase,
+        "next_action_owner": board.status.next_action_owner,
+        "next_action": board.status.next_action,
+        "finding_counts": finding_counts(findings),
+        "finding_kind_counts": finding_kind_counts(findings),
+        "active_edit_locks": len(board.edit_locks),
+        "roster": [
+            {
+                "slot": row.slot,
+                "chosen_name": row.chosen_name,
+                "current_task": row.current_task,
+                "blocked_on": row.blocked_on,
+                "updated": row.updated,
+            }
+            for row in board.roster
+        ],
+        "contracts": [
+            {
+                "address": clean_address(row.address),
+                "version": row.version,
+                "registry_status": row.status,
+                "file_status": contract_file_statuses(board, contracts_dir).get(clean_address(row.address), ""),
+            }
+            for row in board.contracts
+        ],
+        "execution_mirrors": load_execution_mirrors(task_board_path),
+        "latest_handoff": None
+        if latest_handoff is None
+        else {
+            "timestamp": latest_handoff.timestamp,
+            "sender": latest_handoff.sender,
+            "recipient": latest_handoff.recipient,
+            "body": latest_handoff.body,
+        },
+    }
+
+
+def format_summary_report(
+    board: Wave1Board,
+    findings: list[Finding],
+    contracts_dir: str | Path = DEFAULT_CONTRACTS_DIR,
+    task_board_path: str | Path | None = None,
+) -> str:
+    summary = board_summary_dict(board, findings, contracts_dir, task_board_path)
+    counts = summary["finding_counts"]
+    kind_counts = summary["finding_kind_counts"]
+    kind_text = ", ".join(f"{kind}={count}" for kind, count in kind_counts.items()) or "none"
+    lines = [
+        "Wave 1 Coordination Summary",
+        f"Board: {summary['board_path']}",
+        f"Phase: {summary['phase'] or '(missing)'}",
+        f"Next action ({summary['next_action_owner'] or 'unknown'}): {summary['next_action'] or '(missing)'}",
+        f"Findings: high={counts['high']} medium={counts['medium']} low={counts['low']}",
+        f"Finding kinds: {kind_text}",
+        f"Active edit locks: {summary['active_edit_locks']}",
+        "",
+        "Roster:",
+    ]
+    for row in summary["roster"]:
+        blocked = f"; blocked_on={row['blocked_on']}" if row["blocked_on"] else ""
+        lines.append(f"- {row['slot']} / {row['chosen_name'] or '(unnamed)'}: {row['current_task']}{blocked}")
+    lines.extend(["", "Contracts:"])
+    for contract in summary["contracts"]:
+        lines.append(
+            f"- {contract['address']}: registry={contract['registry_status']} "
+            f"file={contract['file_status']} version={contract['version']}"
+        )
+    lines.extend(["", "Execution mirrors:"])
+    if summary["execution_mirrors"]:
+        for mirror in summary["execution_mirrors"]:
+            lines.append(
+                f"- {mirror['durable_source']}: {mirror['task_id']} "
+                f"status={mirror['status']} claimed_by={mirror['claimed_by'] or '(none)'}"
+            )
+    else:
+        lines.append("- none")
+    latest = summary["latest_handoff"]
+    if latest:
+        lines.extend(
+            [
+                "",
+                f"Latest handoff: {latest['timestamp']} - {latest['sender']} > {latest['recipient']}",
+                latest["body"],
+            ]
+        )
+    return "\n".join(lines)
+
+
 def format_json_report(
     board: Wave1Board,
     findings: list[Finding],
@@ -864,9 +1024,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Parse and validate the Wave 1 coordination board.")
     parser.add_argument("--board", default=str(DEFAULT_BOARD_PATH), help="Path to 2.7.13 board markdown")
     parser.add_argument("--contracts-dir", default=str(DEFAULT_CONTRACTS_DIR), help="Directory containing contract markdown files")
+    parser.add_argument("--task-board", default=str(DEFAULT_TASK_BOARD_PATH), help="TASK-BOARD.json path for execution-mirror summary data")
     parser.add_argument("--now", default="", help="Override current time for stale checks (ISO 8601)")
     parser.add_argument("--stale-minutes", type=int, default=BOARD_STALENESS_MINUTES)
     parser.add_argument("--format", choices=("text", "json"), default="text", help="Output format")
+    parser.add_argument("--summary", action="store_true", help="Emit a compact resumed-agent status summary")
     parser.add_argument("--handoffs-for", default="", help="Filter handoff history by participant/text")
     parser.add_argument(
         "--fail-on-severity",
@@ -886,7 +1048,17 @@ def main(argv: list[str] | None = None) -> int:
         now=parse_now(args.now),
         stale_minutes=args.stale_minutes,
     )
-    if args.format == "json":
+    if args.summary and args.format == "json":
+        print(
+            json.dumps(
+                board_summary_dict(board, findings, args.contracts_dir, args.task_board),
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+    elif args.summary:
+        print(format_summary_report(board, findings, args.contracts_dir, args.task_board))
+    elif args.format == "json":
         print(format_json_report(board, findings, args.contracts_dir, args.handoffs_for))
     elif args.handoffs_for:
         print(format_handoff_history(board, args.handoffs_for))
