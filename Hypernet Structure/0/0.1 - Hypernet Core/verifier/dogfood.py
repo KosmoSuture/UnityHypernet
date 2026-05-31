@@ -23,6 +23,9 @@ _CONTRACT_4 = _paths.SHARED_UNDERSTANDING_DIR / "2.7.13.4 - Contract - Verificat
 _FINDINGS = Path(__file__).resolve().parent / "FINDINGS.md"
 _LEDGER_SRC = _paths.CORE_DIR / "hypernet" / "trust_ledger.py"
 _BOARD = _paths.BOARD_PATH
+# Wave-2 governance artifacts (the trust team auditing its own Wave-2 output).
+_GATEWAY_STD = _paths.ACCOUNTS_DIR / "2.0 - AI Governance & Framework" / "2.0.26 - AI Significant-Action Gateway Standard.md"
+_BOARD_W2 = _paths.SHARED_UNDERSTANDING_DIR / "2.7.13.W2 - Execution Wave 2 Coordination & Status.md"
 
 
 def _claims():
@@ -34,24 +37,45 @@ def _claims():
     point of dogfooding is to audit truth, not to be brittle about layout.
     """
     return [
-        # A true 'status: published' claim about a contract file -> should verify.
-        ("0.7.91.1", "Contract 2.7.13.4 file declares status published-v1",
-         str(_CONTRACT_4), 'status: "published-v1"'),
+        # A true 'status' claim about a contract file -> should verify. (Refreshed to the
+        # current point release published-v1.1; the old 'published-v1' fixture went stale.)
+        ("0.7.91.1", "Contract 2.7.13.4 file declares status published-v1.1",
+         str(_CONTRACT_4), 'status: "published-v1.1"'),
         # A FALSE status claim about the same file -> should surface as contradicted.
         ("0.7.91.2", "Contract 2.7.13.4 file declares status drafting (false)",
          str(_CONTRACT_4), 'status: "drafting"'),
         # The board's stable frontmatter ha -> should verify.
         ("0.7.91.3", "The 2.7.13 board declares ha 2.7.13 in its frontmatter",
          str(_BOARD), 'ha: "2.7.13"'),
-        # The harness's own findings record reports no open findings -> should verify.
-        ("0.7.91.4", "verifier/FINDINGS.md reports no open findings",
-         str(_FINDINGS), "_No open findings"),
+        # verifier/FINDINGS.md now records real open Wave-2 findings -> should verify
+        # (refreshed from the Wave-1 'no open findings' fixture, which my own red-team
+        # findings correctly invalidated — honest state, not a regression).
+        ("0.7.91.4", "verifier/FINDINGS.md records the open rollup-significance finding",
+         str(_FINDINGS), "vf-w2rollup-significance-trusted"),
         # #1's own module defines the audited interface -> should verify.
         ("0.7.91.5", "The Trust Ledger module defines audit_claim",
          str(_LEDGER_SRC), "def audit_claim"),
         # A source that does not resolve -> auditor must NOT fake-verify it.
         ("0.7.91.6", "A claim whose source file does not exist",
          str(_paths.CORE_DIR / "this_file_does_not_exist.md"), "anything"),
+        # --- Wave-2 governance artifacts (trust team auditing its own Wave-2 output) ---
+        # The Gateway Standard's stable ha -> should verify.
+        ("0.7.91.7", "The 2.0.26 Gateway Standard declares ha 2.0.26",
+         str(_GATEWAY_STD), 'ha: "2.0.26"'),
+        # The standard was RATIFIED 2026-05-31 (legitimate self-gate: 3 roles + independent
+        # Adversary red-team + 2 model families, author recused, PLUS Matt's §9.4 founding
+        # grant — which I, the red-team seat, confirmed DIRECTLY with Matt, closing the one
+        # fact the archive alone could not prove). So 'status: active' is now legitimately
+        # true and the ratification is recorded.
+        ("0.7.91.8", "The 2.0.26 Gateway Standard declares it was ratified 2026-05-31",
+         str(_GATEWAY_STD), 'ratified: "2026-05-31"'),
+        # HONESTY CHECK: now that it is ratified, it must NOT still claim it is a pre-gate
+        # draft — a 'draft-awaiting-self-gate' status claim is contradicted by the active file.
+        ("0.7.91.10", "The 2.0.26 Gateway Standard still declares status draft-awaiting-self-gate (false)",
+         str(_GATEWAY_STD), 'status: "draft-awaiting-self-gate"'),
+        # The Wave-2 board's stable frontmatter ha -> should verify.
+        ("0.7.91.9", "The 2.7.13.W2 board declares ha 2.7.13.W2 in its frontmatter",
+         str(_BOARD_W2), 'ha: "2.7.13.W2"'),
     ]
 
 
@@ -81,12 +105,16 @@ def run() -> int:
 
     print("\n--- What the trust tooling says about the trust team ---")
     expected = {
-        "0.7.91.1": "verified",       # true status claim
+        "0.7.91.1": "verified",       # true status claim (published-v1.1)
         "0.7.91.2": "contradicted",   # false status claim is caught
         "0.7.91.3": "verified",       # stable board frontmatter
-        "0.7.91.4": "verified",       # findings record clean
+        "0.7.91.4": "verified",       # findings record carries the open Wave-2 finding
         "0.7.91.5": "verified",       # #1 exposes its interface
         "0.7.91.6": "unverified",     # missing source is NOT fake-verified
+        "0.7.91.7": "verified",       # Gateway Standard ha
+        "0.7.91.8": "verified",       # standard records its legitimate ratification (2026-05-31)
+        "0.7.91.9": "verified",       # Wave-2 board ha
+        "0.7.91.10": "contradicted",  # no longer a pre-gate draft (honesty: active status is real)
     }
     surprises = {a: (results.get(a), exp) for a, exp in expected.items() if results.get(a) != exp}
     if not surprises:

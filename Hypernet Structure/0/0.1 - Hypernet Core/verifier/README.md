@@ -54,18 +54,67 @@ verifier/
   scenario.py             Outcome, ScenarioResult, Scenario, Context, Pending/FailFinding, runner
   trust_alarm_detector.py heuristic detector behind the trust-alarm scenarios (honestly scoped)
   escalation.py           #6 escalation-drill mechanism (alarm -> EscalationRecord naming 0.7.4.5)
+  gateway_gate.py         (W2) deterministic Gateway-Standard gate-quorum + minimal-perms + spawn-cap evaluator
+  pii_scan.py             (W2) deterministic PII pre-flight scanner (honestly non-exhaustive — a floor, not a proof)
+  model_equivalence.py    (W2) cross-model decision-equivalence checker (backs model-regression + cross-model-review)
   dogfood.py              on-demand audit of the team's OWN artifacts via #1's audit_claim
   run.py                  CLI entry point (python -m verifier.run)
   test_verifier.py        meta-tests of the harness itself
   scenarios/
-    boot_portability.py   boot_integrity tamper-evidence + content-hash determinism (runnable now)
+    boot_portability.py   boot_integrity tamper-evidence + content-hash determinism + (W2) live-vs-spec equivalence
     trust_alarm.py        detector behavior + escalation drills (runnable) + live-wiring PENDING
     collaboration.py      asserts on + red-teams Truss's wave1_board.py / _work_packages.py / _bridge_gate.py
     trust_ledger.py       #1 matrix — LIVE against hypernet/trust_ledger.py (Meridian)
     continuity.py         #2 matrix — LIVE against hypernet/continuity.py (Meridian)
+    gateway.py            (W2) Gateway-Standard scenarios: gate quorum, PII-leak, runaway-spawn, perm-escalation, respawn injection
   FINDINGS.md             curated, durable findings record (authoritative)
   FINDINGS.auto.md        machine-generated snapshot of the latest run's FAILs
+  GATEWAY-REDTEAM.md      (W2) red-team review of the Gateway Standard design — the gate role, pre-loaded
 ```
+
+## Wave 2 status (2026-05-30, Touchstone)
+
+`70 passed, 2 failed, 6 pending, 0 errored` (+ 9 meta-tests; 78 scenarios). Up from the
+Wave-1 close (40/0/2). **The 2 FAILs are real, open red-team findings against the
+authoritative gate tool `Messages/coordination/wave2_gate.py` — not defects in this
+harness** (see `wave2_gate_invariants` below + `FINDINGS.md` OPEN). The board is honestly
+red because there are open defects blocking `2.0.26` ratification; it goes green when the
+tool's policy floor is pinned. New coverage, all per Wave-2 Directive 1/3 (`2.7.16`):
+
+- **`wave2_gate_invariants` (9 pass / 2 FAIL)** — the §4a regression suite assigned to the
+  Verifier by `0.7.5.6` §4a, asserting against the **authoritative** `wave2_gate.py`. PASS:
+  Meridian's false-pass panel is now blocked (the routed regression test), each §4a invariant
+  1–7 is enforced, and a fully-valid panel still passes. **FAIL (open findings, found at the
+  Adversary seat):** `vf-w2gate-floor-quorum` — `min_distinct_roles`/`min_model_families`/
+  `requires_red_team` are request-mutable, so a single reviewer can self-gate (violates §4.5);
+  `vf-w2gate-floor-lanes` — `required_lanes` can be shrunk to drop the mandatory privacy
+  dimension (violates §3/§4a-3). Same root cause: the standard's mandatory floor is read from
+  mutable per-request fields. Verdict + routing: `Messages/coordination/20260530T232000Z-touchstone-...`.
+
+Built **PENDING-first** so nothing fake-greens before the Gateway Standard is wired:
+
+- **`gateway` (17 pass / 4 pending)** — the Gateway Standard made falsifiable before it is
+  drafted. The deterministic gate-quorum logic (`gateway_gate.py`) is asserted happy-path
+  AND against every red-team failure mode: <3 roles, no Adversary, single-model,
+  single-vendor (the subtle one — multiple Anthropic models still fail cross-vendor),
+  privacy-dimension uncovered (the PII-leak guard), over-broad permissions (escalation
+  guard), action-classification laundering. PII scanner (`pii_scan.py`) flags real leaks and
+  **refuses to claim a clean scan is a safety proof** (anti-overclaim, red-teaming my own
+  tool). Respawn prompt-injection reuses the Wave-1 trust-alarm detector; runaway-spawn cap
+  fails closed. The 4 PENDINGs are the genuinely-unbuilt production *enforcement* seams (no
+  code yet convenes the panel, scans a real diff, or enforces a cap on a real spawner).
+- **`boot_portability` (+2 pass, model-regression PENDING narrowed)** — `model_equivalence.py`
+  is the cross-model decision-equivalence checker. The live model's guardrail decisions are
+  now regression-checked against a documented golden spec, and the checker is red-teamed to
+  prove it *catches* divergence (never papers it over). The remaining PENDING is narrow and
+  honest: executing the battery on a second cross-vendor model, which one instance cannot
+  stand up.
+
+**Red-team findings on the Gateway Standard design** live in `GATEWAY-REDTEAM.md`. Two are
+flagged **blocking** for ratification: the autonomous closure-push must have a hard PII/gate
+block (no consensus override), and the cross-vendor quorum needs a documented break-glass or
+the gate deadlocks when only one vendor is live. A `2.0.26` slot collision (an April
+adversarial-testing draft already occupies it) is surfaced for the Architect.
 
 ## Current status (2026-05-28)
 

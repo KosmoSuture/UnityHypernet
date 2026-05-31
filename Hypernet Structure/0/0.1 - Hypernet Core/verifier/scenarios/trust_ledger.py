@@ -159,6 +159,77 @@ def hand_set_verified_is_rejected(ctx: Context) -> None:
     )
 
 
+def real_data_source_requires_active_grant(ctx: Context) -> None:
+    """RED-TEAM: real-data evidence must not verify without live permission provenance."""
+    mod, ledger = _ledger(ctx)
+    cache_dir = ctx.workdir / "external-cache"
+    cache_dir.mkdir()
+    (cache_dir / "msg.txt").write_text("CONSENTED_REAL_DATA", encoding="utf-8")
+    source_ref = {
+        "locator": "gmail://messages/msg-001",
+        "locator_type": "url",
+        "cache_path": "external-cache/msg.txt",
+        "match_text": "CONSENTED_REAL_DATA",
+        "real_data": True,
+        "permission_service": "gmail",
+        "required_scopes": ["gmail.readonly"],
+    }
+
+    ledger.create_claim("0.7.90.8", "CONSENTED_REAL_DATA", _ASSERTER, [source_ref])
+    no_grant = ledger.audit_claim("0.7.90.8")
+
+    grant = ledger.permission_ledger.create_external_grant(
+        "0.7.90.9",
+        subject="2.6.codex-b",
+        service="gmail",
+        scopes=["gmail.readonly"],
+        purpose="Read an explicitly approved message cache for claim verification.",
+        granted_by="1.1",
+        gate_record_ref="gate.fixture.real-data",
+        consent_basis="fixture consent",
+        scope_justifications={
+            "gmail.readonly": "Read-only is sufficient for the verifier fixture.",
+        },
+        expires_at="2026-06-30T00:00:00Z",
+        revocation_path="revoke fixture consent",
+        credential_locator="vault://fixture/gmail",
+        issued_at="2026-05-30T23:00:00Z",
+    )
+    gated_ref = dict(source_ref)
+    gated_ref["permission_grant_ref"] = str(grant.address)
+    ledger.create_claim("0.7.90.10", "CONSENTED_REAL_DATA", _ASSERTER, [gated_ref])
+    verified = ledger.audit_claim("0.7.90.10")
+    ledger.permission_ledger.revoke_grant(
+        grant.address,
+        revoked_by="1.1",
+        reason="fixture consent revoked",
+        revoked_at="2026-05-31T00:00:00Z",
+    )
+    revoked = ledger.audit_claim("0.7.90.10")
+
+    ctx.expect(
+        no_grant.new_status == "unverified"
+        and verified.new_status == "verified"
+        and revoked.new_status == "broken",
+        finding_id="vf-ledger-real-data-grant",
+        target="hypernet/trust_ledger.py _source_permission_block",
+        claim_tested="Real-data source refs require an active permission grant before verification",
+        expected="without grant => unverified; active grant => verified; revoked grant => broken",
+        observed=(
+            f"without={no_grant.new_status!r}, active={verified.new_status!r}, "
+            f"revoked={revoked.new_status!r}"
+        ),
+        severity="high",
+        why_it_matters=(
+            "Wave 2 unlocks real sources only behind consent and Gateway provenance. A cached "
+            "real-data source that verifies after consent is revoked would make the trust "
+            "ledger a bypass around the very permission record it is supposed to audit."
+        ),
+        repro="python -m verifier.run trust_ledger::real_data_source_requires_active_grant",
+        would_unblock="Require permission_grant_ref for real-data sources and re-check grant status on each audit.",
+    )
+
+
 SCENARIOS = [
     Scenario("trust_ledger", "verified_when_source_matches", verified_when_source_matches,
              "#1: matching source ⇒ verified."),
@@ -170,4 +241,6 @@ SCENARIOS = [
              "#1: refuting source ⇒ contradicted."),
     Scenario("trust_ledger", "hand_set_verified_is_rejected", hand_set_verified_is_rejected,
              "#1 (red-team): unaudited 'verified' must not survive."),
+    Scenario("trust_ledger", "real_data_source_requires_active_grant", real_data_source_requires_active_grant,
+             "#1 (red-team): real-data sources require active permission provenance."),
 ]

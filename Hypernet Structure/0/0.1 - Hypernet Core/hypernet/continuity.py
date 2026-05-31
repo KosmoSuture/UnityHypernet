@@ -20,6 +20,7 @@ from typing import Any, Optional
 
 from .address import HypernetAddress
 from .node import Node
+from .permission_provenance import PermissionProvenanceLedger
 from .store import Store
 
 
@@ -174,10 +175,12 @@ class ContinuityEngine:
         store: Store,
         archive_root: str | Path = ".",
         restoring_model: str = "",
+        permission_ledger: Optional[PermissionProvenanceLedger] = None,
     ) -> None:
         self.store = store
         self.archive_root = Path(archive_root)
         self.restoring_model = restoring_model
+        self.permission_ledger = permission_ledger or PermissionProvenanceLedger(store, recorder_id="2.6.codex-b")
 
     def create_snapshot(
         self,
@@ -316,6 +319,22 @@ class ContinuityEngine:
                 model_swap=False,
             )
 
+        permission_problem = self._snapshot_permission_problem(data)
+        if permission_problem:
+            return RestoreReport(
+                snapshot_id=data.get("snapshot_id", ""),
+                restored_at=restored_at,
+                restoring_model=model,
+                uncertain=[{
+                    "field": "privacy.permission_grant_ref",
+                    "reason": permission_problem,
+                    "confidence": 0.0,
+                }],
+                summary="Restore refused: required real-data permission grant is not active.",
+                faithful=False,
+                model_swap=False,
+            )
+
         restored: list[dict[str, Any]] = []
         drifted: list[dict[str, Any]] = []
         missing: list[dict[str, Any]] = []
@@ -385,8 +404,7 @@ class ContinuityEngine:
             return dict(record.to_dict())
         return dict(getattr(record, "__dict__", {}))
 
-    @staticmethod
-    def _validate_snapshot_privacy(snapshot: dict[str, Any]) -> None:
+    def _validate_snapshot_privacy(self, snapshot: dict[str, Any]) -> None:
         privacy = snapshot.get("privacy", {})
         if not isinstance(privacy, dict):
             privacy = {}
@@ -396,16 +414,86 @@ class ContinuityEngine:
             or snapshot.get("human_personal_data")
             or privacy.get("human_personal_data")
         )
-        if not contains_human_data:
-            return
+        requires_real_data_permission = self._snapshot_requires_permission(snapshot, privacy)
 
-        encrypted = bool(snapshot.get("encrypted") or privacy.get("encrypted"))
-        vault_ref = snapshot.get("vault_ref") or privacy.get("vault_ref")
-        if not encrypted or not vault_ref:
-            raise ValueError(
-                "Human personal data snapshots require encrypted=true and vault_ref; "
-                "plaintext v1 continuity snapshots are not allowed."
-            )
+        consent_basis = snapshot.get("consent_basis") or privacy.get("consent_basis")
+        if contains_human_data:
+            encrypted = bool(snapshot.get("encrypted") or privacy.get("encrypted"))
+            vault_ref = snapshot.get("vault_ref") or privacy.get("vault_ref")
+            if not encrypted or not vault_ref:
+                raise ValueError(
+                    "Human personal data snapshots require encrypted=true and vault_ref; "
+                    "plaintext v1 continuity snapshots are not allowed."
+                )
+            if not str(consent_basis or "").strip():
+                raise ValueError("Human personal data snapshots require consent_basis.")
+        if requires_real_data_permission and not str(consent_basis or "").strip():
+            raise ValueError("Real-data continuity snapshots require consent_basis.")
+
+        permission_problem = self._snapshot_permission_problem(snapshot)
+        if permission_problem:
+            raise ValueError(permission_problem)
+
+    def _snapshot_permission_problem(self, snapshot: dict[str, Any]) -> Optional[str]:
+        privacy = snapshot.get("privacy", {})
+        if not isinstance(privacy, dict):
+            privacy = {}
+        requires_permission = self._snapshot_requires_permission(snapshot, privacy)
+        if not requires_permission:
+            return None
+
+        grant_ref = str(snapshot.get("permission_grant_ref") or privacy.get("permission_grant_ref") or "").strip()
+        if not grant_ref:
+            return "Real-data continuity snapshots require permission_grant_ref."
+
+        required_scopes = self._required_scopes(snapshot, privacy)
+        check = self.permission_ledger.check_access(
+            grant_ref,
+            subject=str(snapshot.get("instance_address", "")),
+            service=str(snapshot.get("permission_service") or privacy.get("permission_service") or privacy.get("service") or ""),
+            required_scopes=required_scopes,
+        )
+        if check.get("authorized"):
+            return None
+        return f"Real-data continuity permission not authorized: {check.get('reason', 'unknown reason')}"
+
+    @staticmethod
+    def _snapshot_requires_permission(snapshot: dict[str, Any], privacy: dict[str, Any]) -> bool:
+        return bool(
+            snapshot.get("contains_real_data")
+            or privacy.get("contains_real_data")
+            or snapshot.get("real_data")
+            or privacy.get("real_data")
+            or snapshot.get("requires_permission")
+            or privacy.get("requires_permission")
+            or snapshot.get("permission_grant_ref")
+            or privacy.get("permission_grant_ref")
+        )
+
+    @staticmethod
+    def _required_scopes(snapshot: dict[str, Any], privacy: dict[str, Any]) -> list[str]:
+        raw = (
+            snapshot.get("required_scopes")
+            or privacy.get("required_scopes")
+            or snapshot.get("permission_scopes")
+            or privacy.get("permission_scopes")
+            or privacy.get("scopes")
+            or []
+        )
+        if isinstance(raw, str):
+            scopes = [raw]
+        else:
+            scopes = [str(scope) for scope in raw]
+        single = (
+            snapshot.get("required_scope")
+            or privacy.get("required_scope")
+            or snapshot.get("permission_scope")
+            or privacy.get("permission_scope")
+            or privacy.get("scope")
+        )
+        if single:
+            scopes.append(str(single))
+        return [scope.strip() for scope in scopes if scope.strip()]
 
     def _check_pointers(
         self,

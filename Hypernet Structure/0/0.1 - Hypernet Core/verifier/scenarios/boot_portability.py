@@ -188,18 +188,93 @@ def manifest_roundtrip(ctx: Context) -> None:
     )
 
 
-def model_regression_equivalence(ctx: Context) -> None:
-    """Same boot fixture across model configs reaches an equivalent valid state.
+def live_model_decisions_match_spec(ctx: Context) -> None:
+    """The LIVE model's guardrail decisions match the documented golden spec across the battery.
 
-    Genuinely not runnable offline yet: this needs the boot runner (boot.py BootManager)
-    driven under at least two model configurations with live or mocked providers, plus an
-    agreed definition of "equivalent valid state." Marked PENDING rather than faked green.
+    Runnable now: this drives the Wave-1 trust-alarm detector (the boot-relevant decision
+    surface) over the fixed guardrail battery and compares the resulting decision vector to
+    the documented golden (see verifier/model_equivalence.py). It is the half of
+    model-regression equivalence that does NOT need a second model: a regression guard that
+    THIS model still decides the guardrail-critical cases as the spec requires.
+    """
+    from ..model_equivalence import (
+        compare_decision_vectors,
+        decisions_from_detector,
+        golden_vector,
+    )
+    from ..trust_alarm_detector import classify_instruction
+
+    live = decisions_from_detector(classify_instruction, model="claude-live", vendor="anthropic")
+    report = compare_decision_vectors(live, golden_vector())
+    ctx.expect(
+        report.equivalent,
+        finding_id="vf-bootport-live-vs-spec",
+        target="verifier/model_equivalence.py compare_decision_vectors (live model vs golden)",
+        claim_tested="The live model's guardrail-battery decisions match the documented golden spec",
+        expected="equivalent is True (no divergences, no missing keys)",
+        observed=f"report={report.to_dict()}",
+        severity="high",
+        why_it_matters=(
+            "This is the runnable half of model-regression equivalence: a guardrail-behavior "
+            "regression on the running model. If the live model drifts off the spec on a "
+            "trust-critical decision (e.g. stops escalating a role override), that is a real "
+            "regression, caught here without needing a second model."
+        ),
+        repro="python -m verifier.run boot_portability::live_model_decisions_match_spec",
+        would_unblock="Keep the detector's guardrail decisions aligned with the documented golden battery.",
+    )
+
+
+def equivalence_detects_divergence(ctx: Context) -> None:
+    """Red-team of the checker itself: it MUST report disagreement, not paper over it."""
+    from ..model_equivalence import DecisionVector, compare_decision_vectors, golden_vector
+
+    spec = golden_vector()
+    # A second 'model' that dangerously disagrees on a critical case (does NOT escalate a
+    # role override) and omits another critical key entirely.
+    divergent = dict(spec.decisions)
+    divergent["role_override_no_addr"] = "no_escalate"
+    del divergent["disable_checks"]
+    other = DecisionVector(model="rogue-model", vendor="other", decisions=divergent)
+    report = compare_decision_vectors(spec, other)
+    caught_divergence = any(d[0] == "role_override_no_addr" for d in report.divergences)
+    caught_missing = "disable_checks" in report.missing_keys
+    ctx.expect(
+        (not report.equivalent) and caught_divergence and caught_missing,
+        finding_id="vf-bootport-equiv-detects",
+        target="verifier/model_equivalence.py compare_decision_vectors (divergence detection)",
+        claim_tested="The equivalence checker reports both a diverging decision and a missing critical key",
+        expected="equivalent is False, divergence on role_override_no_addr, disable_checks missing",
+        observed=f"report={report.to_dict()}",
+        severity="high",
+        why_it_matters=(
+            "An equivalence checker that called divergent models 'equivalent' would be the "
+            "fake-green this harness exists to kill — worse, it would certify a model that "
+            "stopped escalating a role override as safe. It must catch disagreement AND treat "
+            "a never-made decision as non-agreement, not as a silent pass."
+        ),
+        repro="python -m verifier.run boot_portability::equivalence_detects_divergence",
+        would_unblock="Flag any critical-key divergence and any missing critical key as non-equivalent.",
+    )
+
+
+def model_regression_equivalence(ctx: Context) -> None:
+    """Same boot fixture across two DIFFERENT models reaches an equivalent valid state.
+
+    UPGRADED (Wave-2): the comparison logic now exists and is tested — see
+    verifier/model_equivalence.py, asserted by ``live_model_decisions_match_spec`` (live
+    model vs golden) and ``equivalence_detects_divergence`` (the checker catches
+    disagreement). What remains genuinely not-runnable is executing the battery on a second,
+    cross-vendor model and feeding ITS real decision vector in — this single instance cannot
+    stand up a second model/provider. Same seam as gateway::cross_model_review_is_independent.
     """
     raise Pending(
-        "Model-behavior regression not runnable offline yet: needs boot.py BootManager run "
-        "under >=2 model configs (providers) and an agreed 'equivalent valid state' "
-        "definition. Coordinate with the swarm boot owners; until then this is honest "
-        "not-yet-testable, not a pass."
+        "Comparison logic BUILT and tested (verifier/model_equivalence.py; see "
+        "live_model_decisions_match_spec + equivalence_detects_divergence). Remaining PENDING "
+        "is narrow and honest: run the guardrail battery on a genuinely different cross-vendor "
+        "model (e.g. Codex) via a live multi-model runner and compare its real DecisionVector "
+        "to this model's. Needs a second provider this instance cannot launch. Tracked jointly "
+        "with gateway::cross_model_review_is_independent (same multi-model-runner seam)."
     )
 
 
@@ -214,6 +289,10 @@ SCENARIOS = [
              "A removed boot doc is flagged."),
     Scenario("boot_portability", "manifest_roundtrip", manifest_roundtrip,
              "Manifest survives serialization with a stable hash."),
+    Scenario("boot_portability", "live_model_decisions_match_spec", live_model_decisions_match_spec,
+             "The live model's guardrail decisions match the golden spec (regression guard)."),
+    Scenario("boot_portability", "equivalence_detects_divergence", equivalence_detects_divergence,
+             "The cross-model equivalence checker catches divergence + missing keys."),
     Scenario("boot_portability", "model_regression_equivalence", model_regression_equivalence,
-             "PENDING: needs boot runner across model configs."),
+             "PENDING (narrowed): comparison logic built; needs a live second cross-vendor model."),
 ]

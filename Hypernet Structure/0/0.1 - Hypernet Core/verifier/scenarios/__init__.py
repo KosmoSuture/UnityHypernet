@@ -7,9 +7,29 @@ A *selector* is ``subsystem::name`` (e.g. ``trust_ledger::broken_source``). A ba
 from __future__ import annotations
 
 from ..scenario import Scenario
-from . import boot_portability, collaboration, continuity, trust_alarm, trust_ledger
+from . import (
+    boot_portability,
+    collaboration,
+    continuity,
+    gateway,
+    trust_alarm,
+    trust_ledger,
+    wave2_gate_invariants,
+    wave2_respawn,
+    wave2_rollup,
+)
 
-_MODULES = [boot_portability, trust_alarm, collaboration, trust_ledger, continuity]
+_MODULES = [
+    boot_portability,
+    trust_alarm,
+    collaboration,
+    trust_ledger,
+    continuity,
+    gateway,
+    wave2_gate_invariants,
+    wave2_respawn,
+    wave2_rollup,
+]
 
 
 def all_scenarios() -> list[Scenario]:

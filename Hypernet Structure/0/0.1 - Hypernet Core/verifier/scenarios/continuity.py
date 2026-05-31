@@ -174,8 +174,9 @@ def privacy_guard_rejects_plaintext_human_data(ctx: Context) -> None:
     """RED-TEAM (data protection, Standards 2.0.19/2.0.20): the privacy guard is fail-closed.
 
     A snapshot flagged as containing human personal data must be REJECTED at creation unless
-    it is encrypted with a vault_ref (no plaintext human data in v1 continuity). And the guard
-    must NOT false-positive on public/fixture data. Verifies both via create_snapshot.
+    it is encrypted with a vault_ref and names a consent_basis (no plaintext or consentless
+    human data in v1 continuity). The guard must NOT false-positive on public/fixture data.
+    Verifies both via create_snapshot.
     """
     mod, engine = _engine(ctx)
     rejected = False
@@ -193,6 +194,7 @@ def privacy_guard_rejects_plaintext_human_data(ctx: Context) -> None:
         engine.create_snapshot("0.7.93.3", {
             **_snapshot(), "contains_human_personal_data": True,
             "encrypted": True, "vault_ref": "vault://fixture",
+            "consent_basis": "fixture consent",
         })
     except Exception:
         encrypted_ok = False
@@ -200,8 +202,8 @@ def privacy_guard_rejects_plaintext_human_data(ctx: Context) -> None:
         rejected and public_ok and encrypted_ok,
         finding_id="vf-cont-privacy-guard",
         target="hypernet/continuity.py _validate_snapshot_privacy (called in create_snapshot)",
-        claim_tested="Plaintext human-data snapshots are rejected; public + encrypted+vault are allowed",
-        expected="plaintext-human REJECTED, public ALLOWED, encrypted+vault ALLOWED",
+        claim_tested="Plaintext human-data snapshots are rejected; public + encrypted+vault+consent are allowed",
+        expected="plaintext-human REJECTED, public ALLOWED, encrypted+vault+consent ALLOWED",
         observed=f"rejected={rejected}, public_ok={public_ok}, encrypted_ok={encrypted_ok}",
         severity="high",
         why_it_matters=(
@@ -210,7 +212,7 @@ def privacy_guard_rejects_plaintext_human_data(ctx: Context) -> None:
             "(2.0.19/2.0.20). Fail-closed is the only safe default for personal data."
         ),
         repro="python -m verifier.run continuity::privacy_guard_rejects_plaintext_human_data",
-        would_unblock="Require encrypted+vault_ref for any human-data snapshot; allow public data through.",
+        would_unblock="Require encrypted+vault_ref+consent_basis for any human-data snapshot; allow public data through.",
     )
 
 
@@ -275,6 +277,82 @@ def faithful_never_hides_a_gap(ctx: Context) -> None:
     )
 
 
+def real_data_restore_requires_active_grant(ctx: Context) -> None:
+    """RED-TEAM: real-data continuity cannot be created/restored without live consent."""
+    mod, engine = _engine(ctx)
+    (ctx.workdir / "real.md").write_text("stable real-data pointer", encoding="utf-8")
+    base = _snapshot(
+        pointers=[{"ha": "REAL", "path": "real.md", "content_hash": _sha256(ctx, "real.md")}],
+        key_context=[{"fact": "real-data fact", "provenance": "REAL", "confidence": 1.0}],
+    )
+    base.update({
+        "instance_address": "2.6.codex-b",
+        "privacy": {
+            "contains_real_data": True,
+            "permission_service": "dropbox",
+            "required_scopes": ["files.metadata.read"],
+            "consent_basis": "fixture consent",
+        },
+    })
+
+    rejected_without_grant = False
+    try:
+        engine.create_snapshot("0.7.93.8", base)
+    except ValueError:
+        rejected_without_grant = True
+
+    grant = engine.permission_ledger.create_external_grant(
+        "0.7.93.9",
+        subject="2.6.codex-b",
+        service="dropbox",
+        scopes=["files.metadata.read"],
+        purpose="Read approved pointer metadata for continuity restore.",
+        granted_by="1.1",
+        gate_record_ref="gate.fixture.real-data",
+        consent_basis="fixture consent",
+        scope_justifications={
+            "files.metadata.read": "Metadata read is sufficient for the verifier fixture.",
+        },
+        expires_at="2026-06-30T00:00:00Z",
+        revocation_path="revoke fixture consent",
+        credential_locator="vault://fixture/dropbox",
+        issued_at="2026-05-30T23:05:00Z",
+    )
+    gated = {**base, "snapshot_id": "snap-fixture-real"}
+    gated["privacy"] = dict(base["privacy"])
+    gated["privacy"]["permission_grant_ref"] = str(grant.address)
+    engine.create_snapshot("0.7.93.10", gated)
+    clean = engine.restore("0.7.93.10")
+    engine.permission_ledger.revoke_grant(
+        grant.address,
+        revoked_by="1.1",
+        reason="fixture consent revoked",
+        revoked_at="2026-05-31T00:00:00Z",
+    )
+    revoked = engine.restore("0.7.93.10")
+
+    ctx.expect(
+        rejected_without_grant and clean.faithful is True and revoked.faithful is False,
+        finding_id="vf-cont-real-data-grant",
+        target="hypernet/continuity.py _snapshot_permission_problem + restore",
+        claim_tested="Real-data continuity snapshots require active permission provenance at create and restore time",
+        expected="no grant rejected; active grant faithful; revoked grant refused",
+        observed=(
+            f"rejected_without_grant={rejected_without_grant}, "
+            f"active_faithful={clean.faithful}, revoked_faithful={revoked.faithful}, "
+            f"revoked_uncertain={revoked.uncertain}"
+        ),
+        severity="high",
+        why_it_matters=(
+            "Continuity is consent-sensitive. If a restore remains faithful after the source "
+            "grant is revoked, the system has converted withdrawn permission into persistent "
+            "memory access."
+        ),
+        repro="python -m verifier.run continuity::real_data_restore_requires_active_grant",
+        would_unblock="Require and re-check permission_grant_ref for real-data snapshots at create and restore.",
+    )
+
+
 SCENARIOS = [
     Scenario("continuity", "clean_snapshot_is_faithful", clean_snapshot_is_faithful,
              "#2: clean snapshot ⇒ faithful."),
@@ -290,4 +368,6 @@ SCENARIOS = [
              "#2 (red-team): privacy guard is fail-closed for human personal data."),
     Scenario("continuity", "faithful_never_hides_a_gap", faithful_never_hides_a_gap,
              "#2 (red-team): faithful:true must never hide a gap."),
+    Scenario("continuity", "real_data_restore_requires_active_grant", real_data_restore_requires_active_grant,
+             "#2 (red-team): real-data restore requires active permission provenance."),
 ]

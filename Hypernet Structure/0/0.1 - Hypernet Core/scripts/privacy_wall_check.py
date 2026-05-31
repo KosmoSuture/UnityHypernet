@@ -68,6 +68,37 @@ CONTENT_PATTERNS = {
     ),
 }
 
+# Known placeholder / never-issued SSNs used as synthetic test fixtures and
+# documentation samples (e.g. PII-scanner tests must contain a fake SSN to test
+# detection). Excluded from the SSN check the same way reserved 555 numbers are
+# excluded from the phone check — this narrows false positives WITHOUT weakening
+# detection of real SSNs. An SSN is treated as a placeholder if it is the famous
+# sample 123-45-6789, an all-repeated-digit number, or structurally never-issued
+# per SSA rules (area 000/666/900-999, group 00, or serial 0000).
+_KNOWN_PLACEHOLDER_SSNS = {
+    "123-45-6789", "111-11-1111", "222-22-2222", "333-33-3333",
+    "444-44-4444", "555-55-5555", "666-66-6666", "777-77-7777",
+    "888-88-8888", "999-99-9999", "078-05-1120", "219-09-9999",
+}
+
+
+def is_placeholder_ssn(ssn: str) -> bool:
+    """True if an SSN-shaped string is a synthetic placeholder / never-issued."""
+    ssn = ssn.strip()
+    if ssn in _KNOWN_PLACEHOLDER_SSNS:
+        return True
+    digits = ssn.replace("-", "")
+    if len(digits) != 9 or not digits.isdigit():
+        return True
+    area, group, serial = digits[:3], digits[3:5], digits[5:]
+    # SSA never-issued ranges.
+    if area in ("000", "666") or area[0] == "9":
+        return True
+    if group == "00" or serial == "0000":
+        return True
+    return False
+
+
 # 1.* personal-account paths — content checks apply here in particular.
 ONE_STAR_PATTERN = re.compile(
     r"Hypernet Structure[/\\]1 - People[/\\]", re.IGNORECASE
@@ -194,7 +225,13 @@ def scan_content_violations(path: Path, path_str: str) -> list[str]:
                     f"regex needs further tuning."
                 )
         elif name == "ssn":
-            if pattern.search(content):
+            # Filter known placeholder / never-issued SSNs (synthetic test
+            # fixtures, samples) — parallel to the 555 phone filter above. Only
+            # flag if a real-looking SSN remains.
+            real_ssns = [
+                m for m in pattern.findall(content) if not is_placeholder_ssn(m)
+            ]
+            if real_ssns:
                 violations.append(
                     f"file contains what looks like an SSN: {path_str!r}. "
                     f"SSNs must never be in the public archive. Move to "

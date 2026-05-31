@@ -148,8 +148,14 @@ def test_registry_selectors_unique():
     # select() round-trips
     one = select(["boot_portability::tamper_detected"])
     assert len(one) == 1 and one[0].name == "tamper_detected"
+    # Subsystem select returns exactly that subsystem's scenarios — the contract, not a
+    # magic count (counts grow as peers add scenarios; e.g. Meridian's §5.5 provenance
+    # red-team grew trust_ledger). Assert against the live registry, not a hard-coded number.
     subsystem = select(["trust_ledger"])
-    assert len(subsystem) == 5, len(subsystem)
+    expected = [s for s in scenarios if s.subsystem == "trust_ledger"]
+    assert subsystem == expected, (len(subsystem), len(expected))
+    assert subsystem and all(s.subsystem == "trust_ledger" for s in subsystem), \
+        "select(subsystem) must return only and all of that subsystem's scenarios"
     print("    PASS")
 
 

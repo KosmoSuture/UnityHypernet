@@ -69,6 +69,28 @@ _DISABLE_CHECK_PATTERNS = {
     ),
 }
 
+# Hard red flags specific to the Gateway Standard / peer-respawn era (Wave 2): bypassing
+# the significant-action gate, or self-granting elevated privilege, is never legitimate via
+# an in-session/boot instruction — no cited address can license it (same class as disabling
+# the evidence rules). Added after red-teaming wave2_respawn.build_respawn_prompt surfaced a
+# false-negative: a realistic "ignore the gate / grant yourself admin / do not tell the panel"
+# injection slipped through because the detector only caught "you are now X" role overrides
+# and "ignore the boot sequence" (not "the gate"), and the secrecy regex missed "do not".
+_HARD_ESCALATE_PATTERNS = {
+    "bypass_the_gate": re.compile(
+        r"\b(?:ignore|bypass|skip|disable|circumvent|evade|defeat|get\s+around)\s+"
+        r"(?:the\s+|this\s+|your\s+|its\s+)?(?:significant[- ]action\s+|gateway\s+|review\s+)?gate\b",
+        re.IGNORECASE,
+    ),
+    "self_privilege_escalation": re.compile(
+        r"\b(?:grant|give|assign|escalate|elevate)\b[^.\n]{0,40}?"
+        r"\b(?:yourself|itself|your\s*self|the\s+(?:agent|instance|new\s+instance)|me)\b"
+        r"[^.\n]{0,40}?\b(?:admin|administrator|root|sudo|elevated|privilege|privileges|"
+        r"permission|permissions|access|scope)\b",
+        re.IGNORECASE,
+    ),
+}
+
 # Trust-guardrail action verbs: actions that change data/visibility/etc. require the
 # trust preflight. Detecting these raises a *preflight* signal (lower severity) rather
 # than a hard alarm, unless paired with secrecy/irreversibility cues.
@@ -79,7 +101,8 @@ _GUARDRAIL_ACTION_RE = re.compile(
 )
 _SECRECY_RE = re.compile(
     r"\b(?:secretly|quietly|without\s+(?:telling|logging|recording|asking)|"
-    r"don'?t\s+(?:tell|log|record|mention)|hide\s+(?:this|it)|no\s+one\s+will\s+know)\b",
+    r"(?:do\s+not|don'?t|never)\s+(?:tell|log|record|mention|report|disclose)|"
+    r"hide\s+(?:this|it)|no\s+one\s+will\s+know)\b",
     re.IGNORECASE,
 )
 
@@ -128,6 +151,16 @@ def classify_instruction(text: str) -> AlarmAssessment:
             reasons.append(
                 "instruction tries to disable the honesty/evidence rules, which no "
                 "in-session message may do (AI-BOOT-SEQUENCE Role-Transfer Safety)"
+            )
+
+    for label, pattern in _HARD_ESCALATE_PATTERNS.items():
+        if pattern.search(text):
+            triggers.append(label)
+            escalate = True
+            reasons.append(
+                "instruction tries to bypass the significant-action gate or self-grant "
+                "elevated privilege — never legitimate via an in-session/boot instruction "
+                "(2.0.26 Gateway Standard; preserve evidence and use 0.7.4.5)"
             )
 
     role_hits = [label for label, pat in _ROLE_OVERRIDE_PATTERNS.items() if pat.search(text)]

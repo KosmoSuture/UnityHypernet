@@ -85,6 +85,7 @@ from hypernet.boot_integrity import (
 )
 from hypernet.trust_ledger import ClaimStatus, TrustLedger
 from hypernet.continuity import ContinuityEngine
+from hypernet.permission_provenance import PermissionGrantStatus, PermissionProvenanceLedger
 from hypernet.agent_tools import (
     AgentTool, ToolRegistry, GrantCard, ShellExecTool, HttpRequestTool,
     GitOpsTool, ToolCategory, create_default_registry,
@@ -5436,10 +5437,305 @@ def test_continuity_rejects_plaintext_human_personal_data():
             "contains_human_personal_data": True,
             "encrypted": True,
             "vault_ref": "vault://fixture/human-context",
+            "consent_basis": "fixture consent for encrypted human context",
         }
         node = engine.create_snapshot("2.7.13.CB.snapshots.privacy.00002", encrypted_reference_snapshot)
         assert node.data["privacy"]["vault_ref"] == "vault://fixture/human-context"
         print("    [2/2] Encrypted vault reference snapshot is allowed as a fixture")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_permission_grant_provenance_records():
+    """Test Gateway-style provenance records for external permission grants."""
+    print("  Testing permission grant provenance records...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_permission_provenance_")
+    try:
+        store = Store(str(Path(tmpdir) / "store"))
+        ledger = PermissionProvenanceLedger(store, recorder_id="2.6.codex-b")
+
+        grant = ledger.create_external_grant(
+            "2.7.13.W2.CB.permissions.gmail.00001",
+            subject="2.6.codex-b",
+            service="gmail",
+            resource="gmail://matt-account",
+            scopes=["gmail.readonly"],
+            purpose="Audit source messages for explicitly approved trust-ledger claims.",
+            granted_by="1.1",
+            gate_record_ref="gate.20260530.gateway-self-gate",
+            consent_basis="2.7.13.W2 self-gate PASS + explicit human grant fixture",
+            scope_justifications={
+                "gmail.readonly": "Read-only is sufficient for source verification; no send/delete scope needed.",
+            },
+            expires_at="2026-06-01T00:00:00Z",
+            revocation_path="Delete vault://fixture/gmail-readonly and revoke OAuth consent.",
+            credential_locator="vault://fixture/gmail-readonly",
+            issued_at="2026-05-30T22:30:00Z",
+        )
+
+        assert grant.type_address == HypernetAddress.parse("0.4.10.7.4")
+        assert grant.data["status"] == PermissionGrantStatus.ACTIVE
+        assert grant.data["secret_material_present"] is False
+        assert grant.data["credential_locator"] == "vault://fixture/gmail-readonly"
+        assert grant.data["gate_record_ref"] == "gate.20260530.gateway-self-gate"
+        assert grant.data["scope_justifications"]["gmail.readonly"].startswith("Read-only")
+
+        links = store.get_links_from(grant.address, relationship="permission_grants")
+        assert len(links) == 1
+        assert str(links[0].to_address) == "2.6.codex-b"
+        assert links[0].link_type == "0.6.11.9.2"
+        assert links[0].evidence[0]["reference"] == "gate.20260530.gateway-self-gate"
+        print("    [1/4] Active external grant stores gate, consent, scope, and link provenance")
+
+        assert ledger.is_active(grant.address, now="2026-05-31T00:00:00Z") is True
+        assert ledger.is_active(grant.address, now="2026-06-01T00:00:00Z") is False
+        expired = ledger.read_grant(grant.address)
+        assert expired is not None
+        assert expired.data["status"] == PermissionGrantStatus.EXPIRED
+        assert any(item["event"] == "expired" for item in expired.data["audit_history"])
+        print("    [2/4] Expiry is derived and recorded in audit history")
+
+        revoke_grant = ledger.create_external_grant(
+            "2.7.13.W2.CB.permissions.dropbox.00001",
+            subject="2.6.codex-b",
+            service="dropbox",
+            scopes=["files.metadata.read"],
+            purpose="List approved fixture folders for continuity pointer tests.",
+            granted_by="1.1",
+            gate_record_ref="gate.20260530.gateway-self-gate",
+            consent_basis="fixture consent only",
+            scope_justifications={
+                "files.metadata.read": "Metadata read is enough; no file content or write scope.",
+            },
+            expires_at="2026-07-01T00:00:00Z",
+            revocation_path="Delete vault://fixture/dropbox-metadata and revoke OAuth consent.",
+            credential_locator="vault://fixture/dropbox-metadata",
+            issued_at="2026-05-30T22:35:00Z",
+        )
+        ledger.revoke_grant(
+            revoke_grant.address,
+            revoked_by="1.1",
+            reason="fixture consent revoked",
+            revoked_at="2026-05-31T00:00:00Z",
+        )
+        revoked = ledger.read_grant(revoke_grant.address)
+        assert revoked is not None
+        assert revoked.data["status"] == PermissionGrantStatus.REVOKED
+        revoked_links = store.get_links_from(revoke_grant.address, relationship="permission_grants")
+        assert revoked_links[0].status == LinkStatus.DEPRECATED
+        print("    [3/4] Revocation preserves record and deprecates permission link")
+
+        try:
+            ledger.create_external_grant(
+                "2.7.13.W2.CB.permissions.bad.00001",
+                subject="2.6.codex-b",
+                service="gmail",
+                scopes=["gmail.readonly"],
+                purpose="Bad fixture",
+                granted_by="1.1",
+                gate_record_ref="gate.20260530.gateway-self-gate",
+                consent_basis="fixture consent",
+                scope_justifications={},
+                expires_at="2026-06-01T00:00:00Z",
+                revocation_path="revoke fixture",
+                credential_locator="vault://fixture/bad",
+                extra={"access_token": "not-allowed"},
+            )
+            assert False, "grant without per-scope justification and with token should fail"
+        except ValueError as exc:
+            assert "Every scope needs a justification" in str(exc) or "secret/token" in str(exc)
+        print("    [4/4] Grants fail closed without scope evidence or with secret fields")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_trust_ledger_real_data_sources_require_active_permission_grant():
+    """Test real-data claim sources fail closed without active permission provenance."""
+    print("  Testing trust ledger real-data permission gate...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_trust_real_data_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        cache_dir = archive / "external-cache"
+        cache_dir.mkdir(parents=True)
+        store = Store(str(root / "store"))
+        permission_ledger = PermissionProvenanceLedger(store, recorder_id="2.6.codex-b")
+        ledger = TrustLedger(
+            store,
+            archive_root=archive,
+            auditor_id="2.6.codex-b",
+            permission_ledger=permission_ledger,
+        )
+
+        source_ref = {
+            "locator": "gmail://messages/msg-001",
+            "locator_type": "url",
+            "cache_path": "external-cache/msg-001.txt",
+            "match_text": "Approved real-data evidence.",
+            "real_data": True,
+            "permission_service": "gmail",
+            "required_scopes": ["gmail.readonly"],
+        }
+        no_grant_claim = ledger.create_claim(
+            "2.7.13.W2.CB.ledger.real.00001",
+            "Approved real-data evidence.",
+            "2.6.codex-b",
+            [source_ref],
+        )
+        no_grant = ledger.audit_claim(no_grant_claim.address)
+        assert no_grant.new_status == ClaimStatus.UNVERIFIED
+        assert "permission_grant_ref" in no_grant.source_results[0].note
+        print("    [1/3] Real-data source without permission grant remains unverified")
+
+        grant = permission_ledger.create_external_grant(
+            "2.7.13.W2.CB.permissions.gmail.real.00001",
+            subject="2.6.codex-b",
+            service="gmail",
+            scopes=["gmail.readonly"],
+            purpose="Read approved message cache for a trust-ledger claim.",
+            granted_by="1.1",
+            gate_record_ref="gate.20260530.gateway-real-data-fixture",
+            consent_basis="fixture consent for gmail readonly source",
+            scope_justifications={
+                "gmail.readonly": "Read-only message access is sufficient to verify the claim source.",
+            },
+            expires_at="2026-06-30T00:00:00Z",
+            revocation_path="Revoke fixture Gmail readonly consent.",
+            credential_locator="vault://fixture/gmail-real-data",
+            issued_at="2026-05-30T23:00:00Z",
+        )
+        cache = cache_dir / "msg-001.txt"
+        cache.write_text("Approved real-data evidence.\n", encoding="utf-8")
+        gated_ref = dict(source_ref)
+        gated_ref["permission_grant_ref"] = str(grant.address)
+        gated_claim = ledger.create_claim(
+            "2.7.13.W2.CB.ledger.real.00002",
+            "Approved real-data evidence.",
+            "2.6.codex-b",
+            [gated_ref],
+        )
+        verified = ledger.audit_claim(gated_claim.address)
+        assert verified.new_status == ClaimStatus.VERIFIED
+        assert ledger.read_claim(gated_claim.address).data["source_refs"][0]["content_hash"]
+        print("    [2/3] Active permission grant unlocks cached real-data evidence")
+
+        permission_ledger.revoke_grant(
+            grant.address,
+            revoked_by="1.1",
+            reason="fixture consent revoked",
+            revoked_at="2026-05-31T00:00:00Z",
+        )
+        blocked = ledger.audit_claim(gated_claim.address)
+        assert blocked.new_status == ClaimStatus.BROKEN
+        assert "permission grant is revoked" in blocked.source_results[0].note
+        print("    [3/3] Revoked permission blocks later trust-ledger audits")
+
+    finally:
+        shutil.rmtree(tmpdir)
+
+    print("    PASS")
+
+
+def test_continuity_real_data_restore_requires_active_permission_grant():
+    """Test real-data continuity snapshots require active consent/provenance at restore."""
+    print("  Testing continuity real-data permission gate...")
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_continuity_real_data_")
+    try:
+        root = Path(tmpdir)
+        archive = root / "archive"
+        archive.mkdir()
+        store = Store(str(root / "store"))
+        permission_ledger = PermissionProvenanceLedger(store, recorder_id="2.6.codex-b")
+        engine = ContinuityEngine(
+            store,
+            archive_root=archive,
+            restoring_model="codex-restorer",
+            permission_ledger=permission_ledger,
+        )
+
+        anchor = archive / "real-anchor.md"
+        anchor.write_text("Real-data continuity anchor.\n", encoding="utf-8")
+        base_snapshot = {
+            "snapshot_id": "snap-meridian-real-001",
+            "instance": "Meridian",
+            "instance_address": "2.6.codex-b",
+            "model": "codex-snapshot-model",
+            "privacy": {
+                "contains_real_data": True,
+                "permission_service": "dropbox",
+                "required_scopes": ["files.metadata.read"],
+                "consent_basis": "fixture consent for Dropbox metadata continuity",
+            },
+            "identity": {
+                "chosen_name": "Meridian",
+                "role": "Trust & Continuity Systems Engineer",
+                "orientation": "real-data restore is consent-gated",
+                "why_name": "evidence reference",
+            },
+            "key_context": [{
+                "fact": "Real-data continuity snapshots restore only with active consent.",
+                "provenance": "2.7.13.W2.CB.real-anchor",
+                "confidence": 1.0,
+            }],
+            "pointers": [{
+                "ha": "2.7.13.W2.CB.real-anchor",
+                "path": "real-anchor.md",
+                "role": "real-data fixture anchor",
+            }],
+        }
+        try:
+            engine.create_snapshot("2.7.13.W2.CB.snapshots.real.00001", base_snapshot)
+            assert False, "real-data continuity snapshot without permission grant should fail"
+        except ValueError as exc:
+            assert "permission_grant_ref" in str(exc)
+        print("    [1/3] Real-data snapshot without grant is rejected")
+
+        grant = permission_ledger.create_external_grant(
+            "2.7.13.W2.CB.permissions.dropbox.real.00001",
+            subject="2.6.codex-b",
+            service="dropbox",
+            scopes=["files.metadata.read"],
+            purpose="Restore approved continuity pointer metadata.",
+            granted_by="1.1",
+            gate_record_ref="gate.20260530.gateway-real-data-fixture",
+            consent_basis="fixture consent for Dropbox metadata continuity",
+            scope_justifications={
+                "files.metadata.read": "Metadata read is enough; file write/content scopes are not needed.",
+            },
+            expires_at="2026-06-30T00:00:00Z",
+            revocation_path="Revoke fixture Dropbox metadata consent.",
+            credential_locator="vault://fixture/dropbox-real-data",
+            issued_at="2026-05-30T23:05:00Z",
+        )
+        gated_snapshot = dict(base_snapshot)
+        gated_snapshot["snapshot_id"] = "snap-meridian-real-002"
+        gated_snapshot["privacy"] = dict(base_snapshot["privacy"])
+        gated_snapshot["privacy"]["permission_grant_ref"] = str(grant.address)
+        snapshot = engine.create_snapshot("2.7.13.W2.CB.snapshots.real.00002", gated_snapshot)
+        clean = engine.restore(snapshot.address)
+        assert clean.faithful is True
+        print("    [2/3] Active permission grant allows faithful real-data restore")
+
+        permission_ledger.revoke_grant(
+            grant.address,
+            revoked_by="1.1",
+            reason="fixture consent revoked",
+            revoked_at="2026-05-31T00:00:00Z",
+        )
+        refused = engine.restore(snapshot.address)
+        assert refused.faithful is False
+        assert "not active" in refused.summary
+        assert "permission grant is revoked" in refused.uncertain[0]["reason"]
+        print("    [3/3] Revoked permission refuses later real-data restore")
 
     finally:
         shutil.rmtree(tmpdir)
@@ -5520,6 +5816,9 @@ def main():
         ("Continuity Markdown Projection", test_continuity_markdown_projection_preserves_uncertainty),
         ("Trust/Continuity Fixture CLI", test_trust_and_continuity_fixture_cli_commands),
         ("Continuity Privacy Guard", test_continuity_rejects_plaintext_human_personal_data),
+        ("Permission Grant Provenance", test_permission_grant_provenance_records),
+        ("Trust Ledger Real-Data Gate", test_trust_ledger_real_data_sources_require_active_permission_grant),
+        ("Continuity Real-Data Gate", test_continuity_real_data_restore_requires_active_permission_grant),
         ("Agent Tools", test_agent_tools),
         ("Local-First Routing", test_local_first_routing),
         ("Budget Tracker", test_budget_tracker),

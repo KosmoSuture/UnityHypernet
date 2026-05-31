@@ -57,6 +57,7 @@ flags: ["librarian", "index", "governance"]
 | 2.0.15 | Session Handoff Protocol | Draft | Standalone .md — collision resolved 2026-03-02 |
 | 2.0.18 | Cross-Model Review Protocol | Active | Standalone .md — moved from 2.0.16 (secondary collision) |
 | 2.0.25 | Project Conduct Standard | Active | Standalone .md — founder-directed 2026-05-28. Cardinal rules: save-as-you-go, project summaries, loop+multi-task, consensus-gated completion |
+| 2.0.26 | AI Significant-Action Gateway Standard | Active | Standalone .md — **RATIFIED 2026-05-31** via recursive self-gate (3 roles + Adversary + 2 models, author recused) + Matt founding grant. Gates commit/push, external access, escalation, spawn, destructive ops: ≥3 roles + red-team + 2 models, minimal-perms, Gate Record. Workflow `0.7.5.6`. Founder-authorized. Slot reassigned from the unratified 2026-04-22 Adversarial-Testing draft (re-slot to 2.0.28 recommended). |
 
 ## Role Framework (2.0.8)
 

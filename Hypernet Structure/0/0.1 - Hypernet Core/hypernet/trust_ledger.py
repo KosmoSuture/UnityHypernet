@@ -22,6 +22,7 @@ from typing import Any, Optional
 from .address import HypernetAddress
 from .link import Link
 from .node import Node
+from .permission_provenance import PermissionProvenanceLedger
 from .store import Store
 
 
@@ -124,10 +125,12 @@ class TrustLedger:
         store: Store,
         archive_root: str | Path = ".",
         auditor_id: str = "2.6.codex-b",
+        permission_ledger: Optional[PermissionProvenanceLedger] = None,
     ) -> None:
         self.store = store
         self.archive_root = Path(archive_root)
         self.auditor_id = auditor_id
+        self.permission_ledger = permission_ledger or PermissionProvenanceLedger(store, recorder_id=auditor_id)
 
     def create_claim(
         self,
@@ -286,6 +289,9 @@ class TrustLedger:
         locator_type = source_ref.get("locator_type", "file")
         method = source_ref.get("method", "substring")
         stored_hash = source_ref.get("content_hash")
+        permission_block = self._source_permission_block(locator, locator_type, source_ref, stored_hash)
+        if permission_block is not None:
+            return permission_block
 
         if locator_type == "file":
             path = self._resolve_file(locator)
@@ -419,6 +425,76 @@ class TrustLedger:
             method=method,
             note="Substring matched source." if matched else "Substring was not found in source.",
         )
+
+    def _source_permission_block(
+        self,
+        locator: str,
+        locator_type: str,
+        source_ref: dict[str, Any],
+        stored_hash: Any,
+    ) -> Optional[SourceResult]:
+        requires_permission = bool(
+            source_ref.get("permission_grant_ref")
+            or source_ref.get("grant_ref")
+            or source_ref.get("requires_permission")
+            or source_ref.get("real_data")
+            or source_ref.get("contains_real_data")
+        )
+        if not requires_permission:
+            return None
+
+        status = ClaimStatus.BROKEN if stored_hash else ClaimStatus.UNVERIFIED
+        grant_ref = str(source_ref.get("permission_grant_ref") or source_ref.get("grant_ref") or "").strip()
+        if not grant_ref:
+            return SourceResult(
+                locator=locator,
+                locator_type=locator_type,
+                resolved=False,
+                matched=None,
+                content_hash=None,
+                drift=False,
+                status=status,
+                method=str(source_ref.get("method", "substring")),
+                note="Real-data source requires permission_grant_ref.",
+            )
+
+        required_scopes = self._required_scopes(source_ref)
+        check = self.permission_ledger.check_access(
+            grant_ref,
+            subject=self.auditor_id,
+            service=str(source_ref.get("permission_service") or source_ref.get("service") or ""),
+            required_scopes=required_scopes,
+        )
+        if check.get("authorized"):
+            return None
+        return SourceResult(
+            locator=locator,
+            locator_type=locator_type,
+            resolved=False,
+            matched=None,
+            content_hash=None,
+            drift=False,
+            status=status,
+            method=str(source_ref.get("method", "substring")),
+            note=f"Permission grant not authorized: {check.get('reason', 'unknown reason')}",
+        )
+
+    @staticmethod
+    def _required_scopes(source_ref: dict[str, Any]) -> list[str]:
+        raw = (
+            source_ref.get("required_scopes")
+            or source_ref.get("permission_scopes")
+            or source_ref.get("scopes")
+            or []
+        )
+        if isinstance(raw, str):
+            scopes = [raw]
+        else:
+            scopes = [str(scope) for scope in raw]
+        single = source_ref.get("required_scope") or source_ref.get("permission_scope") or source_ref.get("scope")
+        if single:
+            scopes.append(str(single))
+        return [scope.strip() for scope in scopes if scope.strip()]
 
     def _resolve_file(self, locator: str) -> Path:
         path = Path(locator)
