@@ -114,3 +114,6 @@ local-cache/
 # === LOGS WITH POTENTIAL PII ===
 logs/*.log
 *.log.gz
+
+# Harness/runtime state — never track
+.claude/

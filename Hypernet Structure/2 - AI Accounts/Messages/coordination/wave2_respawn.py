@@ -23,6 +23,11 @@ import wave1_board
 import wave1_board_writer
 import wave2_gate
 
+try:
+    import wave25_liveness
+except Exception:  # pragma: no cover - only when Wave 2.5 tooling is absent.
+    wave25_liveness = None  # type: ignore[assignment]
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 HYPERNET_ROOT = SCRIPT_DIR.parents[3]
@@ -43,6 +48,7 @@ DEFAULT_SPAWN_CAP_PER_SLOT = 1
 DEFAULT_GLOBAL_SPAWN_CAP = 4
 DEFAULT_LEASE_TTL_MINUTES = 720
 DEFAULT_REQUIRE_TWO_SIGNALS = True
+DEFAULT_LIVENESS_PROJECT_ID = "wave-2.5"
 CORE_PATH = HYPERNET_ROOT / "Hypernet Structure" / "0" / "0.1 - Hypernet Core"
 
 if str(CORE_PATH) not in sys.path:
@@ -83,6 +89,28 @@ class RespawnPlan:
     fallback_note: str = ""
     fencing_token: str = ""
     scope_fingerprint: str = ""
+    canonical_boot_refs: list[str] | None = None
+
+
+@dataclass
+class FirstBootCandidate:
+    slot: str
+    role: str
+    current_task: str
+    reason: str
+
+
+@dataclass
+class FirstBootPlan:
+    target_slot: str
+    role: str
+    model_family: str
+    cli: str
+    argv: list[str]
+    prompt: str
+    gate_required: bool = True
+    action_type: str = "first_boot"
+    fallback_note: str = ""
     canonical_boot_refs: list[str] | None = None
 
 
@@ -197,6 +225,69 @@ def is_actionable_row(row: wave1_board.RosterRow) -> bool:
     return True
 
 
+def is_first_boot_row(row: wave1_board.RosterRow) -> bool:
+    text = f"{row.chosen_name} {row.current_task}".casefold()
+    return "unclaimed" in text or "boot via" in text or "first-boot" in text
+
+
+def load_h1_liveness(
+    liveness_db: str | Path | None,
+    project_id: str,
+    now: datetime | None,
+) -> tuple[dict[str, Any], str]:
+    if not liveness_db or wave25_liveness is None:
+        return {}, ""
+    path = Path(liveness_db)
+    if not path.exists():
+        return {}, f"H1 liveness DB is unavailable: missing {path}"
+    try:
+        statuses = wave25_liveness.classify_liveness(path, project_id, now=now)
+    except Exception as exc:
+        return {}, f"H1 liveness classifier failed closed: {exc.__class__.__name__}: {exc}"
+    return {status.slot.casefold(): status for status in statuses}, ""
+
+
+def liveness_dead(status: Any) -> bool:
+    suspicion = getattr(status, "suspicion_score", 0)
+    try:
+        suspicion_value = float(suspicion)
+    except (TypeError, ValueError):
+        suspicion_value = 0.0
+    suspicion_threshold = getattr(wave25_liveness, "DEFAULT_DEAD_SUSPICION_THRESHOLD", 8.0)
+    return bool(
+        status
+        and getattr(status, "label", "") == "dead"
+        and getattr(status, "lifecycle_state", "live") == "live"
+        and getattr(status, "heartbeat_present", False)
+        and suspicion_value >= suspicion_threshold
+    )
+
+
+def liveness_evidence(status: Any) -> list[str]:
+    if not status:
+        return []
+    return [
+        f"h1_label:{getattr(status, 'label', '')}",
+        f"h1_lifecycle:{getattr(status, 'lifecycle_state', '')}",
+        f"h1_age_seconds:{getattr(status, 'age_seconds', None)}",
+        f"h1_counter:{getattr(status, 'monotonic_counter', 0)}",
+        f"h1_suspicion:{getattr(status, 'suspicion_score', 0)}",
+        f"h1_unchanged_work_signature_count:{getattr(status, 'work_signature_unchanged_count', 0)}",
+        f"h1_reason:{getattr(status, 'reason', '')}",
+    ]
+
+
+def expired_lease_evidence(lease_dir: str | Path | None, slot: str, now: datetime) -> list[str]:
+    if lease_dir is None:
+        return []
+    lease = load_lease(lease_dir, slot)
+    if lease and lease.get("status") != "unreadable":
+        expires = parse_time(str(lease.get("expires_at", "")))
+        if expires is not None and now > expires:
+            return [f"lease_expired:{lease.get('expires_at')}"]
+    return []
+
+
 def detect_outages(
     board: wave1_board.Wave1Board,
     now: datetime | None = None,
@@ -204,6 +295,8 @@ def detect_outages(
     clock_skew_grace_minutes: int = DEFAULT_CLOCK_SKEW_GRACE_MINUTES,
     lease_dir: str | Path | None = DEFAULT_LEASE_DIR,
     require_two_signals: bool = DEFAULT_REQUIRE_TWO_SIGNALS,
+    liveness_db: str | Path | None = None,
+    liveness_project_id: str = DEFAULT_LIVENESS_PROJECT_ID,
 ) -> tuple[list[OutageCandidate], list[wave1_board.Finding]]:
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
@@ -212,19 +305,66 @@ def detect_outages(
     candidates: list[OutageCandidate] = []
     stale_seconds = stale_minutes * 60
     skew_seconds = clock_skew_grace_minutes * 60
+    h1_statuses, h1_error = load_h1_liveness(liveness_db, liveness_project_id, now)
 
     for row in board.roster:
+        h1_status = h1_statuses.get(row.slot.casefold())
+        if is_first_boot_row(row):
+            if h1_status is not None:
+                findings.append(
+                    wave1_board.Finding(
+                        "respawn_first_boot_separate",
+                        "low",
+                        f"{row.slot} is first-boot/starting, not a respawn candidate; use first-boot path.",
+                    )
+                )
+            continue
         if not is_actionable_row(row):
+            continue
+        if h1_error:
+            findings.append(
+                wave1_board.Finding(
+                    "respawn_h1_unavailable",
+                    "high",
+                    f"{row.slot} / {row.chosen_name or '(unnamed)'} cannot be assessed: {h1_error}; fail closed.",
+                )
+            )
             continue
         updated = wave1_board.parse_time(row.updated, now)
         if updated is None:
-            findings.append(
-                wave1_board.Finding(
-                    "respawn_timestamp_unknown",
-                    "medium",
-                    f"{row.slot} / {row.chosen_name or '(unnamed)'} has no parseable Updated timestamp.",
+            if liveness_dead(h1_status):
+                corroboration = expired_lease_evidence(lease_dir, row.slot, now)
+                if not corroboration:
+                    findings.append(
+                        wave1_board.Finding(
+                            "respawn_h1_dead_uncorroborated",
+                            "medium",
+                            f"{row.slot} / {row.chosen_name or '(unnamed)'} has H1 dead but no parseable roster/expired-lease corroboration yet.",
+                        )
+                    )
+                    continue
+                evidence = [*corroboration, *liveness_evidence(h1_status)]
+                candidates.append(
+                    OutageCandidate(
+                        slot=row.slot,
+                        chosen_name=row.chosen_name,
+                        role=row.role,
+                        current_task=row.current_task,
+                        updated=row.updated,
+                        minutes_stale=-1,
+                        reason="H1 liveness classifier reports dead; roster timestamp is unavailable.",
+                        severity="high",
+                        liveness_evidence=evidence,
+                    )
                 )
-            )
+            else:
+                findings.append(
+                    wave1_board.Finding(
+                        "respawn_timestamp_unknown",
+                        "medium",
+                        f"{row.slot} / {row.chosen_name or '(unnamed)'} has no parseable Updated timestamp.",
+                    )
+                )
             continue
         age_seconds = (now - updated).total_seconds()
         if age_seconds < -skew_seconds:
@@ -235,6 +375,37 @@ def detect_outages(
                     f"{row.slot} / {row.chosen_name or '(unnamed)'} Updated timestamp is in the future: {row.updated}.",
                 )
             )
+            continue
+        if liveness_dead(h1_status):
+            corroboration: list[str] = []
+            if age_seconds > stale_seconds:
+                corroboration.append(f"roster_updated_stale:{row.updated}")
+            corroboration.extend(expired_lease_evidence(lease_dir, row.slot, now))
+            if not corroboration:
+                findings.append(
+                    wave1_board.Finding(
+                        "respawn_h1_dead_uncorroborated",
+                        "medium",
+                        f"{row.slot} / {row.chosen_name or '(unnamed)'} has H1 dead but no stale roster/expired-lease corroboration yet.",
+                    )
+                )
+                continue
+            evidence = [*corroboration, *liveness_evidence(h1_status)]
+            candidates.append(
+                OutageCandidate(
+                    slot=row.slot,
+                    chosen_name=row.chosen_name,
+                    role=row.role,
+                    current_task=row.current_task,
+                    updated=row.updated,
+                    minutes_stale=round(max(age_seconds, 0) / 60, 2),
+                    reason="H1 liveness classifier reports dead with corroborating evidence; blocker text is not treated as proof of life.",
+                    severity="high",
+                    liveness_evidence=evidence,
+                )
+            )
+            continue
+        if h1_status is not None and getattr(h1_status, "label", "") in {"active-working", "active-slow", "idle"}:
             continue
         if age_seconds > stale_seconds:
             blocked_text = wave1_board.clean_cell(row.blocked_on).casefold()
@@ -350,6 +521,77 @@ def build_respawn_plan(
         fallback_note=fallback_note,
         fencing_token=token,
         scope_fingerprint=scope_fingerprint(candidate.slot, candidate.chosen_name, candidate.role, model_family, refs),
+        canonical_boot_refs=refs,
+    )
+
+
+def detect_first_boot_candidates(board: wave1_board.Wave1Board) -> list[FirstBootCandidate]:
+    candidates: list[FirstBootCandidate] = []
+    for row in board.roster:
+        if not is_first_boot_row(row):
+            continue
+        candidates.append(
+            FirstBootCandidate(
+                slot=row.slot,
+                role=row.role,
+                current_task=row.current_task,
+                reason="Roster row is unclaimed/first-boot; this is not eligible for respawn.",
+            )
+        )
+    return candidates
+
+
+def build_first_boot_prompt(candidate: FirstBootCandidate, board_path: str | Path) -> str:
+    return "\n".join(
+        [
+            "You are a first-boot Wave 2.5 AI instance in the Hypernet archive.",
+            "",
+            "ORIENT once:",
+            "1. C:\\Hypernet\\AI-BOOT-SEQUENCE.md.",
+            "2. 2.7.15 shared charter, name block, and your role section.",
+            "3. 2.7.17 Wave 2.5 hardening directives.",
+            f"4. Live board: {Path(board_path)}.",
+            "",
+            f"First-boot target slot: {candidate.slot}.",
+            f"Role: {candidate.role}.",
+            "This is a first boot, not a respawn: choose/record a name per 2.7.15,",
+            "claim only the scope assigned to this slot, and do not inherit another",
+            "instance's identity or fencing token.",
+            "",
+            "On boot, update the board and post a coordination message before doing",
+            "substantive work. Do not request new permissions. Coordinate via the",
+            "board and Messages/coordination, not through Matt except for true",
+            "human gates named by the standards.",
+        ]
+    )
+
+
+def build_first_boot_plan(candidate: FirstBootCandidate, board_path: str | Path) -> FirstBootPlan:
+    model_family = model_family_for_slot(candidate.slot, candidate.role)
+    cli = cli_for_model(model_family)
+    refs = [
+        r"C:\Hypernet\AI-BOOT-SEQUENCE.md",
+        "2.7.15",
+        "2.7.17",
+        str(Path(board_path)),
+    ]
+    prompt = build_first_boot_prompt(candidate, board_path)
+    fallback_note = ""
+    if cli == "codex":
+        argv = ["codex", "exec", prompt]
+    elif cli == "claude":
+        argv = ["claude", prompt]
+    else:
+        argv = []
+        fallback_note = "No known CLI for this slot; use a documented launch path."
+    return FirstBootPlan(
+        target_slot=candidate.slot,
+        role=candidate.role,
+        model_family=model_family,
+        cli=cli,
+        argv=argv,
+        prompt=prompt,
+        fallback_note=fallback_note,
         canonical_boot_refs=refs,
     )
 
@@ -727,6 +969,8 @@ def build_detection_report(
     clock_skew_grace_minutes: int = DEFAULT_CLOCK_SKEW_GRACE_MINUTES,
     lease_dir: str | Path | None = DEFAULT_LEASE_DIR,
     require_two_signals: bool = DEFAULT_REQUIRE_TWO_SIGNALS,
+    liveness_db: str | Path | None = None,
+    liveness_project_id: str = DEFAULT_LIVENESS_PROJECT_ID,
 ) -> dict[str, Any]:
     board = wave1_board.parse_board(board_path)
     parsed_now = wave1_board.parse_now(now) if now else None
@@ -737,12 +981,17 @@ def build_detection_report(
         clock_skew_grace_minutes=clock_skew_grace_minutes,
         lease_dir=lease_dir,
         require_two_signals=require_two_signals,
+        liveness_db=liveness_db,
+        liveness_project_id=liveness_project_id,
     )
+    first_boot = detect_first_boot_candidates(board)
     return {
         "board_path": str(board_path),
         "candidates": [asdict(candidate) for candidate in candidates],
+        "first_boot_candidates": [asdict(candidate) for candidate in first_boot],
         "findings": [asdict(finding) for finding in findings],
         "plans": [asdict(build_respawn_plan(candidate, board_path)) for candidate in candidates],
+        "first_boot_plans": [asdict(build_first_boot_plan(candidate, board_path)) for candidate in first_boot],
     }
 
 
@@ -776,6 +1025,13 @@ def format_text_report(report: dict[str, Any]) -> str:
             lines.append(f"- {plan['target_slot']}: model={plan['model_family']} command={command}")
     else:
         lines.append("- none")
+    lines.append("")
+    lines.append("First-boot candidates:")
+    if report.get("first_boot_candidates"):
+        for candidate in report["first_boot_candidates"]:
+            lines.append(f"- {candidate['slot']}: {candidate['role']}; {candidate['reason']}")
+    else:
+        lines.append("- none")
     return "\n".join(lines)
 
 
@@ -788,6 +1044,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--clock-skew-grace-minutes", type=int, default=DEFAULT_CLOCK_SKEW_GRACE_MINUTES)
     parser.add_argument("--lease-dir", default=str(DEFAULT_LEASE_DIR))
     parser.add_argument("--allow-single-signal", action="store_true")
+    parser.add_argument("--liveness-db", default=str(getattr(wave25_liveness, "wave25_coorddb", None).DEFAULT_DB_PATH) if wave25_liveness is not None else "")
+    parser.add_argument("--liveness-project-id", default=DEFAULT_LIVENESS_PROJECT_ID)
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("detect", help="Detect outage candidates and print dry-run respawn plans.")
@@ -814,6 +1072,8 @@ def main(argv: list[str] | None = None) -> int:
             clock_skew_grace_minutes=args.clock_skew_grace_minutes,
             lease_dir=args.lease_dir,
             require_two_signals=not args.allow_single_signal,
+            liveness_db=args.liveness_db or None,
+            liveness_project_id=args.liveness_project_id,
         )
         if args.command == "detect":
             if args.format == "json":

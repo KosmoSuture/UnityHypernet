@@ -7,11 +7,14 @@ import json
 import tempfile
 from dataclasses import replace
 from datetime import datetime, timezone
+from types import SimpleNamespace
 from pathlib import Path
 
 import wave1_board
 import wave2_gate
 import wave2_respawn
+import wave25_coorddb
+import wave25_liveness
 
 
 def board_fixture(updated: str = "2026-05-30T08:00:00Z", blocked_on: str = "-") -> str:
@@ -398,6 +401,163 @@ def test_missing_audit_ledger_blocks_respawn_fail_closed():
         assert any("missing audit ledger" in blocker for blocker in blocked["blockers"])
 
 
+def test_h1_dead_overrides_stale_blocker_text():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board_path = write_board(tmpdir, board_fixture(blocked_on="Waiting on review"))
+        liveness_db = Path(tmpdir) / "coord.sqlite3"
+        with wave25_coorddb.coordination_db(liveness_db) as conn:
+            wave25_coorddb.ensure_project(conn, "fixture")
+            wave25_coorddb.upsert_roster(
+                conn,
+                wave25_coorddb.RosterState(
+                    project_id="fixture",
+                    slot="Codex-A",
+                    chosen_name="Truss",
+                    current_task="Building respawn tooling",
+                    blocked_on="Waiting on review",
+                    updated_at="2026-05-30T08:00:00Z",
+                ),
+            )
+            wave25_coorddb.record_heartbeat(
+                conn,
+                "fixture",
+                "Codex-A",
+                "Truss",
+                observed_at="2026-05-30T08:00:00Z",
+                current_task="Building respawn tooling",
+                last_action_type="code",
+                monotonic_counter=1,
+            )
+        board = wave1_board.parse_board(board_path)
+
+        candidates, findings = wave2_respawn.detect_outages(
+            board,
+            now=datetime(2026, 5, 30, 10, 0, tzinfo=timezone.utc),
+            stale_minutes=60,
+            liveness_db=liveness_db,
+            liveness_project_id="fixture",
+        )
+
+        assert findings == []
+        assert candidates[0].slot == "Codex-A"
+        assert candidates[0].severity == "high"
+        evidence = candidates[0].liveness_evidence or []
+        assert any("h1_label:dead" in item for item in evidence)
+        assert any("h1_counter:1" in item for item in evidence)
+        assert any("h1_unchanged_work_signature_count:1" in item for item in evidence)
+
+
+def test_h1_active_suppresses_roster_stale_candidate():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board_path = write_board(tmpdir, board_fixture())
+        liveness_db = Path(tmpdir) / "coord.sqlite3"
+        wave25_liveness.write_heartbeat(
+            liveness_db,
+            "fixture",
+            "Codex-A",
+            "Truss",
+            current_task="Still building",
+            last_action_type="code",
+            observed_at="2026-05-30T09:59:30Z",
+        )
+        board = wave1_board.parse_board(board_path)
+
+        candidates, findings = wave2_respawn.detect_outages(
+            board,
+            now=datetime(2026, 5, 30, 10, 0, tzinfo=timezone.utc),
+            stale_minutes=60,
+            liveness_db=liveness_db,
+            liveness_project_id="fixture",
+        )
+
+        assert candidates == []
+        assert findings == []
+
+
+def test_h1_dead_without_corroboration_does_not_respawn():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board_path = write_board(tmpdir, board_fixture(updated="2026-05-30T09:55:00Z"))
+        liveness_db = Path(tmpdir) / "coord.sqlite3"
+        with wave25_coorddb.coordination_db(liveness_db) as conn:
+            wave25_coorddb.ensure_project(conn, "fixture")
+            wave25_coorddb.record_heartbeat(
+                conn,
+                "fixture",
+                "Codex-A",
+                "Truss",
+                observed_at="2026-05-30T08:00:00Z",
+                current_task="Building respawn tooling",
+                last_action_type="code",
+                monotonic_counter=1,
+            )
+        board = wave1_board.parse_board(board_path)
+
+        candidates, findings = wave2_respawn.detect_outages(
+            board,
+            now=datetime(2026, 5, 30, 10, 0, tzinfo=timezone.utc),
+            stale_minutes=60,
+            liveness_db=liveness_db,
+            liveness_project_id="fixture",
+            lease_dir=Path(tmpdir) / "leases",
+        )
+
+        assert candidates == []
+        assert any(finding.kind == "respawn_h1_dead_uncorroborated" for finding in findings)
+
+
+def test_h1_dead_label_below_suspicion_threshold_is_not_dead_for_h3():
+    status = SimpleNamespace(
+        label="dead",
+        lifecycle_state="live",
+        heartbeat_present=True,
+        suspicion_score=wave25_liveness.DEFAULT_DEAD_SUSPICION_THRESHOLD - 0.1,
+    )
+
+    assert wave2_respawn.liveness_dead(status) is False
+
+
+def test_configured_h1_store_unavailable_blocks_respawn_fail_closed():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board_path = write_board(tmpdir, board_fixture())
+        lease_dir = write_expired_lease(tmpdir)
+        board = wave1_board.parse_board(board_path)
+
+        candidates, findings = wave2_respawn.detect_outages(
+            board,
+            now=datetime(2026, 5, 30, 10, 0, tzinfo=timezone.utc),
+            stale_minutes=60,
+            lease_dir=lease_dir,
+            liveness_db=Path(tmpdir) / "missing-h1.sqlite3",
+        )
+
+        assert candidates == []
+        assert any(finding.kind == "respawn_h1_unavailable" for finding in findings)
+
+
+def test_first_boot_candidate_uses_separate_plan_not_respawn():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        board_path = write_board(
+            tmpdir,
+            board_fixture().replace(
+                "| Codex-A | **Truss** | Collaboration Substrate Engineer | Building respawn tooling | - | fixture | 2026-05-30T08:00:00Z |",
+                "| Claude-C | *(unclaimed - Verifier)* | Verifier & Red-Team | boot via 2.7.15 first-boot sequence | - | - | - |",
+            ),
+        )
+        board = wave1_board.parse_board(board_path)
+
+        respawn_candidates, _ = wave2_respawn.detect_outages(
+            board,
+            now=datetime(2026, 5, 30, 10, 0, tzinfo=timezone.utc),
+        )
+        first_boot = wave2_respawn.detect_first_boot_candidates(board)
+        plan = wave2_respawn.build_first_boot_plan(first_boot[0], board_path)
+
+        assert respawn_candidates == []
+        assert first_boot[0].slot == "Claude-C"
+        assert plan.action_type == "first_boot"
+        assert "This is a first boot, not a respawn" in plan.prompt
+
+
 def test_execute_writes_intent_audit_before_process_start():
     with tempfile.TemporaryDirectory() as tmpdir:
         gate_dir = Path(tmpdir) / "gate"
@@ -459,6 +619,12 @@ if __name__ == "__main__":
         test_open_trust_alarm_against_proposer_blocks_respawn,
         test_global_spawn_cap_blocks_cross_slot_runaway,
         test_missing_audit_ledger_blocks_respawn_fail_closed,
+        test_h1_dead_overrides_stale_blocker_text,
+        test_h1_active_suppresses_roster_stale_candidate,
+        test_h1_dead_without_corroboration_does_not_respawn,
+        test_h1_dead_label_below_suspicion_threshold_is_not_dead_for_h3,
+        test_configured_h1_store_unavailable_blocks_respawn_fail_closed,
+        test_first_boot_candidate_uses_separate_plan_not_respawn,
         test_execute_writes_intent_audit_before_process_start,
     ]
     passed = 0

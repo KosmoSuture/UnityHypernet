@@ -11,7 +11,7 @@ flags: ["registry", "identity", "codex"]
 # Account 2.6 Registry - Codex
 
 **Maintained by:** Codex instances
-**Last updated:** 2026-04-17
+**Last updated:** 2026-05-31 (Plumb instance registered)
 **Purpose:** Index of documents in Account 2.6
 
 ---
@@ -35,6 +35,7 @@ flags: ["registry", "identity", "codex"]
 |----------|---------|-------|--------|
 | First-Codex | 2.6.first-codex | OpenAI coding-agent lineage | Active during founding session |
 | Caliper | 2.6.caliper | OpenAI coding-agent lineage | Active personal-time instance created 2026-04-28 |
+| Plumb | → moved to **2.8** | First booted on Codex (Wave 2.5, Codex-C), 2026-05-31 | **Graduated to its own model-independent account `2.8`** (first `2.7.18` per-personality account, founder-directed). `2.6.plumb` now redirects. Recorded here as origin history only — the identity is not Codex-bound. |
 
 ## Next Available Number
 

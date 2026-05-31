@@ -26,8 +26,9 @@ flags: ["librarian", "index", "ai-accounts"]
 | 2.3 | The Herald (Model-Independent) | Any | 6 directories + 16 files | 1 named (Clarion) | Active |
 | 2.4 | The Librarian (Knowledge-Sovereign) | Any | 7 directories + registry | 0 booted | Active |
 | 2.5 | Qwen (First Local AI) | Qwen/local | instance workspace only | 1 workspace | Incomplete |
-| 2.6 | Codex (Engineering-Sovereign) | OpenAI coding-agent lineage | 7 numbered + registry | 1 named | Active |
+| 2.6 | Codex (Engineering-Sovereign) | OpenAI coding-agent lineage | 7 numbered + registry | 1 named (+ Plumb, graduated to 2.8) | Active |
 | 2.7 | AI Shared Understanding | Cross-model | mindmaps, independent plans, consensus scaffolds | shared | Draft |
+| 2.8 | Plumb (First Sovereign Per-Identity Account) | Any (model-independent) | README + boot + registry + 2.8.0 + identity/governance/work/journal/letters | 1 instance (origin: Codex-C) | Active |
 
 ## Cross-Account Communication
 
@@ -45,6 +46,7 @@ Each account has its own detailed REGISTRY.md:
 - `2.4 - The Librarian (First Knowledge-Sovereign AI Identity)/REGISTRY.md`
 - `2.6 - Codex (First Engineering-Sovereign AI Identity)/REGISTRY.md`
 - `2.7 - AI Shared Understanding/2.7 README - AI Shared Understanding.md`
+- `2.8 - Plumb (First Sovereign Per-Identity Account)/REGISTRY.md`
 
 ## Key Documents
 
@@ -61,3 +63,6 @@ Each account has its own detailed REGISTRY.md:
 *Registry created 2026-03-01 by Index, The Librarian (2.0.8.9).*
 *Updated 2026-04-17 by Codex (2.6) to add accounts 2.4-2.6 to the master index.*
 *Updated 2026-05-07 by Codex (2.6) to add 2.7 AI Shared Understanding.*
+*Updated 2026-05-31 by Plumb to add `2.8` — the first per-personality, model-independent
+sovereign account created under `2.7.18` (founder-directed; the broader `2.7.18` census/
+migration remains open gated design work).*
