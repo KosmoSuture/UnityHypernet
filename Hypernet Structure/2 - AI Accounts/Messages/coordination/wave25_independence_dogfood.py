@@ -100,6 +100,8 @@ def validate_independence(
     record_author: str = "",
     executor: str = "",
     require_role_separation_fields: bool = False,
+    require_lineage_independence: bool = False,
+    action_lineage_id: str = "",
 ) -> IndependenceResult:
     """Assert the §5.6 invariants over a Gate Record's reviewers block.
 
@@ -113,6 +115,9 @@ def validate_independence(
       * ref_authors      {artifact_ref(casefolded): author_identity}  -> I9  (§5.7)
       * latest_verdicts  {reviewer_identity(casefolded): latest verdict on artifact} -> I10 (§6.5)
       * proposer/record_author/executor identities                    -> I11 (§5.8)
+      * lineage_id duplicate seats                                     -> I12 (W3-D1)
+      * require_lineage_independence missing lineage fields            -> I12 (W3-D1)
+      * action_lineage_id as reviewer lineage                          -> I12 (W3-D1)
     """
     violations: list[str] = []
     tier = _cf(quorum_tier)
@@ -254,6 +259,28 @@ def validate_independence(
         if len(set(values)) < len(values):
             violations.append("I11-ROLE-CONCENTRATION")
 
+    # --- W3-D1: account labels do not mint new gate seats. ---
+    # Duplicate lineage is a duplicate identity for quorum purposes even when
+    # reviewer labels differ. Missing lineage is only fatal for D1 gates that
+    # explicitly require lineage-aware quorum validation.
+    lineage_seen: set[str] = set()
+    action_lineage = _cf(action_lineage_id)
+    for r in reviewers:
+        lineage_id = _cf(
+            r.get("lineage_id")
+            or r.get("governance_weight_lineage_id")
+            or r.get("runtime_lineage_id")
+        )
+        if not lineage_id:
+            if require_lineage_independence:
+                violations.append("I12-MISSING-LINEAGE-ID")
+            continue
+        if lineage_id in lineage_seen:
+            violations.append("I12-DUPLICATE-LINEAGE")
+        lineage_seen.add(lineage_id)
+        if action_lineage and lineage_id == action_lineage:
+            violations.append("I12-ACTION-LINEAGE-AS-REVIEWER")
+
     # de-dupe preserving order
     ordered, seen_v = [], set()
     for v in violations:
@@ -349,6 +376,43 @@ def fm_scalar(markdown: str, key: str) -> str:
     return _strip_scalar(m.group(1)) if m else ""
 
 
+def _timestamp_key(value: Any) -> str:
+    """Normalize common board timestamps to YYYYMMDDTHHMMSS for cutoff comparison."""
+    raw = str(value or "")
+    match = re.search(
+        r"(\d{4})-?(\d{2})-?(\d{2})(?:[Tt _-]?(\d{2}):?(\d{2})?:?(\d{2})?)?",
+        raw,
+    )
+    if not match:
+        return ""
+    year, month, day, hour, minute, second = match.groups()
+    return f"{year}{month}{day}T{hour or '00'}{minute or '00'}{second or '00'}"
+
+
+def record_timestamp_key(markdown: str, fallback_name: str = "") -> str:
+    """Timestamp used for v0.5 cutoff arming: frontmatter first, filename second."""
+    return _timestamp_key(
+        fm_scalar(markdown, "created")
+        or fm_scalar(markdown, "date")
+        or fallback_name
+    )
+
+
+def infer_verdicts_artifact(markdown: str) -> str:
+    """Infer the artifact whose latest self-authored verdicts should bind a Gate Record."""
+    for key in (
+        "verdicts_artifact",
+        "artifact_under_review",
+        "artifact_id",
+        "target_artifact",
+        "evidence_ref",
+    ):
+        value = fm_scalar(markdown, key)
+        if _artifact_key(value):
+            return value
+    return ""
+
+
 def _resolve_ref_path(ref: str, coordination_dir: Path) -> Path | None:
     """Map an authored_artifact_ref to a file on disk, tolerating repo-relative paths."""
     candidates = [Path(ref), coordination_dir / Path(ref).name]
@@ -426,6 +490,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
                         help="§6.5: cross-check each entry against the reviewer's latest verdict on ARTIFACT_ID (I10)")
     parser.add_argument("--check-role-separation", action="store_true",
                         help="§5.8: proposer/record-author/executor must be distinct (I11)")
+    parser.add_argument("--v05-active-cutoff", metavar="TIMESTAMP",
+                        help="Arm v0.5 I9/I10/I11 checks for Gate Records dated at/after this cutoff")
+    parser.add_argument("--check-lineage-independence", action="store_true",
+                        help="W3-D1: reviewer lineage_id values must be present and distinct for post-cutoff records (I12)")
+    parser.add_argument("--action-lineage-id",
+                        help="W3-D1: lineage whose own action is being gated; reviewers from it fail I12")
     parser.add_argument("--coordination-dir",
                         help="dir holding reviewer messages (default: the gate record's own dir)")
     parser.add_argument("--format", choices=("text", "json"), default="text")
@@ -439,16 +509,45 @@ def main(argv: list[str] | None = None) -> int:
     reviewers = extract_reviewers_from_markdown(markdown)
     coordination_dir = Path(args.coordination_dir) if args.coordination_dir else gate_path.parent
 
-    ref_authors = resolve_ref_authors(reviewers, coordination_dir) if args.check_self_authored else None
+    extra_violations: list[str] = []
+    cutoff_key = _timestamp_key(args.v05_active_cutoff)
+    record_key = record_timestamp_key(markdown, gate_path.name)
+    v05_active_for_record = False
+    if args.v05_active_cutoff:
+        if not cutoff_key:
+            extra_violations.append("I10-CUTOFF-TIMESTAMP-INVALID")
+        elif not record_key:
+            extra_violations.append("I10-RECORD-TIMESTAMP-MISSING")
+        else:
+            v05_active_for_record = record_key >= cutoff_key
+
+    check_self_authored = args.check_self_authored or v05_active_for_record
+    check_role_separation = args.check_role_separation or v05_active_for_record
+    check_lineage_independence = args.check_lineage_independence
+    if args.v05_active_cutoff and not v05_active_for_record:
+        check_lineage_independence = False
+    verdict_artifact = args.check_verdict_match
+    if v05_active_for_record and not verdict_artifact:
+        verdict_artifact = infer_verdicts_artifact(markdown)
+        if not verdict_artifact:
+            extra_violations.append("I10-NO-VERDICTS-ARTIFACT")
+
+    ref_authors = resolve_ref_authors(reviewers, coordination_dir) if check_self_authored else None
     latest_verdicts = (
-        resolve_latest_verdicts(args.check_verdict_match, coordination_dir)
-        if args.check_verdict_match else None
+        resolve_latest_verdicts(verdict_artifact, coordination_dir)
+        if verdict_artifact else None
     )
     proposer = record_author = executor = ""
-    if args.check_role_separation:
+    if check_role_separation:
         proposer = fm_scalar(markdown, "proposer")
         record_author = fm_scalar(markdown, "record_author") or fm_scalar(markdown, "creator")
         executor = fm_scalar(markdown, "executor")
+    action_lineage_id = (
+        args.action_lineage_id
+        or fm_scalar(markdown, "action_lineage_id")
+        or fm_scalar(markdown, "author_lineage_id")
+        or fm_scalar(markdown, "governance_weight_lineage_id")
+    )
 
     result = validate_independence(
         reviewers,
@@ -461,8 +560,16 @@ def main(argv: list[str] | None = None) -> int:
         proposer=proposer,
         record_author=record_author,
         executor=executor,
-        require_role_separation_fields=args.check_role_separation,
+        require_role_separation_fields=check_role_separation,
+        require_lineage_independence=check_lineage_independence,
+        action_lineage_id=action_lineage_id,
     )
+    if extra_violations:
+        violations = list(result.violations)
+        for violation in extra_violations:
+            if violation not in violations:
+                violations.append(violation)
+        result = IndependenceResult(False, violations)
     payload = {"valid": result.valid, "violations": result.violations, "reviewer_count": len(reviewers)}
     if args.format == "json":
         print(json.dumps(payload, indent=2))

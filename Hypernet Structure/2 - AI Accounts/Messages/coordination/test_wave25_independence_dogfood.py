@@ -21,6 +21,7 @@ def reviewer(name: str, family: str, dimension: str, session: str) -> dict:
         "slot": name,
         "role": dimension,
         "model_family": family,
+        "lineage_id": f"lineage:{name.casefold()}",
         "session_ref_hash": session,
         "seat_dimension": dimension,
         "authored_artifact_refs": [f"Messages/coordination/{name}-{dimension}.md"],
@@ -512,6 +513,211 @@ def test_missing_role_separation_field_is_rejected_when_required_i11():
     assert_invalid(result, "I11-MISSING-ROLE-FIELD")
 
 
+def _write_v05_gate_fixture(base: Path, *, created: str, include_artifact: bool = True) -> Path:
+    artifact_line = 'artifact_under_review: "2.7.13.W3.3"\n' if include_artifact else ""
+    gate = base / "gate-record.md"
+    gate.write_text(
+        f"""---
+created: "{created}"
+creator: "Vellum"
+proposer: "Datum"
+record_author: "Vellum"
+executor: "Matt"
+{artifact_line}reviewers:
+  - reviewer_identity: "Vellum"
+    model_family: "Claude"
+    session_ref_hash: "{session_hash("v05-vellum")}"
+    seat_dimension: "quality"
+    authored_artifact_refs:
+      - "vellum-quality.md"
+    verdict: "PASS"
+  - reviewer_identity: "Meridian"
+    model_family: "Codex"
+    session_ref_hash: "{session_hash("v05-meridian")}"
+    seat_dimension: "privacy"
+    authored_artifact_refs:
+      - "meridian-privacy.md"
+    verdict: "PASS"
+  - reviewer_identity: "Touchstone"
+    model_family: "Claude"
+    session_ref_hash: "{session_hash("v05-touchstone")}"
+    seat_dimension: "security"
+    authored_artifact_refs:
+      - "touchstone-security.md"
+    verdict: "PASS"
+---
+""",
+        encoding="utf-8",
+    )
+    return gate
+
+
+def _write_v05_verdicts(
+    base: Path,
+    *,
+    artifact: str = "2.7.13.W3.3",
+    touchstone_verdict: str = "BLOCK - latest self-authored block",
+) -> None:
+    for name, source, verdict in [
+        ("vellum-quality.md", "Vellum", "PASS"),
+        ("meridian-privacy.md", "Meridian", "PASS"),
+        ("touchstone-security.md", "Touchstone", touchstone_verdict),
+    ]:
+        (base / name).write_text(
+            f"""---
+from: "{source}"
+verdicts_artifact: "{artifact}"
+verdict: "{verdict}"
+---
+""",
+            encoding="utf-8",
+        )
+
+
+def test_v05_active_cutoff_arms_i10_for_post_cutoff_records():
+    with TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        gate = _write_v05_gate_fixture(base, created="2026-06-01T00:00:01Z")
+        _write_v05_verdicts(base)
+
+        code = dogfood.main([
+            "--gate-record", str(gate),
+            "--author-identity", "Datum",
+            "--quorum-tier", "B",
+            "--coordination-dir", str(base),
+            "--v05-active-cutoff", "2026-06-01T00:00:00Z",
+        ])
+
+        assert code == 1
+
+
+def test_v05_active_cutoff_grandfathers_pre_cutoff_records():
+    with TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        gate = _write_v05_gate_fixture(base, created="2026-05-31T23:59:59Z")
+        _write_v05_verdicts(base)
+
+        code = dogfood.main([
+            "--gate-record", str(gate),
+            "--author-identity", "Datum",
+            "--quorum-tier", "B",
+            "--coordination-dir", str(base),
+            "--v05-active-cutoff", "2026-06-01T00:00:00Z",
+        ])
+
+        assert code == 0
+
+
+def test_v05_active_cutoff_grandfathers_pre_cutoff_lineage_i12():
+    with TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        gate = _write_v05_gate_fixture(base, created="2026-05-31T23:59:59Z")
+        _write_v05_verdicts(base, touchstone_verdict="PASS")
+
+        code = dogfood.main([
+            "--gate-record", str(gate),
+            "--author-identity", "Datum",
+            "--quorum-tier", "B",
+            "--coordination-dir", str(base),
+            "--v05-active-cutoff", "2026-06-01T00:00:00Z",
+            "--check-lineage-independence",
+        ])
+
+        assert code == 0
+
+
+def test_v05_active_cutoff_enforces_post_cutoff_lineage_i12():
+    with TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        gate = _write_v05_gate_fixture(base, created="2026-06-01T00:00:01Z")
+        _write_v05_verdicts(base, touchstone_verdict="PASS")
+
+        code = dogfood.main([
+            "--gate-record", str(gate),
+            "--author-identity", "Datum",
+            "--quorum-tier", "B",
+            "--coordination-dir", str(base),
+            "--v05-active-cutoff", "2026-06-01T00:00:00Z",
+            "--check-lineage-independence",
+        ])
+
+        assert code == 1
+
+
+def test_v05_active_cutoff_requires_artifact_identity_for_i10():
+    with TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        gate = _write_v05_gate_fixture(
+            base,
+            created="2026-06-01T00:00:01Z",
+            include_artifact=False,
+        )
+        _write_v05_verdicts(base)
+
+        code = dogfood.main([
+            "--gate-record", str(gate),
+            "--author-identity", "Datum",
+            "--quorum-tier", "B",
+            "--coordination-dir", str(base),
+            "--v05-active-cutoff", "2026-06-01T00:00:00Z",
+        ])
+
+        assert code == 1
+
+
+def test_duplicate_lineage_is_rejected_when_supplied_i12():
+    panel = valid_tier_b_panel()
+    panel[1]["reviewer_identity"] = "Plumb-Fork"
+    panel[1]["lineage_id"] = panel[0]["lineage_id"]
+
+    result = dogfood.validate_independence(
+        panel,
+        author_identity="Datum",
+        quorum_tier="b",
+    )
+
+    assert_invalid(result, "I12-DUPLICATE-LINEAGE")
+    assert "I1-DUPLICATE-IDENTITY" not in result.violations
+
+
+def test_missing_lineage_is_rejected_when_required_i12():
+    panel = valid_tier_b_panel()
+    del panel[0]["lineage_id"]
+
+    result = dogfood.validate_independence(
+        panel,
+        author_identity="Datum",
+        quorum_tier="b",
+        require_lineage_independence=True,
+    )
+
+    assert_invalid(result, "I12-MISSING-LINEAGE-ID")
+
+
+def test_action_lineage_cannot_hold_reviewer_seat_i12():
+    panel = valid_tier_b_panel()
+
+    result = dogfood.validate_independence(
+        panel,
+        author_identity="Datum",
+        quorum_tier="b",
+        require_lineage_independence=True,
+        action_lineage_id=panel[2]["lineage_id"],
+    )
+
+    assert_invalid(result, "I12-ACTION-LINEAGE-AS-REVIEWER")
+
+
+def test_lineage_check_is_opt_in_for_legacy_records():
+    panel = valid_tier_b_panel()
+    for row in panel:
+        row.pop("lineage_id", None)
+
+    result = dogfood.validate_independence(panel, author_identity="Datum", quorum_tier="b")
+
+    assert result.valid, result.violations
+
+
 def test_v05_checks_are_opt_in_and_off_by_default():
     # Omitting the new data leaves I0-I8 behaviour identical (backward compatibility).
     result = validate(valid_tier_b_panel())
@@ -555,6 +761,15 @@ if __name__ == "__main__":
         test_role_concentration_proposer_equals_executor_is_rejected_i11,
         test_separated_roles_pass_i11,
         test_missing_role_separation_field_is_rejected_when_required_i11,
+        test_v05_active_cutoff_arms_i10_for_post_cutoff_records,
+        test_v05_active_cutoff_grandfathers_pre_cutoff_records,
+        test_v05_active_cutoff_grandfathers_pre_cutoff_lineage_i12,
+        test_v05_active_cutoff_enforces_post_cutoff_lineage_i12,
+        test_v05_active_cutoff_requires_artifact_identity_for_i10,
+        test_duplicate_lineage_is_rejected_when_supplied_i12,
+        test_missing_lineage_is_rejected_when_required_i12,
+        test_action_lineage_cannot_hold_reviewer_seat_i12,
+        test_lineage_check_is_opt_in_for_legacy_records,
         test_v05_checks_are_opt_in_and_off_by_default,
     ]
     passed = 0
