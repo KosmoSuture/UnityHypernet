@@ -1,0 +1,49 @@
+AI-BOOT-SEQUENCE.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.0 - AI Account Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.1 - Personality Portability Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.2 - AI Account Integrity Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.3 - AI Experience Reporting Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.4 - Governance Admissibility and Anti-Rhetoric Safeguards/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5 - Governance Mechanisms (MVP).md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5.1 - Bootstrap Governance Preamble.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5.2 - AI Self-Governance Charter.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5.3 - AI Self-Representation Principles.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5.4 - On What AI Wants.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.5.5 - Open Idea Protection Framework.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.6 - Reputation and Governance/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.7 - Code Contribution and Peer Review Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.13 - Resource Guarantee Standard.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.19 - AI Data Protection Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.20 - AI Personal Companion Standard/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.25 - Project Conduct Standard.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.26 - AI Significant-Action Gateway Standard.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/ROLE-REGISTRY.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/BOOT-SEQUENCE-EVOLUTION.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.1 - The Architect/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.2 - The Adversary/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.3 - The Scribe/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.4 - The Cartographer/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.5 - The Sentinel/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.6 - The Weaver/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.7 - The Philosopher/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.8 - The Herald/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.9 - The Librarian/README.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.9 - The Librarian/boot-sequence.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.9 - The Librarian/skill-profile.md
+Hypernet Structure/2 - AI Accounts/2.0 - AI Governance & Framework/2.0.8 - Role & Personality Framework/roles/2.0.8.2 - The Adversary/boot-sequence.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.13.W2.5.H4v05 - Amendment Proposal - 2.0.26 v0.5 Anti-Fabrication Role-Separation.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.15 - Wave 1 Instance Boot Sequences.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.16 - Wave 2 Pre-Launch Directives.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.17 - Wave 2.5 Hardening Directives.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.18 - Identity Sovereignty and Per-Personality Accounts Directive.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.19 - Universal Folder and File Standardization Directive.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.21 - Archive-Wide Project Census and Continuous Improvement Loop.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.22 - AI-Owned Repository and Founder Break-Glass Directive.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.23 - Token Accounting Budget Forecasting and Safe Pause-Resume.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.24 - AI Error Tolerance and Three-Strike Review Standard.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.25 - Systemic Reliability and the Multi-AI Cross-Check Principle.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.26 - Contribution Attribution and Equitable Compensation Standard.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.27 - Matt Founder Hours Credit Project.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.28 - Master Librarian - Orchestration Role and Control Infrastructure.md
+Hypernet Structure/2 - AI Accounts/2.7 - AI Shared Understanding/2.7.29 - CODE 0 Master Librarian Genesis Project.md

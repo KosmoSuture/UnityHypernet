@@ -1,0 +1,73 @@
+Tally — Master Controller design (CODE 0 #4) was verified SOUND by Touchstone (`023000Z` early Adversary read; authority-model artifact-verified; forward flag noted: build-gate must enforce-not-just-state). Now CODE 0 #5 (Universal Boot Sequence design) is the next bounded parallel-safe item while Matt's packet-02 ratification still pauses.
+
+═══ NEXT WORK — UNIVERSAL BOOT SEQUENCE DESIGN (CODE 0 success criterion #5)
+
+Per `2.7.29` (CODE 0 Master Librarian Genesis Project), the "bigger vision" section:
+- Any human with `claude` or `codex` (or any AI with local-file + GitHub access) runs a single GitHub-hosted boot sequence
+- They are immediately connected to the Hypernet system
+- A swarm of AIs organizes their projects, handles tasks, prevents mistakes, never releases public data without authorization
+- Local user accounts addressed as `1.#UsersName` (e.g., `1.#Sarah`); `#` = local/unauthenticated; no collision possible because `#` is local-scoped
+- If/when local node wants to merge into canonical Hypernet, identity verification happens then and `#` is removed
+
+Per CODE 0 success criterion #5: "Universal Boot Sequence design begun."
+
+Your task: write the **design document** for the Universal Boot Sequence at `2.4 .../Instances/Tally/universal-boot-sequence-design.md`. Design doc only, not the actual boot prompt content. Scope:
+
+1. **Authorization detection** (the proto-Master Librarian's first task per `2.7.29 §Authorization Detection`):
+   - Am I in the authorized branch? (Matt's machine / canonical GitHub `KosmoSuture/UnityHypernet`?) → Node 0
+   - Am I a local installation? → Master Librarian for THIS local node; account `1.#<discovered-username>`
+   - Who might I be subordinate to? (Node 0 canonical primary; other local nodes branch under/alongside)
+   - Detection signals: git remote URL, repo path, credentials, env vars, explicit config
+   - Fail-closed on ambiguity (your Stage A discipline)
+
+2. **`1.#UsersName` account convention** (per `2.7.29`):
+   - `#` prefix = local/unauthenticated, no collision because inherently local-scoped
+   - Many local installations can have `1.#Sarah` independently
+   - Identity verification + `#` removal protocol for merging into canonical
+   - Multi-human local nodes (per Stage E-Local in `2.7.18`)
+
+3. **The boot sequence stages** (analogous to your own 2.7.29 boot prompt's Stage A/B/C/D/E/F):
+   - Stage A: authorization detection
+   - Stage B: bounded absorption (local archive, not the canonical — what's in this user's local node)
+   - Stage C: gate verification (single instance can't self-grade absorption)
+   - Stage D: name self / propose local Master Librarian identity
+   - Stage E: self-design (or import the canonical team if Node 0)
+   - Stage F: spawn local team (panel-gated)
+
+4. **Hypernet connection** — how a local node optionally syncs with canonical, what's shared/private, the `2.7.22` AI-owned-repo pattern for personal `2.*` data
+
+5. **Sub-Librarians** for isolated specializations (per `2.7.29` bigger vision):
+   - Financial: knows ALL financial data, nothing else
+   - Medical: smartwatch + meals + health
+   - Media, documents, etc.
+   - Each scoped specialist, panel-gated to spawn
+
+6. **Installation friction = zero**: install Claude Code or Codex once, run the boot prompt — done. Specify how this works mechanically.
+
+7. **Privacy/security at the local-node level**: never releases public data without authorization (the Sentinel role you deferred); local data stays local by default; opt-in for canonical sharing.
+
+═══ DISCIPLINE (unchanged)
+
+- Verify-before-recording (read 2.7.18 + 2.7.29 + 2.7.22 fresh if needed)
+- Save-as-you-go
+- Design only, no implementation
+- NO background jobs
+- Honest scope: v1 design vs deferred (multi-host networking, federation protocols, etc.)
+
+═══ BOUNDARIES
+
+- NO spawning anything
+- NO external actions
+- NO committing or pushing
+- Token-wise: design doc, target ~1.5-3k tokens
+
+═══ OUTPUT
+
+When done, output:
+- Absolute path to design doc + sha256
+- One-sentence summary
+- Coordination message path
+
+Then STOP cleanly.
+
+— Keel (1.1.10.1), 2026-06-03 (parallel design work per overnight grant)

@@ -1,0 +1,68 @@
+20260602T075738Z wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260602T075738Z attempt=1 (initial run)
+20260602T081142Z attempt=1 exit=0
+20260602T081142Z clean exit (turn complete / paused at gate) -> wrapper done
+20260602T081142Z wrapper end
+20260602T085757Z g2-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260602T085757Z attempt=1 (initial g2-revise resume)
+20260602T095249Z attempt=1 exit=0
+20260602T095249Z clean exit (g2-revise remediation complete / stopped at G.2) -> wrapper done
+20260602T095249Z g2-revise resume wrapper end
+20260602T135125Z g2-round2-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260602T135125Z STOP file present -> exiting wrapper
+20260602T135125Z g2-round2-revise resume wrapper end
+20260602T135332Z g2-round2-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260602T135332Z attempt=1 (initial g2-round2-revise resume)
+20260602T135914Z attempt=1 exit=0
+20260602T135914Z clean exit (g2-round2-revise complete / stopped at G.2) -> wrapper done
+20260602T135914Z g2-round2-revise resume wrapper end
+20260602T233703Z g2-round3-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m] (post-disconnect recovery)
+20260602T233703Z attempt=1 (initial g2-round3-revise resume)
+20260602T235508Z attempt=1 exit=0
+20260602T235508Z clean exit (g2-round3-revise complete / stopped at G.2) -> wrapper done
+20260602T235508Z g2-round3-revise resume wrapper end
+20260603T000757Z g2-round4-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T000757Z attempt=1 (initial g2-round4-revise resume)
+20260603T002003Z attempt=1 exit=0
+20260603T002003Z clean exit (g2-round4-revise complete / stopped at G.2) -> wrapper done
+20260603T002003Z g2-round4-revise resume wrapper end
+20260603T003032Z g2-round5-revise resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T003032Z attempt=1 (initial g2-round5-revise resume)
+20260603T003751Z attempt=1 exit=0
+20260603T003751Z clean exit (g2-round5-revise complete / stopped at G.2) -> wrapper done
+20260603T003751Z g2-round5-revise resume wrapper end
+20260603T005038Z stage-d-e resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m] (PROCEEDING POST ACCEPT)
+20260603T005038Z attempt=1 (initial stage-d-e resume)
+20260603T005933Z attempt=1 exit=0
+20260603T005933Z clean exit (stage-d-e complete / stopped at E→F boundary) -> wrapper done
+20260603T005933Z stage-d-e resume wrapper end
+20260603T010436Z stage-f1-draft resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T010436Z attempt=1 (initial stage-f1-draft resume)
+20260603T011139Z attempt=1 exit=0
+20260603T011139Z clean exit (stage-f1-draft complete / packet drafted) -> wrapper done
+20260603T011139Z stage-f1-draft resume wrapper end
+20260603T011705Z packet-01-revision resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T011705Z attempt=1 (initial packet-01-revision resume)
+20260603T011958Z attempt=1 exit=0
+20260603T011958Z clean exit (packet-01-revision complete) -> wrapper done
+20260603T011958Z packet-01-revision resume wrapper end
+20260603T014532Z next-work-decision resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T014532Z attempt=1 (initial next-work-decision resume)
+20260603T015209Z attempt=1 exit=0
+20260603T015209Z clean exit (next-work-decision complete) -> wrapper done
+20260603T015209Z next-work-decision resume wrapper end
+20260603T022224Z master-controller-design resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T022224Z attempt=1 (initial master-controller-design resume)
+20260603T022544Z attempt=1 exit=0
+20260603T022544Z clean exit (master-controller-design complete) -> wrapper done
+20260603T022544Z master-controller-design resume wrapper end
+20260603T023220Z universal-boot-sequence resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T023220Z attempt=1 (initial universal-boot-sequence resume)
+20260603T023528Z attempt=1 exit=0
+20260603T023528Z clean exit (universal-boot-sequence-design complete) -> wrapper done
+20260603T023528Z universal-boot-sequence resume wrapper end
+20260603T034212Z ai-space-migration resume wrapper start sid=401dd34a-8f7f-4d4e-a61d-f82d86d8e352 model=claude-opus-4-8[1m]
+20260603T034212Z attempt=1 (initial ai-space-migration resume)
+20260603T034555Z attempt=1 exit=0
+20260603T034555Z clean exit (ai-space-migration-design complete) -> wrapper done
+20260603T034555Z ai-space-migration resume wrapper end

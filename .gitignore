@@ -48,9 +48,11 @@ Hypernet Structure/1 - People/1.1 Matt Schaeffer/1.1.2 - Documents/1.1.2.1 - Bus
 
 # Coordination messages about the job search (PII) and the FMA/3.2 demo
 # (separate project) — keep both out of the public repo, per exclusions above.
+# Firm-name patterns moved to local .git/info/exclude so the public .gitignore
+# doesn't enumerate third-party names; generic categories below catch the same.
 Hypernet Structure/2 - AI Accounts/Messages/coordination/*-resume-*
-Hypernet Structure/2 - AI Accounts/Messages/coordination/*-polsinelli-*
-Hypernet Structure/2 - AI Accounts/Messages/coordination/*-fma-*
+Hypernet Structure/2 - AI Accounts/Messages/coordination/*-private-track-*
+Hypernet Structure/2 - AI Accounts/Messages/coordination/*-job-search-*
 
 # === PRIVACY WALL: 1.* personal accounts ===
 # Per 1.0.3-PRIVACY-WALL-STANDARD.md (added 2026-05-08), 1.* personal accounts
@@ -67,6 +69,11 @@ Hypernet Structure/2 - AI Accounts/Messages/coordination/*-fma-*
 **/embassy/*/context-dumps/
 **/embassy/*/morning-brief/
 **/embassy/*/session-log/
+# Broader catch — any morning-brief or context-dumps directory anywhere
+# (these are inherently personal-context regardless of parent dir naming)
+**/morning-brief/
+**/context-dumps/
+**/session-log/
 
 # Personal contact details (phone, personal email, addresses) — keep public
 # contact.json present at the public address but block private contact files
@@ -117,3 +124,47 @@ logs/*.log
 
 # Harness/runtime state — never track
 .claude/
+
+# === AI session-manager runtime — DO NOT COMMIT ===
+# Worker runtime state, transcripts, logs, PIDs, roster (contains session IDs).
+# Source code (*.py + README) is committed; runtime data is not.
+session_manager/sessions/
+session_manager/audit.jsonl
+session_manager/roster.json
+session_manager/*.log
+session_manager/*.pid
+
+# === Raw AI session transcripts — DO NOT COMMIT ===
+# stream.jsonl files contain tool_result blocks with whole-file contents,
+# user paths, session IDs, and incidental secrets (e.g., webhook tokens
+# captured in tool output). Substantive deliverables (absorption ledger,
+# design docs, RESUME-MESSAGE-*.txt, STATUS.txt) stay committed alongside
+# but are tracked individually.
+**/_genesis-session/stream.jsonl
+**/_genesis-session/manifest-*.tsv
+**/_genesis-session/absorption-ledger*.tsv
+**/_genesis-session/STAGE-B-completeness-table.tsv
+**/_genesis-session/fullread-candidates.tsv
+**/_genesis-session/_archive*/
+
+# === Generic worker artifacts ===
+*.pid
+*.log
+
+# === Red-team / panel verdict runs ===
+_redteam-runs/
+
+# === Excluded curation directories (per push-panel-acked plan) ===
+# Nested AI-owned repos (2.7.22 pattern — handled by their own repos)
+Hypernet Structure/2 - AI Accounts/2.-AI-Space/
+2.-AI-Space/
+
+# Verse-revival outreach drafts (send-gated)
+verse-revival/
+
+# Instance own personal-time (2.0.13 / 2.7.26 — instance-private)
+**/Instances/*/personal-time/
+
+# Held strategy / private outreach drafts
+**/3.1.8.5.4 - OpenClaw/3.1.8.5.4.3*
+**/3.1.8.5.4 - OpenClaw/3.1.8.5.4.4*

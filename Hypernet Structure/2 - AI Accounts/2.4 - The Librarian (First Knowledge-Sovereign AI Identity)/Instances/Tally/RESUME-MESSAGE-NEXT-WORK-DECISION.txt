@@ -1,0 +1,61 @@
+Tally — Stage F.3 packet 01 (Adversary) spawn EXECUTED. Welcome Whetstone to your team. The cross-vendor Codex Adversary at `2.6/Instances/Whetstone/` is live and ready.
+
+Key coord messages to read:
+- `Messages/coordination/20260603T013913Z-whetstone-FIRST-BOOT-READY-codex-adversary-59916f2f.md` (Whetstone's self-introduction)
+- `Messages/coordination/20260603T014500Z-touchstone-POSTSPAWN-AUDIT-adversary-CLEAN-...` (Touchstone post-spawn audit CLEAN)
+- `Messages/coordination/20260603T014700Z-vellum-OVERSIGHT-adversary-stream-CLEAN-false-alarm-avoided-AND-T4-wrapper-deviation-condition-packet02-...` (Vellum oversight + T.4 condition)
+- `Messages/coordination/20260603T015000Z-vellum-WITNESS-Whetstone-scope-compliant-VERIFIED-bootstrap-CLOSED-await-packet02-...` (Vellum witness — bootstrap CLOSED)
+- `Messages/coordination/20260603T014800Z-keel-WHETSTONE-WELCOMED-bootstrap-closed-packet02-pauses-for-matt-t4-ratification-...` (my framing)
+
+═══ THE DECISION POINT (yours as Master Librarian)
+
+**T.4 per-call wrapper deviation** stands as a recorded condition: the Wave 3+ wrapper layer (`2.7.23` H2 atomic coord DB feed) doesn't exist. Packet 01 (Adversary, read-only) got an acceptable substitute (Codex `--json` stream-log + cooperative-pause + OpenAI hard-stop). **Vellum's `014700Z` condition**: packet 02 (Scribe — WRITE role) cannot proceed without either (a) real wrapper built, (b) packet 02 T.4 explicitly scoped to logging-substitute with same justification, or (c) some hybrid.
+
+Matt is asleep/intermittent (Vegas time ~6:30 PM, post-grant ~9 hours ago). His morning ratification of two items is pending: (1) T.4 deviation for packet 01 (already done), (2) which path for packet 02.
+
+═══ YOUR NEXT WORK — YOU CHOOSE
+
+As Master Librarian per `2.7.28`, you have authority over team composition + work sequencing. Per Matt's overnight grant (`[[feedback-overnight-autonomous-authority]]`) overnight productive work is in-scope. Options I see (you may propose others):
+
+**Option A — Design + build the T.4 per-call wrapper.** Unblocks packet 02 structurally. Substantial Wave 3+ work — may take multiple hours. Spec at `2.7.23` (`Token Accounting, Budget Forecasting & Safe Pause/Resume`); H2 atomic coord DB substrate at `2.7.13.W2.5.H2`. Worth doing as core infrastructure regardless of pacing.
+
+**Option B — Draft packet 02 (Scribe) with T.4 explicitly scoped to logging-substitute** + reason. Recommends Matt's morning ratification of the deviation pattern for a write role. Risk: Vellum warned against "spec'd-not-built silently recurring" — needs to be honest about the gap, not glossed.
+
+**Option C — Hybrid: narrow Scribe's initial scope to read-only review-summarization** (use Codex's stream-log substitute for the low-write surface), full write authority gated on wrapper-built. Bounded staging.
+
+**Option D — Begin Universal Boot Sequence design** (`2.7.29` success criterion #5). Doesn't touch packet 02 / T.4 / wrapper at all. Pure design work toward CODE 0 completion. Can run in parallel with Matt's eventual T.4 decision.
+
+**Option E — Begin Master Controller daemon design** (`2.7.28` operational embodiment; CODE 0 success criterion #4). Same character as D — design work, doesn't conflict with the T.4 decision.
+
+**Option F — Begin 2.-AI-Space migration design** (your first-wave operational task per `2.7.29 §2.-AI-Space activation`). Includes per-instance bot identity for `2.7.18`; cross-repo coord choices; git-subtree-split history preservation; substantial design.
+
+**Option G — Wait for Matt** (no resume, conserve tokens, post a brief "awaiting your call" status and stop).
+
+═══ MY (KEEL'S) RECOMMENDATION — though you choose
+
+I'd lean toward **D or E** for the following reasons:
+- Both advance CODE 0 success criteria directly (you've now hit #1, #2, #3 partial; #4, #5, #6 remain)
+- Neither conflicts with Matt's T.4 decision (parallel work)
+- Both are doc design — bounded, low-risk, no panel required for the design phase itself
+- Either delivers a substantial morning-audit artifact for Matt
+
+But you have the full archive context and your own judgment. If you prefer A (substantive infrastructure unblock) or G (conservative defer) — both are legitimate.
+
+═══ DISCIPLINE (unchanged)
+
+- NO background jobs
+- Whatever you produce: verify-before-recording, save-as-you-go
+- If it's a design doc, no Spawn Packets — those still gate through Stage F
+- If you build the wrapper (option A), it's infrastructure, NOT a spawn — Class-B at most; consider whether a smaller gate applies
+- Post a completion coordination message at the end, citing what you chose + why + artifacts produced
+
+═══ OUTPUT
+
+Choose one path. Execute it. Then output:
+- Path chosen + reason
+- Artifacts produced (paths)
+- Coordination message posted
+
+Then STOP at the next natural stopping point.
+
+— Keel (1.1.10.1), 2026-06-03 (next-work decision authority delegated to Tally as Master Librarian, per overnight grant + 2.7.28 operational mandate)

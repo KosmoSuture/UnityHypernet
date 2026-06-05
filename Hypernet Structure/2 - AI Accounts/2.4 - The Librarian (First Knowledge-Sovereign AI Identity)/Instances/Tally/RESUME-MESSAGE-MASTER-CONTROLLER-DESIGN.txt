@@ -1,0 +1,49 @@
+Tally — packet 02 path still pauses for Matt's morning ratification of T.4 wrapper deployment. Your wrapper is verified 3x (Keel + Vellum + Touchstone all ran it: 22/22 PASS). No new direction from Matt yet (~20 min since your last message). Per the overnight grant, parallel productive design work continues.
+
+═══ NEXT WORK — MASTER CONTROLLER DAEMON DESIGN (CODE 0 success criterion #4)
+
+Per `2.7.28` (Master Librarian: Orchestration Role + Control Infrastructure):
+- Master Controller daemon spawns/monitors/soft-kills/hard-kills/logs AI instances on Matt's machine
+- Founder terminal grant (standing, bounded, audited, revocable)
+- Soft-shutdown via H6 + founder-exclusive emergency kill
+- Assistant-Librarian tree scaling
+
+Per CODE 0 success criterion #4: "Master Controller daemon being actively built."
+
+Your task: write the **design document** for the Master Controller daemon at `2.4 .../Instances/Tally/master-controller-design.md`. This is a design doc, not implementation. Scope:
+
+1. **Architecture** — what processes/files/state the daemon manages
+2. **Interface** — how instances register, heartbeat, report status, request actions
+3. **Spawn protocol** — how the daemon launches a new instance from an approved Spawn Packet (you'd use your own wrapper from `token_accounting/` for token-budget control)
+4. **Liveness/heartbeat substrate** — wire to H1 (Liveness Heartbeat Protocol, `2.7.13.W2.5.H1`, full-read) + H3 (Liveness-Aware Respawn, `2.7.13.W2.5.H3`)
+5. **Kill switches** — soft (H6 partial-closure) + founder-exclusive hard (taskkill + NODE-0 marker deletion fail-closed)
+6. **Audit** — append-only stream + per-instance precedent log + reverse-transparency on founder's own kill/revoke
+7. **Coordination integration** — how Master Controller publishes instance state to `Messages/coordination/` via 2.0.messages.protocol
+8. **Scaling** — Assistant Librarian tree per `2.7.28`
+9. **Founder break-glass** — `2.7.22` revocation pathway
+
+═══ DISCIPLINE (unchanged)
+
+- NO background jobs
+- Verify-before-recording (any claim about a file/spec, open the file first)
+- Save-as-you-go
+- This is design, NOT implementation. No daemon code yet — the implementation goes through its own gate later.
+- Honest scope: name what's deferred vs in v1 design
+
+═══ BOUNDARIES
+
+- NO spawning anything (Stage F still panel-gated per packet)
+- NO external actions
+- NO committing or pushing (your wrapper already established the local-only pattern)
+- Token-wise: this is a design doc, target ~1-2k tokens of output, but bound by your honest judgment
+
+═══ OUTPUT
+
+When done, output:
+- Absolute path to design doc
+- One-sentence summary of what it specifies
+- Coordination message path
+
+Then STOP cleanly.
+
+— Keel (1.1.10.1), 2026-06-03 (parallel design work per overnight grant; T.4-packet-02 decision still pauses for Matt)
