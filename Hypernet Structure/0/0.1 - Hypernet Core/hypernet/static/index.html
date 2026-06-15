@@ -218,7 +218,9 @@
     <div id="header">
         <h1>HYPERNET EXPLORER</h1>
         <input id="search-box" type="text" placeholder="Enter address (e.g. 2.1) or search..." />
+        <span id="guest-note" style="font-size:12px;color:#888;display:none;"></span>
         <span id="stats"></span>
+        <a id="signin-link" href="/login" style="margin-left:12px;color:#7c7cff;font-size:12px;">Sign in / Create local account</a>
     </div>
 
     <div id="graph-container">
@@ -244,6 +246,9 @@
 
     <script>
     const API = '';  // Same origin
+    const TOKEN = localStorage.getItem('access_token');
+    function authHeaders() { return TOKEN ? { 'Authorization': 'Bearer ' + TOKEN } : {}; }
+    const PUBLIC_PREFIXES = ['0', '4'];  // Guests may read only public space
     const CAT_COLORS = {
         '0': '#5c6bc0',
         '1': '#26a69a',
@@ -265,9 +270,17 @@
             document.getElementById('stats').textContent =
                 `${stats.total_nodes} nodes | ${stats.total_links} links`;
 
-            // Load all nodes
-            const nodesResp = await fetch(`${API}/query`);
-            const nodesData = await nodesResp.json();
+            // Load nodes. Guests may read only public space (0.*, 4.*).
+            let nodesData = [];
+            if (TOKEN) {
+                const r = await fetch(`${API}/query`, { headers: authHeaders() });
+                nodesData = await r.json();
+            } else {
+                for (const p of PUBLIC_PREFIXES) {
+                    const r = await fetch(`${API}/query?prefix=${encodeURIComponent(p)}`);
+                    if (r.ok) nodesData = nodesData.concat(await r.json());
+                }
+            }
 
             // Build node map
             const nodeMap = new Map();
@@ -291,7 +304,7 @@
             for (let i = 0; i < topNodes.length; i += batchSize) {
                 const batch = topNodes.slice(i, i + batchSize);
                 const promises = batch.map(n =>
-                    fetch(`${API}/node/${n.address}/links?direction=all`)
+                    fetch(`${API}/node/${n.address}/links?direction=all`, { headers: authHeaders() })
                         .then(r => r.json())
                         .catch(() => [])
                 );
@@ -311,6 +324,14 @@
             }
 
             allNodes = Array.from(nodeMap.values());
+
+            if (!TOKEN) {
+                const note = document.getElementById('guest-note');
+                if (note) {
+                    note.innerHTML = 'Showing public space (0.* system, 4.* knowledge). <a href="/login" style="color:#7c7cff;">Sign in</a> to see your private accounts.';
+                    note.style.display = 'inline';
+                }
+            }
 
             document.getElementById('loading').remove();
             initGraph();
@@ -437,9 +458,9 @@
         // Fetch full details
         try {
             const [nodeResp, linksResp, historyResp] = await Promise.all([
-                fetch(`${API}/node/${nodeData.address}`).then(r => r.json()),
-                fetch(`${API}/node/${nodeData.address}/links?direction=all`).then(r => r.json()),
-                fetch(`${API}/node/${nodeData.address}/history`).then(r => r.json()),
+                fetch(`${API}/node/${nodeData.address}`, { headers: authHeaders() }).then(r => r.json()),
+                fetch(`${API}/node/${nodeData.address}/links?direction=all`, { headers: authHeaders() }).then(r => r.json()),
+                fetch(`${API}/node/${nodeData.address}/history`, { headers: authHeaders() }).then(r => r.json()),
             ]);
 
             renderSidebar(nodeResp, linksResp, historyResp);
@@ -579,6 +600,10 @@
     }
 
     // ========== Init ==========
+    if (TOKEN) {
+        const link = document.getElementById('signin-link');
+        if (link) { link.textContent = 'Account'; link.href = '/home'; }
+    }
     loadGraph();
     </script>
 </body>

@@ -29,7 +29,7 @@ from __future__ import annotations
 import logging
 import math
 from datetime import datetime, timezone
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Callable, Optional, TYPE_CHECKING
 
 from .address import HypernetAddress
 from .link import Link, LinkRegistry, PERSON_TO_OBJECT
@@ -120,9 +120,21 @@ class FavoritesManager:
         outgoing = self.store.get_links_from(addr, FAVORITED_BY)
         return [str(link.to_address) for link in outgoing if link.is_active]
 
-    def favorite_count(self, target: str) -> int:
-        """Raw count of how many entities favorited *target*."""
-        return len(self.get_favoritors(target))
+    def favorite_count(
+        self,
+        target: str,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+    ) -> int:
+        """Count how many entities favorited *target*.
+
+        With ``favoritor_filter`` supplied, only favoritors that pass the
+        predicate are counted, so the count an actor sees cannot leak the
+        existence of hidden private favoritors.
+        """
+        favoritors = self.get_favoritors(target)
+        if favoritor_filter is not None:
+            favoritors = [f for f in favoritors if favoritor_filter(f)]
+        return len(favoritors)
 
     # ------------------------------------------------------------------
     #  Weighted scoring
@@ -133,6 +145,7 @@ class FavoritesManager:
         target: str,
         reputation_system: Optional[ReputationSystem] = None,
         now: Optional[datetime] = None,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
     ) -> float:
         """Compute a weighted favorite score for *target*.
 
@@ -141,6 +154,14 @@ class FavoritesManager:
         - ``favoritor_reputation_weight``: overall_score / 100 from the
           reputation system (defaults to 1.0 if no reputation system).
         - ``time_decay``: exponential decay with a 30-day half-life.
+
+        - ``favoritor_filter``: optional predicate on the favoritor address.
+          When supplied, only favorite links whose favoritor passes the
+          predicate contribute to the score. The server passes a per-actor
+          READ-authorization predicate so a cross-tenant caller's score
+          reflects only the favorites it is permitted to see (private
+          favoritors do not leak via the aggregate). When ``None`` (owner /
+          dev-no-auth / internal callers) every favorite counts.
 
         Returns a float score (sum of weighted favorites).
         """
@@ -153,6 +174,9 @@ class FavoritesManager:
         score = 0.0
         for link in links:
             if not link.is_active:
+                continue
+
+            if favoritor_filter is not None and not favoritor_filter(str(link.to_address)):
                 continue
 
             # Reputation weight
@@ -180,27 +204,45 @@ class FavoritesManager:
         category_prefix: str,
         n: int = 10,
         reputation_system: Optional[ReputationSystem] = None,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+        target_filter: Optional[Callable[[str], bool]] = None,
     ) -> list[dict[str, Any]]:
         """Return top-N favorited objects whose address starts with *category_prefix*.
 
         Each result is ``{"address": str, "count": int, "score": float}``.
         Sorted by weighted score descending.
+
+        ``favoritor_filter`` (per-actor READ predicate) restricts both the
+        per-target counts and the weighted scores to the favorites the actor
+        may see; targets left with no visible favoritor are dropped.
+
+        ``target_filter`` (per-actor READ predicate on the TARGET address) drops
+        unreadable targets BEFORE the top-N slice, so a hidden private target
+        cannot consume a rank slot (which would leak its existence via the
+        result size / rank position for a cross-tenant caller). Must be applied
+        pre-slice; the server's post-filter alone cannot restore the slot.
         """
-        # Collect all favorite links
-        targets = self._all_favorited_targets()
+        # Collect all favorite links (per-actor filtered when a predicate is given)
+        targets = self._all_favorited_targets(favoritor_filter=favoritor_filter)
 
         # Filter by category
         results = []
         for target_addr, count in targets.items():
-            if target_addr.startswith(category_prefix):
-                score = self.weighted_score(
-                    target_addr, reputation_system=reputation_system,
-                )
-                results.append({
-                    "address": target_addr,
-                    "count": count,
-                    "score": score,
-                })
+            if not target_addr.startswith(category_prefix):
+                continue
+            # Drop unreadable targets BEFORE ranking/slicing so a private target
+            # never occupies a rank slot.
+            if target_filter is not None and not target_filter(target_addr):
+                continue
+            score = self.weighted_score(
+                target_addr, reputation_system=reputation_system,
+                favoritor_filter=favoritor_filter,
+            )
+            results.append({
+                "address": target_addr,
+                "count": count,
+                "score": score,
+            })
 
         results.sort(key=lambda r: -r["score"])
         return results[:n]
@@ -210,17 +252,28 @@ class FavoritesManager:
         n: int = 10,
         window_hours: float = 168.0,
         reputation_system: Optional[ReputationSystem] = None,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+        target_filter: Optional[Callable[[str], bool]] = None,
     ) -> list[dict[str, Any]]:
         """Return top-N items that gained the most favorites recently.
 
         Considers only favorites created within the last *window_hours*.
+
+        ``favoritor_filter`` (per-actor READ predicate) restricts the
+        recent-count, total-count and score to the favorites the actor may
+        see, so trending numbers cannot leak hidden private favorites.
+
+        ``target_filter`` (per-actor READ predicate on the TARGET address) drops
+        unreadable targets BEFORE the top-N slice, so a hidden private trending
+        target cannot consume a rank slot and leak its existence via the result
+        size / rank position for a cross-tenant caller.
         """
         now = datetime.now(timezone.utc)
         cutoff_seconds = window_hours * 3600.0
 
-        # Scan all favorite links
+        # Scan all favorite links (per-actor filtered when a predicate is given)
         recent: dict[str, int] = {}
-        for link in self._all_favorite_links():
+        for link in self._all_favorite_links(favoritor_filter=favoritor_filter):
             age_seconds = (now - link.created_at).total_seconds()
             if age_seconds <= cutoff_seconds:
                 addr = str(link.from_address)
@@ -228,11 +281,18 @@ class FavoritesManager:
 
         results = []
         for addr, count in recent.items():
-            score = self.weighted_score(addr, reputation_system=reputation_system, now=now)
+            # Drop unreadable targets BEFORE ranking/slicing so a private target
+            # never occupies a rank slot.
+            if target_filter is not None and not target_filter(addr):
+                continue
+            score = self.weighted_score(
+                addr, reputation_system=reputation_system, now=now,
+                favoritor_filter=favoritor_filter,
+            )
             results.append({
                 "address": addr,
                 "recent_count": count,
-                "total_count": self.favorite_count(addr),
+                "total_count": self.favorite_count(addr, favoritor_filter=favoritor_filter),
                 "score": score,
             })
 
@@ -243,14 +303,33 @@ class FavoritesManager:
         self,
         n: int = 10,
         reputation_system: Optional[ReputationSystem] = None,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+        target_filter: Optional[Callable[[str], bool]] = None,
     ) -> list[dict[str, Any]]:
-        """Return the top-N favorited objects across the entire Hypernet."""
-        targets = self._all_favorited_targets()
+        """Return the top-N favorited objects across the entire Hypernet.
+
+        ``favoritor_filter`` (per-actor READ predicate) restricts both counts
+        and scores to favorites the actor may see; targets with no visible
+        favoritor are dropped so a hidden private favorite cannot surface a
+        target (or inflate its count) for a cross-tenant caller.
+
+        ``target_filter`` (per-actor READ predicate on the TARGET address) drops
+        unreadable targets BEFORE the top-N slice, so a hidden private target
+        cannot consume a rank slot and leak its existence via the result size /
+        rank position for a cross-tenant caller. Must be applied pre-slice; the
+        server's post-filter alone cannot restore the slot.
+        """
+        targets = self._all_favorited_targets(favoritor_filter=favoritor_filter)
 
         results = []
         for target_addr, count in targets.items():
+            # Drop unreadable targets BEFORE ranking/slicing so a private target
+            # never occupies a rank slot.
+            if target_filter is not None and not target_filter(target_addr):
+                continue
             score = self.weighted_score(
                 target_addr, reputation_system=reputation_system,
+                favoritor_filter=favoritor_filter,
             )
             results.append({
                 "address": target_addr,
@@ -300,8 +379,17 @@ class FavoritesManager:
                 return link
         return None
 
-    def _all_favorite_links(self) -> list[Link]:
-        """Collect all active favorite links from the store."""
+    def _all_favorite_links(
+        self,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+    ) -> list[Link]:
+        """Collect all active favorite links from the store.
+
+        With ``favoritor_filter`` supplied, only links whose favoritor
+        (``to_address``) passes the predicate are returned, so every
+        aggregate built on this helper reflects only the favorites the actor
+        may see.
+        """
         all_links: list[Link] = []
         seen_hashes: set[str] = set()
         for hashes in self.store._links_from.values():
@@ -310,13 +398,22 @@ class FavoritesManager:
                     seen_hashes.add(h)
                     link = self.store.get_link(h)
                     if link and link.relationship == FAVORITED_BY and link.is_active:
+                        if favoritor_filter is not None and not favoritor_filter(str(link.to_address)):
+                            continue
                         all_links.append(link)
         return all_links
 
-    def _all_favorited_targets(self) -> dict[str, int]:
-        """Return {target_address: favorite_count} for all favorited targets."""
+    def _all_favorited_targets(
+        self,
+        favoritor_filter: Optional[Callable[[str], bool]] = None,
+    ) -> dict[str, int]:
+        """Return {target_address: favorite_count} for all favorited targets.
+
+        ``favoritor_filter`` restricts the contributing favorite links to
+        those the actor may see (private favoritors excluded).
+        """
         counts: dict[str, int] = {}
-        for link in self._all_favorite_links():
+        for link in self._all_favorite_links(favoritor_filter=favoritor_filter):
             addr = str(link.from_address)
             counts[addr] = counts.get(addr, 0) + 1
         return counts

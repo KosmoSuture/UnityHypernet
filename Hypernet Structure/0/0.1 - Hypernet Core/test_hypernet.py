@@ -5743,6 +5743,141 @@ def test_continuity_real_data_restore_requires_active_permission_grant():
     print("    PASS")
 
 
+def test_cross_tenant_favorites_reputation_privacy():
+    """Authenticated cross-tenant privacy on favorites + reputation surfaces.
+
+    Seeds two tenants (1.2 human public+private, 5.1 non-standard top-level)
+    with auth OFF (node store + favorite links persist to data_dir), then
+    re-opens the same data_dir with auth ON and verifies:
+      1. A cross-tenant authed actor (1.9) gets NO private favoritor on
+         /favorites/of/{public addr}, and 403 on /reputation/{private addr}.
+      2. The flagged family: fixed (cross-tenant-filtered) endpoints never
+         surface a private node; scoped-shared endpoints expose no 1./3.
+         private node data.
+      3. Regression: the owner (1.2) still sees its OWN private data; anon
+         leaks stay closed; issue-#4 (bad prefix 400, unprefixed 401) intact.
+    """
+    print("  Testing cross-tenant favorites + reputation privacy...")
+    try:
+        from starlette.testclient import TestClient
+    except ImportError:
+        print("    SKIP (starlette not installed)")
+        print("    PASS")
+        return
+
+    import os
+    from hypernet.server import create_app
+    from hypernet.store import Store
+    from hypernet.favorites import FavoritesManager
+
+    os.environ.pop("HYPERNET_API_KEY", None)
+    os.environ["HYPERNET_RATE_LIMIT"] = "100000"
+
+    tmpdir = tempfile.mkdtemp(prefix="hypernet_xtenant_")
+    try:
+        # --- Phase 1: seed with auth OFF (PUT private + public nodes, a favorite) ---
+        seed = TestClient(create_app(data_dir=tmpdir, auth_enabled=False))
+        # Tenant 1.2 (human): public root + public surface + PRIVATE child 1.2.5
+        seed.put("/node/1.2", json={"data": {"title": "1.2 public root"}})
+        seed.put("/node/1.2.13", json={"data": {"title": "1.2 public surface"}})
+        seed.put("/node/1.2.5", json={"data": {"title": "1.2 PRIVATE", "secret_word": "xtenant_alpha"}})
+        # Tenant 5.1 (non-standard top-level, fully private): root + child 5.1.7
+        seed.put("/node/5.1", json={"data": {"title": "5.1 root", "secret_word": "xtenant_beta"}})
+        seed.put("/node/5.1.7", json={"data": {"title": "5.1.7 child", "secret_word": "xtenant_gamma"}})
+
+        # A favorite (persisted as a link in the store): private 1.2.5 favorites
+        # the public 1.2; owner 1.2 favorites its own private 1.2.5.
+        s = Store(tmpdir, enforce_addresses=True, strict=False)
+        fm = FavoritesManager(s)
+        fm.favorite("1.2.5", "1.2", reason="private favoritor of public target")
+        fm.favorite("1.2", "1.2.5", reason="owner favorites own private")
+        del s, fm
+
+        # --- Phase 2: re-open same data_dir with auth ON ---
+        app = create_app(data_dir=tmpdir, auth_enabled=True)
+        client = TestClient(app)
+
+        def register_login(ha, email):
+            r = client.post("/api/auth/register", json={
+                "email": email, "password": "correct horse battery staple",
+                "display_name": ha, "ha": ha})
+            assert r.status_code == 201, r.text
+            tok = client.post("/api/auth/login", json={
+                "email": email, "password": "correct horse battery staple",
+            }).json()["access_token"]
+            return {"Authorization": f"Bearer {tok}"}
+
+        H9 = register_login("1.9", "xtenant9@example.com")   # cross-tenant actor
+        H12 = register_login("1.2", "xtenant12@example.com")  # owner of 1.2
+
+        # ===== 1. Authed cross-tenant (1.9) =====
+        r = client.get("/favorites/of/1.2", headers=H9)
+        assert r.status_code == 200, r.text
+        # The private 1.2.5 favoritor must NOT be disclosed to a cross-tenant caller.
+        assert "1.2.5" not in r.json()["favoritors"], r.json()
+        # /reputation/{private cross-tenant addr} -> 403 (no profile leaked).
+        assert client.get("/reputation/1.2.5", headers=H9).status_code == 403
+        assert client.get("/reputation/5.1.7", headers=H9).status_code == 403
+
+        # ===== 2. The flagged family =====
+        # FIXED (cross-tenant-filtered): a private node must never appear in the result.
+        def assert_no_private(resp, *, private=("1.2.5", "5.1", "5.1.7", "xtenant_alpha", "xtenant_beta", "xtenant_gamma")):
+            blob = json.dumps(resp.json()) if resp.status_code == 200 else ""
+            for p in private:
+                assert p not in blob, f"private token {p!r} leaked: {blob[:200]}"
+
+        assert_no_private(client.get("/query?prefix=1.2", headers=H9))
+        # 5.* is fully private (no public surface) -> empty list for cross-tenant.
+        assert client.get("/query?prefix=5.1", headers=H9).json() == []
+        assert_no_private(client.get("/search?q=xtenant_alpha", headers=H9))
+        assert_no_private(client.get("/search?q=xtenant_beta", headers=H9))
+        assert_no_private(client.get("/node/1.2/neighbors", headers=H9))
+        assert_no_private(client.get("/node/1.2/subgraph", headers=H9))
+        assert_no_private(client.get("/favorites/top", headers=H9))
+        assert_no_private(client.get("/favorites/by/1.2", headers=H9))
+        # /links/to/{private} is gated to 403 (single-subject private address).
+        assert client.get("/links/to/1.2.5", headers=H9).status_code == 403
+
+        # SCOPED-SHARED (deliberately shared): expose no 1./3. tenant-private node data.
+        for path in ("/tasks/mine/anyassignee", "/mesh/nodes",
+                     "/favorites/stats"):
+            resp = client.get(path, headers=H9)
+            assert resp.status_code == 200, (path, resp.text)
+            assert_no_private(resp)
+        # reputation/leaders + reputation/stats are aggregate surfaces; under auth
+        # the catch-all /reputation/{address} route shadows them (-> 403), so they
+        # disclose no per-tenant private rows either way.
+        assert client.get("/reputation/leaders/research", headers=H9).status_code in (200, 403)
+        assert client.get("/reputation/stats", headers=H9).status_code in (200, 403)
+
+        # ===== 3. REGRESSION =====
+        # Owner (1.2) still sees its OWN private data via /search, /query, /favorites.
+        owner_q = client.get("/query?prefix=1.2", headers=H12).json()
+        assert any(n["address"] == "1.2.5" for n in owner_q), owner_q
+        owner_s = client.get("/search?q=xtenant_alpha", headers=H12).json()
+        assert any(n["address"] == "1.2.5" for n in owner_s), owner_s
+        owner_fav = client.get("/favorites/of/1.2", headers=H12).json()
+        assert "1.2.5" in owner_fav["favoritors"], owner_fav
+        # Owner is authorized to read its own reputation profile (200, not 403).
+        assert client.get("/reputation/1.2.5", headers=H12).status_code == 200
+
+        # Anon leaks stay closed.
+        anon_q = client.get("/query?prefix=1.2").json()
+        assert all(n["address"] != "1.2.5" for n in anon_q), anon_q
+        assert client.get("/favorites/of/1.2").status_code == 401
+        assert client.get("/reputation/1.2").status_code == 401
+        # issue-#4 intact: bad prefix -> 400, unprefixed -> 401, public prefix -> 200.
+        assert client.get("/query?prefix=4.").status_code == 400
+        assert client.get("/query").status_code == 401
+        assert client.get("/query?prefix=4").status_code == 200
+    finally:
+        import os
+        os.environ.pop("HYPERNET_RATE_LIMIT", None)
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    print("    PASS")
+
+
 def main():
     print("\n=== Hypernet Core Tests ===\n")
 
@@ -5870,6 +6005,7 @@ def main():
         ("VR and Children API", test_vr_and_children_api),
         ("Search Endpoint", test_search_endpoint),
         ("Object Container Format", test_object_container_format),
+        ("Cross-Tenant Favorites + Reputation Privacy", test_cross_tenant_favorites_reputation_privacy),
     ]
 
     passed = 0

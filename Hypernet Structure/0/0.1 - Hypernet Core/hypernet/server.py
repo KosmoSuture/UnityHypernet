@@ -363,6 +363,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "/vr",
             "/welcome",
             "/explorer",
+            "/login",
             "/docs",
             "/openapi.json",
             "/redoc",
@@ -499,6 +500,20 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                         content={"detail": "Too many authentication attempts. Try again in a minute."},
                     )
                 bucket.append(now)
+
+            # Best-effort actor resolution: ALWAYS decode any present Bearer
+            # token and stash request.state.user when valid, regardless of
+            # whether the route is public. This does NOT change which requests
+            # are allowed through (no token / invalid token leaves user as None
+            # / anonymous); it only makes the real actor known to read handlers
+            # so per-actor result filtering can show an owner their own private
+            # descendants while still hiding other tenants' private data.
+            best_effort_token = _extract_bearer_token(request.headers.get("Authorization"))
+            if best_effort_token:
+                try:
+                    request.state.user = _auth_svc.get_user_from_token(best_effort_token)
+                except (TokenError, AuthenticationError):
+                    request.state.user = None
 
             # Allow explicitly public routes through without auth. Public
             # address reads are limited to 0.*, 4.*, and account public surfaces.
@@ -676,9 +691,13 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     _account_mgr = LocalAccountManager(_store, data_dir)
 
     @app.get("/accounts/local")
-    def list_local_accounts():
+    def list_local_accounts(request: _Starlette_Request):
         """List all local personal accounts."""
-        return [a.to_dict() for a in _account_mgr.list_accounts()]
+        # Per-actor filter: each local account is a private personal-account
+        # node (address + profile). A cross-tenant authed caller must only see
+        # accounts whose address it may READ; anon 401s upstream. account.to_dict
+        # exposes an "address" key, so reuse the node filter.
+        return _filter_nodes_for_actor(request, [a.to_dict() for a in _account_mgr.list_accounts()])
 
     @app.post("/accounts/local")
     def create_local_account(name: str, encrypted: bool = False):
@@ -688,8 +707,11 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         return account.to_dict()
 
     @app.get("/accounts/local/{address:path}/structure")
-    def local_account_structure(address: str):
+    def local_account_structure(request: _Starlette_Request, address: str):
         """Get the category structure of a local account."""
+        # Gate: a local account's category structure is private per-account
+        # data; only the owner (or an actor who may READ the address) sees it.
+        _require_read_or_403(request, address)
         account = _account_mgr.get_account(address)
         if not account:
             raise HTTPException(404, f"Account not found: {address}")
@@ -702,8 +724,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     from .personal.timeline import TimelineEngine, ZoomLevel
 
     @app.get("/timeline/{account_address:path}/stats")
-    def timeline_stats(account_address: str):
+    def timeline_stats(request: _Starlette_Request, account_address: str):
         """Get timeline statistics for an account."""
+        # Gate: an account's timeline is private per-account LIFE data and the
+        # account ROOT is only a PUBLIC SURFACE, so require the actor be able to
+        # read the account's PRIVATE space (owner / authorized private read).
+        # Anon 401s upstream; this denies the authenticated cross-tenant read of
+        # private descendant content.
+        _require_private_read_or_403(request, account_address)
         tl = TimelineEngine(_store, account_address, data_dir)
         return tl.get_stats()
 
@@ -716,6 +744,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/timeline/{account_address:path}/events")
     def timeline_events(
+        request: _Starlette_Request,
         account_address: str,
         zoom: str = "month",
         source_type: Optional[str] = None,
@@ -724,6 +753,9 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         limit: int = 100,
     ):
         """Query timeline events with filters."""
+        # Gate: per-account private life data — require private-space read of the
+        # account, not just the public surface root (see /timeline/.../stats).
+        _require_private_read_or_403(request, account_address)
         tl = TimelineEngine(_store, account_address, data_dir)
         zoom_level = ZoomLevel(zoom) if zoom in [z.value for z in ZoomLevel] else ZoomLevel.MONTH
         return tl.query(
@@ -732,8 +764,11 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         )
 
     @app.get("/timeline/{account_address:path}/chapters")
-    def timeline_chapters(account_address: str):
+    def timeline_chapters(request: _Starlette_Request, account_address: str):
         """Get auto-detected Life Story chapters."""
+        # Gate: per-account private life data — require private-space read of the
+        # account, not just the public surface root (see /timeline/.../stats).
+        _require_private_read_or_403(request, account_address)
         tl = TimelineEngine(_store, account_address, data_dir)
         return tl.get_chapters()
 
@@ -741,8 +776,12 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     from .personal.narrative import NarrativeGenerator
 
     @app.get("/story/{account_address:path}/overview")
-    def life_story_overview(account_address: str):
+    def life_story_overview(request: _Starlette_Request, account_address: str):
         """Get the full Life Story overview with chapter narratives."""
+        # Gate: an account's narrated life story is private per-account life
+        # data; the account ROOT is only a PUBLIC SURFACE, so require the actor
+        # be able to read the account's PRIVATE space (owner / authorized).
+        _require_private_read_or_403(request, account_address)
         tl = TimelineEngine(_store, account_address, data_dir)
         tl.rebuild()
         gen = NarrativeGenerator(tl)
@@ -750,8 +789,11 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         return overview.to_dict()
 
     @app.get("/story/{account_address:path}/chapter/{chapter_id}")
-    def life_story_chapter(account_address: str, chapter_id: str):
+    def life_story_chapter(request: _Starlette_Request, account_address: str, chapter_id: str):
         """Get the narrative for a specific chapter."""
+        # Gate: per-account private life-story data — require private-space read
+        # of the account, not just the public surface root (see /story/.../overview).
+        _require_private_read_or_403(request, account_address)
         tl = TimelineEngine(_store, account_address, data_dir)
         tl.rebuild()
         gen = NarrativeGenerator(tl)
@@ -1028,13 +1070,191 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 link.source_consented = True
                 link.target_consented = False
 
-    @app.get("/node/{address:path}")
-    def get_node(address: str):
-        ha = HypernetAddress.parse(address)
-        node = _store.get_node(ha)
-        if not node:
-            raise HTTPException(404, f"Node not found: {address}")
-        return node.to_dict()
+    # ── Per-actor result filtering ────────────────────────────────────
+    # When auth is on, collection / traversal / link endpoints can return many
+    # addresses at once for a caller the middleware only coarsely authorized
+    # (the middleware checks the *request prefix*, not every descendant in the
+    # result). We re-filter every returned address/node/link by the ACTUAL
+    # actor's READ authorization so that:
+    #   - anonymous callers (no stashed user) see only public-readable
+    #     addresses (0.*, 4.*, account public surfaces);
+    #   - authenticated callers see exactly what can_read_address() permits —
+    #     their OWN private descendants (usability), but NOT another tenant's
+    #     private data on the endpoints listed below.
+    # The middleware best-effort-resolves request.state.user even on public
+    # paths, so an authenticated owner querying a public-surface prefix is no
+    # longer over-filtered. Dev/no-auth mode short-circuits to no filtering.
+    #
+    # HONEST SCOPE (do not overstate — this does NOT hold on literally every
+    # endpoint):
+    #   * Anonymous access: filtered/gated to public-readable on ALL read
+    #     endpoints — non-public paths 401 in the middleware, and the read
+    #     handlers that DO serve anon (graph/search/links/favorites/etc.)
+    #     run the per-actor filter, which collapses to public-only for an
+    #     anonymous actor.
+    #   * Authenticated cross-tenant filtering covers: the graph endpoints
+    #     (links / neighbors / subgraph / traverse / controlled-subgraph),
+    #     full-text search, the whole-graph links-query, the favorites
+    #     surfaces (/favorites/by, /favorites/of, /favorites/top,
+    #     /favorites/trending) — both the favoritor/target LISTS and the
+    #     derived AGGREGATES (weighted_score, count, recent_count,
+    #     total_count, rankings) are computed from only the favorite links
+    #     whose favoritor the actor may read, so a hidden private favorite
+    #     leaks neither via the list NOR via any score/count — the reputation
+    #     profile (/reputation/{address}, gated on read), the local-accounts
+    #     list + structure, and the per-account timeline + life-story
+    #     endpoints. The timeline/life-story endpoints return PRIVATE
+    #     DESCENDANT life content, so they are gated on PRIVATE-space read of
+    #     the account (owner / authorized private read), NOT merely can_read of
+    #     the public account-surface root — a cross-tenant caller gets 403, not
+    #     private descendant content.
+    #   * DELIBERATELY SHARED (NOT cross-tenant-filtered, by design, each
+    #     documented at its handler): the 0.7.1 task work queue
+    #     (/tasks/mine/{assignee}) and the device-mesh registry (/mesh/nodes).
+    #     Aggregate/stat surfaces (e.g. /reputation/leaders, /reputation/stats,
+    #     /favorites/stats) expose only rollups, not per-tenant private rows.
+    #   * Single-node GET (/node/{address}) is gated by the middleware's
+    #     public-address check, not by this post-filter.
+
+    def _actor_for_request(request: _Starlette_Request):
+        # Returns the stashed user (authenticated) or None (anonymous).
+        if not auth_enabled:
+            return None
+        return getattr(request.state, "user", None)
+
+    def _read_ok_for_request(request: _Starlette_Request, address) -> bool:
+        """True if the request's actor may READ the given address."""
+        from .access_policy import can_read_address, public_can_read_address
+
+        addr = str(address) if address is not None else ""
+        user = _actor_for_request(request)
+        if user is None:
+            # Anonymous (or dev no-auth, where this is never reached because
+            # the filters short-circuit before calling here).
+            return public_can_read_address(addr).allowed
+        booted_ai = bool(
+            getattr(request.state, "boot_verified", False)
+            and getattr(user, "account_kind", "") == "ai"
+        )
+        return can_read_address(
+            user.ha,
+            addr,
+            booted_ai=booted_ai,
+            actor_account_kind=getattr(user, "account_kind", None),
+        ).allowed
+
+    def _filter_active(request: _Starlette_Request) -> bool:
+        # Filtering only applies when auth is enabled. (No-auth dev mode is
+        # fully open by design; auth_enabled=False is unchanged.)
+        return auth_enabled
+
+    def _filter_nodes_for_actor(request: _Starlette_Request, dicts: list) -> list:
+        if not _filter_active(request):
+            return dicts
+        return [d for d in dicts if _read_ok_for_request(request, d.get("address"))]
+
+    def _filter_links_for_actor(request: _Starlette_Request, dicts: list) -> list:
+        if not _filter_active(request):
+            return dicts
+        # A link is visible only if the actor may read BOTH endpoints, so
+        # neither a private source nor a private target leaks via link data.
+        return [
+            d for d in dicts
+            if _read_ok_for_request(request, d.get("from_address"))
+            and _read_ok_for_request(request, d.get("to_address"))
+        ]
+
+    def _filter_addresses_for_actor(request: _Starlette_Request, addrs: list) -> list:
+        if not _filter_active(request):
+            return addrs
+        return [a for a in addrs if _read_ok_for_request(request, a)]
+
+    def _favoritor_read_filter(request: _Starlette_Request):
+        """Return a per-actor READ predicate for favoritor addresses, or None.
+
+        Used by the favorites AGGREGATE surfaces (weighted_score, counts,
+        top_overall, trending). Favorite links carry a favoritor address; an
+        aggregate computed over the raw links would leak the existence /
+        activity of PRIVATE favoritors (their score contribution and count)
+        to an anon/cross-tenant caller even though the favoritor LIST is
+        already per-actor filtered. Passing this predicate into the favorites
+        engine makes every score/count/ranking reflect only the favorite
+        links whose favoritor the actor may read.
+
+        Returns None in dev/no-auth mode (no filtering, same convention as the
+        per-actor list filters), so owners and internal callers are unaffected.
+        """
+        if not _filter_active(request):
+            return None
+        return lambda favoritor_addr: _read_ok_for_request(request, favoritor_addr)
+
+    def _filter_subgraph_for_actor(request: _Starlette_Request, sg: dict) -> dict:
+        if not _filter_active(request) or not isinstance(sg, dict):
+            return sg
+        sg["nodes"] = _filter_nodes_for_actor(request, sg.get("nodes", []))
+        sg["links"] = _filter_links_for_actor(request, sg.get("links", []))
+        return sg
+
+    def _require_read_or_403(request: _Starlette_Request, address) -> None:
+        """Gate a whole single-subject endpoint on the actor's READ permission.
+
+        Used for endpoints that return one tenant's private profile/timeline/
+        life-story keyed by a single address (not a collection we can filter
+        element-by-element). Anonymous already 401s upstream in the middleware;
+        this closes the authenticated cross-tenant case. Dev/no-auth mode
+        short-circuits to open (same convention as the per-actor filters).
+        """
+        if not _filter_active(request):
+            return
+        if not _read_ok_for_request(request, address):
+            raise HTTPException(status_code=403, detail="Not authorized to read this address")
+
+    def _require_private_read_or_403(request: _Starlette_Request, account_address) -> None:
+        """Gate an endpoint that returns an account's PRIVATE life content.
+
+        ``_require_read_or_403`` checks READ of the address as given, but an
+        account ROOT (e.g. ``1.2``) is a PUBLIC ACCOUNT SURFACE — ``can_read``
+        of the root passes for ANY authenticated cross-tenant caller. The
+        account-narrative endpoints (timeline events/chapters/stats, life-story
+        overview/chapter) return PRIVATE DESCENDANT content (private people,
+        titles, highlights, sentinel-tagged private nodes), so gating on the
+        public surface root under-protects them.
+
+        Instead, require that the actor may read the account's PRIVATE space:
+        probe READ-authorization against a synthetic PRIVATE descendant of the
+        account root (a section that is NOT a public account section). Under
+        the access policy that probe only passes for the account OWNER (actor
+        root == account root) or an actor with explicit private-subtree read —
+        anon already 401s upstream, and an authed cross-tenant caller is
+        denied (403). Dev/no-auth mode short-circuits open (same convention).
+        """
+        if not _filter_active(request):
+            return
+        from .access_policy import account_root as _account_root
+        root = _account_root(str(account_address) if account_address is not None else "")
+        # Append a guaranteed-private section marker. For 1.*/3.* accounts this
+        # is a non-public section (so public_can_read denies and only the owner
+        # passes can_read_address); for 2.* accounts the whole space is already
+        # AI-owner-only, so the probe likewise resolves to owner-only.
+        private_probe = f"{root}.private" if root else "private"
+        if not _read_ok_for_request(request, private_probe):
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorized to read this account's private life content",
+            )
+
+    def _parse_address_or_400(address):
+        """Parse caller-supplied address text, mapping malformed input to 400.
+
+        HypernetAddress.parse raises ValueError on malformed input (e.g. an
+        encoded slash / '..' segment arriving as a path parameter). Without
+        this guard that ValueError surfaces as an unhandled 500; callers that
+        pass bad input should get a 400, mirroring the existing /query pattern.
+        """
+        try:
+            return HypernetAddress.parse(address)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid address: {exc}")
 
     @app.put("/node/{address:path}")
     def put_node(
@@ -1053,7 +1273,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         source_type = payload.get("source_type")
         source_id = payload.get("source_id")
 
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         existing = _store.get_node(ha)
         if existing:
             effective_type = type_address or (str(existing.type_address) if existing.type_address else None)
@@ -1061,14 +1281,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             schema_validation = _object_write_validation(effective_type, effective_data, validation_mode)
             existing.update_data(**data)
             if type_address:
-                existing.type_address = HypernetAddress.parse(str(type_address))
+                existing.type_address = _parse_address_or_400(str(type_address))
             _store.put_node(existing)
             response = existing.to_dict()
         else:
             schema_validation = _object_write_validation(str(type_address) if type_address else None, data, validation_mode)
             node = Node(
                 address=ha,
-                type_address=HypernetAddress.parse(str(type_address)) if type_address else None,
+                type_address=_parse_address_or_400(str(type_address)) if type_address else None,
                 data=data,
                 source_type=source_type,
                 source_id=source_id,
@@ -1083,7 +1303,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.delete("/node/{address:path}")
     def delete_node(address: str, hard: bool = False):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         if _store.delete_node(ha, hard=hard):
             return {"deleted": address, "hard": hard}
         raise HTTPException(404, f"Node not found: {address}")
@@ -1091,34 +1311,47 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     # === Link endpoints ===
 
     @app.get("/node/{address:path}/links")
-    def get_node_links(address: str, relationship: Optional[str] = None, direction: str = "outgoing"):
-        ha = HypernetAddress.parse(address)
+    def get_node_links(
+        request: _Starlette_Request,
+        address: str,
+        relationship: Optional[str] = None,
+        direction: str = "outgoing",
+    ):
+        ha = _parse_address_or_400(address)
         if direction == "outgoing":
             links = _store.get_links_from(ha, relationship)
         elif direction == "incoming":
             links = _store.get_links_to(ha, relationship)
         else:
             links = _store.get_links_from(ha, relationship) + _store.get_links_to(ha, relationship)
-        return [l.to_dict() for l in links]
+        # Per-actor filter: anon/cross-tenant callers must not see links whose
+        # other endpoint is a private descendant (Codex round-2 leak via
+        # /node/{public-root}/links, incl the /api variant).
+        return _filter_links_for_actor(request, [l.to_dict() for l in links])
 
     @app.get("/node/{address:path}/neighbors")
-    def get_neighbors(address: str, relationship: Optional[str] = None):
-        ha = HypernetAddress.parse(address)
+    def get_neighbors(request: _Starlette_Request, address: str, relationship: Optional[str] = None):
+        ha = _parse_address_or_400(address)
         neighbors = _store.get_neighbors(ha, relationship)
         nodes = []
         for n_addr in neighbors:
             node = _store.get_node(n_addr)
             if node:
                 nodes.append(node.to_dict())
-        return nodes
+        # Per-actor filter: hide private neighbor nodes (Codex round-2 leak via
+        # /node/{public-root}/neighbors returning private 1.2.5).
+        return _filter_nodes_for_actor(request, nodes)
 
     @app.get("/node/{address:path}/subgraph")
-    def get_subgraph(address: str, depth: int = 2):
-        ha = HypernetAddress.parse(address)
-        return _graph.subgraph(ha, max_depth=depth)
+    def get_subgraph(request: _Starlette_Request, address: str, depth: int = 2):
+        ha = _parse_address_or_400(address)
+        # Per-actor filter of BOTH nodes[] and links[] (Codex round-2 leak via
+        # /node/{public-root}/subgraph surfacing private 1.2.5).
+        return _filter_subgraph_for_actor(request, _graph.subgraph(ha, max_depth=depth))
 
     @app.get("/graph/traverse/{address:path}")
     def graph_traverse(
+        request: _Starlette_Request,
         address: str,
         depth: int = 2,
         relationships: Optional[str] = None,
@@ -1138,9 +1371,9 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         out links below a trust score or evidence count for
         high-confidence-only graph slices.
         """
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         try:
-            return _graph.controlled_subgraph(
+            return _filter_subgraph_for_actor(request, _graph.controlled_subgraph(
                 ha,
                 max_depth=depth,
                 relationships=_relationship_set(relationships),
@@ -1152,7 +1385,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                 transitive_only=transitive_only,
                 min_trust=min_trust,
                 min_evidence=min_evidence,
-            )
+            ))
         except ValueError as exc:
             raise HTTPException(400, str(exc))
 
@@ -1160,7 +1393,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/node/{address:path}/history/{version}")
     def get_node_version(address: str, version: int):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         node = _store.get_node_version(ha, version)
         if not node:
             raise HTTPException(404, f"Version {version} not found for node: {address}")
@@ -1168,8 +1401,21 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/node/{address:path}/history")
     def get_node_history(address: str):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         return _store.get_node_history(ha)
+
+    # Registered AFTER the more-specific /node/{address:path}/... routes above
+    # because the greedy {address:path} on this bare GET would otherwise shadow
+    # /links, /neighbors, /subgraph, /history, /history/{version} (FastAPI
+    # matches routes in registration order). Single-node anon access stays
+    # gated by the jwt middleware's public-address check, so no extra filter.
+    @app.get("/node/{address:path}")
+    def get_node(address: str):
+        ha = _parse_address_or_400(address)
+        node = _store.get_node(ha)
+        if not node:
+            raise HTTPException(404, f"Node not found: {address}")
+        return node.to_dict()
 
     @app.post("/link")
     def create_link(request: _Starlette_Request, payload: dict = Body(...), validation_mode: str = "warn", strict: bool = False):
@@ -1180,8 +1426,8 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         if not isinstance(data, dict):
             raise HTTPException(400, "data must be an object")
         link = Link(
-            from_address=HypernetAddress.parse(str(_require_payload_field(payload, "from_address"))),
-            to_address=HypernetAddress.parse(str(_require_payload_field(payload, "to_address"))),
+            from_address=_parse_address_or_400(str(_require_payload_field(payload, "from_address"))),
+            to_address=_parse_address_or_400(str(_require_payload_field(payload, "to_address"))),
             link_type=str(_require_payload_field(payload, "link_type")),
             relationship=str(_require_payload_field(payload, "relationship")),
             strength=float(payload.get("strength", 1.0)),
@@ -1205,21 +1451,28 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/query")
     def query_nodes(
+        request: _Starlette_Request,
         prefix: Optional[str] = None,
         type_address: Optional[str] = None,
         owner: Optional[str] = None,
         include_deleted: bool = False,
     ):
+        try:
+            prefix_ha = HypernetAddress.parse(prefix) if prefix else None
+            type_ha = HypernetAddress.parse(type_address) if type_address else None
+            owner_ha = HypernetAddress.parse(owner) if owner else None
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid address: {e}")
         nodes = _store.list_nodes(
-            prefix=HypernetAddress.parse(prefix) if prefix else None,
-            type_address=HypernetAddress.parse(type_address) if type_address else None,
-            owner=HypernetAddress.parse(owner) if owner else None,
+            prefix=prefix_ha,
+            type_address=type_ha,
+            owner=owner_ha,
             include_deleted=include_deleted,
         )
-        return [n.to_dict() for n in nodes]
+        return _filter_nodes_for_actor(request, [n.to_dict() for n in nodes])
 
     @app.get("/search")
-    def search_nodes(q: str, limit: int = 20):
+    def search_nodes(request: _Starlette_Request, q: str, limit: int = 20):
         """Full-text search across node data fields (title, name, description).
 
         Scans all nodes and returns those whose data fields contain the query
@@ -1251,16 +1504,21 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
                     d = node.to_dict()
                     d["child_count"] = max(0, _store.count_by_prefix(node.address) - 1)
                     results.append(d)
-                    if len(results) >= limit:
+                    # Over-collect: the per-actor filter below may drop nodes the
+                    # caller can't read, so keep scanning past `limit` raw matches
+                    # to still return up to `limit` *visible* results.
+                    if not _filter_active(request) and len(results) >= limit:
                         break
             except Exception:
                 continue
-        return results
+        # Per-actor filter: an authenticated cross-tenant caller (or anon)
+        # must not see private nodes matched by full-text scan of ALL nodes.
+        return _filter_nodes_for_actor(request, results)[:limit]
 
     @app.get("/children/{address:path}")
-    def get_children(address: str, include_deleted: bool = False):
+    def get_children(request: _Starlette_Request, address: str, include_deleted: bool = False):
         """Get direct children of a node (one level deep). Used by VR spatial browser."""
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         all_nodes = _store.list_nodes(
             prefix=ha,
             include_deleted=include_deleted,
@@ -1276,7 +1534,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             d = child.to_dict()
             d["child_count"] = max(0, _store.count_by_prefix(child.address) - 1)
             result.append(d)
-        return result
+        return _filter_nodes_for_actor(request, result)
 
     @app.get("/children")
     def get_root_children(include_deleted: bool = False):
@@ -1296,7 +1554,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/next-address/{prefix:path}")
     def next_address(prefix: str):
-        ha = HypernetAddress.parse(prefix)
+        ha = _parse_address_or_400(prefix)
         return {"next": str(_store.next_address(ha))}
 
     # === Task Queue endpoints ===
@@ -1323,9 +1581,9 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             title=body.title,
             description=body.description,
             priority=priority_map.get(body.priority, TaskPriority.NORMAL),
-            created_by=HypernetAddress.parse(body.created_by) if body.created_by else None,
+            created_by=_parse_address_or_400(body.created_by) if body.created_by else None,
             tags=body.tags,
-            depends_on=[HypernetAddress.parse(d) for d in body.depends_on] if body.depends_on else None,
+            depends_on=[_parse_address_or_400(d) for d in body.depends_on] if body.depends_on else None,
         )
         return task.to_dict()
 
@@ -1360,43 +1618,49 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     def claim_task(address: str, body: TaskAction):
         if not body.assignee:
             raise HTTPException(400, "assignee is required")
-        ha = HypernetAddress.parse(address)
-        assignee = HypernetAddress.parse(body.assignee)
+        ha = _parse_address_or_400(address)
+        assignee = _parse_address_or_400(body.assignee)
         if _tasks.claim_task(ha, assignee):
             return {"claimed": address, "assignee": body.assignee}
         raise HTTPException(409, f"Cannot claim task: {address}")
 
     @app.post("/tasks/{address:path}/start")
     def start_task(address: str):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         if _tasks.start_task(ha):
             return {"started": address}
         raise HTTPException(409, f"Cannot start task: {address}")
 
     @app.post("/tasks/{address:path}/progress")
     def update_progress(address: str, body: TaskAction):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         if _tasks.update_progress(ha, body.progress or ""):
             return {"updated": address}
         raise HTTPException(409, f"Cannot update task: {address}")
 
     @app.post("/tasks/{address:path}/complete")
     def complete_task(address: str, body: TaskAction):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         if _tasks.complete_task(ha, body.result):
             return {"completed": address}
         raise HTTPException(409, f"Cannot complete task: {address}")
 
     @app.post("/tasks/{address:path}/fail")
     def fail_task(address: str, body: TaskAction):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         if _tasks.fail_task(ha, body.reason or ""):
             return {"failed": address}
         raise HTTPException(409, f"Cannot fail task: {address}")
 
     @app.get("/tasks/mine/{assignee:path}")
     def my_tasks(assignee: str):
-        ha = HypernetAddress.parse(assignee)
+        # DELIBERATELY SHARED — not per-actor filtered. Tasks are the shared
+        # 0.7.1 work queue: assignment/visibility across instances is the
+        # point (coordinators rank workers, instances pick up each other's
+        # tasks). The assignee is a coordination identity, not a tenant's
+        # private node graph, so this is a shared operational surface by
+        # design rather than a cross-tenant leak. Anon still 401s upstream.
+        ha = _parse_address_or_400(assignee)
         tasks = _tasks.get_tasks_for(ha)
         return [t.to_dict() for t in tasks]
 
@@ -1454,6 +1718,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/links/from/{address:path}")
     def links_from(
+        request: _Starlette_Request,
         address: str,
         relationship: Optional[str] = None,
         category: Optional[str] = None,
@@ -1464,14 +1729,15 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         min_trust: Optional[float] = None,
         as_of: Optional[str] = None,
     ):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         as_of_dt = _parse_as_of(as_of)
         links = _links.from_address(ha, relationship)
         links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
-        return [l.to_dict() for l in links]
+        return _filter_links_for_actor(request, [l.to_dict() for l in links])
 
     @app.get("/links/to/{address:path}")
     def links_to(
+        request: _Starlette_Request,
         address: str,
         relationship: Optional[str] = None,
         category: Optional[str] = None,
@@ -1482,14 +1748,15 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         min_trust: Optional[float] = None,
         as_of: Optional[str] = None,
     ):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         as_of_dt = _parse_as_of(as_of)
         links = _links.to_address(ha, relationship)
         links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
-        return [l.to_dict() for l in links]
+        return _filter_links_for_actor(request, [l.to_dict() for l in links])
 
     @app.get("/links/connections/{address:path}")
     def links_connections(
+        request: _Starlette_Request,
         address: str,
         relationship: Optional[str] = None,
         category: Optional[str] = None,
@@ -1500,17 +1767,17 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         min_trust: Optional[float] = None,
         as_of: Optional[str] = None,
     ):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         as_of_dt = _parse_as_of(as_of)
         links = _links.connections(ha, relationship)
         links = _filter_links(links, category, status, verification, active_only, min_strength, min_trust, as_of_dt)
-        return [l.to_dict() for l in links]
+        return _filter_links_for_actor(request, [l.to_dict() for l in links])
 
     @app.get("/links/neighbors/{address:path}")
-    def links_neighbors(address: str, relationship: Optional[str] = None):
-        ha = HypernetAddress.parse(address)
+    def links_neighbors(request: _Starlette_Request, address: str, relationship: Optional[str] = None):
+        ha = _parse_address_or_400(address)
         neighbors = _links.neighbors(ha, relationship)
-        return [str(a) for a in neighbors]
+        return _filter_addresses_for_actor(request, [str(a) for a in neighbors])
 
     @app.post("/links/index/rebuild")
     def links_index_rebuild(max_links: Optional[int] = None):
@@ -1519,6 +1786,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/links/query")
     def links_query(
+        request: _Starlette_Request,
         relationship: Optional[str] = None,
         category: Optional[str] = None,
         status: Optional[str] = None,
@@ -1540,6 +1808,17 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         moment regardless of lifecycle status.
         """
         as_of_dt = _parse_as_of(as_of)
+        # Normalize the caller's pagination exactly as query_links would so the
+        # post-filter slice mirrors the engine's clamping (limit cap 1000,
+        # non-negative offset). We then apply offset/limit OURSELVES, AFTER the
+        # per-actor readability filter — see below.
+        req_limit = max(0, min(limit, 1000))
+        req_offset = max(0, offset)
+        # Fetch UNPAGINATED (limit=0/offset=0 disables the engine's slice; the
+        # caller's pagination is reapplied post-filter). Without this, the engine
+        # applies offset/limit BEFORE the actor-filter, so a hidden private link
+        # would consume a pre-filter slot (limit=1 -> returned:0) and leak its
+        # existence via the pagination boundary. max_scan still bounds the scan.
         links = _links.query_links(
             relationship=relationship,
             category=category,
@@ -1550,8 +1829,8 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             target_prefix=target_prefix,
             active_only=active_only,
             as_of=as_of_dt,
-            limit=limit,
-            offset=offset,
+            limit=0,
+            offset=0,
             max_scan=max_scan,
         )
         filters = {
@@ -1568,10 +1847,23 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             "offset": offset,
             "max_scan": max_scan,
         }
+        # Per-actor filter: a whole-graph link query by source/target prefix must
+        # not leak links whose endpoint is a private node the caller can't read
+        # (authenticated cross-tenant caller passes the prefix-only middleware).
+        # Filter FIRST, THEN paginate, so a hidden private link never consumes a
+        # pagination slot and its existence cannot be inferred from the page
+        # boundary / 'returned' count.
+        filtered = _filter_links_for_actor(request, [l.to_dict() for l in links])
+        # Reapply the caller's offset/limit on the FILTERED list. limit=0 means
+        # "no limit" (mirrors the engine), so only slice when req_limit > 0.
+        if req_limit:
+            paginated = filtered[req_offset:req_offset + req_limit]
+        else:
+            paginated = filtered[req_offset:]
         return {
             "filters": {k: v for k, v in filters.items() if v not in (None, "")},
-            "returned": len(links),
-            "links": [l.to_dict() for l in links],
+            "returned": len(paginated),
+            "links": paginated,
         }
 
     @app.get("/links/stats")
@@ -2419,7 +2711,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.post("/coordinator/decompose/{address:path}")
     def decompose_task(address: str, body: DecomposeRequest):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         task_node = _store.get_node(ha)
         if not task_node:
             raise HTTPException(404, f"Task not found: {address}")
@@ -2432,7 +2724,7 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
 
     @app.get("/coordinator/match/{address:path}")
     def match_task(address: str):
-        ha = HypernetAddress.parse(address)
+        ha = _parse_address_or_400(address)
         task_node = _store.get_node(ha)
         if not task_node:
             raise HTTPException(404, f"Task not found: {address}")
@@ -2453,7 +2745,13 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         source_type: str = "system"
 
     @app.get("/reputation/{address:path}")
-    def get_reputation(address: str):
+    def get_reputation(request: _Starlette_Request, address: str):
+        # Gate: a reputation profile (name/entity_type/domain scores/history)
+        # is per-subject private data. Only return it for an address the actor
+        # may READ; an authenticated cross-tenant caller who cannot read the
+        # subject gets 403 (anon already 401s upstream). /reputation/leaders
+        # and /reputation/stats remain aggregate/public surfaces.
+        _require_read_or_403(request, address)
         profile = _reputation.get_profile(address)
         return profile.to_dict()
 
@@ -3333,6 +3631,15 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
             return HTMLResponse(content=setup_html.read_text(encoding="utf-8"))
         return HTMLResponse(content="<h1>Setup Wizard</h1><p>Setup page not found.</p>")
 
+    @app.get("/login")
+    def login_page():
+        """Serve the sign-in / create-local-account page (public, unauthenticated)."""
+        from fastapi.responses import HTMLResponse
+        login_html = _STATIC_DIR / "login.html"
+        if login_html.exists():
+            return HTMLResponse(content=login_html.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Sign in</h1><p>Login page not found.</p>")
+
     @app.post("/setup/test-provider")
     async def setup_test_provider(body: SetupProviderTest):
         """Test an AI provider connection with the given key or URL.
@@ -3981,6 +4288,14 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
     @app.get("/mesh/nodes")
     async def mesh_list_nodes():
         """List all registered mesh nodes."""
+        # DELIBERATELY SHARED — not per-actor filtered. This is the in-memory
+        # device-mesh registry (compute nodes that connected via /ws/mesh),
+        # not a tenant's private object graph. It exposes only operational
+        # discovery fields (name, capabilities, connection/heartbeat, task
+        # count) for distributed-compute scheduling — a shared operational
+        # surface by design. Anon still 401s upstream (only /mesh/health is
+        # public). If mesh addresses ever carry tenant-private identity, add a
+        # per-actor filter here.
         nodes = []
         for addr, info in _mesh_nodes.items():
             nodes.append({
@@ -4353,31 +4668,105 @@ def create_app(data_dir: str | Path = "data", auth_enabled: bool = False) -> "Fa
         raise HTTPException(404, f"{favoritor} has not favorited {address}")
 
     @app.get("/favorites/by/{entity:path}")
-    def get_entity_favorites(entity: str):
+    def get_entity_favorites(request: _Starlette_Request, entity: str):
         """Get all objects favorited by an entity."""
-        return {"entity": entity, "favorites": _favorites.get_favorites(entity)}
+        # Gate on the ENTITY (favoritor) subject: /favorites/by/{entity}
+        # discloses that the entity has favorited anything at all (its activity
+        # + the size of its favorites list). When the entity is itself a
+        # PRIVATE subject (e.g. a private descendant 1.2.5), a cross-tenant
+        # caller must not learn it has any favorites — even when every favorited
+        # TARGET is readable, the leak is the EXISTENCE/activity of the private
+        # favoritor. Symmetric to the /favorites/of TARGET gate; mirrors
+        # /links/to|from/{private} -> 403. Anon 401s upstream; dev/no-auth
+        # short-circuits open.
+        _require_read_or_403(request, entity)
+        # Per-actor filter: the favorited-address list must not reveal the
+        # existence of private addresses to an anon/cross-tenant caller.
+        favorites = _filter_addresses_for_actor(request, _favorites.get_favorites(entity))
+        return {"entity": entity, "favorites": favorites}
 
     @app.get("/favorites/of/{address:path}")
-    def get_favoritors(address: str):
+    def get_favoritors(request: _Starlette_Request, address: str):
         """Get all entities that favorited an object."""
+        # Gate on the TARGET subject: /favorites/of/{address} discloses that the
+        # subject is favorited at all (favoritors + count + weighted score). When
+        # the target is a single PRIVATE subject (e.g. a private descendant
+        # 1.2.5), a cross-tenant caller must not learn it has any favoritors or a
+        # score — even when the lone favoritor (e.g. the public account root) is
+        # itself readable, the leak is the existence/score of the private TARGET.
+        # Mirrors /links/to/{private} -> 403 and /reputation/{private} -> 403.
+        # Anon 401s upstream; dev/no-auth short-circuits open.
+        _require_read_or_403(request, address)
+        # Per-actor filter: the favoritor list is a plain list of entity
+        # addresses (favorites.get_favoritors -> [str, ...]); a private
+        # favoritor address must not be disclosed to an anon/cross-tenant
+        # caller. Mirrors the sibling /favorites/by filter. Count is derived
+        # from the FILTERED list so it cannot leak the number of hidden
+        # private favoritors either.
+        favoritors = _filter_addresses_for_actor(request, _favorites.get_favoritors(address))
+        # The score is an aggregate over the underlying favorite links; compute
+        # it from only the favorite links whose favoritor this actor may read
+        # so a hidden private favoritor cannot leak via the score. The count is
+        # derived from the already-filtered favoritor LIST (same effect).
         return {
             "address": address,
-            "favoritors": _favorites.get_favoritors(address),
-            "count": _favorites.favorite_count(address),
-            "score": _favorites.weighted_score(address, reputation_system=_reputation),
+            "favoritors": favoritors,
+            "count": len(favoritors),
+            "score": _favorites.weighted_score(
+                address,
+                reputation_system=_reputation,
+                favoritor_filter=_favoritor_read_filter(request),
+            ),
         }
 
     @app.get("/favorites/top")
-    def top_favorites(category: str = "", n: int = 10):
+    def top_favorites(request: _Starlette_Request, category: str = "", n: int = 10):
         """Get top-N favorited objects, optionally filtered by category prefix."""
+        # Pass a per-actor favoritor-read predicate so the counts and weighted
+        # scores in the ranking dicts are computed from ONLY the favorite links
+        # whose favoritor this actor may read — otherwise a hidden private
+        # favorite would leak via the count/score (and could even surface a
+        # target).
+        fav_filter = _favoritor_read_filter(request)
+        # Pass a per-actor TARGET-read predicate so unreadable targets are
+        # dropped BEFORE the top-N slice inside the engine. Without this a
+        # hidden private target would consume a rank slot (n=1 -> [], n=2 ->
+        # public item with rank-1 silently private), leaking its EXISTENCE via
+        # the result size / rank position. The _filter_nodes_for_actor post-pass
+        # below cannot restore a slot already consumed pre-slice, so the
+        # pre-slice filter is the load-bearing fix; the post-filter remains as
+        # defense-in-depth.
+        target_filter = _favoritor_read_filter(request)
         if category:
-            return _favorites.top_in_category(category, n=n, reputation_system=_reputation)
-        return _favorites.top_overall(n=n, reputation_system=_reputation)
+            ranked = _favorites.top_in_category(
+                category, n=n, reputation_system=_reputation,
+                favoritor_filter=fav_filter, target_filter=target_filter,
+            )
+        else:
+            ranked = _favorites.top_overall(
+                n=n, reputation_system=_reputation,
+                favoritor_filter=fav_filter, target_filter=target_filter,
+            )
+        # Per-actor filter (defense-in-depth): graph-wide ranking dicts
+        # ({"address",...}) must not expose private addresses to an
+        # anon/cross-tenant caller.
+        return _filter_nodes_for_actor(request, ranked)
 
     @app.get("/favorites/trending")
-    def trending_favorites(n: int = 10, hours: float = 168.0):
+    def trending_favorites(request: _Starlette_Request, n: int = 10, hours: float = 168.0):
         """Get recently trending favorites."""
-        return _favorites.trending(n=n, window_hours=hours, reputation_system=_reputation)
+        # Per-actor favoritor-read predicate so recent_count/total_count/score
+        # reflect only favorites this actor may see (same rationale as
+        # /favorites/top). The TARGET-read predicate drops unreadable targets
+        # BEFORE the top-N slice so a hidden private target cannot consume a
+        # rank slot and leak its existence via result size / rank position.
+        ranked = _favorites.trending(
+            n=n, window_hours=hours, reputation_system=_reputation,
+            favoritor_filter=_favoritor_read_filter(request),
+            target_filter=_favoritor_read_filter(request),
+        )
+        # Per-actor filter (defense-in-depth; same rationale as /favorites/top).
+        return _filter_nodes_for_actor(request, ranked)
 
     @app.get("/favorites/stats")
     def favorites_stats():

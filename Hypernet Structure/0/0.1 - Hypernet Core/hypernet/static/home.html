@@ -326,8 +326,18 @@
     <div class="status">
       <span>API <i class="dot on" id="apiDot"></i></span>
       <span>Swarm <i class="dot" id="swarmDot"></i></span>
+      <a id="signinLink" href="/login" style="margin-left:12px;color:#7c7cff;font-size:13px;text-decoration:none;">Sign in / Create local account</a>
     </div>
   </header>
+  <script>
+    (function () {
+      var t = localStorage.getItem('access_token');
+      if (t) {
+        var l = document.getElementById('signinLink');
+        if (l) { l.textContent = 'Account'; l.href = '/explorer'; }
+      }
+    })();
+  </script>
 
   <main>
     <section class="panel hero">
