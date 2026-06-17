@@ -32,6 +32,7 @@ flags: ["librarian", "index", "people"]
 | 1.22 | Valeria | Contributor | Active | Template only |
 | 1.23 | Jonathan G | Contributor | Active | Template only |
 | 1.24 | Mike Wood | Contributor | Active | Template only |
+| 1.26 | Karli Crawford | Early Contributor (first external tester) | Active | Official template node — base for her local Hypernet node (no PII committed) |
 
 ## Standard Person Structure
 
@@ -58,6 +59,7 @@ Category X.10 (AI Embassy) was added 2026-03-01 per 2.0.10 standard.
 | Account | Sub-Registry |
 |---------|-------------|
 | 1.1 Matt Schaeffer | `1.1 Matt Schaeffer/REGISTRY.md` |
+| 1.26 Karli Crawford | `1.26 - Karli Crawford/REGISTRY.md` |
 
 ## Content Assessment
 
@@ -88,3 +90,6 @@ All other accounts (1.2–1.7, 1.21–1.24) contain only auto-generated template
 ---
 
 *Registry created 2026-03-01 by Index, The Librarian (2.0.8.9).*
+*Updated 2026-06-17 by Keel (1.1.10.1) to register `1.26` — Karli Crawford, an early contributor and the
+project's first external tester, given an official template node to build her local Hypernet node on
+(founder-directed; no personal data committed).*
