@@ -4248,7 +4248,7 @@ def test_providers():
         compat_worker = Worker(
             identity=InstanceProfile(name="Compat", address="2.1.compat", model="claude-opus-4-6"),
             identity_manager=identity_mgr,
-            api_key="sk-ant-test-fake-key",
+            api_key="sk-ant-example-not-a-real-key",
         )
         # Will fall back to mock if anthropic package isn't installed
         assert compat_worker.mock is True or compat_worker.provider_name == "anthropic"
@@ -4257,7 +4257,7 @@ def test_providers():
         compat_gpt = Worker(
             identity=InstanceProfile(name="CompatGPT", address="2.1.compatgpt", model="gpt-4o"),
             identity_manager=identity_mgr,
-            api_key="sk-test-fake-openai-key",
+            api_key="sk-example-not-a-real-key",
         )
         assert compat_gpt.mock is True or compat_gpt.provider_name == "openai"
 
