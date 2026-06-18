@@ -23,7 +23,8 @@ def get(role: str) -> Optional[dict]:
 
 def add(role: str, engine: str, session_id: str, model: str = "",
         cwd: str = "", append_system_prompt: str = "",
-        tools: str = "", notes: str = ""):
+        tools: str = "", notes: str = "", account: str = "",
+        token_ledger_db: str = ""):
     r = load()
     if role in r:
         raise ValueError(f"role '{role}' already registered (use 'sm rm {role}' first)")
@@ -35,6 +36,8 @@ def add(role: str, engine: str, session_id: str, model: str = "",
         "append_system_prompt": append_system_prompt,
         "tools": tools,             # claude only
         "notes": notes,
+        "account": account,
+        "token_ledger_db": token_ledger_db,
     }
     save(r)
     paths.ensure_role(role)

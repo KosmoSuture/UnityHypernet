@@ -16,8 +16,10 @@ Manages AI session lifecycle on this workstation: spawn, send, monitor, kill.
 
 ```
 python -m session_manager.sm list
+python -m session_manager.sm continuity [--all] [--json] [--stale-after SEC]
+python -m session_manager.sm reentry [--json]
 python -m session_manager.sm status <role>
-python -m session_manager.sm spawn <role> {claude|codex} <session-id> [--model ...] [--tools ...]
+python -m session_manager.sm spawn <role> {claude|codex} <session-id> [--model ...] [--tools ...] [--account ...] [--token-ledger-db ...]
 python -m session_manager.sm send <role> "<prompt>"           # or "@path/to/file.txt"
 python -m session_manager.sm tail <role> [-n N]
 python -m session_manager.sm kill <role>                       # graceful (drops STOP file)
@@ -57,10 +59,33 @@ session_manager/
 
 Bypass flags are honest about the Windows sandbox limitation (`CreateProcessAsUserW: 1312`) — boundary is the spawned instance's stated scope, not the OS sandbox.
 
+## Failure visibility
+
+After each model call, worker status records metadata-only failure fields:
+
+- `last_failure_kind`: `provider_quota_exhausted`, `provider_rate_limited`, `context_limit`, `model_error`, `nonzero_exit`, or empty after success.
+- `retry_after`: provider reset/retry hint when the stream exposes one.
+- `exhaustion_evidence_ref`: stream line number plus line hash, not raw stream text.
+- `continuity_recommended`: `true` only when a Claude-side quota/rate/context failure should be handed to the Codex Continuity Steward queue.
+
+Raw stream tails can contain prompts, tool output, or secrets. Use these status fields for dashboards and Tally continuity markers instead of dumping `stream.jsonl` by default.
+
+`python -m session_manager.sm continuity` prints only lanes with current failure metadata by default.
+Use `--all` to include clean lanes, `--json` when a Codex Continuity Steward needs machine-readable rows,
+and `--stale-after 900` to also surface roles whose heartbeat is more than 15 minutes old.
+
+When `sm spawn` receives `--token-ledger-db`, the worker records a structured `wrapper-unavailable`
+disclosure for each CLI call. This is visibility for the reconciler, not per-call enforcement.
+Without a configured ledger DB, status records `token_disclosure_mode=not_configured`.
+
+`python -m session_manager.sm reentry --json` emits a read-only Codex-to-Tally packet with current
+`git status --short`, continuity rows, and recent coordination notes. It is meant for Claude/Tally
+return after token exhaustion; it does not record verdicts or execute recovery.
+
 ## What v1 does NOT do (named honestly, deferred)
 
 - Autonomous spawn/respawn loop (correctly deferred; human/panel in loop for each Tier-A)
-- Token-budget enforcement at the model-call level beyond what `token_accounting/` wrapper provides (T.4 integration is a follow-up)
+- Token-budget enforcement at the model-call level beyond status classification and what `token_accounting/` wrapper provides (T.4 integration is a follow-up)
 - Survive Windows reboot (workers don't auto-restart)
 - Dashboard UI (`sm list` is the dashboard)
 - Manage instances launched outside sm (need to re-launch under sm to be visible)

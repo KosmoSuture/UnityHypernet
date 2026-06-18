@@ -14,6 +14,7 @@ Commands:
     sm spawn-cmd <role> ...        — print the spawn command (for manual run)
 """
 import argparse
+import calendar
 import json
 import os
 import shlex
@@ -21,10 +22,22 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 from . import audit, paths, roster
 
 def _now_iso():
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def _run_text(cmd: list[str], cwd: Optional[str] = None) -> str:
+    try:
+        out = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=8)
+    except Exception:
+        return ""
+    if out.returncode != 0:
+        return ""
+    return out.stdout.strip()
+
 
 def _is_worker_alive(role: str) -> bool:
     """Check if worker PID exists and is running."""
@@ -69,6 +82,168 @@ def cmd_list(args):
         pending = st.get("pending_commands", "?")
         print(f"{role:<14} {cfg['engine']:<7} {state:<8} {alive:<5} {str(pid):<7} "
               f"{hb:<21} {str(pending):<5} {resume_sid:<38} {last_result:<36}")
+
+
+def _heartbeat_age_sec(heartbeat: str) -> Optional[int]:
+    if not heartbeat or heartbeat == "?":
+        return None
+    try:
+        hb_epoch = calendar.timegm(time.strptime(heartbeat, "%Y-%m-%dT%H:%M:%SZ"))
+    except ValueError:
+        return None
+    return max(0, int(time.time() - hb_epoch))
+
+
+def _continuity_rows(show_all: bool = False, stale_after_sec: int = 0) -> list[dict]:
+    rows = []
+    for role, cfg in sorted(roster.load().items()):
+        st = audit.read_status(role)
+        failure = st.get("last_failure_kind", "") or ""
+        recommended = bool(st.get("continuity_recommended", False))
+        hb = st.get("heartbeat", "?")
+        age = _heartbeat_age_sec(hb)
+        stale = stale_after_sec > 0 and (age is None or age > stale_after_sec)
+        if not show_all and not (recommended or failure or stale):
+            continue
+        rows.append({
+            "role": role,
+            "engine": cfg.get("engine", ""),
+            "state": st.get("state", "?"),
+            "recommended": recommended,
+            "failure": failure or "-",
+            "retry_after": st.get("retry_after", "") or "-",
+            "pending": st.get("pending_commands", "?"),
+            "evidence": st.get("exhaustion_evidence_ref", "") or "-",
+            "disclosure": st.get("token_disclosure_mode", "") or "-",
+            "heartbeat": hb,
+            "heartbeat_age_sec": age,
+            "stale": stale,
+        })
+    return rows
+
+
+def cmd_continuity(args):
+    rows = _continuity_rows(show_all=args.all, stale_after_sec=args.stale_after)
+    if args.json:
+        print(json.dumps(rows, indent=2, sort_keys=True))
+        return 0
+    if not rows:
+        print("(no continuity-relevant failures recorded)")
+        return 0
+    hdr = (f"{'ROLE':<14} {'ENG':<7} {'STATE':<8} {'HANDOFF':<7} "
+           f"{'STALE':<6} {'AGE':<7} {'FAILURE':<26} {'RETRY':<12} {'PEND':<5} "
+           f"{'DISCLOSURE':<14} {'EVIDENCE'}")
+    print(hdr)
+    print("-" * len(hdr))
+    for row in rows:
+        handoff = "YES" if row["recommended"] else "-"
+        stale = "YES" if row["stale"] else "-"
+        age = "-" if row["heartbeat_age_sec"] is None else str(row["heartbeat_age_sec"])
+        print(f"{row['role']:<14} {row['engine']:<7} {row['state']:<8} {handoff:<7} "
+              f"{stale:<6} {age:<7} {row['failure']:<26} {row['retry_after']:<12} "
+              f"{str(row['pending']):<5} {row['disclosure']:<14} {row['evidence']}")
+    return 0
+
+
+def _default_coordination_dir() -> Path:
+    return (paths.ROOT.parent / "Hypernet Structure" / "2 - AI Accounts" /
+            "Messages" / "coordination")
+
+
+def _git_head(cwd: str) -> str:
+    return _run_text(["git", "-C", cwd, "rev-parse", "--short", "HEAD"])
+
+
+def _git_status_lines(cwd: str) -> list[str]:
+    out = _run_text(["git", "-C", cwd, "status", "--short"])
+    return [line for line in out.splitlines() if line.strip()]
+
+
+def _recent_coordination_notes(coordination_dir: Path, limit: int = 8) -> list[dict]:
+    if not coordination_dir.exists():
+        return []
+    files = [p for p in coordination_dir.iterdir() if p.is_file() and p.suffix.lower() == ".md"]
+    files.sort(key=lambda p: (p.stat().st_mtime, p.name), reverse=True)
+    notes = []
+    for p in files[:max(0, limit)]:
+        st = p.stat()
+        notes.append({
+            "name": p.name,
+            "path": str(p),
+            "modified_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime)),
+        })
+    return notes
+
+
+def _build_reentry_packet(cwd: str, coordination_dir: Path,
+                          notes_limit: int = 8, stale_after_sec: int = 900) -> dict:
+    return {
+        "object_type": "codex_to_tally_reentry",
+        "generated_at": _now_iso(),
+        "current_head": _git_head(cwd),
+        "dirty_files": _git_status_lines(cwd),
+        "continuity_rows": _continuity_rows(show_all=True, stale_after_sec=stale_after_sec),
+        "recent_coordination_notes": _recent_coordination_notes(coordination_dir, notes_limit),
+        "completed_by_codex": [],
+        "tests_run": [],
+        "open_decisions_for_tally": [
+            "Review Codex continuity deltas and decide whether Packet 04 should be adopted, revised, or discarded.",
+        ],
+        "held_for_gate_or_matt": [
+            "Durable always-up launch, watchdog restart, pushes, grants, and final gate actions remain held.",
+        ],
+        "recommended_first_tally_action": [
+            "Read the newest Codex continuity handoff/update note, then review only the changed files and open decisions.",
+        ],
+    }
+
+
+def _print_reentry_markdown(packet: dict) -> None:
+    print("codex_to_tally_reentry:")
+    print(f"  generated_at: \"{packet['generated_at']}\"")
+    print(f"  current_head: \"{packet['current_head']}\"")
+    print("  dirty_files:")
+    if packet["dirty_files"]:
+        for item in packet["dirty_files"]:
+            print(f"    - \"{item}\"")
+    else:
+        print("    - \"\"")
+    print("  continuity_rows:")
+    if packet["continuity_rows"]:
+        for row in packet["continuity_rows"]:
+            print(f"    - role: \"{row['role']}\"")
+            print(f"      engine: \"{row['engine']}\"")
+            print(f"      state: \"{row['state']}\"")
+            print(f"      continuity_recommended: {str(row['recommended']).lower()}")
+            print(f"      stale: {str(row['stale']).lower()}")
+            print(f"      failure: \"{row['failure']}\"")
+    else:
+        print("    - {}")
+    print("  recent_coordination_notes:")
+    for note in packet["recent_coordination_notes"]:
+        print(f"    - \"{note['name']}\"")
+    print("  open_decisions_for_tally:")
+    for item in packet["open_decisions_for_tally"]:
+        print(f"    - \"{item}\"")
+    print("  held_for_gate_or_matt:")
+    for item in packet["held_for_gate_or_matt"]:
+        print(f"    - \"{item}\"")
+    print("  recommended_first_tally_action:")
+    for item in packet["recommended_first_tally_action"]:
+        print(f"    - \"{item}\"")
+
+
+def cmd_reentry(args):
+    cwd = args.cwd or str(paths.ROOT.parent)
+    coord = Path(args.coordination_dir) if args.coordination_dir else _default_coordination_dir()
+    packet = _build_reentry_packet(cwd, coord, notes_limit=args.notes,
+                                   stale_after_sec=args.stale_after)
+    if args.json:
+        print(json.dumps(packet, indent=2, sort_keys=True))
+    else:
+        _print_reentry_markdown(packet)
+    return 0
+
 
 def cmd_status(args):
     st = audit.read_status(args.role)
@@ -130,6 +305,8 @@ def cmd_spawn(args):
         append_system_prompt=args.append_system_prompt or "",
         tools=args.tools or "",
         notes=args.notes or "",
+        account=args.account or "",
+        token_ledger_db=args.token_ledger_db or "",
     )
     # Clear any stale STOP file
     sf = paths.stop_file(args.role)
@@ -168,7 +345,16 @@ def cmd_send(args):
         prompt = args.prompt
         source = "inline"
     ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-    cmd_file = paths.commands_dir(args.role) / f"{ts}-{args.tag or 'cmd'}.txt"
+    # Sanitize the tag to filename-safe chars. Windows forbids : * ? " < > | / \
+    # in filenames; a ':' in a tag previously produced an NTFS alternate-data-stream
+    # and a suffix-less file that _list_commands (.txt/.md only) silently skipped —
+    # so the command was queued, counted as 0 pending, and never executed. Replace
+    # anything unsafe with '-' so every queued command is a real, discoverable file.
+    raw_tag = args.tag or "cmd"
+    safe_tag = "".join(c if (c.isalnum() or c in "._-") else "-" for c in raw_tag)[:60] or "cmd"
+    if safe_tag != raw_tag:
+        print(f"note: tag sanitized to '{safe_tag}' (filename-safe)")
+    cmd_file = paths.commands_dir(args.role) / f"{ts}-{safe_tag}.txt"
     cmd_file.write_text(prompt, encoding="utf-8")
     audit.audit("command_queued", role=args.role, command_file=str(cmd_file),
                 source=source, prompt_chars=len(prompt))
@@ -265,6 +451,13 @@ def cmd_recover(args):
     print(f"last_command_sha   : {st.get('last_command_completed_sha', '(none)') or '(none)'}")
     print(f"last_call_exit_code: {st.get('last_call_exit_code', '(none)')}")
     print(f"last_call_dur_ms   : {st.get('last_call_duration_ms', '(none)')}")
+    print(f"last_failure_kind  : {st.get('last_failure_kind', '(none)') or '(none)'}")
+    print(f"retry_after        : {st.get('retry_after', '(none)') or '(none)'}")
+    print(f"continuity_rec     : {st.get('continuity_recommended', False)}")
+    print(f"evidence_ref       : {st.get('exhaustion_evidence_ref', '(none)') or '(none)'}")
+    print(f"token_disclosure   : {st.get('token_disclosure_mode', '(none)') or '(none)'}")
+    print(f"token_disclosure_id: {st.get('token_disclosure_id', '(none)') or '(none)'}")
+    print(f"token_disc_error   : {st.get('token_disclosure_error', '(none)') or '(none)'}")
     print(f"pending commands   : {st.get('pending_commands', '?')}")
     print()
     print(f"--- RESUME COMMAND HINT ---")
@@ -283,6 +476,22 @@ def build_parser():
 
     sub.add_parser("list").set_defaults(func=cmd_list)
 
+    s = sub.add_parser("continuity", help="show metadata-only provider failures and Codex handoff recommendations")
+    s.add_argument("--all", action="store_true", help="include roles without current failures")
+    s.add_argument("--json", action="store_true", help="emit JSON rows")
+    s.add_argument("--stale-after", type=int, default=0, metavar="SEC",
+                   help="also include roles whose heartbeat is older than SEC seconds; 0 disables stale checks")
+    s.set_defaults(func=cmd_continuity)
+
+    s = sub.add_parser("reentry", help="emit a read-only Codex-to-Tally re-entry packet")
+    s.add_argument("--cwd", default=str(paths.ROOT.parent), help="repository/workspace root to inspect")
+    s.add_argument("--coordination-dir", default="", help="coordination notes directory")
+    s.add_argument("-n", "--notes", type=int, default=8, help="number of recent coordination notes to list")
+    s.add_argument("--stale-after", type=int, default=900, metavar="SEC",
+                   help="mark continuity rows stale when heartbeat age exceeds SEC")
+    s.add_argument("--json", action="store_true", help="emit JSON packet")
+    s.set_defaults(func=cmd_reentry)
+
     s = sub.add_parser("status")
     s.add_argument("role")
     s.set_defaults(func=cmd_status)
@@ -296,6 +505,8 @@ def build_parser():
     s.add_argument("--append-system-prompt", default="")
     s.add_argument("--tools", default="")
     s.add_argument("--notes", default="")
+    s.add_argument("--account", default="", help="account label for token disclosures, e.g. 2.6")
+    s.add_argument("--token-ledger-db", default="", help="optional token_accounting SQLite DB for unmetered disclosures")
     s.set_defaults(func=cmd_spawn)
 
     s = sub.add_parser("send")
