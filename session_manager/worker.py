@@ -608,7 +608,9 @@ def run(role: str):
     #   The recovery/state vars are the FIRST statements inside the try; they are pure literal assignments
     #   that cannot raise, so the except/finally always have them defined.
     try:
-        last_heartbeat = time.time()
+        # Pure-literal assignments FIRST (cannot raise), so the except/finally always have every field it
+        # depends on. last_heartbeat uses time.time() (a call) so it goes LAST among the inits — the except
+        # path does not reference it. [reverify2 R1: strict literal-first shape.]
         last_command_completed_sha = ""
         last_call_exit_code = None
         last_call_duration_ms = 0
@@ -618,6 +620,7 @@ def run(role: str):
             "token_disclosure_id": "",
             "token_disclosure_error": "",
         }
+        last_heartbeat = time.time()
         paths.worker_pid(role).write_text(str(os.getpid()), encoding="utf-8")
         # First heartbeat — recovery-ready from second one
         audit.audit("worker_start", role=role, pid=os.getpid(),
