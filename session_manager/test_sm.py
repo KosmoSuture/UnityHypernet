@@ -623,6 +623,40 @@ class TestSM(unittest.TestCase):
         held.release()
         print("  PASS  singleton lock refuses a second PROCESS (cross-process)")
 
+    def test_singleton_lock_released_on_process_kill(self):
+        # R2 coverage: the CORE property — when the holding process is KILLED (no orderly release), the
+        # kernel auto-releases the lock so a replacement can reclaim the role. Real child, real kill.
+        import subprocess
+        from session_manager.worker_lock import SingletonLock
+        lf = self.tmp / "kill.lock"
+        repo = str(Path(__file__).resolve().parent.parent)
+        child = ("import sys,time; sys.path.insert(0, r'%s'); from session_manager.worker_lock import "
+                 "SingletonLock; l=SingletonLock(r'%s'); print('LOCKED' if l.acquire() else 'FAIL', "
+                 "flush=True); time.sleep(60)" % (repo, str(lf)))
+        proc = subprocess.Popen([sys.executable, "-c", child], stdout=subprocess.PIPE, text=True)
+        try:
+            self.assertEqual((proc.stdout.readline() or "").strip(), "LOCKED", "child must hold the lock")
+            self.assertFalse(SingletonLock(lf).acquire(), "must be refused while the child holds the lock")
+            proc.kill()
+            proc.wait(timeout=10)
+            reclaimed = False
+            for _ in range(30):  # kernel release can lag a beat after death
+                probe = SingletonLock(lf)
+                if probe.acquire():
+                    probe.release()
+                    reclaimed = True
+                    break
+                time.sleep(0.1)
+            self.assertTrue(reclaimed, "the lock must be reclaimable after the holder is KILLED")
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+            try:
+                proc.stdout.close()
+            except Exception:
+                pass
+        print("  PASS  singleton lock auto-released on process KILL (kernel release; real subprocess)")
+
     def test_supervisor_real_launch_imports(self):
         # P0 fix: the exact supervisor relaunch invocation must IMPORT from its cwd (not ModuleNotFoundError).
         import subprocess

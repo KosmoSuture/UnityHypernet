@@ -602,20 +602,22 @@ def run(role: str):
               f"(pid {existing or '?'}); refusing to start (singleton lock)", file=sys.stderr)
         audit.audit("worker_refused_startup_singleton_lock_held", role=role, existing_pid=existing)
         sys.exit(4)
-    # Recovery/state vars pre-initialized BEFORE the try, so the except/finally always have them defined.
-    last_heartbeat = time.time()
-    last_command_completed_sha = ""
-    last_call_exit_code = None
-    last_call_duration_ms = 0
-    last_failure = {}
-    last_disclosure = {
-        "token_disclosure_mode": "not_configured",
-        "token_disclosure_id": "",
-        "token_disclosure_error": "",
-    }
-    # ★ P1 (adversary fix): the try/finally that releases the singleton lock + cleans worker.pid must wrap
-    #   EVERY post-acquire startup step, so a startup exception still releases the lock (no wedge).
+    # ★ P1 (adversary fix, reverify R1): the try/finally that releases the singleton lock + cleans
+    #   worker.pid begins IMMEDIATELY after a successful acquire — no post-acquire/pre-try gap — so EVERY
+    #   post-acquire startup step is covered and a startup exception still releases the lock (no wedge).
+    #   The recovery/state vars are the FIRST statements inside the try; they are pure literal assignments
+    #   that cannot raise, so the except/finally always have them defined.
     try:
+        last_heartbeat = time.time()
+        last_command_completed_sha = ""
+        last_call_exit_code = None
+        last_call_duration_ms = 0
+        last_failure = {}
+        last_disclosure = {
+            "token_disclosure_mode": "not_configured",
+            "token_disclosure_id": "",
+            "token_disclosure_error": "",
+        }
         paths.worker_pid(role).write_text(str(os.getpid()), encoding="utf-8")
         # First heartbeat — recovery-ready from second one
         audit.audit("worker_start", role=role, pid=os.getpid(),
