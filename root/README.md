@@ -22,13 +22,17 @@ A `Signature and comment signature verified` result means the file was signed by
 private key (Matt).
 
 ## ★ Honest status (real vs pending — do not overclaim)
-- ✅ **Genesis public key placed + committed.** Matt holds the private key offline.
-- ⏳ **Branch protection on `/root/` — MATT'S ACTION (GitHub settings).** Until you enable it (require
-  CODEOWNERS review + block force-push on the `root/` path), an AI writer with push access could overwrite
-  this file. **The root is NOT yet tamper-proof against an AI writer until branch protection is on.**
-- ⏳ **First anchor head not yet signed.** Next: Matt signs the current T.4 ledger head → `root/anchor_head.sig`.
-- ⏳ **Bootstrap/TOFU:** publish this fingerprint via a second channel so verifiers trust it arrived honestly
-  (per `2.7.40` §6).
+- ✅ **Genesis public key published here.** Matt holds the private key offline.
+- ★ **Authoritative home = the branch-protected `hypernet-audit-anchors` repo** (decision 2026-06-21).
+  That repo already has force-push + deletion disabled, so it sidesteps the PR-vs-direct-push problem on
+  `main`. **This main-repo copy is a published MIRROR** — and multi-venue publication of the fingerprint
+  actually *strengthens* the bootstrap/TOFU trust (anyone can cross-check the same key across both repos).
+- ⏳ **Establishing the genesis in the authoritative protected repo is a FOUNDER action** (fittingly: the
+  human plants the root, not the AI). Pending Matt's placement.
+- ⏳ **First anchor head not yet signed.** Next: Matt signs the current T.4 ledger head → `anchor_head.sig`
+  in the authoritative repo.
+- Honest caveat: per `2.7.40` §6, the anchor repo's `enforce_admins=false` means a repo admin retains a
+  break-glass path — state this beside any "immutable" claim.
 
 ## Provenance
 Per `2.7.40` (Non-AI-Writable Root of Trust). Genesis established 2026-06-20 by Matt (key) + Keel (placement).
