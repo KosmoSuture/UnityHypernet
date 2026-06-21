@@ -1,0 +1,5 @@
+# Root of trust — changes to the trust root require the founder's explicit review.
+# Pair this with GitHub branch protection (require CODEOWNERS review, block force-push,
+# include administrators) on the paths below. Per 2.7.40 (Non-AI-Writable Root of Trust).
+/root/            @KosmoSuture
+.github/CODEOWNERS @KosmoSuture
