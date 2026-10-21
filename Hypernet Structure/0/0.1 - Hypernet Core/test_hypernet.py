@@ -5607,7 +5607,7 @@ def test_trust_ledger_real_data_sources_require_active_permission_grant():
             scope_justifications={
                 "gmail.readonly": "Read-only message access is sufficient to verify the claim source.",
             },
-            expires_at="2026-06-30T00:00:00Z",
+            expires_at="2099-01-01T00:00:00Z",
             revocation_path="Revoke fixture Gmail readonly consent.",
             credential_locator="vault://fixture/gmail-real-data",
             issued_at="2026-05-30T23:00:00Z",
@@ -5711,7 +5711,7 @@ def test_continuity_real_data_restore_requires_active_permission_grant():
             scope_justifications={
                 "files.metadata.read": "Metadata read is enough; file write/content scopes are not needed.",
             },
-            expires_at="2026-06-30T00:00:00Z",
+            expires_at="2099-01-01T00:00:00Z",
             revocation_path="Revoke fixture Dropbox metadata consent.",
             credential_locator="vault://fixture/dropbox-real-data",
             issued_at="2026-05-30T23:05:00Z",

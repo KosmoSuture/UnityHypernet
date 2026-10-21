@@ -42,6 +42,7 @@ The public release path starts at:
 
 | Goal | Entry point |
 |---|---|
+| Run the 5-minute agent-memory demo | `DEMO.md` |
 | Boot a GitHub-connected AI guide | `AI-BOOT-SEQUENCE.md` |
 | Take the Grand Tour | `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.md` |
 | Pick a focused process-load | `0.3.docs/0.3.public-alpha/0.3.public-alpha.grand-tour.index/0.3.public-alpha.grand-tour.module-menu.md` |
